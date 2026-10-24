@@ -1,0 +1,107 @@
+/* Inter: next/font in layout.tsx (preloaded, size-matched fallback), as --font-inter. */
+body { font-feature-settings: "cv11", "ss03", "calt"; -webkit-font-smoothing: antialiased; }
+/* Round 6: a bare <small> never falls under 12 px (the browser default is "smaller", i.e. 10 px inside 12 px text). */
+:where(small) { font-size: max(12px, 0.85em); }
+
+
+/* Phones and the Pulse phone app (MOBILE-SHELL). Safe areas come from env() only (POLISH-1). The Pulse app's shell
+   (Capacitor) also injects --safe-area-inset-*, but always with the window's full insets: where Android had already
+   placed the page below the status bar (Android 14 and older, phone app 1.1.0/1.1.1) env() is 0 and that variable
+   added the status bar a second time, an empty band above the header. env() is right wherever the page itself
+   reaches under a bar (Android edge to edge, iPhone, phone browsers) and 0 wherever the system already made room. */
+:root {
+  --pulse-safe-top: env(safe-area-inset-top, 0px);
+  --pulse-safe-right: env(safe-area-inset-right, 0px);
+  --pulse-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --pulse-safe-left: env(safe-area-inset-left, 0px);
+}
+/* Inside the app: no browser feel. Interface text is not selectable and taps do not flash; what people type, read
+   and copy (fields, messages, documents) stays selectable. Long-press on links and images opens nothing. */
+html[data-shell] { -webkit-text-size-adjust: 100%; overscroll-behavior-y: none; }
+html[data-shell] body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html[data-shell] :is(input, textarea, select, [contenteditable="true"], [data-selectable], pre, code, blockquote, article p, .pulse-print-root) { -webkit-user-select: text; user-select: text; }
+html[data-shell] :is(a, img) { -webkit-user-drag: none; }
+/* Any row that scrolls sideways (tabs, segmented controls, filter chips) fades out where it continues; AppFeel sets
+   data-more from its scroll position. */
+[data-more="end"] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 44px), transparent); }
+[data-more="start"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 44px); mask-image: linear-gradient(90deg, transparent, #000 44px); }
+[data-more="both"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 44px, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(90deg, transparent, #000 44px, #000 calc(100% - 44px), transparent); }
+@media (max-width: 899.98px) {
+  /* 16 px fields never trigger the phone's zoom-on-focus; buttons and fields are at least 44 px tall. */
+  main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) { font-size: 16px; }
+  main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select) { min-height: 44px; }
+  [role="dialog"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) { font-size: 16px; min-height: 44px; }
+  /* EST-1200: a checkbox or radio is pressed through its label, which is at least 44 px tall (flex and block labels). */
+  label:has(> input:is([type="checkbox"], [type="radio"])) { min-height: 44px; }
+}
+/* Print / Save as PDF on a policy (HR desk or My desk → Policies) prints only the document's print copy, in ink on paper,
+   whatever the theme on screen. */
+.pulse-print-root { display: none; }
+@media print {
+  html:has(.pulse-print-root), html:has(.pulse-print-root) body { height: auto !important; min-height: 0 !important; overflow: visible !important; background: #fff !important; }
+  body:has(> .pulse-print-root) > :not(.pulse-print-root) { display: none !important; }
+  .pulse-print-root { display: block; --theme-text: #000; --theme-text-muted: #444; --theme-border: #bbb; --theme-border-strong: #999; --theme-surface: #fff; --theme-surface-subtle: #eee; --theme-action: #000; --theme-warning: #6b4a00; color: #000; }
+  @page { margin: 16mm 14mm; }
+}
+
+/* PRESENCE-ONBOARD: the header's one-tap check-in sits beside the inbox bell; page header actions make room for it. */
+html[data-checkin] [data-has-utilities="true"] { --pulse-utility-width: 276px; }
+
+/* LAYOUT-SWEEP (11 Oct 2026): thin scrollbars that keep out of the way, app-wide. A scroll area shows a slim thumb while
+   the pointer is over it (or focus is inside it) and nothing at rest; the gutter stays, so nothing shifts when it
+   appears. Touch screens keep their own overlay scrollbars. Rows that scroll sideways keep their faded edges. */
+@media (hover: hover) and (pointer: fine) {
+  :root { --pulse-scroll-thumb: color-mix(in srgb, var(--theme-text, #17123a) 22%, transparent); }
+  * { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+  *:hover, *:focus-within { scrollbar-color: var(--pulse-scroll-thumb) transparent; }
+  html [data-round11], html [data-round11] * { scrollbar-width: thin; }
+}
+
+/* UX-5B: "Go there". The spotlit anchor glows with an outline and a soft ring (its own size never changes, so nothing
+   around it moves) and pulses three times; with reduced motion it only glows. The coach mark is go.tsx's. */
+[data-spotlight] {
+  border-radius: 10px;
+  outline: 2px solid var(--theme-action);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--theme-action) 16%, transparent);
+  transition: outline-color 0.3s ease, box-shadow 0.3s ease;
+}
+[data-spotlight="on"] { animation: pulse-spot 1.3s ease-in-out 3; }
+@keyframes pulse-spot {
+  0%, 100% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--theme-action) 14%, transparent); }
+  50% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--theme-action) 4%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { [data-spotlight] { animation: none !important; transition: none; } }
+/* UX-5B: "Open beside": the page makes room for the task pane (companion.tsx sets the width). */
+html[data-beside] body { margin-right: var(--pulse-beside, 0px); }
+
+/* E2E-4P: while the on-screen keyboard is up (keyboard.tsx; the page is resized above it) the phone's tab bar steps
+   away, so the composer, a form's buttons or a sheet's footer sit right above the keyboard. */
+:root[data-keyboard="open"] nav[aria-label="Mobile navigation"] { display: none !important; }
+
+/* UI-UPGRADE (owner, 24 Oct 2026: "native selects everywhere"): every native select inside a page or a dialog looks
+   like the kit's Select (height, radius, border, focus ring, colours in light and dark). Where the browser supports a
+   customizable select (Chrome and the Android app's WebView), its list is Pulse's own too: a card with rounded rows, the
+   chosen one ticked, keyboard as before. A page's own class still sets the size; elsewhere the browser's list shows. */
+:where(main, [role="dialog"]) select:not([multiple]):not([size]) {
+  min-height: 36px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 9px; background-color: var(--theme-surface);
+  color: var(--theme-text); font: inherit; font-size: 14px; cursor: pointer; transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+:where(main, [role="dialog"]) select:not([multiple]):not([size]):hover:not(:disabled) { border-color: var(--theme-border-strong); }
+:where(main, [role="dialog"]) select:not([multiple]):not([size]):focus-visible { outline: none; border-color: var(--theme-action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 16%, transparent); }
+:where(main, [role="dialog"]) select:not([multiple]):not([size]):disabled { background-color: var(--theme-disabled-surface); color: var(--theme-disabled-text); cursor: not-allowed; }
+@supports (appearance: base-select) {
+  :where(main, [role="dialog"]) select:not([multiple]):not([size]) { appearance: base-select; display: inline-flex; align-items: center; gap: 8px; }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size])::picker-icon { color: var(--theme-text-muted); transition: rotate 180ms ease; }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size]):open::picker-icon { rotate: 180deg; }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size])::picker(select) {
+    appearance: base-select; margin-block: 4px; padding: 4px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: var(--theme-text);
+    box-shadow: 0 18px 44px rgb(15 18 40 / 18%), 0 2px 6px rgb(15 18 40 / 8%); max-height: min(360px, 60vh); min-width: anchor-size(width); }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size]) option { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 6px 10px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size]) option:is(:hover, :focus-visible) { background: var(--theme-surface-subtle); outline: none; }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size]) option:checked { color: var(--theme-action); font-weight: 600; }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size]) option::checkmark { order: 1; margin-left: auto; color: var(--theme-action); }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size]) option:disabled { color: var(--theme-disabled-text); cursor: not-allowed; }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size]) optgroup { padding-top: 4px; color: var(--theme-text-muted); font-size: 12px; font-weight: 650; }
+  :where(main, [role="dialog"]) select:not([multiple]):not([size]) optgroup option { color: var(--theme-text); font-weight: 400; }
+}

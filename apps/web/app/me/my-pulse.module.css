@@ -1,0 +1,167 @@
+/* My Pulse (LIFECYCLE part 5): the person's own home. Short, warm, phone-first: one column on a phone, a calm grid on
+   a computer that scrolls inside the page body. */
+.home { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.hello { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0; }
+.hello h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.hello p { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.checkIn { display: grid; gap: 12px; margin-bottom: 12px; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.stack { display: grid; gap: 12px; min-width: 0; }
+.card { display: grid; gap: 10px; min-width: 0; padding: 14px; border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); }
+.card > header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.card h3 { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 14px; font-weight: 650; }
+.card h3 svg { color: var(--theme-action); }
+.card > header a, .card > header small { color: var(--theme-text-muted); font-size: 12px; }
+.big { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.big div { display: grid; gap: 1px; min-width: 0; padding: 8px 10px; border-radius: 12px; background: var(--theme-surface-subtle); }
+.big dt { order: 2; overflow: hidden; color: var(--theme-text-muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+.big dd { order: 1; margin: 0; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 10px; padding: 7px 0; border-bottom: 1px solid var(--theme-border); font-size: 13px; }
+.list li:last-child { border-bottom: 0; }
+.list li > span { display: grid; min-width: 0; }
+.list li b { overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.list small, .muted { color: var(--theme-text-muted); font-size: 12px; }
+.late { color: var(--theme-warning); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; background: var(--theme-surface-subtle); font-size: 12px; }
+.chips span[data-new] { background: color-mix(in srgb, var(--theme-success) 16%, var(--theme-surface)); }
+.kudos { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.kudos li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; align-items: start; font-size: 13px; }
+.kudos q { quotes: "“" "”"; }
+.kudos small { display: block; color: var(--theme-text-muted); font-size: 11.5px; }
+.facts { display: grid; gap: 0; margin: 0; }
+.facts div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 8px; padding: 7px 0; border-bottom: 1px solid var(--theme-border); }
+.facts div:last-child { border-bottom: 0; }
+.facts dt { color: var(--theme-text-muted); font-size: 12px; }
+.facts dd { grid-column: 1; margin: 0; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.facts dd small { display: block; color: var(--theme-text-muted); font-size: 11.5px; font-weight: 400; }
+.facts button { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+.empty { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.form { display: grid; gap: 10px; }
+.form label { display: grid; gap: 4px; color: var(--theme-text-muted); font-size: 12px; }
+.form input, .form select, .form textarea { min-height: 36px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; }
+.form textarea { min-height: 80px; padding: 8px 10px; resize: vertical; }
+
+/* LAYOUT-SWEEP: no inner scroll window; the page scrolls (ui.module.css lets a fit page scroll when it must). */
+@media (max-width: 1179.98px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 759.98px) { .grid { grid-template-columns: minmax(0, 1fr); } .big dd { font-size: 18px; } .big dt { white-space: normal; } }
+
+/* ---------- UX-5A: My desk in order of priority. Today, due today and waiting for you on top; the week; compact tiles. */
+.top { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+.top > * { min-width: 0; }
+.top > .card { align-content: start; }
+.todaySlot { display: grid; min-width: 0; }
+.todaySlot > * { min-width: 0; }
+.card .empty { display: flex; align-items: center; gap: 7px; }
+.card .empty svg { flex: none; color: var(--theme-success); }
+.more { color: var(--theme-action); font-size: 12.5px; font-weight: 550; text-decoration: none; }
+.waits { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.waits a { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border-radius: 12px;
+  background: var(--theme-surface-subtle); color: var(--theme-text); text-decoration: none; }
+.waits a:hover { background: color-mix(in srgb, var(--theme-action) 8%, var(--theme-surface)); }
+.waits a > svg { color: var(--theme-action); }
+.waits span { display: grid; min-width: 0; font-size: 13px; font-weight: 600; }
+.waits small { color: var(--theme-text-muted); font-size: 11.5px; font-weight: 400; }
+.waits b { min-width: 26px; padding: 2px 8px; border-radius: 999px; background: var(--theme-action); color: var(--theme-action-text); font-size: 12.5px; text-align: center; font-variant-numeric: tabular-nums; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.stats div { display: grid; gap: 1px; min-width: 104px; padding: 8px 12px; border-radius: 12px; background: var(--theme-surface-subtle); }
+.stats dt { order: 2; color: var(--theme-text-muted); font-size: 11.5px; }
+.stats dd { order: 1; margin: 0; font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.tile { position: relative; display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); }
+.tile[data-tone="attention"] { border-color: color-mix(in srgb, var(--theme-warning) 45%, var(--theme-border)); }
+.tileBtn { display: grid; gap: 4px; min-width: 0; padding: 12px 14px; border: 0; border-radius: 16px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.tileBtn:hover:not(:disabled) { background: color-mix(in srgb, var(--theme-surface-subtle) 60%, transparent); }
+.tileBtn:disabled { cursor: default; }
+.tileBtn:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; }
+.tileHead { display: flex; align-items: center; gap: 7px; color: var(--theme-text-muted); font-size: 12.5px; font-weight: 600; }
+.tileHead svg { color: var(--theme-action); }
+.tileFigure { display: flex; align-items: baseline; gap: 6px; }
+.tileFigure b { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tileFigure small { color: var(--theme-text-muted); font-size: 12px; }
+/* RELEASE-5: two lines, so a tile's sentence is read whole at 1440 (one line cut "Payslips appear when HR is…"). */
+.tileLine { display: -webkit-box; overflow: hidden; color: var(--theme-text-muted); font-size: 12.5px; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow-wrap: anywhere; }
+.tileAside { display: flex; margin-top: auto; padding: 0 12px 10px; }
+.tileAside button, .tileAside a { height: 30px; font-size: 12.5px; }
+.subhead { margin: 14px 0 4px; color: var(--theme-text-muted); font-size: 11.5px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+.todayChip { align-content: start; }
+.chip { display: inline-flex; align-items: center; gap: 6px; justify-self: start; margin: 0; padding: 5px 11px; border-radius: 999px; background: color-mix(in srgb, var(--theme-success) 12%, var(--theme-surface)); font-size: 13px; font-weight: 600; }
+.chip svg { color: var(--theme-success); }
+.formField { display: grid; gap: 4px; color: var(--theme-text-muted); font-size: 12px; }
+@media (max-width: 1179.98px) { .top { grid-template-columns: repeat(2, minmax(0, 1fr)); } .top > :first-child { grid-column: 1 / -1; } }
+@media (max-width: 759.98px) {
+  .top { grid-template-columns: minmax(0, 1fr); }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .tileBtn { padding: 11px 12px; }
+  .stats div { flex: 1 1 96px; min-width: 0; }
+}
+/* UX-5A: a long title in a list ends in "…" instead of pushing the page sideways on a phone. */
+.list li > span > a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list li > span > a b { white-space: nowrap; }
+
+/* ---------- OWNER WORKBENCH (21 Oct 2026): My desk feels like home ---------- */
+/* A personal hero, one Today card, the week as one strip, and five tiles of one shape with a tinted icon each. */
+.home { gap: 16px; }
+.hero { position: relative; display: flex; align-items: center; gap: 16px; padding: 20px 22px; overflow: hidden; border-radius: 22px;
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--theme-action) 14%, var(--theme-surface)) 0%, var(--theme-surface) 60%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-border) 70%, transparent); }
+.hero > :first-child { flex: none; box-shadow: 0 0 0 3px var(--theme-surface), 0 6px 18px color-mix(in srgb, var(--theme-action) 22%, transparent); border-radius: 50%; }
+.heroText { display: grid; gap: 2px; min-width: 0; flex: 1 1 auto; }
+.heroText h2 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
+.heroText p { margin: 0; color: var(--theme-text-muted); font-size: 13.5px; }
+.heroText .heroDate { color: color-mix(in srgb, var(--theme-action) 80%, var(--theme-text)); font-size: 12px; font-weight: 650; letter-spacing: 0.02em; text-transform: uppercase; }
+.heroAside { flex: none; width: min(360px, 40%); }
+/* The profile reminder, compact inside the hero: text, a thin meter, one button. */
+.heroAside > section { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 12px; margin: 0; padding: 12px 14px; border: 0; border-radius: 16px;
+  background: color-mix(in srgb, var(--theme-surface) 80%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-border) 70%, transparent); }
+.heroAside > section > span:first-child { display: grid; gap: 1px; min-width: 0; font-size: 13px; }
+.heroAside > section > span:first-child small { color: var(--theme-text-muted); font-size: 12px; }
+.heroAside > section > span:nth-child(2) { grid-column: 1 / -1; grid-row: 2; height: 4px; border-radius: 4px; overflow: hidden; background: color-mix(in srgb, var(--theme-text) 8%, transparent); }
+.heroAside > section > a { grid-column: 2; grid-row: 1; height: 32px; padding: 0 12px; font-size: 13px; white-space: nowrap; }
+.top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.card { gap: 12px; padding: 16px 18px; border: 0; border-radius: 20px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-border) 75%, transparent), 0 1px 2px rgb(0 0 0 / 0.03); }
+.card h3 { font-size: 15px; letter-spacing: -0.01em; }
+.clear { display: flex; align-items: center; gap: 12px; padding: 6px 0 2px; }
+.clear > span:last-child { display: grid; gap: 2px; min-width: 0; }
+.clear b { font-size: 15px; font-weight: 650; }
+.clear small { color: var(--theme-text-muted); font-size: 13px; }
+.clearIcon { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 13px; background: color-mix(in srgb, var(--theme-success) 14%, transparent); color: var(--theme-success); }
+/* The week: one strip of figures divided by hairlines, not five grey boxes. */
+.week .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0; }
+.week .stats div { min-width: 0; padding: 4px 16px; border-radius: 0; background: none; border-left: 1px solid color-mix(in srgb, var(--theme-border) 80%, transparent); }
+.week .stats div:first-child { padding-left: 0; border-left: 0; }
+.week .stats dd { font-size: 26px; letter-spacing: -0.02em; }
+.week .stats dt { font-size: 12px; }
+/* Tiles: one shape; a tinted squircle per tile (its own hue), the figure large, the action quiet at the foot. */
+.tiles { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+.tile { border: 0; border-radius: 20px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-border) 75%, transparent), 0 1px 2px rgb(0 0 0 / 0.03); transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms ease; }
+.tile:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-border) 75%, transparent), 0 10px 24px rgb(0 0 0 / 0.06); }
+.tile { --hue: var(--theme-action); }
+.tile:nth-child(5n+2) { --hue: #16a34a; } .tile:nth-child(5n+3) { --hue: #0ea5e9; } .tile:nth-child(5n+4) { --hue: #f59e0b; } .tile:nth-child(5n+5) { --hue: #ec4899; }
+.tileBtn { gap: 8px; padding: 16px 16px 10px; border-radius: 20px; }
+.tileHead { gap: 10px; color: var(--theme-text); font-size: 13.5px; font-weight: 650; }
+.tileHead svg { box-sizing: content-box; width: 16px; height: 16px; padding: 7px; border-radius: 10px; background: color-mix(in srgb, var(--hue) 14%, transparent); color: var(--hue); }
+.tileFigure b { font-size: 28px; letter-spacing: -0.02em; }
+.tileAside { padding: 0 16px 14px; }
+.tileAside button, .tileAside a { height: 32px; border-radius: 10px; }
+@media (max-width: 1179.98px) { .heroAside { width: min(320px, 45%); } }
+@media (max-width: 759.98px) {
+  .hero { flex-wrap: wrap; align-items: flex-start; padding: 16px; border-radius: 20px; }
+  .hero > :first-child { width: 44px; height: 44px; }
+  .heroText h2 { font-size: 22px; }
+  .heroAside { width: 100%; }
+  .top { grid-template-columns: minmax(0, 1fr); }
+  .week .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 10px; }
+  .week .stats div:nth-child(3n+1) { padding-left: 0; border-left: 0; }
+  .week .stats dd { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .tile { transition: none; } .tile:hover { transform: none; } }
+/* Phone: the profile reminder is one line of text over its meter, with the button beside it; the "?" stays inline. */
+@media (max-width: 759.98px) {
+  .heroAside > section { grid-template-columns: minmax(0, 1fr) auto; padding: 10px 12px; }
+  .heroAside > section > span:first-child b { font-size: 13.5px; }
+  .heroAside > section > span:first-child small { display: inline; }
+  .heroAside > section > span:first-child > :last-child { display: none; }
+  .heroAside > section > a { height: 34px; padding: 0 12px; font-size: 13px; }
+}

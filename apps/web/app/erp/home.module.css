@@ -1,0 +1,22 @@
+/* BILLING (18 Oct 2026): the Billing home: big buttons for what people come to do, the "Needs you" tray. Pulse tokens
+   only; two buttons a row on a phone, 48 px rows. */
+.quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; min-width: 0; }
+.big { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 64px; padding: 12px 14px; border: 1px solid var(--theme-border); border-radius: 14px;
+  background: var(--theme-surface); color: var(--theme-text); text-decoration: none; transition: border-color 140ms ease, transform 120ms ease; -webkit-tap-highlight-color: transparent; }
+.big:hover { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); }
+.big:active { transform: scale(0.98); }
+.big:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.big > svg { flex: none; padding: 8px; box-sizing: content-box; border-radius: 10px; background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); }
+.big > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.big b { overflow: hidden; font-size: 14px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.big small { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.tray { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.trayHead { display: flex; align-items: center; gap: 8px; margin: 2px 2px 0; font-size: 15px; font-weight: 650; }
+.trayHead span { min-width: 22px; padding: 0 7px; border-radius: 999px; background: var(--theme-action); color: var(--theme-action-text, #fff); font-size: 12px; line-height: 22px; text-align: center; }
+.calm { margin: 0; padding: 14px; border: 1px dashed var(--theme-border); border-radius: 12px; color: var(--theme-text-muted); font-size: 13px; }
+.anchor { min-width: 0; scroll-margin-top: 72px; }
+.anchor > section { height: 100%; }
+.books { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; color: var(--theme-text-muted); font-size: 12.5px; }
+@media (max-width: 899.98px) { .quick { grid-template-columns: repeat(2, minmax(0, 1fr)); } .big { align-items: flex-start; } .big b { white-space: normal; } }
+@media (max-width: 419.98px) { .big { gap: 10px; padding: 10px 12px; } .big small { white-space: normal; } }
+@media (prefers-reduced-motion: reduce) { .big { transition: none; } .big:active { transform: none; } }
