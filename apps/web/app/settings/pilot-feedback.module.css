@@ -1,0 +1,13 @@
+/* R54: the pilot's four questions, one row each, a 1–5 scale of plain buttons-as-radios. */
+.questions { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; }
+.question { display: grid; grid-template-columns: minmax(180px, 260px) auto; justify-content: start; gap: 8px 14px; align-items: center; margin: 0; padding: 0; border: 0; font-size: 13.5px; }
+.question legend { float: left; padding: 0; }
+.scale { display: flex; gap: 6px; }
+.scale label { position: relative; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--theme-border); border-radius: 10px; cursor: pointer; font-size: 13px; font-variant-numeric: tabular-nums; }
+.scale input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.scale label:has(input:checked) { border-color: var(--theme-action); background: color-mix(in oklab, var(--theme-action) 14%, var(--theme-surface)); font-weight: 600; }
+.scale label:has(input:focus-visible) { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.done { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+@media (max-width: 640px) {
+  .question { grid-template-columns: 1fr; }
+}

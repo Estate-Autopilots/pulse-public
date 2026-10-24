@@ -1,0 +1,43 @@
+/* CHAT-SHELL v2: the chat dock. Bottom left of the work area (Pip keeps the right corner), quiet until opened. */
+.tab, .dock { position: fixed; z-index: calc(var(--ds-z-float, 60) - 1); left: calc(var(--shell-rail-w, 64px) + 20px); bottom: 18px; }
+.tab { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px 0 12px; border: 0; border-radius: 999px; background: var(--ds-glass-strong); backdrop-filter: var(--ds-glass-blur);
+  box-shadow: var(--ds-glass-edge), var(--ds-glass-shadow); color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: transform var(--ds-fast, 140ms) var(--ds-ease, ease); animation: in 220ms var(--ds-ease, ease) both; }
+.tab:hover { transform: translateY(-1px); }
+.tab svg { color: var(--theme-action); }
+.tab i { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--theme-action); color: var(--theme-action-text); font-size: 10.5px; font-style: normal; font-weight: 700; }
+.dock { width: min(380px, calc(100vw - 120px)); height: min(520px, calc(100dvh - 120px)); display: flex; flex-direction: column; overflow: hidden; border-radius: 18px; background: var(--theme-surface);
+  box-shadow: var(--ds-elev-3); animation: in 240ms var(--ds-ease, ease) both; }
+@keyframes in { from { opacity: 0; translate: 0 10px; } }
+.dock header { flex: none; display: flex; align-items: center; gap: 2px; height: 46px; padding: 0 6px 0 16px; border-bottom: 1px solid var(--ds-line, var(--theme-border)); }
+.dock header b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 650; }
+.icon { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: none; color: var(--theme-text-muted); cursor: pointer; }
+.icon:hover { background: var(--ds-hover); color: var(--theme-text); }
+.msgs { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; background: color-mix(in srgb, var(--theme-canvas) 70%, var(--theme-surface)); }
+.msg { display: grid; justify-items: start; max-width: 82%; }
+.msg[data-mine] { align-self: flex-end; justify-items: end; }
+.msg small { margin: 4px 6px 1px; font-size: 11px; font-weight: 650; color: var(--theme-text-muted); }
+.msg p { margin: 0; padding: 6px 10px; border-radius: 12px; background: var(--theme-surface); box-shadow: 0 1px 0.5px rgb(11 20 26 / 10%); font-size: 13.5px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg[data-mine] p { background: color-mix(in srgb, var(--theme-action) 13%, var(--theme-surface)); }
+.msg time { margin-left: 8px; font-size: 10.5px; color: var(--theme-text-muted); }
+.note { margin: auto; color: var(--theme-text-muted); font-size: 13px; text-align: center; }
+.note a { color: var(--theme-action); }
+.error { margin: 0; padding: 6px 12px; color: var(--theme-danger); font-size: 12.5px; }
+.box { flex: none; display: flex; align-items: flex-end; gap: 6px; padding: 8px; border-top: 1px solid var(--ds-line, var(--theme-border)); }
+.box textarea { flex: 1; min-width: 0; max-height: 110px; padding: 8px 12px; border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-canvas); color: var(--theme-text); font: inherit; font-size: 14px; resize: none; outline: none; field-sizing: content; }
+.box textarea:focus { border-color: color-mix(in srgb, var(--theme-action) 60%, transparent); }
+.box button { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--theme-action); color: var(--theme-action-text); cursor: pointer; }
+.box button:disabled { opacity: .35; cursor: default; }
+@media (max-width: 899.98px) { .tab, .dock { display: none; } }
+@media (prefers-reduced-motion: reduce) { .tab, .dock { animation: none; } }
+
+/* Owner workbench UI (22 Oct 2026): the Chat button sits in the top bar beside the bell (first in the row of actions),
+   and the dock drops down under it at the right, like the bell's panel. Nothing floats over the page while it is closed. */
+.tab { position: relative; left: auto; bottom: auto; order: -1; z-index: auto; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; gap: 0; border: 1px solid var(--theme-border);
+  border-radius: 8px; background: var(--theme-surface); box-shadow: none; backdrop-filter: none; animation: none; }
+.tab:hover { transform: none; background: var(--theme-surface-subtle); }
+.tab[data-open] { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); }
+.tab > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tab > i { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; border: 2px solid var(--theme-canvas); box-sizing: border-box; font-size: 10.5px; }
+.dock { top: 56px; right: 16px; bottom: auto; left: auto; z-index: var(--ds-z-float, 60); height: min(520px, calc(100dvh - 80px)); }
+@media (max-width: 899.98px) { .tab, .dock { display: none; } }
