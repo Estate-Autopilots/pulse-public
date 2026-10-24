@@ -1,0 +1,1 @@
+../migrations/0045_ea_editor_config_seed.sql

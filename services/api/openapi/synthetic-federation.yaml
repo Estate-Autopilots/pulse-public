@@ -1,0 +1,29 @@
+openapi: 3.1.0
+info:
+  title: Synthetic federated My Tasks install harness (EST-2087; not the install API)
+  version: 0.1.0
+  description: >-
+    Scratch PostgreSQL only. Each install owns its tasks and server-side link registry; no selectors, writes or DB
+    access on /context. Contexts are v1.<payload>.<HMAC-SHA256>, at most 300 s, rechecked against the link on every read.
+paths:
+  /synthetic/federation/context:
+    post:
+      summary: Exchange a private per-install link credential (Bearer linkId.secret) for a short-lived read context
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false } } } }
+      responses:
+        '200':
+          description: '{context, expiresAt}; private, no-store'
+          content: { application/json: { schema: { type: object, additionalProperties: false, required: [context, expiresAt],
+            properties: { context: { type: string }, expiresAt: { type: string, format: date-time } } } } }
+        '400': { description: Body or query present }
+        '401': { description: Unknown, revoked or malformed link credential }
+  /synthetic/federation/tasks:
+    get:
+      summary: Read the linked person's own tasks in this install (Bearer context)
+      responses:
+        '200':
+          description: Four-field allowlist only; private, no-store
+          content: { application/json: { schema: { type: array, items: { $ref: 'synthetic-my-tasks.yaml#/components/schemas/SyntheticMyTask' } } } }
+        '400': { description: Request selectors are forbidden }
+        '401': { description: Malformed, tampered, expired, foreign-install or revoked-link context }
+        '403': { description: Inactive or non-member person, link changed mid-read, or non-scratch database }
