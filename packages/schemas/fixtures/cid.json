@@ -1,0 +1,75 @@
+{
+  "about": "CID fixtures (02 \u00a74.4). Python (pulse_sdk.cid) and TypeScript parsers must agree on every case.",
+  "valid": [
+    {
+      "name": "EA0584-HK03-v2.mp4",
+      "tenant": "EA",
+      "project": 584,
+      "type": "HK",
+      "num": 3,
+      "version": 2,
+      "variant": null,
+      "base": "EA0584-HK03"
+    },
+    {
+      "name": "EA0584-HK03-v2-9x16.mp4",
+      "tenant": "EA",
+      "project": 584,
+      "type": "HK",
+      "num": 3,
+      "version": 2,
+      "variant": "9x16",
+      "base": "EA0584-HK03"
+    },
+    {
+      "name": "EA0584-MV01",
+      "tenant": "EA",
+      "project": 584,
+      "type": "MV",
+      "num": 1,
+      "version": null,
+      "variant": null,
+      "base": "EA0584-MV01"
+    },
+    {
+      "name": "ABCD123456-IA101-1x1.png",
+      "tenant": "ABCD",
+      "project": 123456,
+      "type": "IA",
+      "num": 101,
+      "version": null,
+      "variant": "1x1",
+      "base": "ABCD123456-IA101"
+    },
+    {
+      "name": "C:\\Exports\\EA10000-VV12-v10.mov",
+      "tenant": "EA",
+      "project": 10000,
+      "type": "VV",
+      "num": 12,
+      "version": 10,
+      "variant": null,
+      "base": "EA10000-VV12"
+    },
+    {
+      "name": "EA0584-HK03-v123.mp4",
+      "tenant": "EA",
+      "project": 584,
+      "type": "HK",
+      "num": 3,
+      "version": null,
+      "variant": "v123",
+      "base": "EA0584-HK03",
+      "note": "the spec regex reads an over-long version as a variant"
+    }
+  ],
+  "invalid": [
+    "ea0584-HK03-v2.mp4",
+    "EA0584-HK3.mp4",
+    "EA584-HK03.mp4",
+    "EA0584-HK03-v2.final.mp4",
+    "EA0584-HK03 final.mp4",
+    "EA-0584-HK03.mp4",
+    "hook final.mp4"
+  ]
+}
