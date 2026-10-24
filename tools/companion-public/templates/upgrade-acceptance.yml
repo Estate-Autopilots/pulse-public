@@ -1,0 +1,38 @@
+name: Verify installed Companion upgrade
+on:
+  workflow_dispatch:
+    inputs:
+      from_tag: { description: 'Exact baseline immutable release tag', type: string, required: true }
+      to_tag: { description: 'Exact newer immutable release tag', type: string, required: true }
+permissions: { contents: read }
+jobs:
+  installed-upgrade:
+    strategy:
+      fail-fast: false
+      matrix: { os: [windows-latest, macos-latest], scenario: [upgrade, rollback] }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - name: Install released build, detect, verify, install, restart, assert new WebView version
+        env: { GH_TOKEN: '${{ github.token }}', FROM_TAG: '${{ inputs.from_tag }}', TO_TAG: '${{ inputs.to_tag }}' }
+        shell: bash
+        run: node apps/desktop/scripts/verify-upgrade.mjs "$FROM_TAG" "$TO_TAG" "${{ matrix.scenario }}"
+      - name: Retain native startup diagnostics
+        if: ${{ failure() && runner.os == 'macOS' }}
+        shell: bash
+        run: |
+          mkdir -p upgrade-proof
+          screencapture -x upgrade-proof/final-desktop.png || true
+          log show --last 15m --style compact --predicate 'process == "pulse-desktop" OR (process == "SecurityAgent" AND eventMessage CONTAINS[c] "pulse")' > upgrade-proof/macos-startup.log
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: 'upgrade-proof-${{ matrix.os }}-${{ matrix.scenario }}'
+          path: |
+            upgrade-proof/*.json
+            upgrade-proof/*.png
+            upgrade-proof/*.log
+          if-no-files-found: warn

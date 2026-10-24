@@ -1,0 +1,23 @@
+.page { max-width: 1040px; margin: auto; padding: 32px 24px; line-height: 1.65; }
+:global(html):has(.page), :global(body):has(.page) { height: auto; overflow: auto; }
+.page h1 { margin: 16px 0; font-size: 20px; font-weight: 650; line-height: 1.25; letter-spacing: -0.02em; }
+.page h3 { overflow-wrap: anywhere; }
+.reference > section > h3 { font: var(--lx-text-ui); }
+.page a { color: var(--theme-action); }
+.page nav, .actions { display: flex; flex-wrap: wrap; gap: 16px; }
+.page header, .page footer { padding-block: 24px; }
+.reference, .guides { display: grid; gap: 24px; margin-block: 24px; }
+.reference p, .reference form, .reference dl, .reference details, .guides p, .guides pre { margin: 16px; }
+.reference > section > :is(label, h3) { margin: 16px; }
+.page pre { padding: 16px; border-radius: 8px; background: var(--theme-surface-subtle); white-space: pre-wrap; overflow-wrap: anywhere; font: var(--lx-text-meta); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; max-height: 480px; overflow: auto; }
+.page summary { cursor: pointer; }
+.page dt { font-weight: 600; margin-top: 16px; }
+.page dd { margin: 0; }
+.form { display: grid; gap: 16px; }
+.form p { margin: 0; color: var(--theme-text-muted); }
+.page :is(button, a, input, select, textarea, summary, pre):focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 3px; }
+.skeleton { min-height: 72px; margin: 16px; background: var(--theme-surface-subtle); border-radius: 8px; }
+@media (max-width: 760px) { .page h1 { font-size: 18px; } }
+@media (max-width: 600px) { .page { padding: 16px; } .actions { align-items: stretch; flex-direction: column; } }
+
+.guides p code { white-space: nowrap; }
