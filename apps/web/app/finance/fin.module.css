@@ -1,0 +1,146 @@
+/* FINANCE-UI (10 Oct 2026): sections, the Overview board, the brief, queues and tables. Pulse tokens only; every
+   `flex: 1 1 0` sits inside the desktop fit query so phones scroll instead of collapsing. Selectors are qualified
+   where `.page a { color: inherit }` would otherwise win. */
+.srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* ---------- Sections, live strip, views ---------- */
+.navBlock { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.navRow { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 6px 16px; min-width: 0; border-bottom: 1px solid var(--theme-border); }
+.sections { display: flex; gap: 2px; min-width: 0; }
+.sections > .section { position: relative; padding: 7px 10px 9px; color: var(--theme-text-muted); font-size: 14px; font-weight: 500; white-space: nowrap; }
+.sections > .section:hover { color: var(--theme-text); }
+.sections > .section[aria-current="page"] { color: var(--theme-text); font-weight: 600; }
+.sections > .section[aria-current="page"]::after { content: ""; position: absolute; right: 8px; bottom: -1px; left: 8px; height: 2px; border-radius: 2px; background: var(--theme-action); }
+.strip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0; padding-bottom: 7px; color: var(--theme-text-muted); font-size: 12px; }
+.stripMeta { white-space: nowrap; }
+.strip > .sourcesLink { display: inline-flex; align-items: center; gap: 5px; color: var(--theme-action); font-weight: 500; white-space: nowrap; }
+.strip > .sourcesLink:hover { text-decoration: underline; }
+.views { display: inline-flex; flex-wrap: wrap; gap: 2px; width: fit-content; max-width: 100%; padding: 3px; border-radius: 9px; background: var(--theme-surface-subtle); }
+.views > .view { padding: 4px 12px; border-radius: 7px; color: var(--theme-text-muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+.views > .view:hover { color: var(--theme-text); }
+.views > .view[aria-current="true"] { background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 1px 2px rgb(24 20 60 / 10%); }
+.navTitle { margin: 0; font-size: 14px; font-weight: 600; }
+@media (max-width: 760px) {
+  .navRow { gap: 0; }
+  /* COMP-B: six sections no longer fit one row at 390 px: they wrap to a second row rather than spill sideways. */
+  .sections { width: 100%; flex-wrap: wrap; justify-content: flex-start; column-gap: 4px; }
+  .sections > .section { padding: 7px 6px 9px; font-size: 13.5px; }
+  .sections > .section[aria-current="page"]::after { right: 4px; left: 4px; }
+  .strip { width: 100%; padding: 8px 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); }
+  .views { display: flex; width: 100%; }
+  .views > .view { flex: 1 1 auto; padding: 5px 8px; text-align: center; }
+}
+
+/* ---------- The finance body ----------
+   Owner workbench UI (stability, 23 Oct 2026): Finance is one scrolling page. Its body, the Overview, the views, the
+   pairs of cards and the tables used to scroll inside themselves (four scroll bars on one page, tables cut off mid-row);
+   now only the page scrolls and every part shows at its own height. */
+.body { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* ---------- Overview board ---------- */
+.overview { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+/* What the founders should know first (its points side by side), the trend across the page, then the three ranked
+   lists side by side, each wide enough for its names. */
+.board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-areas: "brief brief brief" "trend trend trend" "age clients cost"; gap: 16px; min-width: 0; }
+@media (min-width: 1180px) {
+  .briefPanel .bullets { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; }
+  .briefPanel .bullets > li:nth-child(2) .bullet { border-top: 0; padding-top: 2px; }
+}
+.briefPanel { grid-area: brief; }
+.trendPanel { grid-area: trend; }
+.agePanel { grid-area: age; }
+.clientsPanel { grid-area: clients; }
+.costPanel { grid-area: cost; }
+.board > section { display: flex; flex-direction: column; min-width: 0; }
+.chartBody { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; padding: 4px 20px 18px; }
+.chartNote { margin: 2px 0 0; color: var(--theme-text-muted); font-size: 12px; line-height: 1.45; }
+@media (max-width: 1179.98px) {
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "brief brief" "trend trend" "age clients" "cost cost"; }
+}
+@media (max-width: 760px) {
+  .board { grid-template-columns: minmax(0, 1fr); grid-template-areas: "brief" "trend" "age" "clients" "cost"; }
+  .chartBody { padding: 2px 12px 12px; }
+}
+
+/* ---------- Brief: one sentence, one bold figure, a confidence chip and Details ---------- */
+.bullets { display: grid; margin: 0; padding: 0 20px 10px; list-style: none; }
+.bullet { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 4px 10px; padding: 11px 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); }
+.bullets > li:first-child .bullet { border-top: 0; padding-top: 2px; }
+.bulletIcon { grid-row: span 2; display: flex; padding-top: 2px; color: var(--theme-text-muted); }
+.bullet[data-tone="good"] .bulletIcon { color: var(--theme-success); }
+.bullet[data-tone="warn"] .bulletIcon { color: var(--theme-warning); }
+.bullet[data-tone="bad"] .bulletIcon { color: var(--theme-danger); }
+.bulletText { margin: 0; font-size: 13px; line-height: 1.45; text-wrap: pretty; }
+.bulletText b { font-weight: 650; white-space: nowrap; }
+.bulletFoot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.detailsLink { display: inline-flex; align-items: center; gap: 1px; padding: 2px 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
+.detailsLink:hover { text-decoration: underline; }
+.detailsLink:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 4px; }
+.drawerBody { display: grid; gap: 14px; padding: 16px 20px 24px; font-size: 14px; line-height: 1.55; }
+.drawerBody > p { margin: 0; }
+.facts { display: grid; gap: 10px; margin: 0; }
+.facts > div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px; }
+.facts dt { color: var(--theme-text-muted); font-size: 13px; }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+.drawerBody .openLink { color: var(--theme-action); font-weight: 500; }
+.drawerBody .openLink:hover { text-decoration: underline; }
+
+/* ---------- Change against the month before ---------- */
+.change { display: inline-flex; align-items: center; gap: 1px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.change[data-tone="good"] { color: var(--theme-success); }
+.change[data-tone="bad"] { color: var(--theme-danger); }
+.change[data-tone="flat"] { color: var(--theme-text-muted); }
+
+/* A tile that has words instead of a figure ("Statement needed"). */
+.wordValue { display: block; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; white-space: normal; }
+
+/* ---------- A page's own views (Switch): small underlined tabs, a third, quieter level ---------- */
+.switch { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.subtabs { display: flex; flex-wrap: wrap; gap: 4px 18px; border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); }
+.subtabs > .subtab { position: relative; padding: 2px 0 8px; border: 0; background: none; color: var(--theme-text-muted); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.subtabs > .subtab:hover { color: var(--theme-text); }
+.subtabs > .subtab[aria-selected="true"] { color: var(--theme-text); font-weight: 600; }
+.subtabs > .subtab[aria-selected="true"]::after { content: ""; position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; border-radius: 2px; background: var(--theme-action); }
+.subtabs > .subtab:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 4px; }
+.pane { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.pane[hidden] { display: none; }
+
+/* ---------- Live pages: a pair of cards side by side, quiet footnotes, a notice when the sync has not run ---------- */
+.pair { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; min-width: 0; }
+.pair > * { min-width: 0; }
+.pair > section { display: flex; flex-direction: column; }
+.foot { margin: 0; color: var(--theme-text-muted); font-size: 12px; line-height: 1.5; }
+.foot p { margin: 0; }
+.lead { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.notice { display: grid; gap: 6px; padding: 18px 20px; border: 1px dashed var(--theme-border); border-radius: 20px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.notice b { color: var(--theme-text); font-size: 14px; }
+/* Two tables side by side only where both have room for their columns; otherwise one above the other (a wide one
+   no longer scrolls sideways inside half a page). */
+@media (max-width: 1599.98px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Cash: what is missing (and who supplies it), cards, assumptions, record kinds ---------- */
+.need { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 16px 20px; border: 1px solid color-mix(in srgb, var(--theme-warning) 35%, var(--theme-border)); border-radius: 20px; background: color-mix(in srgb, var(--theme-warning) 7%, var(--theme-surface)); font-size: 13px; line-height: 1.45; }
+.need > div { display: grid; gap: 2px; min-width: 0; }
+.need b { color: var(--theme-text); font-weight: 600; }
+.need span { color: var(--theme-text-muted); }
+.card { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 18px 20px; border: 0; border-radius: 20px; background: var(--theme-surface); box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 0 0 1px color-mix(in srgb, var(--theme-border) 55%, transparent); }
+.card h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.assumptions { margin: 0; padding-left: 18px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.55; }
+.assumptions li + li { margin-top: 4px; }
+.needs { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.needItem { display: grid; gap: 3px; padding: 14px 18px; border: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); border-left: 3px solid var(--theme-warning); border-radius: 14px; background: var(--theme-surface); font-size: 13px; line-height: 1.45; }
+.needItem span { color: var(--theme-text-muted); }
+.needItem small { color: var(--theme-text); font-size: 12px; font-weight: 500; }
+.kinds { display: flex; flex-wrap: wrap; gap: 6px; }
+.kinds > .kind { padding: 4px 10px; border: 1px solid var(--theme-border); border-radius: 999px; color: var(--theme-text-muted); font-size: 12px; }
+.kinds > .kind:hover { color: var(--theme-text); }
+.kinds > .kind[aria-current="true"] { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); color: var(--theme-action); }
+/* LAYOUT-SWEEP: a section's views stay one row on a phone (four since People value): the row scrolls sideways
+   instead of wrapping into a second line. */
+@media (max-width: 760px) { .views { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; } .views::-webkit-scrollbar { display: none; } .views > .view { flex: none; } }
+/* FLOAT-2 (device audit, 22 Oct 2026): on a phone every control here takes a 44 px press. */
+@media (max-width: 899.98px) {
+  .sections > .section { min-height: 44px; }
+  .strip > .sourcesLink, .detailsLink { position: relative; }
+  .strip > .sourcesLink::before, .detailsLink::before { content: ""; position: absolute; inset: -12px -4px; }
+}

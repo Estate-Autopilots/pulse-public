@@ -1,0 +1,9 @@
+{
+  "about": "Reel voice: one energetic creator voice for English and Hinglish (an ElevenLabs library voice saved on the account; not a clone of a real person). Eleven v3 with audio tags such as [excited] and [happy] in the storyboard lines. Change voice_id here and re-run `reels.py voice`; cached lines are reused, changed ones are re-made.",
+  "model": "eleven_v3",
+  "settings": {"stability": 0.5, "similarity_boost": 0.8},
+  "languages": {
+    "en": {"label": "English (Indian)", "language_code": "en", "voice_id": "0S6xG2aDSxyTDcYrV1oo", "name": "Utkarsh - Viral UGC Content Creator"},
+    "hi": {"label": "Hinglish (Devanagari voice text, Roman captions)", "language_code": "hi", "voice_id": "0S6xG2aDSxyTDcYrV1oo", "name": "Utkarsh - Viral UGC Content Creator"}
+  }
+}
