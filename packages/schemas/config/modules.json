@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pulse.invalid/schemas/config/modules.json",
+  "title": "Tenant module switches",
+  "description": "pulse.tenant_config doc_kind 'tenant', doc_key 'modules'. A module listed in `off` leaves the navigation and the command palette, its pages show one neutral 'not switched on' page, and its API routes answer 404 like a route that does not exist (services/api/src/modules.ts MODULE_API). No document means every module is on. Dashboard, Tasks, Projects, Clients, Contacts, Team, My desk, Settings, Review data and Audit are always on. Set by config only: there is no admin setting or endpoint yet.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["off"],
+  "properties": {
+    "off": {
+      "description": "designers: /designers and the design API. map: /map. acquisition: /acquisition, the staff /portal pages and the portal, client-delivery and lead-webhook API. chats: /chats, /communication, /inbox (chat e-mail), /groups. briefs: /briefs. money: /finance, /money and ERP (/erp: invoices, catalogue, exports; its API too). hr: the HR desk pages (/hr, /hr-history, /shifts) and the HR API (/api/v0/hr, leave, attendance, shifts, /me/hr, people HR, HR contact and salary, companion wallet and late disputes). With hr off, My desk, its approvals and its requests read only HR data, so they show the neutral page; /leave redirects there; Dashboard links into HR (such as the leadership In today figure) land on the neutral page. relationships: /relationships and its API (R46). skills: /people/skills, a person's Skills & CV tab and their API (R48). jobs: /people/jobs and the internal jobs API (R49). chat_import: /chats/import, Chats' Import WhatsApp history and the import API (R47). connectors: Settings → Connected sources → Connectors, its source card and the connectors API (R52). creative: /creative, the Creative Strategy app (sprints, CS Home) and its API (EST-1474). sales_xray: /apps/sales-xray, the Sales X-Ray app (each person's own connection, their calls and leads, Ask) and its API (EST-1363). These seven are also off until the server switches each on (PULSE_RELATIONSHIPS, PULSE_SKILLS, PULSE_JOBS, PULSE_CHAT_IMPORT, PULSE_CONNECTORS=1 or setup, PULSE_CREATIVE=1, PULSE_SALES_XRAY=1). pulse_hq: /hq, Pulse HQ (the business of Pulse: feature catalogue, ideas, Offer Studio, brand) and its API (/api/v0/hq); organisation-only: off unless the document names it in `on`.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["designers", "map", "acquisition", "chats", "briefs", "money", "hr", "relationships", "skills", "jobs", "chat_import", "connectors", "creative", "sales_xray", "pulse_hq"] }
+    },
+    "on": {
+      "description": "PULSE-HQ: organisation-only modules this organisation switches on. They are off everywhere else, with or without a document (services/api/src/modules.ts ORG_ONLY). pulse_hq is on only in the Pulse organisation (@pulsehq, migration 0944).",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["pulse_hq"] }
+    }
+  }
+}

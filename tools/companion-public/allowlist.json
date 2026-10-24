@@ -1,0 +1,1098 @@
+[
+  {
+    "source": "tools/companion-public/templates/builds.yml",
+    "destination": ".github/workflows/companion-builds.yml"
+  },
+  {
+    "source": "tools/companion-public/templates/.gitignore",
+    "destination": ".gitignore"
+  },
+  {
+    "source": ".nvmrc",
+    "destination": ".nvmrc"
+  },
+  {
+    "source": "tools/companion-public/templates/LICENSE",
+    "destination": "LICENSE"
+  },
+  {
+    "source": "tools/companion-public/templates/README.md",
+    "destination": "README.md"
+  },
+  {
+    "source": "apps/chrome-extension/companion-store.js",
+    "destination": "apps/chrome-extension/companion-store.js"
+  },
+  {
+    "source": "apps/chrome-extension/companion-worker.js",
+    "destination": "apps/chrome-extension/companion-worker.js"
+  },
+  {
+    "source": "apps/chrome-extension/context.css",
+    "destination": "apps/chrome-extension/context.css"
+  },
+  {
+    "source": "apps/chrome-extension/context.html",
+    "destination": "apps/chrome-extension/context.html"
+  },
+  {
+    "source": "apps/chrome-extension/context.js",
+    "destination": "apps/chrome-extension/context.js"
+  },
+  {
+    "source": "apps/chrome-extension/icons/128.png",
+    "destination": "apps/chrome-extension/icons/128.png"
+  },
+  {
+    "source": "apps/chrome-extension/icons/16.png",
+    "destination": "apps/chrome-extension/icons/16.png"
+  },
+  {
+    "source": "apps/chrome-extension/icons/32.png",
+    "destination": "apps/chrome-extension/icons/32.png"
+  },
+  {
+    "source": "apps/chrome-extension/icons/48.png",
+    "destination": "apps/chrome-extension/icons/48.png"
+  },
+  {
+    "source": "apps/chrome-extension/manifest.json",
+    "destination": "apps/chrome-extension/manifest.json"
+  },
+  {
+    "source": "apps/chrome-extension/match.js",
+    "destination": "apps/chrome-extension/match.js"
+  },
+  {
+    "source": "apps/chrome-extension/package.json",
+    "destination": "apps/chrome-extension/package.json"
+  },
+  {
+    "source": "apps/chrome-extension/popup.css",
+    "destination": "apps/chrome-extension/popup.css"
+  },
+  {
+    "source": "apps/chrome-extension/popup.html",
+    "destination": "apps/chrome-extension/popup.html"
+  },
+  {
+    "source": "apps/chrome-extension/popup.js",
+    "destination": "apps/chrome-extension/popup.js"
+  },
+  {
+    "source": "apps/chrome-extension/scripts/package.mjs",
+    "destination": "apps/chrome-extension/scripts/package.mjs"
+  },
+  {
+    "source": "apps/chrome-extension/scripts/sync-shared.mjs",
+    "destination": "apps/chrome-extension/scripts/sync-shared.mjs"
+  },
+  {
+    "source": "apps/chrome-extension/session.js",
+    "destination": "apps/chrome-extension/session.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/client.js",
+    "destination": "apps/chrome-extension/shared/client.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/demo.js",
+    "destination": "apps/chrome-extension/shared/demo.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/index.js",
+    "destination": "apps/chrome-extension/shared/index.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/panel.css",
+    "destination": "apps/chrome-extension/shared/panel.css"
+  },
+  {
+    "source": "apps/chrome-extension/shared/panel.js",
+    "destination": "apps/chrome-extension/shared/panel.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/pip.css",
+    "destination": "apps/chrome-extension/shared/pip.css"
+  },
+  {
+    "source": "apps/chrome-extension/shared/pip.js",
+    "destination": "apps/chrome-extension/shared/pip.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/presence.js",
+    "destination": "apps/chrome-extension/shared/presence.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/queue.js",
+    "destination": "apps/chrome-extension/shared/queue.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/reminders.js",
+    "destination": "apps/chrome-extension/shared/reminders.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/surfaces.js",
+    "destination": "apps/chrome-extension/shared/surfaces.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/time.js",
+    "destination": "apps/chrome-extension/shared/time.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/triangulation.js",
+    "destination": "apps/chrome-extension/shared/triangulation.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/view.js",
+    "destination": "apps/chrome-extension/shared/view.js"
+  },
+  {
+    "source": "apps/chrome-extension/storage.js",
+    "destination": "apps/chrome-extension/storage.js"
+  },
+  {
+    "source": "apps/chrome-extension/test/companion.test.js",
+    "destination": "apps/chrome-extension/test/companion.test.js"
+  },
+  {
+    "source": "apps/chrome-extension/test/privacy.test.js",
+    "destination": "apps/chrome-extension/test/privacy.test.js"
+  },
+  {
+    "source": "apps/chrome-extension/test/session.test.js",
+    "destination": "apps/chrome-extension/test/session.test.js"
+  },
+  {
+    "source": "apps/chrome-extension/test/storage.test.js",
+    "destination": "apps/chrome-extension/test/storage.test.js"
+  },
+  {
+    "source": "apps/chrome-extension/worker.js",
+    "destination": "apps/chrome-extension/worker.js"
+  },
+  {
+    "source": "apps/desktop/NOTICE.md",
+    "destination": "apps/desktop/NOTICE.md"
+  },
+  {
+    "source": "apps/desktop/build.mjs",
+    "destination": "apps/desktop/build.mjs"
+  },
+  {
+    "source": "apps/desktop/core/Cargo.lock",
+    "destination": "apps/desktop/core/Cargo.lock"
+  },
+  {
+    "source": "apps/desktop/core/Cargo.toml",
+    "destination": "apps/desktop/core/Cargo.toml"
+  },
+  {
+    "source": "apps/desktop/core/src/bridge.rs",
+    "destination": "apps/desktop/core/src/bridge.rs"
+  },
+  {
+    "source": "apps/desktop/core/src/lib.rs",
+    "destination": "apps/desktop/core/src/lib.rs"
+  },
+  {
+    "source": "apps/desktop/core/src/navigation.rs",
+    "destination": "apps/desktop/core/src/navigation.rs"
+  },
+  {
+    "source": "apps/desktop/core/src/release.rs",
+    "destination": "apps/desktop/core/src/release.rs"
+  },
+  {
+    "source": "apps/desktop/core/src/sensors.rs",
+    "destination": "apps/desktop/core/src/sensors.rs"
+  },
+  {
+    "source": "apps/desktop/core/src/tracker.rs",
+    "destination": "apps/desktop/core/src/tracker.rs"
+  },
+  {
+    "source": "tools/companion-public/templates/desktop-package.json",
+    "destination": "apps/desktop/package.json"
+  },
+  {
+    "source": "apps/desktop/scripts/create-build-metadata.mjs",
+    "destination": "apps/desktop/scripts/create-build-metadata.mjs"
+  },
+  {
+    "source": "apps/desktop/src-tauri/.gitignore",
+    "destination": "apps/desktop/src-tauri/.gitignore"
+  },
+  {
+    "source": "apps/desktop/src-tauri/Cargo.lock",
+    "destination": "apps/desktop/src-tauri/Cargo.lock"
+  },
+  {
+    "source": "apps/desktop/src-tauri/Cargo.toml",
+    "destination": "apps/desktop/src-tauri/Cargo.toml"
+  },
+  {
+    "source": "apps/desktop/src-tauri/build.rs",
+    "destination": "apps/desktop/src-tauri/build.rs"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/128x128.png",
+    "destination": "apps/desktop/src-tauri/icons/128x128.png"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/128x128@2x.png",
+    "destination": "apps/desktop/src-tauri/icons/128x128@2x.png"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/32x32.png",
+    "destination": "apps/desktop/src-tauri/icons/32x32.png"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/icon.icns",
+    "destination": "apps/desktop/src-tauri/icons/icon.icns"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/icon.ico",
+    "destination": "apps/desktop/src-tauri/icons/icon.ico"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/icon.png",
+    "destination": "apps/desktop/src-tauri/icons/icon.png"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/tray-alert.png",
+    "destination": "apps/desktop/src-tauri/icons/tray-alert.png"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/tray-break.png",
+    "destination": "apps/desktop/src-tauri/icons/tray-break.png"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/tray-in.png",
+    "destination": "apps/desktop/src-tauri/icons/tray-in.png"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/tray-template.png",
+    "destination": "apps/desktop/src-tauri/icons/tray-template.png"
+  },
+  {
+    "source": "apps/desktop/src-tauri/icons/tray.png",
+    "destination": "apps/desktop/src-tauri/icons/tray.png"
+  },
+  {
+    "source": "apps/desktop/src-tauri/src/companion.rs",
+    "destination": "apps/desktop/src-tauri/src/companion.rs"
+  },
+  {
+    "source": "apps/desktop/src-tauri/src/lib.rs",
+    "destination": "apps/desktop/src-tauri/src/lib.rs"
+  },
+  {
+    "source": "apps/desktop/src-tauri/src/main.rs",
+    "destination": "apps/desktop/src-tauri/src/main.rs"
+  },
+  {
+    "source": "apps/desktop/src-tauri/tauri.conf.json",
+    "destination": "apps/desktop/src-tauri/tauri.conf.json"
+  },
+  {
+    "source": "apps/desktop/src/accessibility.js",
+    "destination": "apps/desktop/src/accessibility.js"
+  },
+  {
+    "source": "apps/desktop/src/app.js",
+    "destination": "apps/desktop/src/app.js"
+  },
+  {
+    "source": "apps/desktop/src/index.html",
+    "destination": "apps/desktop/src/index.html"
+  },
+  {
+    "source": "apps/desktop/src/panel-window.css",
+    "destination": "apps/desktop/src/panel-window.css"
+  },
+  {
+    "source": "apps/desktop/src/panel.js",
+    "destination": "apps/desktop/src/panel.js"
+  },
+  {
+    "source": "apps/desktop/tests/accessibility.test.js",
+    "destination": "apps/desktop/tests/accessibility.test.js"
+  },
+  {
+    "source": "apps/desktop/tests/build-metadata.test.mjs",
+    "destination": "apps/desktop/tests/build-metadata.test.mjs"
+  },
+  {
+    "source": "apps/desktop/tests/panel.test.mjs",
+    "destination": "apps/desktop/tests/panel.test.mjs"
+  },
+  {
+    "source": "apps/mobile/scripts/ios-screen-check.swift",
+    "destination": "apps/mobile/scripts/ios-screen-check.swift"
+  },
+  {
+    "source": "tools/companion-public/templates/package.json",
+    "destination": "package.json"
+  },
+  {
+    "source": "packages/companion/package.json",
+    "destination": "packages/companion/package.json"
+  },
+  {
+    "source": "packages/companion/src/client.js",
+    "destination": "packages/companion/src/client.js"
+  },
+  {
+    "source": "packages/companion/src/demo.js",
+    "destination": "packages/companion/src/demo.js"
+  },
+  {
+    "source": "packages/companion/src/index.d.ts",
+    "destination": "packages/companion/src/index.d.ts"
+  },
+  {
+    "source": "packages/companion/src/index.js",
+    "destination": "packages/companion/src/index.js"
+  },
+  {
+    "source": "packages/companion/src/panel.css",
+    "destination": "packages/companion/src/panel.css"
+  },
+  {
+    "source": "packages/companion/src/panel.d.ts",
+    "destination": "packages/companion/src/panel.d.ts"
+  },
+  {
+    "source": "packages/companion/src/panel.js",
+    "destination": "packages/companion/src/panel.js"
+  },
+  {
+    "source": "packages/companion/src/pip.css",
+    "destination": "packages/companion/src/pip.css"
+  },
+  {
+    "source": "packages/companion/src/pip.js",
+    "destination": "packages/companion/src/pip.js"
+  },
+  {
+    "source": "packages/companion/src/presence.js",
+    "destination": "packages/companion/src/presence.js"
+  },
+  {
+    "source": "packages/companion/src/queue.js",
+    "destination": "packages/companion/src/queue.js"
+  },
+  {
+    "source": "packages/companion/src/reminders.js",
+    "destination": "packages/companion/src/reminders.js"
+  },
+  {
+    "source": "packages/companion/src/surfaces.js",
+    "destination": "packages/companion/src/surfaces.js"
+  },
+  {
+    "source": "packages/companion/src/time.js",
+    "destination": "packages/companion/src/time.js"
+  },
+  {
+    "source": "packages/companion/src/triangulation.js",
+    "destination": "packages/companion/src/triangulation.js"
+  },
+  {
+    "source": "packages/companion/src/view.js",
+    "destination": "packages/companion/src/view.js"
+  },
+  {
+    "source": "packages/companion/test/client-pip.test.js",
+    "destination": "packages/companion/test/client-pip.test.js"
+  },
+  {
+    "source": "packages/companion/test/presence.test.js",
+    "destination": "packages/companion/test/presence.test.js"
+  },
+  {
+    "source": "packages/companion/test/queue-reminders.test.js",
+    "destination": "packages/companion/test/queue-reminders.test.js"
+  },
+  {
+    "source": "packages/companion/test/triangulation.test.js",
+    "destination": "packages/companion/test/triangulation.test.js"
+  },
+  {
+    "source": "packages/companion/test/view.test.js",
+    "destination": "packages/companion/test/view.test.js"
+  },
+  {
+    "source": "packages/design-system/package.json",
+    "destination": "packages/design-system/package.json"
+  },
+  {
+    "source": "packages/design-system/src/brand.d.ts",
+    "destination": "packages/design-system/src/brand.d.ts"
+  },
+  {
+    "source": "packages/design-system/src/brand.js",
+    "destination": "packages/design-system/src/brand.js"
+  },
+  {
+    "source": "packages/design-system/src/native.ts",
+    "destination": "packages/design-system/src/native.ts"
+  },
+  {
+    "source": "packages/design-system/src/tokens.css",
+    "destination": "packages/design-system/src/tokens.css"
+  },
+  {
+    "source": "tools/companion-public/templates/pnpm-lock.yaml",
+    "destination": "pnpm-lock.yaml"
+  },
+  {
+    "source": "tools/companion-public/templates/pnpm-workspace.yaml",
+    "destination": "pnpm-workspace.yaml"
+  },
+  {
+    "source": "rust-toolchain.toml",
+    "destination": "rust-toolchain.toml"
+  },
+  {
+    "source": "packages/companion/src/updates.js",
+    "destination": "packages/companion/src/updates.js"
+  },
+  {
+    "source": "packages/companion/src/updates.d.ts",
+    "destination": "packages/companion/src/updates.d.ts"
+  },
+  {
+    "source": "packages/companion/src/update-card.js",
+    "destination": "packages/companion/src/update-card.js"
+  },
+  {
+    "source": "packages/companion/test/updates.test.js",
+    "destination": "packages/companion/test/updates.test.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/updates.js",
+    "destination": "apps/chrome-extension/shared/updates.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/update-card.js",
+    "destination": "apps/chrome-extension/shared/update-card.js"
+  },
+  {
+    "source": "apps/chrome-extension/STORE.md",
+    "destination": "apps/chrome-extension/STORE.md"
+  },
+  {
+    "source": "apps/desktop/core/src/update_recovery.rs",
+    "destination": "apps/desktop/core/src/update_recovery.rs"
+  },
+  {
+    "source": "apps/desktop/src-tauri/src/updater.rs",
+    "destination": "apps/desktop/src-tauri/src/updater.rs"
+  },
+  {
+    "source": "tools/companion-public/templates/release-version.mjs",
+    "destination": "apps/desktop/scripts/release-version.mjs"
+  },
+  {
+    "source": "apps/desktop/scripts/publish-release.mjs",
+    "destination": "apps/desktop/scripts/publish-release.mjs"
+  },
+  {
+    "source": "apps/desktop/scripts/check-release.mjs",
+    "destination": "apps/desktop/scripts/check-release.mjs"
+  },
+  {
+    "source": "apps/desktop/scripts/configure-updater.mjs",
+    "destination": "apps/desktop/scripts/configure-updater.mjs"
+  },
+  {
+    "source": "apps/desktop/core/src/update_signature.rs",
+    "destination": "apps/desktop/core/src/update_signature.rs"
+  },
+  {
+    "source": "tools/companion-public/templates/upgrade-acceptance.yml",
+    "destination": ".github/workflows/upgrade-acceptance.yml"
+  },
+  {
+    "source": "apps/desktop/scripts/verify-upgrade.mjs",
+    "destination": "apps/desktop/scripts/verify-upgrade.mjs"
+  },
+  {
+    "source": "apps/desktop/WHATS_NEW.md",
+    "destination": "apps/desktop/WHATS_NEW.md"
+  },
+  {
+    "source": "tools/companion-public/templates/windows-acceptance.yml",
+    "destination": ".github/workflows/windows-tray-acceptance.yml"
+  },
+  {
+    "source": "packages/companion/src/communications.js",
+    "destination": "packages/companion/src/communications.js"
+  },
+  {
+    "source": "packages/companion/src/communications.d.ts",
+    "destination": "packages/companion/src/communications.d.ts"
+  },
+  {
+    "source": "packages/companion/test/communications.test.js",
+    "destination": "packages/companion/test/communications.test.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/communications.js",
+    "destination": "apps/chrome-extension/shared/communications.js"
+  },
+  {
+    "source": "apps/desktop/src-tauri/src/pings.rs",
+    "destination": "apps/desktop/src-tauri/src/pings.rs"
+  },
+  {
+    "source": "apps/desktop/core/src/startup.rs",
+    "destination": "apps/desktop/core/src/startup.rs"
+  },
+  {
+    "source": "apps/desktop/src/app.html",
+    "destination": "apps/desktop/src/app.html"
+  },
+  {
+    "source": "apps/desktop/src/app.css",
+    "destination": "apps/desktop/src/app.css"
+  },
+  {
+    "source": "apps/desktop/src/settings.html",
+    "destination": "apps/desktop/src/settings.html"
+  },
+  {
+    "source": "apps/desktop/src/settings.js",
+    "destination": "apps/desktop/src/settings.js"
+  },
+  {
+    "source": "apps/desktop/src/settings.css",
+    "destination": "apps/desktop/src/settings.css"
+  },
+  {
+    "source": "apps/desktop/src/prefs.js",
+    "destination": "apps/desktop/src/prefs.js"
+  },
+  {
+    "source": "apps/desktop/src/demo-comms.js",
+    "destination": "apps/desktop/src/demo-comms.js"
+  },
+  {
+    "source": "apps/desktop/src-tauri/src/appwin.rs",
+    "destination": "apps/desktop/src-tauri/src/appwin.rs"
+  },
+  {
+    "source": "apps/desktop/src-tauri/src/presence.rs",
+    "destination": "apps/desktop/src-tauri/src/presence.rs"
+  },
+  {
+    "source": "apps/desktop/src-tauri/src/acceptance.rs",
+    "destination": "apps/desktop/src-tauri/src/acceptance.rs"
+  },
+  {
+    "source": "apps/desktop/src-tauri/capabilities/local.json",
+    "destination": "apps/desktop/src-tauri/capabilities/local.json"
+  },
+  {
+    "source": "apps/desktop/core/src/wifi.rs",
+    "destination": "apps/desktop/core/src/wifi.rs"
+  },
+  {
+    "source": "packages/companion/src/features.js",
+    "destination": "packages/companion/src/features.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/features.js",
+    "destination": "apps/chrome-extension/shared/features.js"
+  },
+  {
+    "source": "apps/desktop/core/src/mac_keychain.rs",
+    "destination": "apps/desktop/core/src/mac_keychain.rs"
+  },
+  {
+    "source": "apps/desktop/scripts/mac-notification-acceptance.sh",
+    "destination": "apps/desktop/scripts/mac-notification-acceptance.sh"
+  },
+  {
+    "source": "tools/companion-public/templates/macos-acceptance.yml",
+    "destination": ".github/workflows/macos-acceptance.yml"
+  },
+  {
+    "source": "packages/companion/src/desktop-session.js",
+    "destination": "packages/companion/src/desktop-session.js"
+  },
+  {
+    "source": "packages/companion/test/desktop-session.test.js",
+    "destination": "packages/companion/test/desktop-session.test.js"
+  },
+  {
+    "source": "apps/chrome-extension/shared/desktop-session.js",
+    "destination": "apps/chrome-extension/shared/desktop-session.js"
+  },
+  {
+    "source": "apps/desktop/tests/app-window-search.test.mjs",
+    "destination": "apps/desktop/tests/app-window-search.test.mjs"
+  },
+  {
+    "source": "apps/desktop/src/update-card.js",
+    "destination": "apps/desktop/src/update-card.js"
+  },
+  {
+    "source": "apps/desktop/tests/update-panel.test.mjs",
+    "destination": "apps/desktop/tests/update-panel.test.mjs"
+  },
+  {
+    "source": "apps/desktop/scripts/publish-desktop-release.mjs",
+    "destination": "apps/desktop/scripts/publish-desktop-release.mjs"
+  },
+  {
+    "source": "tools/companion-public/templates/desktop-release.yml",
+    "destination": ".github/workflows/desktop-release.yml"
+  },
+  {
+    "source": "apps/mobile/android/.gitignore",
+    "destination": "apps/mobile/android/.gitignore"
+  },
+  {
+    "source": "apps/mobile/android/app/.gitignore",
+    "destination": "apps/mobile/android/app/.gitignore"
+  },
+  {
+    "source": "apps/mobile/android/app/build.gradle",
+    "destination": "apps/mobile/android/app/build.gradle"
+  },
+  {
+    "source": "apps/mobile/android/app/proguard-rules.pro",
+    "destination": "apps/mobile/android/app/proguard-rules.pro"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/AndroidManifest.xml",
+    "destination": "apps/mobile/android/app/src/main/AndroidManifest.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Gateway.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Gateway.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/InboxWorker.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/InboxWorker.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/MainActivity.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/MainActivity.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Notifier.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Notifier.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/PulseShellPlugin.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/PulseShellPlugin.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Shell.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Shell.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/ShellChromeClient.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/ShellChromeClient.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/ShellDownloads.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/ShellDownloads.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/UploadTypes.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/UploadTypes.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/ShellStore.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/ShellStore.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/ShellWebViewClient.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/ShellWebViewClient.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Theme.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Theme.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Updater.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/Updater.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/drawable/ic_stat_pulse.xml",
+    "destination": "apps/mobile/android/app/src/main/res/drawable/ic_stat_pulse.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+    "destination": "apps/mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/values-night/colors.xml",
+    "destination": "apps/mobile/android/app/src/main/res/values-night/colors.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/values/colors.xml",
+    "destination": "apps/mobile/android/app/src/main/res/values/colors.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/values/ic_launcher_background.xml",
+    "destination": "apps/mobile/android/app/src/main/res/values/ic_launcher_background.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/values/strings.xml",
+    "destination": "apps/mobile/android/app/src/main/res/values/strings.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/values/styles.xml",
+    "destination": "apps/mobile/android/app/src/main/res/values/styles.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/xml/data_extraction_rules.xml",
+    "destination": "apps/mobile/android/app/src/main/res/xml/data_extraction_rules.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/xml/file_paths.xml",
+    "destination": "apps/mobile/android/app/src/main/res/xml/file_paths.xml"
+  },
+  {
+    "source": "apps/mobile/android/build.gradle",
+    "destination": "apps/mobile/android/build.gradle"
+  },
+  {
+    "source": "apps/mobile/android/gradle.properties",
+    "destination": "apps/mobile/android/gradle.properties"
+  },
+  {
+    "source": "apps/mobile/android/gradle/wrapper/gradle-wrapper.properties",
+    "destination": "apps/mobile/android/gradle/wrapper/gradle-wrapper.properties"
+  },
+  {
+    "source": "apps/mobile/android/settings.gradle",
+    "destination": "apps/mobile/android/settings.gradle"
+  },
+  {
+    "source": "apps/mobile/android/variables.gradle",
+    "destination": "apps/mobile/android/variables.gradle"
+  },
+  {
+    "source": "apps/mobile/assets/adaptive-icon.png",
+    "destination": "apps/mobile/assets/adaptive-icon.png"
+  },
+  {
+    "source": "apps/mobile/assets/icon.png",
+    "destination": "apps/mobile/assets/icon.png"
+  },
+  {
+    "source": "apps/mobile/capacitor.config.json",
+    "destination": "apps/mobile/capacitor.config.json"
+  },
+  {
+    "source": "apps/mobile/ios/.gitignore",
+    "destination": "apps/mobile/ios/.gitignore"
+  },
+  {
+    "source": "apps/mobile/ios/App/App.xcodeproj/project.pbxproj",
+    "destination": "apps/mobile/ios/App/App.xcodeproj/project.pbxproj"
+  },
+  {
+    "source": "apps/mobile/ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+    "destination": "apps/mobile/ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/AppDelegate.swift",
+    "destination": "apps/mobile/ios/App/App/AppDelegate.swift"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/Contents.json",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/Contents.json"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/Contents.json",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/Contents.json"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732-1.png",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732-1.png"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732-2.png",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732-2.png"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732.png",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-2732x2732.png"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-dark-2732x2732-1.png",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-dark-2732x2732-1.png"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-dark-2732x2732-2.png",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-dark-2732x2732-2.png"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-dark-2732x2732.png",
+    "destination": "apps/mobile/ios/App/App/Assets.xcassets/Splash.imageset/splash-dark-2732x2732.png"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Base.lproj/LaunchScreen.storyboard",
+    "destination": "apps/mobile/ios/App/App/Base.lproj/LaunchScreen.storyboard"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Base.lproj/Main.storyboard",
+    "destination": "apps/mobile/ios/App/App/Base.lproj/Main.storyboard"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/Info.plist",
+    "destination": "apps/mobile/ios/App/App/Info.plist"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/PulseShellPlugin.swift",
+    "destination": "apps/mobile/ios/App/App/PulseShellPlugin.swift"
+  },
+  {
+    "source": "apps/mobile/ios/App/App/SceneDelegate.swift",
+    "destination": "apps/mobile/ios/App/App/SceneDelegate.swift"
+  },
+  {
+    "source": "apps/mobile/ios/App/CapApp-SPM/.gitignore",
+    "destination": "apps/mobile/ios/App/CapApp-SPM/.gitignore"
+  },
+  {
+    "source": "apps/mobile/ios/App/CapApp-SPM/README.md",
+    "destination": "apps/mobile/ios/App/CapApp-SPM/README.md"
+  },
+  {
+    "source": "apps/mobile/ios/App/CapApp-SPM/Sources/CapApp-SPM/CapApp-SPM.swift",
+    "destination": "apps/mobile/ios/App/CapApp-SPM/Sources/CapApp-SPM/CapApp-SPM.swift"
+  },
+  {
+    "source": "apps/mobile/ios/debug.xcconfig",
+    "destination": "apps/mobile/ios/debug.xcconfig"
+  },
+  {
+    "source": "apps/mobile/package.json",
+    "destination": "apps/mobile/package.json"
+  },
+  {
+    "source": "apps/mobile/scripts/android-acceptance.sh",
+    "destination": "apps/mobile/scripts/android-acceptance.sh"
+  },
+  {
+    "source": "apps/mobile/scripts/make-assets.mjs",
+    "destination": "apps/mobile/scripts/make-assets.mjs"
+  },
+  {
+    "source": "apps/mobile/scripts/promote-android.mjs",
+    "destination": "apps/mobile/scripts/promote-android.mjs"
+  },
+  {
+    "source": "apps/mobile/scripts/publish-prerelease.mjs",
+    "destination": "apps/mobile/scripts/publish-prerelease.mjs"
+  },
+  {
+    "source": "apps/mobile/tests/shell.test.mjs",
+    "destination": "apps/mobile/tests/shell.test.mjs"
+  },
+  {
+    "source": "apps/mobile/www/index.html",
+    "destination": "apps/mobile/www/index.html"
+  },
+  {
+    "source": "apps/mobile/www/offline.html",
+    "destination": "apps/mobile/www/offline.html"
+  },
+  {
+    "source": "tools/companion-public/templates/mobile.yml",
+    "destination": ".github/workflows/mobile.yml"
+  },
+  {
+    "source": "tools/companion-public/templates/emulator-matrix.yml",
+    "destination": ".github/workflows/emulator-matrix.yml"
+  },
+  {
+    "source": "tools/companion-public/templates/phone-simulations.yml",
+    "destination": ".github/workflows/phone-simulations.yml"
+  },
+  {
+    "source": "apps/mobile/scripts/log-emulator.sh",
+    "destination": "apps/mobile/scripts/log-emulator.sh"
+  },
+  {
+    "source": "apps/mobile/tests/emulator-logging.test.mjs",
+    "destination": "apps/mobile/tests/emulator-logging.test.mjs"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendancePlugin.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendancePlugin.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendanceSurfaces.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendanceSurfaces.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendanceWidget.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendanceWidget.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendanceAction.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendanceAction.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/OfficeArrival.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/OfficeArrival.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/SurfacePolicy.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/SurfacePolicy.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/drawable/attendance_background.xml",
+    "destination": "apps/mobile/android/app/src/main/res/drawable/attendance_background.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/layout/attendance_widget.xml",
+    "destination": "apps/mobile/android/app/src/main/res/layout/attendance_widget.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/xml/attendance_widget.xml",
+    "destination": "apps/mobile/android/app/src/main/res/xml/attendance_widget.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendanceWidgetSmall.java",
+    "destination": "apps/mobile/android/app/src/main/java/com/pulse/work/mobile/AttendanceWidgetSmall.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/layout/attendance_widget_small.xml",
+    "destination": "apps/mobile/android/app/src/main/res/layout/attendance_widget_small.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/main/res/xml/attendance_widget_small.xml",
+    "destination": "apps/mobile/android/app/src/main/res/xml/attendance_widget_small.xml"
+  },
+  {
+    "source": "apps/mobile/android/app/src/test/java/com/pulse/work/mobile/SurfacePolicyTest.java",
+    "destination": "apps/mobile/android/app/src/test/java/com/pulse/work/mobile/SurfacePolicyTest.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/test/java/com/pulse/work/mobile/UploadTypesTest.java",
+    "destination": "apps/mobile/android/app/src/test/java/com/pulse/work/mobile/UploadTypesTest.java"
+  },
+  {
+    "source": "apps/mobile/android/app/src/androidTest/java/com/pulse/work/mobile/AttendanceSurfacesTest.java",
+    "destination": "apps/mobile/android/app/src/androidTest/java/com/pulse/work/mobile/AttendanceSurfacesTest.java"
+  },
+  {
+    "source": "apps/mobile/scripts/android-qa.sh",
+    "destination": "apps/mobile/scripts/android-qa.sh"
+  },
+  {
+    "source": "apps/mobile/android/app/src/androidTest/java/com/pulse/work/mobile/QaSessionTest.java",
+    "destination": "apps/mobile/android/app/src/androidTest/java/com/pulse/work/mobile/QaSessionTest.java"
+  },
+  {
+    "source": "apps/desktop/src/address.js",
+    "destination": "apps/desktop/src/address.js"
+  },
+  {
+    "source": "apps/desktop/src/pairing.js",
+    "destination": "apps/desktop/src/pairing.js"
+  },
+  {
+    "source": "apps/desktop/core/src/server.rs",
+    "destination": "apps/desktop/core/src/server.rs"
+  },
+  {
+    "source": "apps/desktop/core/src/pairing.rs",
+    "destination": "apps/desktop/core/src/pairing.rs"
+  },
+  {
+    "source": "apps/desktop/tests/address-step.test.mjs",
+    "destination": "apps/desktop/tests/address-step.test.mjs"
+  },
+  {
+    "source": "apps/mobile/scripts/configure-origin.mjs",
+    "destination": "apps/mobile/scripts/configure-origin.mjs"
+  },
+  {
+    "source": "apps/mobile/README.md",
+    "destination": "apps/mobile/README.md"
+  }
+]
