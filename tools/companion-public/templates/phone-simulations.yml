@@ -1,0 +1,187 @@
+name: Pulse phone simulations
+# Location and network simulations for the phone app on GitHub's free runners, synthetic data only. Nightly and on
+# demand, separate from the merge gate; evidence only (screens and results as artifacts), nothing publishes.
+# - Android (Google APIs images, where geofences come from Play services): EA's QA-E2E phases (geofence enter/dwell/
+#   jitter/leave with spoofed GPS, Wi-Fi off/on, lifecycle) on a synthetic in-process session, then a conditions run:
+#   a moving GPS route, GPS off, slow networks (GSM/EDGE/3G), offline and airplane mode, with a screen per step.
+# - iPhone Simulator (small, regular, large): install, launch light/dark, a moving location route, a simulated push.
+# Wi-Fi triangulation cannot be faked on stock emulators: it is simulated with mocked locations plus network-state
+# changes. Source of truth: tools/companion-public/templates/phone-simulations.yml.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 21 * * *'   # 02:30 IST
+  push:
+    branches: [main]
+    paths: ['.github/workflows/phone-simulations.yml']
+permissions:
+  contents: read
+concurrency:
+  group: phone-simulations-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: version
+        run: echo "version=$(node -p "require('./apps/mobile/package.json').version")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '21' }
+      - uses: android-actions/setup-android@v3
+        with: { packages: 'platform-tools build-tools;36.0.0 platforms;android-36' }
+      - uses: gradle/actions/setup-gradle@v5
+        with: { gradle-version: '8.14.3' }
+      - run: corepack enable && pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/mobile sync android
+      - working-directory: apps/mobile/android
+        run: gradle assembleRelease assembleReleaseAndroidTest --no-daemon --max-workers=2 -Dorg.gradle.parallel=false
+      - run: |
+          mkdir -p out
+          cp apps/mobile/android/app/build/outputs/apk/release/app-release*.apk "out/Pulse-${{ steps.version.outputs.version }}-android.apk"
+          cp apps/mobile/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk "out/Pulse-${{ steps.version.outputs.version }}-android-tests.apk"
+      - uses: actions/upload-artifact@v7
+        with: { name: 'sim-apk-${{ github.run_id }}', path: out/, if-no-files-found: error, retention-days: 7 }
+
+  android-location:
+    needs: build
+    name: android-location-api${{ matrix.api }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        api: [31, 34, 35]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
+        with: { name: 'sim-apk-${{ github.run_id }}', path: apk }
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: Conditions script (moving route, no GPS, slow and no network)
+        run: |
+          cat > "$RUNNER_TEMP/conditions.sh" <<'SH'
+          #!/usr/bin/env bash
+          # One screen per condition. Points are [lng lat] around a synthetic Pune site, as `geo fix` takes them.
+          set -u; out=$1; mkdir -p "$out"
+          shot() { sleep "${2:-8}"; adb exec-out screencap -p > "$out/$1.png" || true; echo "$(date -u +%T) $1" >> "$out/steps.txt"; }
+          adb shell monkey -p com.pulse.work.mobile -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || true
+          shot 00-launch 20
+          i=0; for p in "73.8567 18.5204" "73.8590 18.5215" "73.8615 18.5230" "73.8640 18.5246" "73.8662 18.5260" "73.8690 18.5275"; do
+            i=$((i+1)); adb emu geo fix $p >/dev/null 2>&1 || true; sleep 10; done
+          shot 01-route-arrived 2
+          adb shell cmd location set-location-enabled false >/dev/null 2>&1 || true; shot 02-gps-off
+          adb shell cmd location set-location-enabled true >/dev/null 2>&1 || true
+          for speed in gsm edge umts; do adb emu network speed "$speed" >/dev/null 2>&1 || true; adb emu network delay "$speed" >/dev/null 2>&1 || true
+            adb shell am start -a android.intent.action.MAIN -n com.pulse.work.mobile/.MainActivity >/dev/null 2>&1 || true; shot "03-network-$speed" 15; done
+          adb emu network speed full >/dev/null 2>&1 || true; adb emu network delay none >/dev/null 2>&1 || true
+          adb shell svc wifi disable; adb shell svc data disable; shot 04-offline 12
+          adb shell svc wifi enable; adb shell svc data enable; shot 05-back-online 15
+          adb shell cmd connectivity airplane-mode enable >/dev/null 2>&1 || true; shot 06-airplane 10
+          adb shell cmd connectivity airplane-mode disable >/dev/null 2>&1 || true; shot 07-airplane-off 15
+          echo "conditions done"
+          SH
+          chmod +x "$RUNNER_TEMP/conditions.sh"
+      - uses: reactivecircus/android-emulator-runner@v2
+        env:
+          RESUME_MINUTES: '10'
+          PULSE_SIGNIN_TEXT: 'Username|Sign in to Pulse'
+        with:
+          api-level: ${{ matrix.api }}
+          emulator-build: 14788078
+          profile: pixel_7
+          arch: x86_64
+          target: google_apis
+          cores: 2
+          ram-size: 3072M
+          heap-size: 512M
+          disk-size: 6000M
+          emulator-boot-timeout: 900
+          emulator-options: -no-window -gpu lavapipe -feature -Vulkan -noaudio -no-boot-anim -no-snapshot
+          disable-animations: true
+          pre-emulator-launch-script: bash apps/mobile/scripts/log-emulator.sh
+          script: |
+            bash apps/mobile/scripts/android-qa.sh "apk/Pulse-${{ needs.build.outputs.version }}-android.apk" "apk/Pulse-${{ needs.build.outputs.version }}-android-tests.apk" "sim-${{ matrix.api }}/qa" "geofence,wifi,lifecycle" || echo "qa phases reported failures (see sim-${{ matrix.api }}/qa)"
+            bash "$RUNNER_TEMP/conditions.sh" "sim-${{ matrix.api }}/conditions"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: sim-android-api${{ matrix.api }}-${{ github.run_id }}
+          path: sim-${{ matrix.api }}/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  ios:
+    runs-on: macos-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - run: corepack enable && pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/mobile sync ios
+      - name: Build for the iPhone Simulator (no Apple account)
+        working-directory: apps/mobile/ios/App
+        run: |
+          xcodebuild -jobs 2 -project App.xcodeproj -scheme App -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/pulse-ios" ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO -quiet
+          echo "IPHONE_APP=$(find "$RUNNER_TEMP/pulse-ios/Build/Products" -maxdepth 2 -name 'App.app' -print -quit)" >> "$GITHUB_ENV"
+      - name: Small, regular and large iPhones - launch, location route, push, light/dark
+        timeout-minutes: 45
+        run: |
+          mkdir -p ios-sim
+          cat > "$RUNNER_TEMP/push.json" <<'JSON'
+          {"Simulator Target Bundle": "com.pulse.work.mobile", "aps": {"alert": {"title": "Pulse", "body": "Synthetic task assigned: site visit at 11:00"}, "sound": "default"}}
+          JSON
+          xcrun simctl list devices available -j > "$RUNNER_TEMP/devices.json"
+          picks=$(python3 - "$RUNNER_TEMP/devices.json" <<'PY'
+          import json, sys
+          d = json.load(open(sys.argv[1]))['devices']
+          rt = sorted([k for k in d if 'iOS' in k], reverse=True)[0]
+          phones = [x for x in d[rt] if x['name'].startswith('iPhone')]
+          def pick(pred):
+              return next((x for x in phones if pred(x['name'])), None)
+          chosen = [pick(lambda n: 'SE' in n) or pick(lambda n: 'mini' in n) or phones[0],
+                    pick(lambda n: n.rstrip('0123456789 ').endswith('iPhone') or n.split()[-1].isdigit()) or phones[0],
+                    pick(lambda n: 'Pro Max' in n) or pick(lambda n: 'Plus' in n) or phones[-1]]
+          seen = set()
+          for x in chosen:
+              if x['udid'] not in seen:
+                  seen.add(x['udid']); print(x['udid'] + '|' + x['name'].replace(' ', '_'))
+          PY
+          )
+          echo "$picks" > ios-sim/devices.txt
+          for pick in $picks; do
+            udid=${pick%%|*}; name=${pick#*|}; dir="ios-sim/$name"; mkdir -p "$dir"
+            xcrun simctl boot "$udid"; xcrun simctl bootstatus "$udid" -b
+            xcrun simctl install "$udid" "$IPHONE_APP"
+            xcrun simctl privacy "$udid" grant location-always com.pulse.work.mobile || true
+            xcrun simctl privacy "$udid" grant notifications com.pulse.work.mobile || true
+            for theme in light dark; do
+              xcrun simctl ui "$udid" appearance "$theme"
+              xcrun simctl terminate "$udid" com.pulse.work.mobile || true
+              xcrun simctl launch "$udid" com.pulse.work.mobile; sleep 25
+              xcrun simctl io "$udid" screenshot "$dir/launch-$theme.png"
+            done
+            xcrun simctl location "$udid" set 18.5204,73.8567 || true; sleep 5
+            xcrun simctl location "$udid" start --speed=12 18.5204,73.8567 18.5230,73.8615 18.5260,73.8662 18.5275,73.8690 || true
+            sleep 30; xcrun simctl io "$udid" screenshot "$dir/route.png"
+            xcrun simctl location "$udid" clear || true
+            xcrun simctl push "$udid" com.pulse.work.mobile "$RUNNER_TEMP/push.json" || true
+            sleep 5; xcrun simctl io "$udid" screenshot "$dir/push.png"
+            xcrun simctl shutdown "$udid" || true
+          done
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: sim-ios-${{ github.run_id }}
+          path: ios-sim/
+          if-no-files-found: ignore
+          retention-days: 14

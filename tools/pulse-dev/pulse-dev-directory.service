@@ -1,0 +1,8 @@
+[Unit]
+Description=Pulse dev read-only Workspace groups and aliases
+[Service]
+Type=oneshot
+WorkingDirectory=/home/eadev/work/pulse/strike
+EnvironmentFile=/etc/estate-autopilots/db/pulse_dev.env
+ExecStart=/home/eadev/work/pulse/strike/.venv/bin/python -m pulse_workers.workspace_directory
+TimeoutStartSec=300
