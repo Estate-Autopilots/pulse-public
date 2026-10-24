@@ -1,0 +1,352 @@
+name: Pulse phone app
+# Pulse for Android and iPhone: the production Pulse web app in a thin Capacitor shell (apps/mobile). Builds on
+# GitHub's runners only. Android is signed with the durable Pulse key so it installs over the Expo 0.3.5/1.0.0 app.
+# A main build publishes a public release (APK, SHA-256 sums, iPhone Simulator app). It never moves an update
+# channel: the test channel's Android entry changes only through the explicit `promote` input after the go-ahead.
+on:
+  push:
+    # The isolated validation branch builds, signs and runs the full acceptance, but only main publishes.
+    branches: [main, validation/mobile-shell, validation/r21-android-surfaces]
+    paths: ['apps/mobile/**', 'packages/companion/src/updates.js', '.github/workflows/mobile.yml', 'pnpm-lock.yaml']
+  workflow_dispatch:
+    inputs:
+      origin:
+        description: Android only — https://host for this install (blank keeps the default phone build)
+        type: string
+        default: ''
+      validation_only:
+        description: Build and test without the signing key; publish nothing
+        type: boolean
+        default: false
+      promote:
+        description: After the go-ahead only — a published phone release tag (companion-vX.Y.Z-sha) to offer on the test channel; with origin, that address's own release, offered only to its installs (builds nothing)
+        type: string
+        default: ''
+      signin_text:
+        description: Text that proves the sign-in page is shown (acceptance)
+        type: string
+        default: Username
+      qa_phases:
+        description: QA-E2E phases (e.g. wifi); gpsphoto with validation_only runs focused Android checks
+        type: string
+        default: ''
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ${{ inputs.promote && 'phone-promote' || format('phone-{0}-{1}', github.ref, inputs.origin) }}
+  cancel-in-progress: false
+env:
+  PULSE_ORIGIN: ${{ inputs.origin || '' }}
+jobs:
+  prepare:
+    if: ${{ !inputs.promote }}
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate the build origin before starting native jobs
+        run: node apps/mobile/scripts/configure-origin.mjs
+      - id: version
+        run: echo "version=$(node -p "require('./apps/mobile/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Require the durable Android key for a publishing build
+        if: ${{ !inputs.validation_only }}
+        env:
+          ANDROID_SIGNING_STORE_BASE64: ${{ secrets.ANDROID_SIGNING_STORE_BASE64 }}
+          ANDROID_SIGNING_PASSWORD: ${{ secrets.ANDROID_SIGNING_PASSWORD }}
+        run: test -n "$ANDROID_SIGNING_STORE_BASE64" && test -n "$ANDROID_SIGNING_PASSWORD"
+
+  android:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      VALIDATION_ONLY: ${{ inputs.validation_only }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '21' }
+      - uses: android-actions/setup-android@v3
+        with: { packages: 'platform-tools build-tools;36.0.0 platforms;android-36' }
+      - uses: gradle/actions/setup-gradle@v5
+        with: { gradle-version: '8.14.3' }
+      - run: corepack enable && pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/mobile test
+      - run: pnpm --dir apps/mobile sync android
+      - name: Load the durable Pulse signing identity
+        if: ${{ !inputs.validation_only }}
+        env: { STORE_BASE64: '${{ secrets.ANDROID_SIGNING_STORE_BASE64 }}' }
+        run: node -e 'require("fs").writeFileSync(process.env.RUNNER_TEMP+"/pulse-signing.p12",Buffer.from(process.env.STORE_BASE64,"base64"),{mode:0o600})'
+      - name: Build the APK
+        working-directory: apps/mobile/android
+        env:
+          PULSE_ANDROID_KEYSTORE: ${{ !inputs.validation_only && format('{0}/pulse-signing.p12', runner.temp) || '' }}
+          PULSE_ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_PASSWORD }}
+        run: gradle testReleaseUnitTest assembleRelease assembleReleaseAndroidTest --no-daemon --max-workers=2 -Dorg.gradle.parallel=false
+      - name: Check package, version and signing certificate
+        run: |
+          apk=apps/mobile/android/app/build/outputs/apk/release/app-release.apk
+          tools=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          mkdir -p out
+          "$tools/aapt2" dump badging "$apk" | head -2 | tee out/apk-badging.txt
+          code=$(node -p "const [a,b,c]=process.env.VERSION.split('.').map(Number);a*1000000+b*1000+c")
+          grep -q "package: name='com.pulse.work.mobile' versionCode='$code' versionName='$VERSION'" out/apk-badging.txt
+          # The published Expo 1.0.0 APK has versionCode 1000000; the shell must be higher to install over it.
+          test "$code" -gt 1000000
+          "$tools/apksigner" verify --verbose --print-certs "$apk" | tee out/apk-signature.txt
+          if [ "$VALIDATION_ONLY" != true ]; then grep -qi 'certificate SHA-256 digest: 7fb7e080fe49b5f285cbd436c500167575d5f1e6f862e7fbbebb3bec6d0989e6' out/apk-signature.txt; fi
+          cp "$apk" "out/Pulse-$VERSION-android.apk"
+          cp apps/mobile/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk "out/Pulse-$VERSION-android-tests.apk"
+          rm -f "$RUNNER_TEMP/pulse-signing.p12"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: phone-android-${{ github.sha }}
+          path: out/
+          if-no-files-found: error
+          retention-days: 30
+
+  android-acceptance:
+    needs: [prepare, android]
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
+        with: { name: 'phone-android-${{ github.sha }}', path: apk }
+      - name: The published Expo 1.0.0 APK, for the upgrade-in-place test
+        if: ${{ !inputs.validation_only }}
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          gh release download companion-v1.0.0-8aec149 -R Estate-Autopilots/pulse-companion -p 'Pulse-1.0.0-android.apk' -D old
+          echo "4a7778be106ef6b57841613c7fc44d748e1fb82043579de88247753e685fb224  old/Pulse-1.0.0-android.apk" | sha256sum -c
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        env:
+          # Publishing builds require the sign-in form itself. Validation runs before the matching web release is
+          # live also accept production's earlier signed-out page, so the remaining checks still run.
+          PULSE_SIGNIN_TEXT: ${{ inputs.signin_text || (github.ref == 'refs/heads/main' && 'Username' || 'Username|Sign in to Pulse') }}
+        with:
+          api-level: 34
+          # Keep the emulator binary reproducible while diagnosing 37.2.12 losing its entire ADB connection.
+          # Android's archive lists stable 36.4.9 as build 14788078.
+          emulator-build: 14788078
+          profile: pixel_7
+          arch: x86_64
+          # No Google services are needed by this shell. The Google image's Pixel Launcher ANR covered Pulse
+          # under Mesa; use the AOSP launcher, with the same API, signed APK and acceptance assertions.
+          target: default
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          disk-size: 6000M
+          emulator-boot-timeout: 900
+          # The pinned emulator segfaulted (exit 139) with SwiftShader during WebView launch. Android documents
+          # lavapipe as the independent Mesa software backend; keep guest Vulkan disabled for Chromium.
+          emulator-options: -no-window -gpu lavapipe -feature -Vulkan -noaudio -no-boot-anim -no-snapshot
+          disable-animations: true
+          # Keep the long-lived emulator's output on a file descriptor that survives the action's launch shell.
+          # It also preserves host-side failures after ADB has disappeared.
+          pre-emulator-launch-script: bash apps/mobile/scripts/log-emulator.sh
+          script: bash apps/mobile/scripts/android-acceptance.sh "apk/Pulse-${{ needs.prepare.outputs.version }}-android.apk" "${{ !inputs.validation_only && 'old/Pulse-1.0.0-android.apk' || '' }}" screens
+      - name: Record emulator host memory and process failures
+        if: always()
+        run: |
+          mkdir -p screens
+          free -m > screens/host-memory.txt
+          ps -C qemu-system-x86_64 -o pid,rss,stat >> screens/host-memory.txt || true
+          sudo dmesg | grep -Ei 'out of memory|oom-kill|killed process|qemu.*segfault' > screens/host-kernel.txt || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phone-android-screens-${{ github.sha }}
+          path: screens/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  android-gps-photo:
+    # Required on every address's APK: the real camera, page geolocation prompt and denial path.
+    needs: [prepare, android]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
+        with: { name: 'phone-android-${{ github.sha }}', path: apk }
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        env:
+          PULSE_SIGNIN_TEXT: ${{ inputs.signin_text || 'Username|Sign in to Pulse' }}
+        with:
+          api-level: 34
+          emulator-build: 14788078
+          profile: pixel_7
+          arch: x86_64
+          target: default
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          disk-size: 6000M
+          emulator-boot-timeout: 900
+          emulator-options: -no-window -gpu lavapipe -feature -Vulkan -noaudio -no-boot-anim -no-snapshot -camera-back emulated
+          disable-animations: true
+          pre-emulator-launch-script: bash apps/mobile/scripts/log-emulator.sh
+          script: bash apps/mobile/scripts/android-qa.sh "apk/Pulse-${{ needs.prepare.outputs.version }}-android.apk" "apk/Pulse-${{ needs.prepare.outputs.version }}-android-tests.apk" qa-gps-photo gpsphoto
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phone-android-gps-photo-${{ github.sha }}
+          path: qa-gps-photo/
+          if-no-files-found: error
+          retention-days: 30
+
+  android-qa:
+    if: ${{ !inputs.origin && inputs.qa_phases != 'gpsphoto' }}
+    # QA-E2E: the shell around a synthetic Pulse on the emulator (apps/mobile/scripts/android-qa.sh; QaSessionTest
+    # answers the shell's gateway calls in-process, so no credential reaches a Pulse server). The AOSP image runs the
+    # notification prompt and notifications, the widget, lifecycle and the Wi-Fi rule; a Google APIs image runs the
+    # geofences (Android's geofences come from Play services) with spoofed GPS. Evidence only: publishing does not wait.
+    needs: [prepare, android]
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: aosp, target: default, phases: 'permissions,notifications,widget,lifecycle,wifi' }
+          - { name: google, target: google_apis, phases: 'geofence,wifi' }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
+        with: { name: 'phone-android-${{ github.sha }}', path: apk }
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        env:
+          RESUME_MINUTES: '30'
+          PULSE_SIGNIN_TEXT: 'Username|Sign in to Pulse'
+        with:
+          api-level: 34
+          emulator-build: 14788078
+          profile: pixel_7
+          arch: x86_64
+          target: ${{ matrix.target }}
+          cores: 2
+          ram-size: 3072M
+          heap-size: 512M
+          disk-size: 6000M
+          emulator-boot-timeout: 900
+          emulator-options: -no-window -gpu lavapipe -feature -Vulkan -noaudio -no-boot-anim -no-snapshot
+          disable-animations: true
+          pre-emulator-launch-script: bash apps/mobile/scripts/log-emulator.sh
+          script: bash apps/mobile/scripts/android-qa.sh "apk/Pulse-${{ needs.prepare.outputs.version }}-android.apk" "apk/Pulse-${{ needs.prepare.outputs.version }}-android-tests.apk" "qa-${{ matrix.name }}" "${{ inputs.qa_phases || matrix.phases }}"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phone-android-qa-${{ matrix.name }}-${{ github.sha }}
+          path: qa-${{ matrix.name }}/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  ios:
+    if: ${{ !inputs.origin && !(inputs.validation_only && inputs.qa_phases == 'gpsphoto') }}
+    needs: prepare
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - run: corepack enable && pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/mobile sync ios
+      - name: Build for the iPhone Simulator (no Apple account, local ad-hoc signature)
+        working-directory: apps/mobile/ios/App
+        run: |
+          xcodebuild -jobs 2 -project App.xcodeproj -scheme App -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/pulse-ios" ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO -quiet
+          app=$(find "$RUNNER_TEMP/pulse-ios/Build/Products" -maxdepth 2 -name 'App.app' -print -quit)
+          test -n "$app"
+          /usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$app/Info.plist" | grep -qx com.pulse.work.mobile
+          /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$app/Info.plist" | grep -qx "$VERSION"
+          test -f "$app/public/offline.html"
+          codesign --verify --deep --strict "$app"
+          echo "IPHONE_APP=$app" >> "$GITHUB_ENV"
+          mkdir -p "$GITHUB_WORKSPACE/ios-out"
+          ditto -c -k --keepParent "$app" "$GITHUB_WORKSPACE/ios-out/Pulse-$VERSION-ios-simulator.zip"
+      - name: Launch on an iPhone Simulator and capture the sign-in page
+        timeout-minutes: 20
+        run: |
+          mkdir -p ios-screens
+          udid=$(xcrun simctl list devices available -j | python3 -c "import sys,json; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k,v in sorted(d.items(), reverse=True) if 'iOS' in k for x in v if x['name'].startswith('iPhone')))")
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl install "$udid" "$IPHONE_APP"
+          for theme in light dark; do
+            xcrun simctl ui "$udid" appearance "$theme"
+            xcrun simctl terminate "$udid" com.pulse.work.mobile || true
+            xcrun simctl launch "$udid" com.pulse.work.mobile
+            sleep 30
+            xcrun simctl io "$udid" screenshot "ios-screens/ios-cold-launch-$theme.png"
+            # Validate the form after the matching production web release; a blank/failed launch cannot pass.
+            if [ "${{ github.ref }}" = refs/heads/main ]; then
+              swift apps/mobile/scripts/ios-screen-check.swift "ios-screens/ios-cold-launch-$theme.png" Username
+            fi
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: phone-ios-${{ github.sha }}
+          path: ios-out/
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: phone-ios-screens-${{ github.sha }}
+          path: ios-screens/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  publish:
+    needs: [prepare, android, android-acceptance, android-gps-photo, ios]
+    # always() evaluates this job even when the intentional Android-only build skipped iOS.
+    if: ${{ always() && !cancelled() && github.ref == 'refs/heads/main' && !inputs.validation_only && !inputs.promote && needs.prepare.result == 'success' && needs.android.result == 'success' && needs.android-acceptance.result == 'success' && needs.android-gps-photo.result == 'success' && (needs.ios.result == 'success' || (inputs.origin && needs.ios.result == 'skipped')) }}
+    runs-on: ubuntu-latest
+    permissions: { contents: write, actions: read }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - uses: actions/download-artifact@v7
+        with: { path: artifacts, pattern: 'phone-*-${{ github.sha }}' }
+      - name: Publish the release (no update channel changes)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+        run: node apps/mobile/scripts/publish-prerelease.mjs
+
+  promote:
+    # With origin, promote-android.mjs writes only that address's latest-<host>.json; latest.json stays EA's.
+    if: ${{ inputs.promote != '' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions: { contents: write, actions: read }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - name: Offer the approved phone app on the test channel
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROMOTE_TAG: ${{ inputs.promote }}
+        run: node apps/mobile/scripts/promote-android.mjs
