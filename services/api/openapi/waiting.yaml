@@ -1,0 +1,70 @@
+openapi: 3.1.0
+info: { title: Pulse waiting chain, version: 1.0.0 }
+security: [{ staffSession: [] }]
+paths:
+  /api/v0/tasks/{id}/waiting:
+    parameters: [{ in: path, name: id, required: true, schema: { type: string, format: uuid } }]
+    get:
+      operationId: getTaskWaitingV0
+      description: Visible root only (404 otherwise). First five open links breadth-first, oldest per level; more counts remaining links. Hidden blockers have null titles. Declared blockers belong to visible displayed tasks. Company address and answer/nudge fields are null in v1.
+      responses:
+        '200': { description: Waiting chain, content: { application/json: { schema: { $ref: '#/components/schemas/Chain' } } } }
+        '401': { description: Sign in required }
+        '404': { description: Task unavailable or caller is not a member }
+  /api/v0/me/blocked-on:
+    get:
+      operationId: listBlockedOnMeV0
+      responses:
+        '200': { description: Own oldest 50 waits with no count, content: { application/json: { schema: { $ref: '#/components/schemas/BlockedOn' } } } }
+        '401': { description: Sign in required }
+        '403': { description: Member required }
+  /api/v0/agents/{id}/blocked-on:
+    parameters: [{ in: path, name: id, required: true, schema: { type: string, format: uuid } }]
+    get:
+      operationId: listBlockedOnAgentV0
+      description: AI itself, its owner, admins or leadership only; no access to another human's list.
+      responses:
+        '200': { description: Oldest 50 waits with no count, content: { application/json: { schema: { $ref: '#/components/schemas/BlockedOn' } } } }
+        '401': { description: Sign in required }
+        '403': { description: List unavailable }
+components:
+  securitySchemes:
+    staffSession: { type: apiKey, in: header, name: x-pulse-session }
+  schemas:
+    Person: { type: object, additionalProperties: false, required: [id, name, ai], properties: { id: { type: string, format: uuid }, name: { type: string }, ai: { type: boolean } } }
+    Task: { type: object, additionalProperties: false, required: [id, title, status], properties: { id: { type: string, format: uuid }, title: { type: string }, status: { type: string } } }
+    Brief: { type: object, additionalProperties: false, required: [id, title], properties: { id: { type: string, format: uuid }, title: { type: string } } }
+    BlockedOn:
+      type: object
+      additionalProperties: false
+      required: [rows]
+      properties:
+        rows: { type: array, maxItems: 50, items: { type: object, additionalProperties: false, required: [linkId, since, answer, waiting, blocker], properties: { linkId: { type: string, format: uuid }, since: { type: string, format: date-time }, answer: { type: 'null' }, waiting: { type: object, additionalProperties: false, required: [id, title, status, owner], properties: { id: { type: string, format: uuid }, title: { type: string }, status: { type: string }, owner: { anyOf: [{ $ref: '#/components/schemas/Person' }, { type: 'null' }] } } }, blocker: { $ref: '#/components/schemas/Brief' } } } }
+    Chain:
+      type: object
+      additionalProperties: false
+      required: [task, steps, more, declared]
+      properties:
+        task: { $ref: '#/components/schemas/Task' }
+        more: { type: integer, minimum: 0 }
+        declared: { type: array, items: { type: object, additionalProperties: false, required: [kind, since], properties: { kind: { type: string }, since: { type: string, format: date-time } } } }
+        steps:
+          type: array
+          maxItems: 5
+          items:
+            type: object
+            additionalProperties: false
+            required: [linkId, depth, fromId, blocker, actor, company, since, answer, answeredAt, nudgedAt, nextNudgeAt, next]
+            properties:
+              linkId: { type: string, format: uuid }
+              depth: { type: integer, minimum: 1 }
+              fromId: { type: string, format: uuid }
+              blocker: { type: object, additionalProperties: false, required: [id, title, hidden, status], properties: { id: { type: string, format: uuid }, title: { type: [string, 'null'] }, hidden: { type: boolean }, status: { type: string } } }
+              actor: { anyOf: [{ type: object, additionalProperties: false, required: [id, name, ai, photoAt], properties: { id: { type: string, format: uuid }, name: { type: string }, ai: { type: boolean }, photoAt: { type: [string, 'null'], format: date-time } } }, { type: 'null' }] }
+              company: { type: object, additionalProperties: false, required: [name, address], properties: { name: { type: string }, address: { type: 'null' } } }
+              since: { type: string, format: date-time }
+              answer: { type: 'null' }
+              answeredAt: { type: 'null' }
+              nudgedAt: { type: 'null' }
+              nextNudgeAt: { type: 'null' }
+              next: { enum: [closed, nudge] }

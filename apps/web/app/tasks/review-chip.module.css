@@ -1,0 +1,14 @@
+/* TASKS-4B: the top bar's Reviews chip (layout utilities, every page). */
+.chip { display: inline-flex; flex: none; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 1px solid color-mix(in srgb, var(--theme-action) 35%, var(--theme-border)); border-radius: 9px;
+  background: color-mix(in srgb, var(--theme-action) 8%, var(--theme-surface)); color: var(--theme-action); font-size: 13px; font-weight: 650; text-decoration: none; pointer-events: auto; }
+.chip:hover { background: color-mix(in srgb, var(--theme-action) 14%, var(--theme-surface)); }
+.chip b { display: inline-grid; min-width: 20px; height: 20px; place-items: center; padding: 0 5px; border-radius: 10px; background: var(--theme-action); color: #fff; font-size: 11px; font-variant-numeric: tabular-nums; }
+.chip[data-late] { border-color: color-mix(in srgb, var(--theme-danger) 40%, var(--theme-border)); color: var(--theme-danger); background: color-mix(in srgb, var(--theme-danger) 8%, var(--theme-surface)); }
+.chip[data-late] b { background: var(--theme-danger); }
+@media (max-width: 1279.98px) { .chipWord { display: none; } .chip { padding: 0 8px; } }
+/* EST-1200: on a phone the 32 px chip takes a 44 px press (an invisible margin above and below it). */
+@media (max-width: 899.98px) { .chip { position: relative; } .chip::after { content: ""; position: absolute; inset: -7px -1px; } }
+/* EST-1205: on a phone in portrait the top bar has room for the page's title or this chip, not both (with every chip
+   showing, "Settings" was cut to "Set…" at 360 px). The chip steps aside there: My work lists the same reviews first,
+   under "Needs you", with Review all. Tablets and computers keep it. */
+@media (max-width: 479.98px) { .chip { display: none; } }

@@ -1,0 +1,221 @@
+/* Pip's island: an ink pill that springs open inside the top bar. Only its own box moves (it is positioned), so the
+   page never shifts; width, height and opacity are the only animated properties. */
+.island {
+  --ink: #17123a; --ink-2: rgb(255 255 255 / 66%); --island-h: 34px;
+  --spring: linear(0, .006, .025 2.8%, .101 6.1%, .539 18.9%, .721 25.3%, .849 31.5%, .937 38.1%, .968 41.8%, .991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001 85.2%, 1);
+  position: absolute; z-index: 60; top: 4px; right: var(--island-right, 0px);
+}
+:root[data-theme="dark"] .island { --ink: #050409; }
+.island[data-home="centre"] { right: auto; left: 50%; transform: translateX(-50%); }
+.slot { display: block; flex: none; width: 42px; height: 34px; }
+.slot[data-home="centre"] { display: none; }
+
+.pill { position: relative; display: flex; align-items: center; width: 42px; height: var(--island-h); margin-top: 3px; overflow: hidden; border-radius: 999px; background: var(--ink); color: #fff;
+  box-shadow: 0 6px 18px rgb(23 18 58 / 22%), inset 0 0 0 1px rgb(255 255 255 / 6%);
+  transition: width 560ms var(--spring), height 440ms var(--spring), margin-top 440ms var(--spring), box-shadow 300ms ease; }
+.island[data-open] .pill { width: var(--island-w, min(420px, var(--island-max, 420px))); height: 40px; margin-top: 0; box-shadow: 0 14px 34px rgb(23 18 58 / 30%), inset 0 0 0 1px rgb(255 255 255 / 8%); }
+.island[data-tone="error"] .pill { box-shadow: 0 14px 34px rgb(23 18 58 / 30%), 0 0 0 2px color-mix(in srgb, var(--theme-danger, #d4373f) 75%, transparent); }
+
+/* Pip's button covers the whole pill (also while it settles back from an arrival), and nothing inside it takes the
+   pointer: the face is redrawn when Pip's mood changes, and a press whose target vanished before release is no click. */
+.pip { position: absolute; inset: 0; display: grid; place-items: center; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; transition: opacity 180ms ease, transform 300ms var(--spring);
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
+.face, .badge, .lead, .text, .menu button > * { pointer-events: none; }
+.pip:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.island[data-open] .pip { opacity: 0; transform: scale(.6); }
+.face { display: grid; width: 28px; height: 28px; place-items: center; }
+.badge { position: absolute; top: 1px; right: 1px; min-width: 15px; height: 15px; padding: 0 4px; box-sizing: border-box; border: 2px solid var(--ink); border-radius: 999px; background: #ff7a59; color: #fff;
+  font-size: 9.5px; font-weight: 800; line-height: 11px; text-align: center; font-variant-numeric: tabular-nums; animation: badge-in 420ms var(--spring) both; }
+@keyframes badge-in { from { transform: scale(0); } }
+
+.content { position: absolute; top: 0; left: 0; display: flex; align-items: center; gap: 8px; width: var(--island-w, max-content); max-width: var(--island-max, 420px); height: 40px; padding: 0 6px 0 6px;
+  box-sizing: border-box; opacity: 0; transition: opacity 120ms ease; }
+.island[data-open] .content { opacity: 1; transition: opacity 220ms ease 140ms; }
+.line { display: flex; flex: 1 1 auto; align-items: center; gap: 9px; min-width: 0; height: 32px; padding: 0 4px 0 0; border: 0; border-radius: 999px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.lead { display: grid; flex: none; width: 28px; height: 28px; place-items: center; }
+.leadPip { display: grid; place-items: center; }
+.text { display: flex; align-items: baseline; gap: 6px; min-width: 0; overflow: hidden; font-size: 13.5px; white-space: nowrap; }
+.text b { flex: 0 0 auto; max-width: 100%; overflow: hidden; font-weight: 650; text-overflow: ellipsis; }
+.text span { flex: 0 1 auto; min-width: 0; overflow: hidden; color: var(--ink-2); text-overflow: ellipsis; }
+.act { display: inline-flex; align-items: center; text-decoration: none; flex: none; min-height: 28px; padding: 0 12px; border: 0; border-radius: 999px; background: #fff; color: #17123a; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.act:hover { background: #ece8ff; }
+.dismiss { display: grid; flex: none; width: 26px; height: 26px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgb(255 255 255 / 10%); color: var(--ink-2); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
+.dismiss:hover { background: rgb(255 255 255 / 18%); color: #fff; }
+.line:focus-visible, .act:focus-visible, .dismiss:focus-visible { outline: 2px solid #b9adff; outline-offset: 2px; }
+.live { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Hover: today's summary. Click: Pip's menu. In the top bar both hang under the pill; floating, beside Pip.
+   FLOAT (21 Oct 2026): one glass card for both, every item named, on the AC scale. */
+.card, .menu { position: absolute; top: calc(100% + 10px); right: 0; z-index: 1; box-sizing: border-box; width: 296px; border: 0; border-radius: var(--ds-radius-lg, 16px); color: var(--theme-text);
+  background: var(--ds-glass-strong, var(--theme-surface)); -webkit-backdrop-filter: var(--ds-glass-blur, none); backdrop-filter: var(--ds-glass-blur, none);
+  box-shadow: var(--ds-glass-edge, inset 0 0 0 1px var(--theme-border)), var(--ds-glass-shadow, 0 18px 44px rgb(24 20 60 / 16%));
+  transform-origin: calc(100% - 20px) 0; animation: pop var(--ds-float-in, 280ms) var(--ds-spring, ease-out) both; }
+.island[data-home="centre"] .card, .island[data-home="centre"] .menu { right: auto; left: 50%; margin-left: -148px; transform-origin: 50% 0; }
+/* In the top bar the card sits inside the bar's own glass (or the calm home's capsule), where a second blur cannot
+   reach the page: solid, so the page never shows through it. */
+.island:not([data-home="free"]) .card, .island:not([data-home="free"]) .menu { background: var(--theme-surface); }
+@keyframes pop { from { opacity: 0; transform: translateY(-4px) scale(.97); } }
+.card { display: grid; gap: 4px; width: 264px; padding: 12px 14px; font-size: var(--ds-text-md, 13.5px); pointer-events: none; }
+.island[data-home="centre"] .card { margin-left: -132px; }
+.card p { margin: 0; color: var(--theme-text-muted); line-height: 1.4; }
+.card .hello { color: var(--theme-text); font-size: var(--ds-text-lg, 15px); font-weight: var(--ds-weight-strong, 650); }
+.card .quiet { color: var(--theme-action); }
+.menu { display: flex; flex-direction: column; gap: 1px; max-height: min(560px, calc(100dvh - 80px)); padding: 6px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.menu svg { flex: none; color: var(--theme-text-muted); }
+.menu button { display: flex; flex: none; align-items: center; gap: 10px; width: 100%; min-height: var(--ds-control-md, 36px); padding: 0 10px; border: 0; border-radius: var(--ds-radius-sm, 8px);
+  background: none; color: var(--theme-text); font: inherit; font-size: var(--ds-text-md, 13.5px); font-weight: var(--ds-weight-medium, 550); text-align: left; cursor: pointer;
+  transition: background-color var(--ds-fast, 140ms) ease; }
+.menu button:hover, .menu button:focus-visible { background: var(--ds-hover, var(--theme-surface-subtle)); outline: none; }
+.menu button:focus-visible { box-shadow: inset 0 0 0 2px var(--theme-focus); }
+.menu button > span, .menu kbd { margin-left: auto; color: var(--theme-text-muted); font: inherit; font-size: var(--ds-text-sm, 12.5px); font-weight: var(--ds-weight-regular, 450); }
+.menu kbd { min-width: 18px; padding: 0 5px; border: 1px solid var(--ds-line, var(--theme-border)); border-radius: 5px; text-align: center; }
+.menu i { position: relative; flex: none; width: 30px; height: 18px; margin-left: auto; border-radius: 999px; background: var(--theme-border); transition: background-color 160ms ease; }
+.menu i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 20%); transition: transform 220ms var(--spring); }
+.menu i[data-on] { background: var(--theme-action); }
+.menu i[data-on]::after { transform: translateX(12px); }
+.menuError { margin: 2px 4px 6px; padding: 8px 10px; border-radius: 9px; background: color-mix(in srgb, var(--theme-danger, #d4373f) 10%, transparent); color: var(--theme-text); font-size: 13px; line-height: 1.4; }
+/* Who it is for and how the day stands; then the day's own buttons (check in, break, check out). */
+.menuHead { display: grid; gap: 2px; padding: 8px 10px 8px; }
+.menuHead b { font-size: var(--ds-text-lg, 15px); font-weight: var(--ds-weight-strong, 650); letter-spacing: -0.01em; }
+.menuHead span { color: var(--theme-text-muted); font-size: var(--ds-text-sm, 12.5px); }
+.menuDay { display: flex; gap: 6px; padding: 0 4px 8px; }
+.menuDay button { flex: 1 1 0; justify-content: center; gap: 6px; min-height: var(--ds-control-md, 36px); padding: 0 10px; border-radius: var(--ds-radius-md, 12px);
+  background: var(--ds-hover, var(--theme-surface-subtle)); font-weight: var(--ds-weight-strong, 650); }
+.menuDay button:hover { background: var(--ds-press, var(--theme-surface-subtle)); }
+.menuDay button[data-primary] { background: var(--theme-action); color: var(--theme-action-text); }
+.menuDay button[data-primary] svg { color: currentColor; }
+.menuDay button[data-primary]:hover { background: var(--theme-action-hover, var(--theme-action)); }
+.menuGroup, .menuFoot { display: flex; flex-direction: column; gap: 1px; padding-top: 4px; border-top: 1px solid var(--ds-line, var(--theme-border)); }
+.menuFoot { margin-top: 2px; }
+.menuFoot button { min-height: 32px; font-size: var(--ds-text-sm, 12.5px); color: var(--theme-text-muted); }
+.menuLabel { display: flex; align-items: center; gap: 6px; margin: 6px 10px 2px; color: var(--theme-text-muted); font-size: var(--ds-text-xs, 11.5px); font-weight: var(--ds-weight-strong, 650); letter-spacing: .02em; }
+.menuLabel b { min-width: 18px; padding: 0 6px; border-radius: 999px; background: var(--theme-action); color: var(--theme-action-text); font-size: 11px; line-height: 18px; text-align: center; }
+.menuQuiet { margin: 2px 10px 6px; color: var(--theme-text-muted); font-size: var(--ds-text-sm, 12.5px); }
+.menu .need { align-items: center; min-height: 44px; padding: 5px 10px; }
+.menu .need > span { display: grid; min-width: 0; margin: 0; color: inherit; font-size: inherit; }
+.menu .need b { overflow: hidden; font-weight: var(--ds-weight-medium, 550); text-overflow: ellipsis; white-space: nowrap; }
+.menu .need small { overflow: hidden; color: var(--theme-text-muted); font-size: var(--ds-text-xs, 11.5px); text-overflow: ellipsis; white-space: nowrap; }
+.menu .need[data-urgent] b { color: var(--theme-danger, #c62828); }
+.menu .need[data-urgent]::before { content: ""; flex: none; width: 3px; height: 26px; margin: 0 -4px 0 -6px; border-radius: 2px; background: var(--theme-danger, #c62828); }
+
+
+/* Phones: a compact pill in the bar; it opens across the bar and its menu hangs from the right edge. */
+@media (max-width: 899.98px) {
+  .island { top: calc(var(--pulse-safe-top, 0px) + 6px); }
+  .island[data-placed] { transition: right 560ms var(--spring); }
+  .island[data-open] { right: 8px; }
+  .menu, .card { position: fixed; top: calc(var(--pulse-safe-top, 0px) + 56px); right: 8px; left: auto; margin: 0; transform-origin: calc(100% - 24px) 0; }
+  .slot { width: 44px; height: 44px; }
+  .pill { margin-top: 3px; }
+  .island[data-open] .pill { height: 40px; margin-top: 0; }
+  .text { font-size: 13px; }
+  .menu, .card { width: min(300px, calc(100vw - 16px)); }
+  .menu button { min-height: 44px; }
+  /* EST-1200: the closed 42x34 pill takes a 44 px press: its button's invisible margin passes the pill's edge. */
+  .island:not([data-open]) .pill { overflow: clip; overflow-clip-margin: 5px; }
+  .pip::after { content: ""; position: absolute; inset: -5px -1px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .island, .pill, .pip, .content, .island[data-open] .content, .menu i, .menu i::after { transition: opacity 120ms ease; }
+  .badge, .card, .menu { animation: none; }
+}
+@supports not (transition-timing-function: linear(0, 1)) { .island { --spring: cubic-bezier(.2, .9, .25, 1.12); } }
+@media print { .island { display: none; } }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+/* LAYOUT-SWEEP: beside the buttons (phones, 900–1279 px) the island waits until it is placed in its own slot. */
+.island:not([data-placed]):not([data-home="centre"]):not([data-home="free"]) { visibility: hidden; }
+
+/* ---------- FLOAT (21 Oct 2026): Pip floating free ----------
+   A calm round glass button (56 px) in its corner, draggable, remembered; nothing but Pip's face inside. Its messages
+   are one short glass card beside it, its menu the same glass card as in the top bar. It keeps clear of what the page
+   needs (lib/float-place.mjs) and slides there and back. Under every sheet, drawer and dialog, and out of the way while
+   a modal one is open (its own sheet may sit lower, like the phone's More). Its live line still speaks. */
+/* Owner workbench UI (stability): Pip moves by transform (it slid by top/left, a layout on every frame of the slide). */
+.island[data-home="free"] { position: fixed; top: 0; left: 0; right: auto; bottom: auto; z-index: var(--ds-z-float, 60); transform: translate3d(var(--pip-x, 0px), var(--pip-y, 0px), 0); touch-action: none;
+  transition: transform 420ms var(--ds-spring, ease); }
+.island[data-home="free"][data-drag] { transition: none; will-change: transform; }
+:global(body:has([aria-modal="true"])) > .island[data-home="free"] > :not(.live), :global(body:has(dialog[open])) > .island[data-home="free"] > :not(.live) { visibility: hidden; }
+.island[data-home="free"] .pill { width: 56px; height: 56px; margin: 0; overflow: visible; border-radius: 50%; background: none; box-shadow: none !important; }
+.island[data-home="free"] .pip { inset: 0; border-radius: 50%; cursor: grab; background: var(--ds-glass, var(--theme-surface)); -webkit-backdrop-filter: var(--ds-glass-blur, none); backdrop-filter: var(--ds-glass-blur, none);
+  box-shadow: var(--ds-glass-edge, inset 0 0 0 1px var(--theme-border)), var(--ds-glass-shadow, 0 16px 40px rgb(20 18 50 / .16)); transition: transform 300ms var(--ds-spring, ease), box-shadow 200ms ease; }
+.island[data-home="free"] .pip:hover { transform: translateY(-2px); box-shadow: var(--ds-glass-edge, inset 0 0 0 1px var(--theme-border)), 0 22px 46px rgb(20 18 50 / .2), 0 3px 10px rgb(20 18 50 / .08); }
+.island[data-home="free"] .pip:active { transform: scale(.95); transition-duration: 120ms; }
+.island[data-home="free"] .pip[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--theme-action), var(--ds-glass-shadow, 0 16px 40px rgb(20 18 50 / .16)); }
+.island[data-home="free"][data-drag] .pip { cursor: grabbing; transform: scale(1.06); }
+.island[data-home="free"][data-open] .pip { opacity: 1; transform: none; }
+/* Pip's head (r 30 at 56,68 of 120) fills the disc: the 72 px face sits so the head is centred. Calm: no drop shadow
+   under the face (the glass has one) and no signal arcs around it in a corner of every page. */
+.island[data-home="free"] .face { position: absolute; top: -12.8px; left: -5.6px; width: 72px; height: 72px; }
+.island[data-home="free"] .face :global(.pip-shadow), .island[data-home="free"] .face :global(.pip-arcs) { display: none; }
+.island[data-home="free"] .face :global(.pip-eyes) { translate: var(--pip-look-x, 0px) var(--pip-look-y, 0px); transition: translate 180ms ease-out; }
+.island[data-home="free"] .badge { top: -3px; right: -3px; min-width: 20px; height: 20px; border-color: var(--theme-canvas, #fff); background: var(--theme-danger, #e5484d); font-size: 11px; line-height: 16px; }
+/* A message: one short glass card on the side with room, the main action and a close; urgent ones keep a red edge
+   and wait for the person. */
+.island[data-home="free"] .content { position: absolute; top: auto; bottom: calc(100% + 10px); right: 0; left: auto; gap: 10px; width: max-content; max-width: min(340px, calc(100vw - 32px)); height: auto; min-height: 0;
+  padding: 10px 8px 10px 12px; border-radius: var(--ds-radius-lg, 16px); color: var(--theme-text);
+  background: var(--ds-glass-strong, var(--theme-surface)); -webkit-backdrop-filter: var(--ds-glass-blur, none); backdrop-filter: var(--ds-glass-blur, none);
+  box-shadow: var(--ds-glass-edge, inset 0 0 0 1px var(--theme-border)), var(--ds-glass-shadow, 0 16px 40px rgb(20 18 50 / .16));
+  opacity: 0; transform: translateY(6px) scale(.98); transform-origin: calc(100% - 28px) 100%; transition: opacity 160ms ease, transform var(--ds-float-in, 280ms) var(--ds-spring, ease); pointer-events: none; }
+.island[data-home="free"][data-open] .content { opacity: 1; transform: none; pointer-events: auto; }
+.island[data-home="free"][data-side="left"] .content { right: auto; left: 0; transform-origin: 28px 100%; }
+.island[data-home="free"][data-v="top"] .content { top: calc(100% + 10px); bottom: auto; transform-origin: calc(100% - 28px) 0; }
+.island[data-home="free"][data-v="top"][data-side="left"] .content { transform-origin: 28px 0; }
+/* Beside Pip instead (when above would cover the page's own button): level with Pip, on its open side. */
+.island[data-home="free"][data-msg="beside"] .content { top: auto; bottom: 0; right: calc(100% + 10px); left: auto; max-width: min(340px, calc(var(--pip-x, 100vw) - 26px)); transform-origin: 100% 100%; }
+.island[data-home="free"][data-msg="beside"][data-side="left"] .content { right: auto; left: calc(100% + 10px); max-width: min(340px, calc(100vw - var(--pip-x, 0px) - 92px)); transform-origin: 0 100%; }
+.island[data-home="free"][data-msg="beside"][data-v="top"] .content { top: 0; bottom: auto; }
+.island[data-home="free"][data-urgent] .content { box-shadow: inset 3px 0 0 var(--theme-danger, #e5484d), var(--ds-glass-edge, inset 0 0 0 1px var(--theme-border)), var(--ds-glass-shadow, 0 16px 40px rgb(20 18 50 / .16)); }
+.island[data-home="free"][data-tone="error"] .content { box-shadow: inset 3px 0 0 var(--theme-danger, #e5484d), var(--ds-glass-edge, inset 0 0 0 1px var(--theme-border)), var(--ds-glass-shadow, 0 16px 40px rgb(20 18 50 / .16)); }
+.island[data-home="free"] .line { align-items: center; height: auto; }
+.island[data-home="free"] .text { flex-direction: column; align-items: flex-start; gap: 1px; white-space: normal; font-size: var(--ds-text-md, 13.5px); }
+.island[data-home="free"] .text b { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 1.3; font-weight: var(--ds-weight-strong, 650); }
+.island[data-home="free"] .text span { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 1; color: var(--theme-text-muted); font-size: var(--ds-text-sm, 12.5px); line-height: 1.35; }
+.island[data-home="free"] .act { min-height: 30px; background: var(--theme-action); color: var(--theme-action-text); }
+.island[data-home="free"] .act:hover { background: var(--theme-action-hover, var(--theme-action)); }
+.island[data-home="free"] .dismiss { background: var(--ds-hover, rgb(0 0 0 / 6%)); color: var(--theme-text-muted); }
+.island[data-home="free"] .dismiss:hover { background: var(--ds-press, rgb(0 0 0 / 10%)); color: var(--theme-text); }
+.island[data-home="free"] .line:focus-visible, .island[data-home="free"] .act:focus-visible, .island[data-home="free"] .dismiss:focus-visible { outline-color: var(--theme-focus); }
+/* Menu and summary: beside Pip, towards the larger free side, never taller than the room there. */
+.island[data-home="free"] .menu, .island[data-home="free"] .card { position: absolute; top: auto; bottom: calc(100% + 10px); right: 0; left: auto; margin: 0; transform-origin: calc(100% - 28px) 100%; }
+.island[data-home="free"][data-side="left"] .menu, .island[data-home="free"][data-side="left"] .card { right: auto; left: 0; transform-origin: 28px 100%; }
+.island[data-home="free"][data-v="top"] .menu, .island[data-home="free"][data-v="top"] .card { top: calc(100% + 10px); bottom: auto; transform-origin: calc(100% - 28px) 0; }
+.island[data-home="free"] .menu { max-height: var(--pip-room, 70vh); }
+@keyframes pip-in { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+.island[data-home="free"] .menu, .island[data-home="free"] .card { animation-name: pip-in; }
+/* Tucked away: half of Pip peeks from the right edge; a tap brings it back. */
+.island[data-home="free"][data-tucked] { top: auto; bottom: calc(140px + var(--pulse-safe-bottom, 0px)); left: auto; right: 0; transform: none; }
+.island[data-home="free"][data-tucked] .pip { transform: translateX(55%); cursor: pointer; }
+.island[data-home="free"][data-tucked] .pip:hover { transform: translateX(35%); }
+.slot[data-home="free"] { display: none; }
+@media (prefers-reduced-motion: reduce) { .island[data-home="free"], .island[data-home="free"] .pip, .island[data-home="free"] .content { transition: none; } .island[data-home="free"] .menu, .island[data-home="free"] .card { animation: none; } }
+
+
+/* An arrival opens above Pip, where a phone's raised composer lives. Keep it clear while typing or sending. */
+:global(body:has([data-chat-composer]:focus-within)) > .island[data-home="free"] .content { visibility: hidden; pointer-events: none; }
+
+/* EST-2182: after a phone's composer loses focus, keep arrival actions below the header, clear of Send.
+   Reaching for Send must not hover an overlapping arrival and hold its dismissal timer open. */
+@media (max-width: 760px) {
+  /* Pip is inert while an arrival is open; its transparent pill must not intercept the composer either. */
+  :global(body:has([data-chat-composer])) > .island[data-home="free"][data-open] { pointer-events: none; }
+  /* The island is moved by a transform, which makes it the containing block of its fixed children: "fixed, 64 px from
+     the top" landed 64 px below Pip, on the composer. The window's spot is worked out from Pip's own position. */
+  :global(body:has([data-chat-composer])) > .island[data-home="free"] .content {
+    position: absolute; top: calc(var(--pulse-safe-top, 0px) + 64px - var(--pip-y, 0px)); right: calc(var(--pip-x, 0px) + 100% - 100vw + 8px);
+    bottom: auto; left: auto; transform-origin: top right;
+  }
+}
+@media (prefers-reduced-motion: reduce) { .island[data-home="free"], .island[data-home="free"] .pip, .island[data-home="free"] .face :global(.pip-eyes) { transition: none; } }
+/* Owner workbench UI (stability, 23 Oct 2026): Pip's face is still at rest. Its endless breathe, blink, glow and bulb
+   loops repainted the page under Pip's blurred glass every frame, on every page, for as long as it was open. A change of
+   mood still plays its short motion once. */
+.island :global(svg *) { animation-iteration-count: 1 !important; }
+
+/* E2E-4P: while the on-screen keyboard is up (keyboard.tsx) a floating Pip steps away: it sat on the composer's Send. */
+:global(:root[data-keyboard="open"]) .island[data-home="free"] { visibility: hidden; pointer-events: none; }
+
+/* UI-UPGRADE (R067): a floating Pip fades back while the page scrolls under it, and returns when the page rests. */
+.island[data-home="free"] > .pill { transition: opacity 220ms ease; }
+.island[data-home="free"][data-scrolling]:not([data-open]):not([data-drag]):not(:focus-within) > .pill { opacity: .22; }
+/* UI-UPGRADE (R067): on a phone the page fills the width, so a floating Pip is a size smaller (still a 46 px target). */
+@media (max-width: 599.98px) { .island[data-home="free"] > .pill { scale: .84; transform-origin: 50% 100%; } }
