@@ -1,0 +1,182 @@
+/* Projects: board, cards and list. Uses the page kit's variables (--soft, --hover, --accent-soft) so light and dark both work. */
+
+/* ---------- Stage dot ---------- */
+.dot { display: inline-block; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--theme-border-strong); }
+.dot[data-stage="delivering"] { background: var(--theme-success); }
+.dot[data-stage="quiet"], .dot[data-stage="paused"] { background: var(--theme-warning); }
+.dot[data-stage="new"] { background: var(--theme-action); }
+.dot[data-stage="cancelled"] { background: var(--theme-danger); }
+
+/* ---------- Toolbar: one row under the window toolbar ---------- */
+.bar { flex: none; gap: 8px 10px; min-width: 0; }
+.barStart { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.barEnd { display: flex; flex: 1 1 auto; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
+.chip { display: inline-flex; flex: none; align-items: center; gap: 6px; height: 32px; padding: 0 11px; border: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); border-radius: 9px; background: var(--theme-surface); color: var(--theme-text-muted); font-size: 13px; font-weight: 550; white-space: nowrap; transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease, transform 120ms ease; }
+.chip:hover { border-color: var(--theme-border-strong); color: var(--theme-text); }
+.chip:active { transform: scale(0.97); }
+.chip[aria-current="true"] { border-color: color-mix(in srgb, var(--theme-action) 40%, var(--theme-border)); background: var(--accent-soft); color: var(--theme-action); }
+.chip b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.chipWhen { margin-left: -2px; }
+.barEnd form { flex: 0 1 220px; width: auto; min-width: 120px; }
+.inlineLink { position: relative; z-index: 1; color: inherit; }
+.inlineLink:hover { color: var(--theme-action); text-decoration: underline; }
+/* EST-1201: a client name longer than the card shortens itself with an ellipsis (its card line's tooltip has it whole),
+   so the link is never cut mid-letter by the line around it. */
+.cardSub > .inlineLink { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; vertical-align: top; white-space: nowrap; }
+/* Owner workbench UI (stability): the filters and the search share one line only when both fit; otherwise the search
+   and the view switch take a second line instead of sliding over "Delivered this week". */
+.bar { flex-wrap: wrap; }
+/* With the side panel open a 1280 window leaves about 970 px: the view switch keeps its icons, the chip its count. */
+@media (max-width: 1439.98px) { .viewLabel, .chipWhen { display: none; } }
+@media (max-width: 760px) { .barStart { flex-wrap: wrap; max-width: 100%; } }
+
+/* ---------- Board: the columns share the width and the height; each one pages on its own ---------- */
+.board { position: relative; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 10px; min-width: 0; }
+.board > [data-off] { display: none; }
+.column { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; border-radius: 12px; background: color-mix(in srgb, var(--theme-surface-subtle) 62%, transparent); }
+.columnHead { display: flex; flex: none; align-items: center; gap: 7px; height: 38px; margin: 0; padding: 0 6px 0 12px; font-size: 13px; font-weight: 600; }
+.columnHead small { color: var(--theme-text-muted); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.columnHead > :last-child { margin-left: auto; }
+.columnList { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 8px; padding: 1px 8px 8px; }
+.columnList > .card { align-content: space-between; }
+.columnEmpty { margin: 0 8px 8px; padding: 18px 10px; border: 1px dashed var(--theme-border); border-radius: 10px; color: var(--theme-text-muted); font-size: 12px; text-align: center; }
+.boardNav { position: absolute; z-index: 3; top: 50%; display: grid; width: 28px; height: 28px; margin-top: -14px; place-items: center; border: 1px solid var(--theme-border); border-radius: 50%; background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 2px 8px rgb(15 27 51 / 12%); cursor: pointer; transition: background-color 120ms ease, transform 120ms cubic-bezier(0.16, 1, 0.3, 1), opacity 120ms ease; }
+.boardNav[data-side="left"] { left: -14px; }
+.boardNav[data-side="right"] { right: -14px; }
+.boardNav:hover:not(:disabled) { background: var(--theme-surface-subtle); }
+.boardNav:active:not(:disabled) { transform: scale(0.92); }
+.boardNav:disabled { opacity: 0; pointer-events: none; }
+@media (min-width: 1180px) and (min-height: 600px) {
+  .board { grid-template-rows: minmax(0, 1fr); }
+}
+/* Phone and tablet: the page scrolls, the columns swipe sideways and each still pages by count. */
+@media (max-width: 1179.98px), (max-height: 599.98px) {
+  .board { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(248px, 1fr); align-items: start; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .board::-webkit-scrollbar { display: none; }
+  .column { scroll-snap-align: start; }
+  .boardNav { display: none; }
+}
+
+/* ---------- Cards ---------- */
+.cardGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(228px, 1fr)); align-content: start; gap: 12px; }
+.cardGrid > .card { align-content: space-between; }
+.card { position: relative; display: grid; align-content: start; gap: 10px; min-width: 0; padding: 12px; border: 1px solid color-mix(in srgb, var(--theme-border) 52%, transparent); border-radius: 12px; background: var(--theme-surface); transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease; }
+/* Cards sit in a clipped, paged view: hover tints instead of lifting out of it. */
+.card:hover { border-color: color-mix(in srgb, var(--theme-border-strong) 80%, transparent); background: var(--hover); }
+.card:has(.cardLink:active) { transform: scale(0.985); }
+.card:focus-within { border-color: var(--theme-border-strong); }
+.card[data-compact] { gap: 8px; padding: 10px; border-radius: 10px; }
+.cardHead { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 20px; }
+.cardWhen { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.cardText { display: grid; gap: 1px; min-width: 0; }
+.cardLink { overflow: hidden; font-size: 14px; font-weight: 600; letter-spacing: -0.005em; text-overflow: ellipsis; white-space: nowrap; }
+.cardLink::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.card:hover .cardLink { color: var(--theme-action); }
+.cardSub { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.titleRow { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; }
+.titleRow .cardWhen { flex: none; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 0; }
+.stats > div { display: grid; min-width: 0; }
+.stats dd { margin: 0; font-size: 15px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.stats dt { order: 2; overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.stats > div[data-on] dd { color: var(--theme-action); }
+.statLine { display: flex; flex-wrap: wrap; gap: 2px 6px; margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.statLine > span { white-space: nowrap; }
+.statLine span + span::before { content: "·"; margin-right: 6px; color: var(--theme-border-strong); }
+.statLine b { color: var(--theme-text); font-weight: 650; font-variant-numeric: tabular-nums; }
+.statLine span[data-on] b { color: var(--theme-action); }
+.cardFoot { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; padding-top: 9px; border-top: 1px solid var(--soft); color: var(--theme-text-muted); font-size: 12px; }
+.cardFoot > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- File tiles ---------- */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.fileTile { position: relative; z-index: 1; display: grid; justify-items: center; align-content: center; gap: 3px; height: 50px; border: 1px solid var(--soft); border-radius: 8px; background: color-mix(in srgb, var(--tint, var(--theme-text-muted)) 7%, var(--theme-surface)); color: color-mix(in srgb, var(--tint, var(--theme-text-muted)) 80%, var(--theme-text)); font-size: 12px; font-weight: 500; line-height: 1; transition: border-color 120ms ease, background-color 120ms ease, transform 120ms ease; }
+.fileTile[data-kind="video"] { --tint: var(--theme-action); }
+.fileTile[data-kind="image"] { --tint: var(--theme-success); }
+.fileTile span { color: var(--theme-text-muted); }
+.fileTile:hover { border-color: color-mix(in srgb, var(--tint, var(--theme-text-muted)) 45%, var(--theme-border)); background: color-mix(in srgb, var(--tint, var(--theme-text-muted)) 14%, var(--theme-surface)); transform: translateY(-1px); }
+.fileTile:active { transform: scale(0.97); }
+.tiles[data-small] .fileTile { grid-auto-flow: column; gap: 5px; height: 28px; border-radius: 7px; }
+.tilesEmpty { display: grid; height: 50px; place-items: center; border: 1px dashed var(--theme-border); border-radius: 8px; color: var(--theme-text-muted); font-size: 12px; }
+.tilesEmpty[data-small] { height: 28px; border-radius: 7px; }
+.rowTiles .tiles { display: flex; gap: 4px; }
+.rowTiles .fileTile { width: 26px; height: 24px; border-radius: 6px; }
+.rowTiles .fileTile span { display: none; }
+
+/* ---------- Detail header and footnotes ---------- */
+.headMeta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.defs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 28px; margin: 0; padding: 4px 14px 14px; font-size: 13px; }
+.defs > div { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.defs dt { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.defs dd { margin: 0; color: var(--theme-text-muted); }
+.relRow { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 6px 14px; border-top: 1px solid var(--soft); transition: background-color 120ms ease; }
+.relRow:hover { background: var(--hover); }
+
+@media (max-width: 760px) {
+  .board { grid-auto-columns: 84%; }
+  .cardGrid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .barStart, .barEnd { flex-basis: 100%; }
+  .barEnd form { flex: 1 1 auto; }
+  .defs { grid-template-columns: minmax(0, 1fr); }
+  .defs > div { grid-template-columns: 108px minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card, .fileTile, .chip, .relRow, .boardNav { transition: none; }
+  .card:has(.cardLink:active), .fileTile:hover, .fileTile:active, .chip:active { transform: none; }
+}
+.stack { display: grid; gap: 12px; min-width: 0; }
+
+/* ---------- List: a sheet whose rows page; the header row stays ---------- */
+.sheet { overflow: hidden; }
+.table th:first-child, .table td:first-child { padding-left: 16px; }
+.table thead th { border-bottom: 1px solid var(--soft); }
+.table tbody tr:first-child td { border-top: 0; }
+.lead { width: 38%; max-width: 0; }
+.lead > * { display: block; max-width: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.clip { width: 20%; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 1499.98px) { .roomy { display: none; } }
+@media (max-width: 760px) { .lead { width: auto; } }
+
+/* Short windows: cards drop their foot and use the small file tiles, so a third row fits. */
+@media (min-width: 1180px) and (max-height: 820px) {
+  .cardGrid .cardFoot { display: none; }
+  .cardGrid .card { gap: 8px; padding: 10px 12px; }
+  .cardGrid .fileTile { grid-auto-flow: column; gap: 5px; height: 32px; border-radius: 7px; }
+  .cardGrid .tilesEmpty { height: 32px; border-radius: 7px; }
+}
+
+/* ---------- Round 6: fewer, larger things instead of shrunken ones ---------- */
+/* Board: three or four roomy columns; a card is two lines (title + when, client · place + counts), so a column shows a real page. */
+.board { gap: 12px; }
+.columnHead { height: 42px; font-size: 14px; }
+.columnHead small { font-size: 13px; }
+.columnEmpty { font-size: 13px; }
+.card[data-compact] { gap: 4px; padding: 9px 12px; }
+.card[data-compact] .titleRow { align-items: baseline; }
+.card[data-compact] .cardSub { flex: 1 1 auto; min-width: 0; font-size: 13px; }
+.card[data-compact] .statLine { flex: none; flex-wrap: nowrap; font-size: 13px; }
+.cardWhen { font-size: 13px; }
+.boardNav { width: 32px; height: 32px; margin-top: -16px; }
+.boardNav[data-side="left"] { left: -16px; }
+.boardNav[data-side="right"] { right: -16px; }
+/* Cards: wider cards (four across a laptop), names and places wrap to two lines instead of being cut. */
+.cardGrid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.cardGrid .cardSub { display: -webkit-box; overflow: hidden; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 13px; }
+.cardGrid .cardLink { display: -webkit-box; overflow: hidden; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 15px; }
+.stats dt { overflow: visible; text-overflow: clip; white-space: normal; }
+.tiles[data-small] .fileTile { height: 32px; }
+.rowTiles .fileTile { width: 32px; height: 32px; }
+
+/* Project profile: the record identity (window toolbar) and tabs; each tab gets the full height for its task. */
+.profileOverview, .profileRow, .halves { display: grid; gap: 12px; min-width: 0; min-height: 0; }
+.profileOverview { grid-template-rows: auto minmax(0, 1fr); }
+.profileRow { grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); }
+.halves { grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr); }
+.profileRow > section, .halves > section { min-height: 0; }
+@media (min-width: 1180px) and (min-height: 600px) {
+  .profileRow, .halves { grid-template-rows: minmax(0, 1fr); }
+}
+@media (max-width: 1179.98px), (max-height: 599.98px) {
+  .profileRow, .halves { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) { .table .lead { width: 72%; } .table .lead a { white-space: normal; overflow-wrap: anywhere; } }
