@@ -1,0 +1,275 @@
+{
+  "rule_version": "delivery-rules/v2",
+  "tenant_config": {
+    "folder_rules": {
+      "subfolders": [
+        {"match": "video editing details", "role": "input:edit_brief"},
+        {"match": "project blueprint", "role": "input:blueprint_folder", "nested": true},
+        {"match": "research(\\s+and)?\\s+scripts?", "role": "input:research"},
+        {"match": "(shoot\\s+)?raw(\\s+(files|footage))?|shoot raw files", "role": "input:raw_footage"},
+        {"match": "model\\s+final\\s+videos?(\\s+and)?(\\s+its)?\\s+hooks?|final\\s+videos?(\\s+and\\s+hooks?)?", "role": "deliverables", "default_version_kind": "final"},
+        {"match": "vovs?(\\s+and\\s+designs?)?", "role": "deliverables", "default_version_kind": "final"},
+        {"match": "creatives?", "role": "deliverables", "default_version_kind": "final"},
+        {"match": "(cp\\s+video|landing\\s+page|founders?\\s+video|brand\\s*film|client\\s+testimonials?)(.*)", "role": "deliverables", "default_version_kind": "final"},
+        {"match": "drafts?", "role": "deliverables", "default_version_kind": "draft", "nested": true},
+        {"match": "leads?", "role": "ignore"}
+      ],
+      "file_name": {
+        "legacy_version_tokens": ["v\\d+", "final", "revised", "rev\\s*\\d*", "\\(\\d+\\)", "copy"],
+        "legacy_type_hints": {
+          "hook\\s*\\d": "HK",
+          "\\bCP\\d{0,3}\\b": "CP",
+          "vov": "VV",
+          "model": "MV",
+          "walk\\s*through": "WT",
+          "founder": "FV",
+          "testimonial": "TS"
+        }
+      },
+      "creative_type_rules": {
+        "folder_path": [
+          {"match": "model\\s+final\\s+videos?(?:\\s+and(?:\\s+its)?\\s+hooks?)?|final\\s+videos?(?:\\s+and\\s+hooks?)?", "type": "model_video"},
+          {"match": "vovs?(?:\\s+and\\s+designs?)?", "type": "vov"},
+          {"match": "cp\\s+videos?", "type": "vov"},
+          {"match": "founders?\\s+videos?", "type": "founder_video"},
+          {"match": "client\\s+testimonials?", "type": "testimonial"},
+          {"match": "walkthroughs?|walk\\s+throughs?", "type": "walkthrough"}
+        ],
+        "file_name": [
+          {"match": "\\bmodel(?:[-\\s]led)?\\s+video\\b", "type": "model_video"},
+          {"match": "\\bvov\\b", "type": "vov"},
+          {"match": "\\bcp[-\\s]+videos?\\b", "type": "vov"},
+          {"match": "\\bfounders?[-\\s]+videos?\\b", "type": "founder_video"},
+          {"match": "\\btestimonials?\\b", "type": "testimonial"},
+          {"match": "\\bwalk[\\s-]*throughs?\\b", "type": "walkthrough"}
+        ],
+        "parsed_type_codes": {
+          "MV": "model_video",
+          "HK": "model_video",
+          "VV": "vov",
+          "CP": "vov",
+          "FV": "founder_video",
+          "TS": "testimonial",
+          "WT": "walkthrough"
+        }
+      },
+      "design_type_rules": {
+        "folder_path": [
+          {"match": "single[-\\s]+image[-\\s]+ads?", "type": "single_image_ad"},
+          {"match": "carousels?", "type": "carousel"},
+          {"match": "brochures?", "type": "brochure"},
+          {"match": "logos?|brand marks?", "type": "logo"},
+          {"match": "pitch[-\\s]+decks?", "type": "pitch_deck"}
+        ],
+        "file_name": [
+          {"match": "\\bbrand[-\\s]+mark\\b", "type": "logo"}
+        ]
+      }
+    }
+  },
+  "design_type_precedence_cases": [
+    {"id": "design-client-logos-excluded", "folder_path": ["Client logos"], "expected": "other"},
+    {"id": "design-bank-logos-kept", "folder_path": ["Bank Logos"], "expected": "logo"},
+    {"id": "design-brochure-references-excluded", "folder_path": ["Brochure references"], "expected": "other"},
+    {"id": "design-builder-input-excluded", "folder_path": ["Old brochure from builder"], "expected": "other"},
+    {"id": "design-deepest-folder-wins", "folder_path": ["Brochures", "Logos"], "expected": "logo"},
+    {"id": "design-client-video-shoot-carousel-kept", "folder_path": ["Client Video Shoot", "Project A", "Carousels"], "expected": "carousel"},
+    {"id": "design-client-video-shoot-single-image-kept", "folder_path": ["Client Video Shoot", "Project A", "Single Image Ads"], "expected": "single_image_ad"},
+    {"id": "design-inner-reference-excluded-under-brochures", "folder_path": ["Brochures", "References"], "expected": "other"}
+  ],
+  "legacy_names": [
+    {"name": "Hook 1 - River View v2.mp4", "type_code": "HK", "version": 2},
+    {"name": "unrecognised export.mp4", "type_code": null, "version": null}
+  ],
+  "version_order": [
+    {
+      "versions": [
+        {"number": 10, "uploaded_at": "2026-01-03", "name": "v10"},
+        {"number": 2, "uploaded_at": "2026-01-02", "name": "v2"},
+        {"number": null, "uploaded_at": "2026-01-01", "name": "unnumbered"}
+      ],
+      "ordered_names": ["unnumbered", "v2", "v10"]
+    }
+  ],
+  "classify": [
+    {
+      "id": "cid-in-drafts",
+      "file_event": {"name": "EA0584-HK03-v2-9x16.mp4", "mime": "video/mp4", "folder_path": ["8) Drafts"]},
+      "expected": {
+        "asset": {"cid": "EA0584-HK03", "type_code": "HK"},
+        "version": {"number": 2, "kind": "draft", "variant": "9x16"},
+        "folder_role": "deliverables",
+        "delivered": true,
+        "confidence": 0.95,
+        "review_required": false
+      },
+      "why_contains": "Filename matched the CID syntax"
+    },
+    {
+      "id": "nested-drafts-use-core-stage-rule",
+      "file_event": {"name": "Hook 1.mp4", "mime": "video/mp4", "folder_path": ["5) Model Final Videos & Its Hooks", "Drafts"]},
+      "expected": {
+        "asset": {"legacy_name": "Hook 1", "type_code": "HK"},
+        "version": {"number": null, "kind": "draft", "variant": null, "label": null},
+        "folder_role": "deliverables",
+        "delivered": true,
+        "confidence": 0.65,
+        "review_required": false
+      },
+      "why_contains": "Configured legacy type hint"
+    },
+    {
+      "id": "unresolved-legacy-with-drive-id",
+      "file_event": {"file_id": "synthetic-file-unknown", "name": "unrecognised export.mp4", "mime": "video/mp4", "folder_path": ["8) Drafts"]},
+      "expected": {
+        "asset": {"key": "gdrive:synthetic-file-unknown", "type": "unknown", "legacy_name": "unrecognised export"},
+        "version": {"number": null, "kind": "draft", "variant": null, "label": null},
+        "folder_role": "deliverables",
+        "delivered": true,
+        "confidence": 0.1,
+        "review_required": false
+      },
+      "why_contains": "provisionally keyed by Drive file id"
+    },
+    {
+      "id": "unresolved-legacy-without-drive-id",
+      "file_event": {"name": "unrecognised export.mp4", "mime": "video/mp4", "folder_path": ["8) Drafts"]},
+      "expected": {
+        "asset": null,
+        "folder_role": "deliverables",
+        "delivered": true,
+        "confidence": 0.1,
+        "review_required": false
+      },
+      "why_contains": "asset identity is unresolved"
+    },
+    {
+      "id": "blueprint-hook-is-approved-input",
+      "file_event": {"data": {"name": "Hook 1.docx", "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}, "folder_path": ["2) Research & Scripts", "Project Blueprint"]},
+      "expected": {"input": {"kind": "approved_script", "received": true}, "folder_role": "input:blueprint_folder"},
+      "why_contains": "recorded as received input"
+    },
+    {
+      "id": "unknown-cid-with-asset-index",
+      "file_event": {"name": "EA0584-MV01.mp4", "mime": "video/mp4", "folder_path": ["8) Drafts"]},
+      "tenant_config_overrides": {"asset_index": [{"cid": "EA0584-HK03", "project_registry": "0584", "project_id": "project-a"}]},
+      "expected": {"asset": null, "delivered": true, "confidence": 0.2, "review_required": true},
+      "why_contains": "not in the supplied asset index"
+    },
+    {
+      "id": "cross-project-cid-needs-review",
+      "file_event": {"name": "EA0584-HK03-v2.mp4", "mime": "video/mp4", "project_registry": "9999", "folder_path": ["8) Drafts"]},
+      "tenant_config_overrides": {"asset_index": [{"cid": "EA0584-HK03", "project_registry": "0584", "project_id": "project-a"}]},
+      "expected": {"asset": {"cid": "EA0584-HK03", "project_registry": "0584", "project_id": "project-a"}, "delivered": true, "confidence": 0.95, "review_required": true},
+      "why_contains": "different project"
+    },
+    {
+      "id": "creative-type-model-video-folder",
+      "file_event": {"name": "Final Cut.mp4", "mime": "video/mp4", "folder_path": ["5) Model Final Videos & Its Hooks"]},
+      "expected": {"delivered": true, "creative_type": "model_video", "creative_type_classified": true, "creative_type_source": "folder_path"},
+      "why_contains": "Creative type 'Model video'"
+    },
+    {
+      "id": "creative-type-vov-filename",
+      "file_event": {"name": "River View VOV final.mp4", "mime": "video/mp4", "folder_path": ["Creatives"]},
+      "expected": {"delivered": true, "creative_type": "vov", "creative_type_classified": true, "creative_type_source": "file_name"},
+      "why_contains": "Creative type 'VOV'"
+    },
+    {
+      "id": "creative-type-founder-folder",
+      "file_event": {"name": "Leadership edit.mp4", "mime": "video/mp4", "folder_path": ["Founder Videos"]},
+      "expected": {"delivered": true, "creative_type": "founder_video", "creative_type_classified": true, "creative_type_source": "folder_path"},
+      "why_contains": "Creative type 'Founder video'"
+    },
+    {
+      "id": "creative-type-testimonial-folder",
+      "file_event": {"name": "Client story.mp4", "mime": "video/mp4", "folder_path": ["Client Testimonials"]},
+      "expected": {"delivered": true, "creative_type": "testimonial", "creative_type_classified": true, "creative_type_source": "folder_path"},
+      "why_contains": "Creative type 'Testimonial'"
+    },
+    {
+      "id": "creative-type-walkthrough-filename",
+      "file_event": {"name": "Walk-through final 01.mp4", "mime": "video/mp4", "folder_path": ["Creatives"]},
+      "expected": {"delivered": true, "creative_type": "walkthrough", "creative_type_classified": true, "creative_type_source": "file_name"},
+      "why_contains": "Creative type 'Walkthrough'"
+    },
+    {
+      "id": "creative-type-from-existing-cid-parser",
+      "file_event": {"name": "EA0584-HK03-v2.mp4", "mime": "video/mp4", "folder_path": ["Creatives"]},
+      "expected": {"delivered": true, "creative_type": "model_video", "creative_type_classified": true, "creative_type_source": "parsed_type_code"},
+      "why_contains": "Creative type 'Model video'"
+    },
+    {
+      "id": "creative-type-other-unclassified",
+      "file_event": {"name": "Unmarked export.mp4", "mime": "video/mp4", "folder_path": ["Creatives"]},
+      "expected": {"delivered": true, "creative_type": "other", "creative_type_classified": false, "creative_type_rule": null},
+      "why_contains": "other (unclassified)"
+    },
+    {
+      "id": "design-single-image-ad-png",
+      "file_event": {"name": "Summer offer.png", "mime": "image/png", "folder_path": ["Creatives", "Single Image Ads"]},
+      "expected": {"delivered": true, "design_type": "single_image_ad", "design_type_classified": true, "design_type_source": "folder_path"},
+      "why_contains": "Design type 'Single-image ad'"
+    },
+    {
+      "id": "design-carousel-image",
+      "file_event": {"name": "Launch carousel.jpg", "mime": "image/jpeg", "folder_path": ["Creatives", "Carousels"]},
+      "expected": {"delivered": true, "design_type": "carousel", "design_type_classified": true, "design_type_source": "folder_path"},
+      "why_contains": "Design type 'Carousel'"
+    },
+    {
+      "id": "design-brochure-pdf",
+      "file_event": {"name": "Project brochure.pdf", "mime": "application/pdf", "folder_path": ["Creatives", "Brochures"]},
+      "expected": {"delivered": true, "design_type": "brochure", "design_type_classified": true, "design_type_source": "folder_path"},
+      "why_contains": "Design type 'Brochure'"
+    },
+    {
+      "id": "design-logo-ai",
+      "file_event": {"name": "Brand identity.ai", "mime": "application/octet-stream", "folder_path": ["Creatives", "Logos"]},
+      "expected": {"delivered": true, "design_type": "logo", "design_type_classified": true, "design_type_source": "folder_path"},
+      "why_contains": "Design type 'Logo'"
+    },
+    {
+      "id": "design-pitch-deck-pdf",
+      "file_event": {"name": "Sales pitch deck.pdf", "mime": "application/pdf", "folder_path": ["Creatives", "Pitch Decks"]},
+      "expected": {"delivered": true, "design_type": "pitch_deck", "design_type_classified": true, "design_type_source": "folder_path"},
+      "why_contains": "Design type 'Pitch deck'"
+    },
+    {
+      "id": "design-logo-photoshop-extension",
+      "file_event": {"name": "Brand mark source.psd", "mime": "application/octet-stream", "folder_path": ["Creatives", "Misc exports"]},
+      "expected": {"delivered": true, "design_type": "logo", "design_type_classified": true, "design_type_source": "file_name"},
+      "why_contains": "Design type 'Logo'"
+    },
+    {
+      "id": "design-carousel-photoshop-extension",
+      "file_event": {"name": "Carousel source.psd", "mime": "application/octet-stream", "folder_path": ["Creatives", "Carousels"]},
+      "expected": {"delivered": true, "design_type": "carousel", "design_type_classified": true, "design_type_source": "folder_path"},
+      "why_contains": "Design type 'Carousel'"
+    },
+    {
+      "id": "design-unmatched-other-photoshop-extension",
+      "file_event": {"name": "Unmarked export.psd", "mime": "application/octet-stream", "folder_path": ["Creatives", "Misc exports"]},
+      "expected": {"delivered": true, "design_type": "other", "design_type_classified": false, "design_type_rule": null},
+      "why_contains": "other (unclassified)"
+    }
+  ],
+  "design_summary_exclusions": [
+    {
+      "id": "design-client-uploaded-logo-excluded",
+      "file_event": {"name": "Client mark.png", "mime": "image/png", "folder_path": ["Creatives", "Logos"]},
+      "uploader_side": "client",
+      "account_basis": "last modifying account",
+      "expected_count": 0
+    }
+  ],
+  "design_summary_inclusions": [
+    {
+      "id": "design-indexed-shared-login-counted",
+      "file_event": {"name": "Indexed shared logo.pdf", "mime": "application/pdf", "folder_path": ["Creatives", "Logos"]},
+      "account": {"is_shared": true, "purpose": "Indexed shared login"},
+      "expected_count": 1,
+      "expected_credit": "shared_login"
+    }
+  ]
+}
