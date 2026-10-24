@@ -1,0 +1,38 @@
+/* EST-1474: Creative Strategy (CS Home, a sprint). Theme tokens only, so light and dark follow. */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 12px; align-items: start; min-width: 0; }
+/* A sprint: intake beside the inputs on wide screens, the clock across the whole width. */
+.sprintGrid { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); gap: 12px; align-items: start; min-width: 0; }
+.wide { grid-column: 1 / -1; }
+.rows { list-style: none; margin: 0; padding: 4px 14px 10px; display: grid; gap: 0; }
+.rows > li + li { border-top: 1px solid var(--theme-border); }
+.row { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; color: inherit; text-decoration: none; }
+.row:hover b { text-decoration: underline; }
+.row:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 6px; }
+.row[data-state="alert"] > svg, .row[data-state="overdue"] > svg { color: var(--theme-danger); }
+.row[data-state="today"] > svg { color: var(--theme-warning); }
+.row[data-state="upcoming"] > svg { color: var(--theme-text-muted); }
+.main { display: grid; gap: 2px; min-width: 0; }
+.main b { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.main small { color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+/* An input: label, owner, received date, state. A deliverable: done, label, owner, state. */
+.item { display: grid; grid-template-columns: minmax(160px, 1fr) 190px 160px 96px; grid-template-areas: "main owner date state"; gap: 10px; align-items: center; padding: 8px 0; scroll-margin-top: 80px; }
+.item > :nth-child(1) { grid-area: main; }
+.item > :nth-child(2) { grid-area: owner; min-width: 0; }
+.item > :nth-child(3) { grid-area: date; }
+.item > :nth-child(4) { grid-area: state; justify-self: end; }
+.item[data-state] { grid-template-columns: 22px minmax(160px, 1fr) 190px 96px; grid-template-areas: "done main owner state"; }
+.item[data-state] > :nth-child(1) { grid-area: done; }
+.item[data-state] > :nth-child(2) { grid-area: main; }
+.item[data-state] > :nth-child(3) { grid-area: owner; }
+.item[data-state] > :nth-child(4) { grid-area: state; }
+.item:target { background: color-mix(in oklab, var(--theme-action) 8%, transparent); border-radius: 8px; }
+.done { display: flex; align-items: center; justify-content: center; }
+.date { width: 100%; }
+.form { display: grid; gap: 12px; padding: 12px 14px 14px; }
+.people { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+@media (max-width: 1100px) { .sprintGrid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .item { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "main state" "owner date"; row-gap: 6px; }
+  .item[data-state] { grid-template-columns: 22px minmax(0, 1fr) auto; grid-template-areas: "done main state" ". owner owner"; }
+  .item > :nth-child(2) { justify-self: start; }
+}

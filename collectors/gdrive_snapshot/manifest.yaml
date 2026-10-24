@@ -1,0 +1,14 @@
+name: gdrive_snapshot
+version: 1.0.0
+source_kind: pull
+provider: google_workspace_index
+auth: postgres_read_only
+emits: [drive.file.observed]
+purposes: [delivery]
+sensitivity: 1
+backfill: { source: EA Drive metadata index, max_batch: 1000 }
+consent: notice
+filters:
+  tables: [drive_file]
+  content: false
+  excluded_paths: [EA Team Member Details, salary, finance]
