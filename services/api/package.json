@@ -1,0 +1,35 @@
+{
+  "name": "@pulse/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.21.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters --pretty false && node --check test/health.test.mjs",
+    "typecheck": "tsc --noEmit --pretty false",
+    "test": "pnpm build && node --test --test-concurrency=2 test/*.test.mjs",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@pulse/chat-export": "workspace:*",
+    "@pulse/invoice-doc": "workspace:*",
+    "ajv": "8.20.0",
+    "fastify": "5.12.5",
+    "jose": "6.2.12",
+    "js-yaml": "4.3.2",
+    "pg": "8.23.1",
+    "sharp": "0.35.5",
+    "openid-client": "6.8.8",
+    "web-push": "3.6.7"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "4.0.9",
+    "@types/node": "24.19.1",
+    "@types/pg": "8.23.1",
+    "@types/web-push": "3.6.4",
+    "typescript": "5.9.3"
+  }
+}
