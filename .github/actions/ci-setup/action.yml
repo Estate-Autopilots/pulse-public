@@ -1,0 +1,62 @@
+name: Pulse CI setup
+description: Locked dependencies and the same-run web build for isolated hosted jobs
+inputs:
+  browser:
+    default: 'false'
+    description: Install Chromium and runner system libraries
+  web:
+    default: 'false'
+    description: Restore the web build from this exact run (any attempt; a run is one head SHA)
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v7
+      with:
+        node-version-file: .nvmrc
+    - shell: bash
+      run: |
+        corepack enable
+        corepack pnpm config set store-dir "$HOME/.local/share/pnpm/store" --global
+    - uses: actions/cache@v6.1.0
+      with:
+        path: ~/.local/share/pnpm/store
+        key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: pnpm-${{ runner.os }}-
+    - uses: actions/setup-python@v7
+      with:
+        python-version: '3.12'
+    - uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
+    - shell: bash
+      run: |
+        corepack pnpm install --frozen-lockfile
+        uv sync --all-packages --locked
+        corepack pnpm --filter @pulse/api build
+    # The runner's apt mirror took 8.5 minutes for Playwright's 26 MB of system packages (pulse-public run of
+    # 22 Oct). Keep the downloaded packages in the Actions cache and skip the man-db trigger.
+    - if: inputs.browser == 'true'
+      uses: actions/cache@v6.1.0
+      with:
+        path: ~/.cache/pulse-apt
+        key: apt-playwright-${{ runner.os }}-${{ hashFiles('tests/e2e/package.json') }}
+        restore-keys: apt-playwright-${{ runner.os }}-
+    - if: inputs.browser == 'true'
+      shell: bash
+      run: |
+        sudo rm -f /var/lib/man-db/auto-update
+        mkdir -p ~/.cache/pulse-apt
+        if compgen -G "$HOME/.cache/pulse-apt/*.deb" >/dev/null; then sudo cp -n ~/.cache/pulse-apt/*.deb /var/cache/apt/archives/; fi
+        corepack pnpm --dir tests/e2e exec playwright install --with-deps chromium
+        if compgen -G "/var/cache/apt/archives/*.deb" >/dev/null; then cp -n /var/cache/apt/archives/*.deb ~/.cache/pulse-apt/; fi
+    - if: inputs.web == 'true'
+      uses: actions/download-artifact@v5
+      with:
+        name: web-${{ github.run_id }}
+        path: ${{ runner.temp }}/web-build
+    - if: inputs.web == 'true'
+      shell: bash
+      run: |
+        tar -xzf "$RUNNER_TEMP/web-build/web.tgz" -C apps/web
+        test -s apps/web/.next/BUILD_ID
+        echo 'PULSE_WEB_BUILT=1' >> "$GITHUB_ENV"

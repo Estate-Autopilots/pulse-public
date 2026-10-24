@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="color-scheme" content="light dark">
+<title>Pulse</title>
+<style>
+  /* The shell's own offline screen: shown instead of any browser error when Pulse cannot be reached. */
+  :root { --canvas:#f6f6fa; --surface:#fff; --text:#191a2e; --muted:#66687e; --action:#5b45d6; --action-text:#fff; --border:#dbdce8; }
+  @media (prefers-color-scheme: dark) { :root { --canvas:#121219; --surface:#1a1a24; --text:#eeeef6; --muted:#a7a8bb; --action:#a99cff; --action-text:#17123a; --border:#31313f; } .light { display:none } }
+  @media (prefers-color-scheme: light) { .dark { display:none } }
+  html, body { margin:0; height:100%; background:var(--canvas); color:var(--text); font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color:transparent; }
+  main { box-sizing:border-box; min-height:100%; display:grid; place-items:center; text-align:center;
+    padding:max(24px,env(safe-area-inset-top)) 24px max(24px,env(safe-area-inset-bottom)); }
+  .card { max-width:340px; display:grid; justify-items:center; gap:12px; }
+  h1 { font-size:22px; line-height:1.25; margin:8px 0 0; font-weight:650; }
+  p { margin:0; color:var(--muted); }
+  button { margin-top:12px; min-height:48px; min-width:180px; border:0; border-radius:14px; padding:0 22px; font:inherit; font-weight:600;
+    background:var(--action); color:var(--action-text); }
+  button:active { transform:scale(.98); }
+  button[disabled] { opacity:.6; }
+  small { color:var(--muted); font-size:13px; min-height:18px; }
+</style>
+</head>
+<body>
+<main>
+  <section class="card" aria-live="polite">
+    <span class="light" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="96" height="96"><defs><linearGradient id="pb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f7dff"/><stop offset="1" stop-color="#5b45d6"/></linearGradient></defs><ellipse cx="60" cy="110" rx="26" ry="4.5" fill="rgba(24,20,60,.14)"/><path d="M60 22C88 22 102 38 102 62C102 88 86 100 60 100S18 88 18 62C18 38 32 22 60 22Z" fill="url(#pb)"/><path d="M33 47c1-9 8-15 16-16" fill="none" stroke="#ffffff" stroke-opacity=".45" stroke-width="3.6" stroke-linecap="round"/><rect x="42.5" y="46.5" width="10" height="15" rx="5" fill="#ffffff"/><rect x="67.5" y="46.5" width="10" height="15" rx="5" fill="#ffffff"/><path d="M41 43l11-3" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M79 43l-11-3" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M53 69q3.5-3 7 0t7 0" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="98" cy="22" r="5.5" fill="#ffb547"/></svg></span>
+    <span class="dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="96" height="96"><defs><linearGradient id="pbd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a596ff"/><stop offset="1" stop-color="#6a55e6"/></linearGradient></defs><ellipse cx="60" cy="110" rx="26" ry="4.5" fill="rgba(0,0,0,.45)"/><path d="M60 22C88 22 102 38 102 62C102 88 86 100 60 100S18 88 18 62C18 38 32 22 60 22Z" fill="url(#pbd)"/><path d="M33 47c1-9 8-15 16-16" fill="none" stroke="#ffffff" stroke-opacity=".45" stroke-width="3.6" stroke-linecap="round"/><rect x="42.5" y="46.5" width="10" height="15" rx="5" fill="#ffffff"/><rect x="67.5" y="46.5" width="10" height="15" rx="5" fill="#ffffff"/><path d="M41 43l11-3" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M79 43l-11-3" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M53 69q3.5-3 7 0t7 0" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="98" cy="22" r="5.5" fill="#ffb547"/></svg></span>
+    <h1 id="title">You’re offline</h1>
+    <p id="text">Pulse needs the internet. Your work is safe; Pulse opens again as soon as you’re connected.</p>
+    <button id="retry" type="button">Retry</button>
+    <small id="note"></small>
+  </section>
+</main>
+<script>
+  // Only Pulse itself may be reopened from here.
+  var ORIGIN = 'https://pulse.estateautopilots.com';
+  var query = new URLSearchParams(location.search);
+  var from = query.get('from') || '';
+  var target = from.indexOf(ORIGIN + '/') === 0 ? from : ORIGIN + '/';
+  if (query.get('why') === 'server') {
+    document.getElementById('title').textContent = 'Pulse can’t be reached right now';
+    document.getElementById('text').textContent = 'Your connection works, but Pulse did not answer. It usually comes back within a minute.';
+  }
+  var retry = document.getElementById('retry'), note = document.getElementById('note'), busy = false;
+  function attempt(manual) {
+    if (busy) return; busy = true; retry.disabled = true; note.textContent = manual ? 'Trying again…' : '';
+    fetch(ORIGIN + '/healthz', { cache: 'no-store', mode: 'no-cors' }).then(function () { location.replace(target); })
+      .catch(function () { busy = false; retry.disabled = false; note.textContent = manual ? 'Still offline. Pulse keeps trying by itself.' : ''; });
+  }
+  retry.addEventListener('click', function () { attempt(true); });
+  window.addEventListener('online', function () { attempt(false); });
+  setInterval(function () { if (navigator.onLine) attempt(false); }, 8000);
+</script>
+</body>
+</html>

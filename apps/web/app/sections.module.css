@@ -1,0 +1,19 @@
+.workspace { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; }
+.toolbar { display: flex; flex: none; align-items: center; gap: 6px; min-width: 0; }
+.tabs { min-width: 0; max-width: 100%; }
+.toolbar > .tabs { flex: 0 1 auto; overflow-x: auto; }
+.tabs > button { flex: none; white-space: nowrap; }
+.pane { min-width: 0; }
+/* `wrap`: every view stays reachable on a phone by wrapping, not paging. */
+.tabs[data-wrap] { flex-wrap: wrap; height: auto; overflow: visible; }
+.toolbar > .tabs[data-wrap] { overflow: visible; }
+.tabs[data-wrap] > button { flex: 1 1 auto; overflow: visible; }
+.pane[hidden] { display: none; }
+@media (min-width: 1180px) and (min-height: 600px) {
+ .workspace, .pane { flex: 1 1 0; min-height: 0; }
+ .pane { display: flex; flex-direction: column; }
+ .pane > section, .pane > form { flex: 1 1 0; min-height: 0; }
+ .pane > form { display: flex; flex-direction: column; }
+ .pane > form > [data-pager] { flex: 1 1 0; }
+}
+@media (max-width: 899.98px) { .toolbar > .tabs { flex-wrap: wrap; overflow: visible; } }

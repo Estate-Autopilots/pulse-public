@@ -1,0 +1,133 @@
+/* Billing redesign (18 Oct 2026): the composer (write on the left, the customer's copy on the right), the document page
+   (chain bar, one next step, the filed copy) and the documents list (one line per document). Theme tokens only; the
+   kit draws the rows, the steppers, the next step and the sheet. Two columns from 900 px; below 600 px the customer's copy
+   is a sheet from the bottom. */
+
+/* ---------- Two columns: write | the customer's copy ---------- */
+.composer { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr); gap: 16px; align-items: start; min-width: 0; }
+.write { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.view { position: sticky; top: 8px; min-width: 0; }
+@media (max-width: 899.98px) { .composer { grid-template-columns: minmax(0, 1fr); } .view { position: static; } }
+@media (max-width: 599.98px) { .view, .deskOnly { display: none; } .write { padding-bottom: 150px; } }
+
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; }
+.top > nav { flex: 0 1 auto; }
+.draftChip { display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted);
+  font-size: 12px; font-weight: 600; white-space: nowrap; }
+.label { margin: 0 0 6px; color: var(--theme-text-muted); font-size: 11.5px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; }
+.block { display: flex; flex-direction: column; min-width: 0; }
+
+.avatar { display: grid; flex: none; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface));
+  color: var(--theme-action); font-size: 13px; font-weight: 700; }
+.src { display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; border-radius: 999px; background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface));
+  color: var(--theme-action); font-size: 12px; font-weight: 600; white-space: nowrap; }
+@media (max-width: 419.98px) { .src { display: none; } }
+
+/* Add-on chips under the lines */
+.adds { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; min-width: 0; }
+.addsLabel { color: var(--theme-text-muted); font-size: 12.5px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; min-height: 32px; padding: 0 12px; border: 1px dashed color-mix(in srgb, var(--theme-action) 70%, var(--theme-border));
+  border-radius: 999px; background: transparent; color: var(--theme-action); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip:hover { background: color-mix(in srgb, var(--theme-action) 8%, var(--theme-surface)); }
+.chip[data-tone="needed"] { border-color: color-mix(in srgb, var(--theme-warning) 75%, var(--theme-border)); color: color-mix(in srgb, var(--theme-warning) 70%, var(--theme-text)); }
+.chip[data-tone="quiet"] { border-style: solid; border-color: var(--theme-border); color: var(--theme-text-muted); }
+@media (max-width: 899.98px) { .chip { min-height: 40px; } }
+.find { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.find input { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 9px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; }
+.find input:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 0; border-color: transparent; }
+
+/* A price that differs from the catalogue: a request, never an input */
+.flag { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--theme-danger) 30%, var(--theme-border));
+  border-radius: 10px; background: color-mix(in srgb, var(--theme-danger) 7%, var(--theme-surface)); font-size: 13px; line-height: 1.45; }
+.flag b { color: var(--theme-danger); font-weight: 650; }
+.flag > span { flex: 1 1 220px; min-width: 0; }
+.flag[data-tone="ok"] { border-color: color-mix(in srgb, var(--theme-success) 35%, var(--theme-border)); background: color-mix(in srgb, var(--theme-success) 8%, var(--theme-surface)); }
+.flag[data-tone="ok"] b { color: var(--theme-success); }
+
+/* Totals */
+.totals { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; padding: 2px 2px 0; }
+.totals small { color: var(--theme-text-muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.total { font-size: 22px; font-weight: 750; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.total small { margin-right: 6px; font-size: 12.5px; font-weight: 500; letter-spacing: 0; }
+
+/* Forms inside More details and the drawers */
+.fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; min-width: 0; }
+.fields > label { align-content: start; }
+.wide { grid-column: 1 / -1; }
+.checks { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.check { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; color: var(--theme-text); font-size: 13px; cursor: pointer; }
+.check input { width: 16px; height: 16px; accent-color: var(--theme-action); }
+.hint { color: var(--theme-text-muted); font-size: 11.5px; font-weight: 400; }
+.bad { color: var(--theme-danger); }
+.good { color: var(--theme-success); }
+.note { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.5; }
+.note b { color: var(--theme-text); font-weight: 600; }
+.price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; font-size: 13px; }
+.price b { font-size: 16px; font-variant-numeric: tabular-nums; }
+@media (max-width: 599.98px) { .fields { grid-template-columns: minmax(0, 1fr); } .fields input, .fields select { height: 40px; } }
+
+/* The phone sheet's panes */
+.sheetTerms { margin: 0; color: var(--theme-text); font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
+.activity { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; font-size: 13px; }
+.activity li { display: flex; flex-wrap: wrap; gap: 2px 8px; color: var(--theme-text-muted); }
+.activity b { color: var(--theme-text); font-weight: 600; }
+.sheetTotal { font-variant-numeric: tabular-nums; }
+.sheetTotal b { color: var(--theme-text); font-size: 15px; }
+
+/* ---------- The live preview (preview.tsx): a title with a note, tools on the right; bare inside the sheet ---------- */
+.previewTitle { display: flex; flex-direction: column; min-width: 0; }
+.previewTitle small { color: var(--theme-text-muted); font-size: 12px; font-weight: 400; }
+.previewTools { display: inline-flex; flex: none; align-items: center; gap: 8px; }
+.previewBare { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.previewBare canvas { max-width: 100%; }
+
+/* ---------- The document page ---------- */
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 0; }
+.facts div { display: grid; gap: 2px; min-width: 0; }
+.facts dt { color: var(--theme-text-muted); font-size: 11.5px; }
+.facts dd { overflow: hidden; margin: 0; font-size: 13.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; }
+.headTitle { display: flex; flex-direction: column; flex: 1 1 200px; min-width: 0; }
+.headTitle strong { overflow: hidden; font-size: 17px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.headTitle span { overflow: hidden; color: var(--theme-text-muted); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap; }
+.headTotal { font-size: 20px; font-weight: 750; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.more { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--theme-border); border-radius: 9px; background: var(--theme-surface);
+  color: var(--theme-text-muted); cursor: pointer; }
+.more:hover { color: var(--theme-text); border-color: var(--theme-border-strong); }
+@media (max-width: 899.98px) { .more { width: 44px; height: 44px; } }
+.linkBox { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.linkBox input { flex: 1 1 200px; min-width: 0; height: 36px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 12.5px; }
+.radios { display: flex; flex-direction: column; gap: 6px; }
+.radio { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 10px; color: var(--theme-text); font-size: 14px; cursor: pointer; }
+.radio:has(input:checked) { border-color: var(--theme-action); box-shadow: 0 0 0 1px var(--theme-action); }
+.radio input { width: 16px; height: 16px; accent-color: var(--theme-action); }
+.cancelled { margin: 0; padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--theme-danger) 8%, var(--theme-surface)); font-size: 12.5px; }
+
+/* ---------- The documents list ---------- */
+.listTools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; min-width: 0; }
+.listTools > div[role="radiogroup"] { flex: 0 1 auto; min-width: 0; max-width: 100%; }
+.search { flex: 1 1 200px; min-width: 0; max-width: 360px; }
+.search input { width: 100%; height: 36px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 9px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13.5px; }
+.search input:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 0; border-color: transparent; }
+@media (max-width: 599.98px) { .search { flex-basis: 100%; max-width: none; } .search input { height: 44px; font-size: 16px; } }
+.listNote { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; }
+.listNote button { padding: 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-weight: 600; cursor: pointer; }
+.typeIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.typeIcon[data-type="quotation"] { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action); }
+.typeIcon[data-type="invoice"] { background: color-mix(in srgb, var(--theme-success) 12%, var(--theme-surface)); color: var(--theme-success); }
+@media (max-width: 419.98px) { .typeIcon { display: none; } }
+.chipStatus { margin-top: 2px; }
+.empty { padding: 28px 16px; color: var(--theme-text-muted); font-size: 13.5px; text-align: center; }
+.listFoot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; color: var(--theme-text-muted); font-size: 12.5px; }
+
+/* The filed copy beside an approved document, and the follow-up card under it (its own "Log reply" is the next step's) */
+.copy { position: sticky; top: 8px; display: flex; flex-direction: column; gap: 8px; min-width: 0; max-height: calc(100dvh - 120px); padding: 10px; border: 1px solid var(--theme-border);
+  border-radius: 12px; background: color-mix(in srgb, var(--theme-surface-subtle) 70%, var(--theme-surface)); overflow: hidden; }
+.copy > div:last-child { min-height: 0; overflow-y: auto; }
+.copyHead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; padding: 0 2px; font-size: 13px; font-weight: 600; }
+@media (max-width: 899.98px) { .copy { position: static; max-height: none; } }
+.follow:empty { display: none; }
+/* Only the card's buttons hide: its "Open the follow-up task" link stays (EST-1239). */
+.follow section > div > button, .follow section > div:has(> button):not(:has(> a)) { display: none; }
+.listWrap { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding-bottom: 24px; }
