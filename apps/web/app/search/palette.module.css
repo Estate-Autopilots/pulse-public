@@ -1,0 +1,41 @@
+/* UX-5A: Ctrl+K (palette.tsx). A fixed frame: the input on top, results that scroll inside a box of a set height (so
+   results arriving from the server never move the input or what is above them), hints at the foot. A full-height sheet
+   on phones. Theme tokens only; no motion under prefers-reduced-motion. */
+.backdrop { position: fixed; z-index: var(--ds-z-palette, 10000); inset: 0; display: grid; align-items: start; justify-items: center; padding: min(14vh, 120px) 16px 24px;
+  background: rgb(13 20 34 / 38%); backdrop-filter: blur(4px); animation: fade 120ms ease-out both; }
+.dialog { display: flex; flex-direction: column; width: min(680px, 100%); overflow: hidden; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface);
+  color: var(--theme-text); box-shadow: 0 24px 70px rgb(15 27 51 / 22%); animation: drop 160ms cubic-bezier(.2, .8, .2, 1) both; }
+:global(html[data-theme="dark"]) .dialog { box-shadow: 0 24px 70px rgb(0 0 0 / 55%), 0 0 0 1px rgb(255 255 255 / 4%); }
+.inputRow { flex: none; display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 14px 0 16px; border-bottom: 1px solid var(--theme-border); color: var(--theme-text-muted); }
+.inputRow input { flex: 1 1 auto; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--theme-text); font: inherit; font-size: 16px; }
+.inputRow input::placeholder { color: var(--theme-text-muted); }
+.status { flex: none; min-width: 70px; color: var(--theme-text-muted); font-size: 12px; text-align: right; }
+.results { flex: none; height: min(56vh, 460px); overflow-y: auto; overscroll-behavior: contain; padding: 6px 8px 8px; scroll-padding: 34px 0 8px; }
+.groupLabel { margin: 10px 10px 4px; color: var(--theme-text-muted); font-size: 11px; font-weight: 650; letter-spacing: .05em; text-transform: uppercase; }
+.groupLabel:first-child { margin-top: 4px; }
+.row { display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 5px 10px; border-radius: 9px; color: var(--theme-text); cursor: pointer; }
+.row[data-active] { background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); }
+.row[data-pip] { margin-bottom: 4px; border: 1px solid color-mix(in srgb, var(--theme-action) 28%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); }
+.row[data-pip][data-active] { background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); }
+.icon { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 8px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.row[data-active] .icon, .row[data-pip] .icon { color: var(--theme-action); }
+.main { display: flex; flex: 1 1 auto; flex-direction: column; min-width: 0; gap: 1px; }
+.label { overflow: hidden; font-size: 14px; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
+.sub { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.pipWord { color: var(--theme-action); font-size: 11px; font-weight: 650; letter-spacing: .03em; text-transform: uppercase; }
+.end { display: inline-flex; flex: none; align-items: center; gap: 8px; color: var(--theme-text-muted); font-size: 11.5px; }
+.empty { margin: 24px 12px; color: var(--theme-text-muted); font-size: 13px; text-align: center; }
+.hints { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 0; padding: 9px 16px; border-top: 1px solid var(--theme-border);
+  background: color-mix(in srgb, var(--theme-surface-subtle) 45%, var(--theme-surface)); color: var(--theme-text-muted); font-size: 12px; }
+.hints span { display: inline-flex; align-items: center; gap: 6px; }
+@keyframes fade { from { opacity: 0; } }
+@keyframes drop { from { opacity: 0; transform: translateY(-6px) scale(.99); } }
+@media (max-width: 599.98px) {
+  .backdrop { padding: 0; align-items: stretch; }
+  .dialog { width: 100%; height: 100dvh; border-width: 0; border-radius: 0; }
+  .inputRow { height: 60px; padding-top: env(safe-area-inset-top, 0px); }
+  .results { flex: 1 1 auto; height: auto; min-height: 0; }
+  .row { min-height: 52px; }
+  .hints { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .backdrop, .dialog { animation: none; } }

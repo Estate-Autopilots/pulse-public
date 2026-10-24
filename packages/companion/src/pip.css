@@ -1,0 +1,122 @@
+/* Pip, the Pulse bot (OWNER-PIP): the Ripple mark come alive. The body breathes, the eyes blink, the two rings carry
+   the mood. Motion is soft (springs, never jumpy), only transform and opacity animate, and it all stops for reduced
+   motion. */
+.pip {
+  --pip-a: #8e73ff; --pip-b: #4f37d0; --pip-arc: #a996ff; --pip-eye: #ffffff; --pip-ring: #ffffff; --pip-shadow: rgba(24, 20, 60, .14);
+  --pip-cup: #ffffff; --pip-cup-line: #4a35c0; --pip-steam: #9b98b8; --pip-z: #7a68e6;
+  --pip-spring: cubic-bezier(.34, 1.56, .64, 1);
+  display: block; overflow: visible; flex: none;
+}
+:root[data-theme="dark"] .pip {
+  --pip-a: #a596ff; --pip-b: #6a55e6; --pip-arc: #8f7dff; --pip-ring: #16161b; --pip-shadow: rgba(0, 0, 0, .45); --pip-cup: #eeeef6; --pip-cup-line: #a99cff; --pip-steam: #8d8aa8; --pip-z: #b8adff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pip { --pip-a: #a596ff; --pip-b: #6a55e6; --pip-arc: #8f7dff; --pip-ring: #16161b; --pip-shadow: rgba(0, 0, 0, .45); --pip-cup: #eeeef6; --pip-cup-line: #a99cff; --pip-steam: #8d8aa8; --pip-z: #b8adff; }
+}
+.pip * { transform-box: fill-box; transform-origin: center; }
+.pip .pip-stop-a { stop-color: var(--pip-a); }
+.pip .pip-stop-b { stop-color: var(--pip-b); }
+.pip .pip-shadow { fill: var(--pip-shadow); }
+.pip .pip-bob { transform-box: view-box; transform-origin: 56px 98px; transition: transform .6s var(--pip-spring), filter .4s; }
+.pip .pip-shine { fill: none; stroke: #fff; stroke-opacity: .45; stroke-width: 3.4; stroke-linecap: round; }
+.pip .pip-eyes { fill: var(--pip-eye); transition: transform .45s var(--pip-spring); }
+.pip .pip-lines path, .pip .pip-brows path { fill: none; stroke: var(--pip-eye); stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
+.pip .pip-arcs { transform-box: view-box; transform-origin: 56px 68px; transition: opacity .4s, transform .6s var(--pip-spring); opacity: .6; }
+.pip .pip-arc { fill: none; stroke: var(--pip-arc); stroke-width: 7.5; stroke-linecap: round; }
+.pip .pip-arc2 { opacity: .7; }
+.pip .pip-bulb { stroke: var(--pip-ring); stroke-width: 2.6; }
+.pip .pip-glow { opacity: 0; }
+.pip .pip-hand { fill: var(--pip-b); transform-origin: 30% 100%; }
+.pip .pip-mug { fill: var(--pip-cup); stroke: var(--pip-cup-line); stroke-width: 2; }
+.pip .pip-handle { fill: none; stroke: var(--pip-cup-line); stroke-width: 2.2; stroke-linecap: round; }
+.pip .pip-steam { fill: none; stroke: var(--pip-steam); stroke-width: 2; stroke-linecap: round; opacity: 0; }
+.pip .pip-zzz path { fill: none; stroke: var(--pip-z); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.pip .pip-rings circle { stroke-width: 2.4; opacity: 0; }
+
+/* Idle: slow breathing, an occasional blink, the rings at rest, the live dot glowing softly. */
+.pip .pip-bob { animation: pip-breathe 4.2s ease-in-out infinite; }
+.pip .pip-blink { animation: pip-blink 5.2s infinite; }
+.pip .pip-bulb { animation: pip-soft 4.2s ease-in-out infinite; }
+/* Checked in: the live dot beats like a calm pulse. */
+.pip[data-mood="in"] .pip-bulb { animation: pip-beat 1.6s ease-in-out infinite; }
+.pip[data-mood="in"] .pip-glow { animation: pip-glow 1.6s ease-out infinite; }
+/* Listening: leans in, eyes wider, the rings pulse and ripples spread from the body. */
+.pip[data-mood="listening"] .pip-bob { animation: none; transform: translateX(2px) scale(1.04) rotate(-4deg); }
+.pip[data-mood="listening"] .pip-eyes { transform: scale(1.12); }
+.pip[data-mood="listening"] .pip-arcs { opacity: 1; animation: pip-arcs 1.1s ease-in-out infinite; }
+.pip[data-mood="listening"] .pip-rings circle, .pip[data-mood="new-message"] .pip-rings circle { animation: pip-ring 1.8s cubic-bezier(.2, .7, .3, 1) infinite; }
+/* Thinking: shrinks a little, looks up and away, the rings orbit while Pulse works. */
+.pip[data-mood="thinking"] .pip-bob { animation: none; transform: scale(.96); }
+.pip[data-mood="thinking"] .pip-eyes { animation: pip-drift 2.4s ease-in-out infinite; }
+.pip[data-mood="thinking"] .pip-arcs { opacity: .9; animation: pip-orbit 2.6s cubic-bezier(.5, .1, .5, .9) infinite; }
+/* Speaking: a soft squash and stretch; ripples spread as it talks. */
+.pip[data-mood="speaking"] .pip-bob { animation: pip-talk .38s ease-in-out infinite; }
+.pip[data-mood="speaking"] .pip-eyes { transform: scaleY(.82); }
+.pip[data-mood="speaking"] .pip-arcs { opacity: .3; }
+.pip[data-mood="speaking"] .pip-rings circle { animation: pip-ring 1.4s cubic-bezier(.2, .7, .3, 1) infinite; }
+/* New message: perks up with one hop, then waits with wide eyes. */
+.pip[data-mood="new-message"] .pip-bob { animation: pip-perk .7s var(--pip-spring) 1 both; }
+.pip[data-mood="new-message"] .pip-eyes { transform: scale(1.12); }
+.pip[data-mood="new-message"] .pip-arcs { opacity: .95; }
+.pip[data-mood="new-message"] .pip-bulb { animation: pip-beat .9s ease-in-out 3; }
+/* Happy: smiling eyes and a springy hop. Celebrate: a jump and a spin with confetti. */
+.pip[data-mood="happy"] .pip-bob { animation: pip-hop 1.1s cubic-bezier(.3, .7, .4, 1) 2; }
+.pip[data-mood="happy"] .pip-arcs, .pip[data-mood="done"] .pip-arcs { opacity: .95; }
+.pip[data-mood="celebrate"] .pip-bob { animation: pip-cheer 1.5s cubic-bezier(.3, .7, .3, 1) 2; }
+.pip[data-mood="celebrate"] .pip-arcs { opacity: 1; animation: pip-arcs .5s ease-in-out 6; }
+.pip[data-mood="celebrate"] .pip-stars { animation: pip-twinkle 1.2s ease-in-out infinite; }
+.pip .pip-confetti rect { opacity: 0; animation: pip-pop 1.6s ease-out 2 both; }
+.pip .pip-confetti rect:nth-child(even) { animation-delay: .12s; }
+.pip .pip-confetti rect:nth-child(3n) { animation-delay: .24s; }
+/* Concerned: tilts, drops its gaze and loses colour; the rings pull in. */
+.pip[data-mood="concerned"] .pip-bob { animation: pip-sway 3.2s ease-in-out infinite; filter: saturate(.5); }
+.pip[data-mood="concerned"] .pip-eyes { transform: translateY(2px) scale(.9); }
+.pip[data-mood="concerned"] .pip-arcs { opacity: .25; transform: scale(.92); }
+/* Waking up: a stretch. Break: steam from the cup. End of day: a wave. */
+.pip[data-mood="waking"] .pip-bob { animation: pip-stretch 3.2s ease-in-out infinite; }
+.pip[data-mood="break"] .pip-steam { animation: pip-steam 2.6s ease-out infinite; }
+.pip .pip-wave { animation: pip-wave 2.4s ease-in-out 3; }
+/* Night: slower breathing, the rings dim, drifting z's. */
+.pip[data-mood="sleepy"] .pip-bob, .pip[data-mood="sleeping"] .pip-bob { animation-duration: 6s; }
+.pip[data-mood="sleepy"] .pip-arcs, .pip[data-mood="sleeping"] .pip-arcs, .pip[data-mood="break"] .pip-arcs { opacity: .25; }
+.pip .pip-zzz path { animation: pip-z 3.6s ease-out infinite; }
+.pip .pip-late { animation-delay: .47s !important; }
+.pip .pip-zzz .pip-late { animation-delay: .9s !important; }
+.pip .pip-later { animation-delay: 1.8s !important; }
+
+@keyframes pip-breathe { 50% { transform: scale(1.03, .985); } }
+@keyframes pip-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes pip-soft { 50% { opacity: .7; } }
+@keyframes pip-beat { 10% { transform: scale(1.3); } 25% { transform: scale(1.15); } 40% { transform: scale(1); } }
+@keyframes pip-glow { 0% { transform: scale(1); opacity: .6; } 80%, 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes pip-ring { 0% { transform: scale(.85); opacity: .6; } 100% { transform: scale(1.7); opacity: 0; } }
+@keyframes pip-arcs { 50% { opacity: .45; } }
+@keyframes pip-orbit { to { transform: rotate(360deg); } }
+@keyframes pip-drift { 0%, 100% { transform: translate(-3px, -4px); } 50% { transform: translate(-1px, -5px); } }
+@keyframes pip-talk { 0%, 100% { transform: scale(1.03, .95); } 50% { transform: scale(.97, 1.04); } }
+@keyframes pip-perk { 0% { transform: scale(1); } 30% { transform: scale(1.06, .9); } 60% { transform: translateY(-8px) scale(.96, 1.06); } 100% { transform: none; } }
+@keyframes pip-hop { 30% { transform: translateY(-9px) scale(1.04, .97); } 55% { transform: scale(1.06, .93); } 70% { transform: translateY(-2px); } }
+@keyframes pip-cheer { 35% { transform: translateY(-14px) rotate(180deg); } 70%, 100% { transform: rotate(360deg); } }
+@keyframes pip-sway { 0%, 100% { transform: rotate(-6deg) translateY(2px); } 50% { transform: rotate(-2deg) translateY(2px); } }
+@keyframes pip-stretch { 30% { transform: scale(.97, 1.05) translateY(-2px); } 45% { transform: scale(1.02, .98); } }
+@keyframes pip-steam { 0% { opacity: 0; transform: translateY(3px); } 35% { opacity: .85; } 100% { opacity: 0; transform: translateY(-7px); } }
+@keyframes pip-wave { 0%, 60%, 100% { transform: rotate(0); } 15%, 45% { transform: rotate(-38deg); } 30% { transform: rotate(-12deg); } }
+@keyframes pip-pop { 0% { opacity: 0; transform: translateY(6px) scale(.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-8px) rotate(160deg); } }
+@keyframes pip-twinkle { 50% { transform: scale(1.12) rotate(8deg); } }
+@keyframes pip-z { 0% { opacity: 0; transform: translate(0, 4px) scale(.7); } 30% { opacity: .9; } 100% { opacity: 0; transform: translate(-6px, -8px) scale(1.1); } }
+
+/* Still poses: the person asked for less motion, or the surface is a screenshot. */
+.pip.pip-still *, .pip.pip-still { animation: none !important; transition: none !important; }
+.pip.pip-still .pip-steam { opacity: .6; }
+.pip.pip-still .pip-rings circle { opacity: .45; transform: scale(1.25); }
+.pip.pip-still .pip-rings .pip-late { opacity: .2; transform: scale(1.5); }
+.pip.pip-still .pip-zzz path { opacity: .8; }
+.pip.pip-still .pip-confetti rect { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .pip *, .pip { animation: none !important; transition: none !important; }
+  .pip .pip-steam { opacity: .6; }
+  .pip .pip-rings circle { opacity: .45; transform: scale(1.25); }
+  .pip .pip-rings .pip-late { opacity: .2; transform: scale(1.5); }
+  .pip .pip-zzz path { opacity: .8; }
+  .pip .pip-confetti rect { opacity: 1; }
+}

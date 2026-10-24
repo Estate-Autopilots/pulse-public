@@ -1,0 +1,18 @@
+.welcome { display: grid; gap: 12px; padding: 16px 18px; border: 1px solid color-mix(in srgb, var(--theme-action) 22%, var(--theme-border)); border-radius: 12px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface)), var(--theme-surface) 60%); }
+.head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.title { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.sub { margin: 3px 0 0; color: var(--theme-text-muted); font-size: 13px; }
+.close { display: inline-grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: none; color: var(--theme-text-muted); cursor: pointer; }
+.close:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.bar { height: 4px; overflow: hidden; border-radius: 4px; background: var(--theme-surface-subtle); }
+.bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--theme-action), var(--theme-brand-2)); transition: width 400ms ease; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.step { display: flex; align-items: flex-start; gap: 10px; height: 100%; min-height: 64px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: inherit; text-decoration: none; transition: border-color 120ms ease, transform 120ms ease; }
+.step:hover { border-color: color-mix(in srgb, var(--theme-action) 40%, var(--theme-border)); transform: translateY(-1px); }
+.icon { display: inline-grid; flex: none; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); }
+.steps li[data-done] .icon { background: color-mix(in srgb, var(--theme-success) 14%, var(--theme-surface)); color: var(--theme-success); }
+.steps li[data-done] b { color: var(--theme-text-muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--theme-text-muted) 50%, transparent); }
+.text { display: grid; gap: 2px; min-width: 0; }
+.text b { font-size: 14px; font-weight: 600; }
+.text small { color: var(--theme-text-muted); font-size: 12px; line-height: 1.4; }
