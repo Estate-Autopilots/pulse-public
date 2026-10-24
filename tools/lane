@@ -1,0 +1,480 @@
+#!/usr/bin/env python3
+"""Pulse lane tool: claim a lane with a task branch, see who holds each lane, hand work over for review.
+
+  tools/lane start <lane> <EST-n>-<slug>   claim a free lane: create task/<lane>/<EST-n>-<slug> from origin/main and
+                                           push it (for a branch that is already yours on origin: check it out)
+  tools/lane status [--json]               every lane FREE or BUSY, with the holding branch and its head commit
+  tools/lane ready [--ci]                  check the branch is clean, pushed and in sync, then print the line
+                                           "Ready for review: EST-n @ <sha7>" to paste into the Paperclip issue
+  tools/lane sync                          merge origin/main into the current task branch and push it
+  tools/lane check-branch <name>           validate a branch name
+
+Rules (ops contracts §1-§4): a lane holds one task branch at a time. It is BUSY while a task/<lane>/* branch exists
+on origin and FREE otherwise; the merge deletes the branch and frees the lane. Review lines are bound to the exact
+head commit, so every new push needs a new "Ready for review" line.
+
+Works with any origin (a local bare repository path or a GitHub URL). Python 3 standard library only.
+Exit codes: 0 ok, 1 refused or a check failed, 2 usage error.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+REMOTE = "origin"
+MAIN = "main"
+LONG_LIVED = ("main", "staging", "production")
+LANE_NAMES = ("platform", "web", "web2", "data", "desktop", "intel", "mobile", "qa", "ops")
+# The branch name regex of the ops contracts §2, and its <EST-n>-<slug> tail on its own.
+BRANCH_RE = re.compile(r"^task/(platform|web|web2|data|desktop|intel|mobile|qa|ops)/(EST-\d+)-[a-z0-9][a-z0-9-]{0,39}$")
+TASK_RE = re.compile(r"^(EST-\d+)-[a-z0-9][a-z0-9-]{0,39}$")
+SLUG_RULE = "slug: lowercase letters, digits and dashes, starting with a letter or digit, at most 40 characters"
+LANES_FILE = Path(__file__).resolve().parent / "lanes.json"
+
+
+class LaneError(Exception):
+    """A refusal or a failed check: printed as 'lane: <message>' plus indented hint lines, exit code 1."""
+
+    def __init__(self, message: str, *hints: str) -> None:
+        super().__init__(message)
+        self.hints = [h for h in hints if h]
+
+
+# --- git helpers --------------------------------------------------------------------------------------------------
+
+def git(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    """Run git with captured output. Never waits for a credential prompt (agents have no terminal)."""
+    env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
+    proc = subprocess.run(["git", *args], capture_output=True, text=True, env=env)
+    if check and proc.returncode != 0:
+        raise LaneError(f"'git {' '.join(args)}' failed:", *last_lines(proc.stderr))
+    return proc
+
+
+def git_out(*args: str) -> str:
+    return git(*args).stdout.strip()
+
+
+def last_lines(text: str, n: int = 6) -> list[str]:
+    return [line for line in text.strip().splitlines() if line.strip()][-n:]
+
+
+def safe_url(url: str) -> str:
+    """The origin URL without any user:token@ part, so it is safe to print."""
+    return re.sub(r"^([a-z][a-z0-9+.-]*://)[^/@]*@", r"\1", url, flags=re.IGNORECASE)
+
+
+def origin_url() -> str:
+    proc = git("remote", "get-url", REMOTE, check=False)
+    if proc.returncode != 0:
+        raise LaneError("this clone has no 'origin' remote", "lane claims live on origin; clone the Pulse repository")
+    return proc.stdout.strip()
+
+
+def remote_heads() -> dict[str, str]:
+    """Branches on origin as {name: sha}, asked from origin itself (remote-tracking refs may be stale)."""
+    proc = git("ls-remote", "--heads", REMOTE, check=False)
+    if proc.returncode != 0:
+        raise LaneError(f"cannot list the branches on origin ({safe_url(origin_url())})", *last_lines(proc.stderr, 4))
+    heads = {}
+    for line in proc.stdout.splitlines():
+        sha, _, ref = line.partition("\t")
+        if ref.startswith("refs/heads/"):
+            heads[ref.removeprefix("refs/heads/")] = sha
+    return heads
+
+
+def fetch() -> None:
+    proc = git("fetch", "--prune", "--quiet", REMOTE, check=False)
+    if proc.returncode != 0:
+        raise LaneError(f"git fetch from origin ({safe_url(origin_url())}) failed:", *last_lines(proc.stderr, 4))
+
+
+def current_branch() -> str | None:
+    proc = git("symbolic-ref", "--quiet", "--short", "HEAD", check=False)
+    return proc.stdout.strip() if proc.returncode == 0 else None
+
+
+def local_branch_exists(branch: str) -> bool:
+    return git("show-ref", "--verify", "--quiet", f"refs/heads/{branch}", check=False).returncode == 0
+
+
+def count(range_spec: str) -> int:
+    return int(git_out("rev-list", "--count", range_spec))
+
+
+def ahead_behind(local: str, upstream: str) -> tuple[int, int]:
+    """(commits only in local, commits only in upstream)."""
+    ahead, behind = git_out("rev-list", "--left-right", "--count", f"{local}...{upstream}").split()
+    return int(ahead), int(behind)
+
+
+def operation_in_progress() -> str | None:
+    """Name of an unfinished merge, rebase, cherry-pick or revert, if any."""
+    for marker, what in (("MERGE_HEAD", "a merge"), ("rebase-merge", "a rebase"), ("rebase-apply", "a rebase"),
+                         ("CHERRY_PICK_HEAD", "a cherry-pick"), ("REVERT_HEAD", "a revert")):
+        if Path(git_out("rev-parse", "--git-path", marker)).exists():
+            return what
+    return None
+
+
+def ensure_clean(action: str) -> None:
+    operation = operation_in_progress()
+    if operation:
+        raise LaneError(f"cannot {action}: {operation} is in progress",
+                        "finish it (resolve, git add, git commit) or abort it first")
+    lines = git("status", "--porcelain=v1").stdout.splitlines()
+    if lines:
+        shown = [f"  {line}" for line in lines[:10]]
+        if len(lines) > 10:
+            shown.append(f"  ... and {len(lines) - 10} more")
+        raise LaneError(f"cannot {action}: the working tree has uncommitted changes:", *shown,
+                        "commit them (or stash them) first; 'git status' shows them")
+
+
+def issue_of(branch: str) -> str | None:
+    match = BRANCH_RE.match(branch)
+    return match.group(2) if match else None
+
+
+def describe(branch: str, sha: str) -> str:
+    """'task/web/EST-31-x @ abc1234 (EST-31, last commit 2 hours ago by Web Engineer)' as far as known locally."""
+    parts = [issue_of(branch)] if issue_of(branch) else []
+    proc = git("log", "-1", "--format=%cr by %an", sha, "--", check=False)
+    if proc.returncode == 0 and proc.stdout.strip():
+        parts.append(f"last commit {proc.stdout.strip()}")
+    return f"{branch} @ {sha[:7]}" + (f" ({', '.join(parts)})" if parts else "")
+
+
+def warn(message: str) -> None:
+    print(f"lane: warning: {message}", file=sys.stderr)
+
+
+def load_lanes() -> dict[str, dict]:
+    try:
+        lanes = json.loads(LANES_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise LaneError(f"cannot read {LANES_FILE}: {exc}") from None
+    unknown = sorted(set(lanes) - set(LANE_NAMES))
+    if unknown:
+        raise LaneError(f"{LANES_FILE} names lanes the contracts do not know: {', '.join(unknown)}")
+    return lanes
+
+
+def task_branch_here() -> tuple[str, str, str]:
+    """(branch, lane, issue) of the checked-out task branch, or a clear refusal."""
+    branch = current_branch()
+    match = BRANCH_RE.match(branch or "")
+    if not match:
+        raise LaneError(f"not on a task branch (current: {branch or 'detached HEAD'})",
+                        "switch to your task branch: git checkout task/<lane>/<EST-n>-<slug>",
+                        "or claim a lane first: tools/lane start <lane> <EST-n>-<slug>")
+    return branch, match.group(1), match.group(2)
+
+
+# --- commands -----------------------------------------------------------------------------------------------------
+
+def cmd_start(args: argparse.Namespace) -> int:
+    lanes = load_lanes()
+    lane, task = args.lane, args.task
+    if lane not in lanes:
+        raise LaneError(f"unknown lane '{lane}'", f"lanes: {', '.join(lanes)}")
+    if lanes[lane].get("no_branch"):
+        raise LaneError(f"the {lane} lane works without a task branch, so there is nothing to claim")
+    match = TASK_RE.match(task)
+    if not match:
+        raise LaneError(f"'{task}' is not <EST-n>-<slug>", "example: tools/lane start web EST-31-my-week", SLUG_RULE)
+    issue, branch, prefix = match.group(1), f"task/{lane}/{task}", f"task/{lane}/"
+    if lanes[lane].get("planned"):
+        warn(f"the {lane} lane is planned (normally paused); claiming it anyway")
+
+    ensure_clean("start a task")
+    fetch()
+    heads = remote_heads()
+    if MAIN not in heads:
+        raise LaneError("origin has no main branch yet", "main needs its first commit before lanes can be claimed")
+
+    others = sorted(b for b in heads if b.startswith(prefix) and b != branch)
+    if others:
+        hints = [f"held by {describe(b, heads[b])}" for b in others]
+        same_issue = [b for b in others if issue_of(b) == issue]
+        if same_issue:
+            hints.append(f"that is the same issue; continue it with: tools/lane start {lane} "
+                         f"{same_issue[0].removeprefix(prefix)}")
+        else:
+            hints += ["a lane holds one task branch at a time; it becomes free when that branch is merged",
+                      "'tools/lane status' shows every lane"]
+        raise LaneError(f"lane {lane} is BUSY", *hints)
+
+    if branch in heads:
+        return adopt(lane, branch)
+    return claim(lane, branch, prefix)
+
+
+def adopt(lane: str, branch: str) -> int:
+    """The branch is already on origin and it is this task's: check it out and track it."""
+    upstream = f"{REMOTE}/{branch}"
+    if local_branch_exists(branch):
+        git("checkout", "--quiet", branch)
+        git("branch", "--quiet", f"--set-upstream-to={upstream}")
+        ahead, behind = ahead_behind("HEAD", upstream)
+        if behind and not ahead:
+            git("merge", "--ff-only", "--quiet", upstream)
+        elif behind and ahead:
+            warn(f"your local {branch} and origin's have diverged ({ahead} local, {behind} remote commits); "
+                 "reconcile them before pushing")
+        elif ahead:
+            warn(f"{ahead} local commit(s) on {branch} are not pushed yet")
+    else:
+        git("checkout", "--quiet", "--track", "-b", branch, upstream)
+    print(f"Lane {lane}: continuing {branch} @ {git_out('rev-parse', 'HEAD')[:7]} (already on origin).")
+    return 0
+
+
+def claim(lane: str, branch: str, prefix: str) -> int:
+    """Create the branch from origin/main and push it: the push is the claim."""
+    base = f"{REMOTE}/{MAIN}"
+    if local_branch_exists(branch):
+        own = count(f"{base}..{branch}")
+        if own:
+            raise LaneError(f"a local branch {branch} exists with {own} commit(s) that are not on origin",
+                            f"if it is this task's work, claim the lane with it: git checkout {branch} && "
+                            f"git push -u {REMOTE} {branch}",
+                            f"if it is left over, delete it: git branch -D {branch}")
+        git("checkout", "--quiet", "--no-track", "-B", branch, base)  # no own commits: just move it to main
+    else:
+        git("checkout", "--quiet", "--no-track", "-b", branch, base)
+    sha = git_out("rev-parse", "HEAD")
+
+    push = git("push", "--quiet", "-u", REMOTE, f"{branch}:refs/heads/{branch}", check=False)
+    if push.returncode != 0:
+        raise LaneError(f"pushing {branch} to origin failed, so the lane is not claimed:", *last_lines(push.stderr, 4))
+
+    # Two claims at the same moment both pass the check above. Whoever sees a rival after pushing withdraws.
+    rivals = sorted(b for b in remote_heads() if b.startswith(prefix) and b != branch)
+    if rivals:
+        git("push", "--quiet", f"--force-with-lease=refs/heads/{branch}:{sha}", REMOTE, f":refs/heads/{branch}",
+            check=False)
+        raise LaneError(f"lane {lane} was claimed by {rivals[0]} at the same moment; your claim was withdrawn",
+                        "try again when the lane is free ('tools/lane status')")
+
+    print(f"Lane {lane} claimed: {branch} @ {sha[:7]} (from origin/main).")
+    print("Commit and push as you go; 'tools/lane sync' brings in main; 'tools/lane ready' when done.")
+    return 0
+
+
+def cmd_status(args: argparse.Namespace) -> int:
+    lanes = load_lanes()
+    url = safe_url(origin_url())
+    heads = remote_heads()
+
+    def holder(branch: str) -> dict:
+        return {"branch": branch, "sha": heads[branch], "issue": issue_of(branch), "valid": bool(issue_of(branch))}
+
+    rows = []
+    for lane, info in lanes.items():
+        branches = sorted(b for b in heads if b.startswith(f"task/{lane}/"))
+        state = "no_branch" if info.get("no_branch") else ("busy" if branches else "free")
+        rows.append({"lane": lane, "state": state, "engineer": info.get("engineer"), "project": info.get("project"),
+                     "planned": bool(info.get("planned")), "branches": [holder(b) for b in branches]})
+    lane_prefixes = tuple(f"task/{lane}/" for lane in lanes)
+    stray = sorted(b for b in heads if b.startswith("task/") and not b.startswith(lane_prefixes))
+    invalid = sorted(b["branch"] for row in rows for b in row["branches"] if not b["valid"])
+
+    if args.json:
+        print(json.dumps({"origin": url, "branches": {name: heads.get(name) for name in LONG_LIVED},
+                          "lanes": rows, "invalid": invalid + stray}, indent=2))
+        return 0
+
+    print(f"Lanes on origin ({url}):")
+    for row in rows:
+        if row["state"] == "no_branch":
+            status, holder = "-", "works without a task branch"
+        else:
+            status = row["state"].upper()
+            holder = ", ".join(f"{b['branch']} @ {b['sha'][:7]}" for b in row["branches"]) or "-"
+            if len(row["branches"]) > 1:
+                holder += f"  [{len(row['branches'])} branches; a lane holds one]"
+        note = f"  ({row['engineer']}{', planned' if row['planned'] else ''})"
+        print(f"  {row['lane']:<9} {status:<5} {holder}{note}")
+    print("  " + " · ".join(f"{name} {heads[name][:7] if name in heads else 'none'}" for name in LONG_LIVED))
+    sys.stdout.flush()
+    for branch in invalid + stray:
+        warn(f"{branch} is not a valid task branch name (see 'tools/lane check-branch')")
+    return 0
+
+
+def cmd_ready(args: argparse.Namespace) -> int:
+    branch, lane, issue = task_branch_here()
+    ensure_clean("mark the branch ready")
+    fetch()
+    heads = remote_heads()
+    if branch not in heads:
+        raise LaneError(f"{branch} is not on origin",
+                        f"push it: git push -u {REMOTE} {branch}",
+                        "if it was merged already, the work is in main and the lane is free")
+    head = git_out("rev-parse", "HEAD")
+    if head != heads[branch]:
+        ahead, behind = ahead_behind("HEAD", f"{REMOTE}/{branch}")
+        if not behind:
+            raise LaneError(f"{ahead} commit(s) are not pushed yet", f"push them: git push {REMOTE} {branch}")
+        if not ahead:
+            raise LaneError(f"origin has {behind} newer commit(s) on {branch}",
+                            f"update first: git pull --ff-only {REMOTE} {branch}")
+        raise LaneError(f"your {branch} and origin's have diverged ({ahead} local, {behind} remote commits)",
+                        "reconcile them (git pull --no-rebase), then push and run this again")
+    if args.ci:
+        if Path('/home/eadev/.config/pulse-hosted-ci/policy.json').exists():
+            checked = subprocess.run(['python3', '/opt/ea-watchdog/hosted_ci.py', '--fresh',
+                                      '--source-sha', head, '--repository', '.'], capture_output=True, text=True)
+            if checked.returncode == 75:
+                raise LaneError(f"hosted CI for {head[:7]} is still running; run `tools/lane ready --ci` again in a few minutes")
+            if checked.returncode != 0:
+                try: summary = json.loads(checked.stdout)['summary']
+                except (ValueError, KeyError): summary = 'hosted evidence unavailable'
+                raise LaneError(f"hosted CI failed: {summary}")
+        else:
+            returncode = subprocess.call(["bash", "tools/ci.sh"])
+            if returncode != 0:
+                raise LaneError(f"tools/ci.sh failed (exit {returncode}); fix it before asking for review")
+        ensure_clean("mark the branch ready after CI (it must not change tracked files)")
+
+    if count(f"{REMOTE}/{MAIN}..HEAD") == 0:
+        raise LaneError(f"{branch} has no commits beyond main; there is nothing to review")
+
+    rivals = sorted(b for b in heads if b.startswith(f"task/{lane}/") and b != branch)
+    if rivals:
+        warn(f"lane {lane} also has {', '.join(rivals)} on origin; a lane holds one task branch")
+    behind_main = count(f"HEAD..{REMOTE}/{MAIN}")
+    if behind_main:
+        warn(f"main has {behind_main} commit(s) this branch does not have; 'tools/lane sync' merges them in")
+    print(f"Ready for review: {issue} @ {head[:7]}")
+    return 0
+
+
+def cmd_sync(args: argparse.Namespace) -> int:
+    branch, _lane, _issue = task_branch_here()
+    if operation_in_progress() == "a merge":
+        raise LaneError("a merge is in progress",
+                        "finish it: resolve the conflicts, git add <files>, git commit --no-edit; then run "
+                        "'tools/lane sync' again to push",
+                        "or abandon it: git merge --abort")
+    ensure_clean("sync")
+    fetch()
+    heads = remote_heads()
+    if MAIN not in heads:
+        raise LaneError("origin has no main branch")
+    if branch not in heads:
+        raise LaneError(f"{branch} is not on origin",
+                        "if it was merged, the work is in main and the lane is free",
+                        f"if it was never pushed: git push -u {REMOTE} {branch}")
+
+    # Commits pushed to this branch from another clone come first (fast-forward only).
+    ahead, behind = ahead_behind("HEAD", f"{REMOTE}/{branch}")
+    if behind and ahead:
+        raise LaneError(f"your {branch} and origin's have diverged ({ahead} local, {behind} remote commits)",
+                        "reconcile them (git pull --no-rebase), then run 'tools/lane sync' again")
+    if behind:
+        git("merge", "--ff-only", "--quiet", f"{REMOTE}/{branch}")
+
+    missing = count(f"HEAD..{REMOTE}/{MAIN}")
+    if missing:
+        merge = git("merge", "--no-edit", "-m", f"Merge origin/main into {branch}", f"{REMOTE}/{MAIN}", check=False)
+        if merge.returncode != 0:
+            conflicted = git_out("diff", "--name-only", "--diff-filter=U").splitlines()
+            if conflicted:
+                raise LaneError(f"merging main into {branch} stopped on conflicts in {len(conflicted)} file(s):",
+                                *(f"  {path}" for path in conflicted),
+                                "resolve each file, then: git add <files> && git commit --no-edit",
+                                "then run 'tools/lane sync' again to push the merge",
+                                "or undo the merge: git merge --abort")
+            raise LaneError("git merge failed:", *last_lines(merge.stderr + merge.stdout))
+
+    head = git_out("rev-parse", "HEAD")
+    if head == heads[branch]:
+        print(f"{branch} @ {head[:7]} already has everything from main and matches origin; nothing to do.")
+        return 0
+    push = git("push", "--quiet", REMOTE, f"HEAD:refs/heads/{branch}", check=False)
+    if push.returncode != 0:
+        raise LaneError(f"pushing {branch} failed:", *last_lines(push.stderr, 4))
+    done = f"merged {missing} commit(s) from main and pushed" if missing else "pushed"
+    print(f"Synced {branch} @ {head[:7]}: {done}.")
+    print("The new head needs its own CI run and a new 'Ready for review' line.")
+    return 0
+
+
+def cmd_check_branch(args: argparse.Namespace) -> int:
+    name = args.name.removeprefix("refs/heads/")
+    match = BRANCH_RE.match(name)
+    if not match:
+        raise LaneError(f"'{name}' is not a valid task branch name",
+                        "format: task/<lane>/<EST-n>-<slug>, e.g. task/web/EST-31-my-week",
+                        f"lanes: {', '.join(LANE_NAMES)}", SLUG_RULE)
+    lane = match.group(1)
+    print(f"ok: {name} (lane {lane}, issue {match.group(2)})")
+    try:
+        if load_lanes().get(lane, {}).get("no_branch"):
+            warn(f"the {lane} lane normally works without a task branch")
+    except LaneError:
+        pass  # the name check stands on its own
+    return 0
+
+
+# --- main ---------------------------------------------------------------------------------------------------------
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="tools/lane", description=__doc__.split("\n\n")[0],
+                                     epilog="Details: CONTRIBUTING.md (How work flows).")
+    sub = parser.add_subparsers(dest="command", required=True, metavar="command")
+
+    p = sub.add_parser("start", help="claim a free lane with a new task branch from origin/main")
+    p.add_argument("lane", help=f"one of: {', '.join(LANE_NAMES)}")
+    p.add_argument("task", metavar="EST-n-slug", help="issue id and a short slug, e.g. EST-31-my-week")
+    p.set_defaults(func=cmd_start)
+
+    p = sub.add_parser("status", help="show every lane as FREE or BUSY (asks origin)")
+    p.add_argument("--json", action="store_true", help="machine-readable output")
+    p.set_defaults(func=cmd_status)
+
+    p = sub.add_parser("ready", help="check the task branch and print the 'Ready for review' line")
+    p.add_argument("--ci", action="store_true", help="run tools/ci.sh first")
+    p.set_defaults(func=cmd_ready)
+
+    p = sub.add_parser("sync", help="merge origin/main into the current task branch and push it")
+    p.set_defaults(func=cmd_sync)
+
+    p = sub.add_parser("check-branch", help="validate a task branch name")
+    p.add_argument("name")
+    p.set_defaults(func=cmd_check_branch)
+    return parser
+
+
+def main() -> int:
+    args = build_parser().parse_args()
+    try:
+        if args.command != "check-branch":
+            proc = git("rev-parse", "--show-toplevel", check=False)
+            if proc.returncode != 0:
+                raise LaneError("not inside a git repository", "run tools/lane from your Pulse clone")
+            os.chdir(proc.stdout.strip())
+        return args.func(args)
+    except LaneError as exc:
+        print(f"lane: {exc}", file=sys.stderr)
+        for hint in exc.hints:
+            print(f"  {hint}", file=sys.stderr)
+        return 1
+    except FileNotFoundError as exc:
+        print(f"lane: {exc.strerror}: {exc.filename} (is git installed?)", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        return 130
+
+
+if __name__ == "__main__":
+    sys.exit(main())
