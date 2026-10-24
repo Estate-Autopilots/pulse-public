@@ -1,0 +1,8 @@
+# EA-AI: every 5 minutes, check production's live release (a deploy lands hourly at most).
+[Unit]
+Description=Pulse production: check every 5 minutes that the AI runtime runs the live release
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+[Install]
+WantedBy=timers.target

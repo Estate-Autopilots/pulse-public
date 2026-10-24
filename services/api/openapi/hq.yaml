@@ -1,0 +1,60 @@
+openapi: 3.1.0
+info: { title: Organisation HQ identity and feature links, version: 1.0.0 }
+paths:
+  /api/v0/hq:
+    get:
+      summary: Read the organisation's HQ
+      description: Existing catalogue, ideas, offers, brand, brand versions and people accompany these identity fields. Tenant scoped; a staff identity is required. HQ off answers 404.
+      responses:
+        '200':
+          description: HQ with its organisation's identity
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [title, platform]
+                properties:
+                  title: { type: string, description: 'Saved brand title, otherwise <organisation name> HQ.' }
+                  platform: { type: boolean, description: 'True only when pulse.org.handle is pulsehq.' }
+        '404': { description: HQ switched off }
+  /api/v0/me:
+    get:
+      summary: Read the signed-in viewer
+      responses:
+        '200':
+          description: Existing viewer fields plus hqTitle
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [hqTitle]
+                properties:
+                  hqTitle: { type: [string, 'null'], description: 'The same resolved HQ title; null while pulse_hq is off.' }
+  /api/v0/hq/brand:
+    post:
+      summary: Save the brand document (organisation leaders)
+      description: Existing brand write and version history; title is trimmed and capped at 40 characters. Empty or omitted title uses the organisation-name fallback. Other brand fields retain their existing semantics.
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object, properties: { title: { type: string, maxLength: 40 } } }
+      responses:
+        '200': { description: Saved brand document }
+  /api/v0/hq/features/{id}:
+    parameters:
+      - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
+    post:
+      summary: Edit a feature (organisation leaders)
+      description: href also applies on feature creation. An omitted href retains the link on edits. Invalid links are stored as null.
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object, properties: { href: { $ref: '#/components/schemas/FeatureHref' } } }
+      responses:
+        '200': { description: Feature updated }
+components:
+  schemas:
+    FeatureHref:
+      type: [string, 'null']
+      maxLength: 300
+      description: 'An internal path starting with one slash (letters, digits, /?=&._-), or absolute https:// with a dotted DNS host, optional port 0..65535 and path/query/fragment. No credentials, whitespace or backslashes; http, javascript and //host are rejected as null.'
