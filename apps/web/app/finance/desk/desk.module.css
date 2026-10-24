@@ -1,0 +1,49 @@
+/* FINANCE-UI CA desk: registers in a side list (chips on a phone), the register in the Finance table, close packs as
+   a queue with one action each, exports and access on the side. The page scrolls; tables keep a sticky header. */
+.desk { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.status { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.links { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; margin-left: auto; }
+.links a { color: var(--theme-action) !important; font-weight: 500; }
+.layout { display: grid; grid-template-columns: 210px minmax(0, 1fr) 280px; gap: 16px; align-items: start; min-width: 0; }
+.registers { position: sticky; top: 8px; display: flex; flex-direction: column; gap: 14px; }
+.group { display: flex; flex-direction: column; gap: 2px; }
+.group > span { padding: 0 10px 4px; color: var(--theme-text-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.group > a { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; border-radius: 8px; color: var(--theme-text-muted) !important; font-size: 13px; font-weight: 500; }
+.group > a small { color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.group > a:hover { background: var(--theme-surface-subtle); color: var(--theme-text) !important; }
+.group > a[aria-current="page"] { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action) !important; font-weight: 600; }
+.main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.title { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -0.01em; }
+.muted { margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); border-radius: 12px; background: var(--theme-surface); min-width: 0; font-size: 13px; }
+.card h2 { margin: 0; font-size: 14px; font-weight: 600; }
+.card p { margin: 0; overflow-wrap: anywhere; }
+.exports { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.exports a, .download { display: inline-flex; align-items: center; gap: 6px; color: var(--theme-action) !important; font-weight: 500; }
+.files { display: grid; gap: 6px; max-height: 260px; margin: 0; padding: 0; overflow-y: auto; list-style: none; }
+.files li { display: flex; align-items: flex-start; gap: 6px; min-width: 0; color: var(--theme-text-muted); }
+.files li svg { flex: none; margin-top: 2px; }
+.files a { min-width: 0; color: var(--theme-text) !important; overflow-wrap: anywhere; }
+.files a:hover { color: var(--theme-action) !important; text-decoration: underline; }
+.setup { margin: 0; padding-left: 18px; color: var(--theme-text-muted); line-height: 1.55; }
+.more { color: var(--theme-action) !important; font-weight: 500; }
+.queue { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.pack { display: grid; gap: 8px; padding: 14px; border: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); border-radius: 12px; background: var(--theme-surface); font-size: 13px; }
+.pack p { margin: 0; overflow-wrap: anywhere; }
+.pack details summary { cursor: pointer; color: var(--theme-text-muted); }
+.pack details p { margin-top: 6px; white-space: pre-wrap; }
+.packHead, .packFoot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.packHead b { font-size: 14px; }
+.empty { padding: 16px; border: 1px dashed var(--theme-border); border-radius: 10px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+@media (max-width: 1279.98px) { .layout { grid-template-columns: 200px minmax(0, 1fr); } .side { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); } }
+@media (max-width: 760px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .links { margin-left: 0; }
+  .registers { position: static; flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  .group { display: contents; }
+  .group > span { display: none; }
+  .group > a { padding: 5px 10px; border: 1px solid var(--theme-border); border-radius: 999px; font-size: 12px; }
+  .group > a small { display: none; }
+  .side { display: flex; }
+}

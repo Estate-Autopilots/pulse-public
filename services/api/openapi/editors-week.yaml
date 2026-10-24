@@ -1,0 +1,72 @@
+openapi: 3.1.0
+info: { title: Pulse editor weekly report, version: 1.1.0 }
+paths:
+  /v1/editors/{person}/week:
+    get:
+      summary: Read an editor's weekly delivery counts, targets, and own open tasks
+      description: Editors can read their own report and assigned open tasks; managers can read their reports' weekly counts and admins can read any report. Cross-editor reports omit open tasks.
+      parameters:
+        - { name: person, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: week, in: query, required: true, schema: { type: string, pattern: '^\d{4}-W(0[1-9]|[1-4][0-9]|5[0-3])$' } }
+      responses:
+        '200':
+          description: Weekly counts by creative type
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [week, types]
+                properties:
+                  week: { type: string }
+                  types:
+                    type: object
+                    propertyNames: { enum: [model_video, vov, founder_video, testimonial, walkthrough, other] }
+                    additionalProperties: { $ref: '#/components/schemas/TargetedDelivery' }
+                  openTasks:
+                    type: array
+                    description: Present for the authenticated person's own report only.
+                    items: { $ref: '#/components/schemas/EditorOpenTask' }
+        '400': { description: Invalid week or person identifier }
+        '403': { description: The viewer cannot inspect this editor }
+        '404': { description: The editor was not found }
+components:
+  schemas:
+    EditorOpenTask:
+      type: object
+      additionalProperties: false
+      required: [id, title, status, dueAt, assets]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        status: { type: string, enum: [open, in_progress, blocked, in_review] }
+        dueAt: { type: [string, 'null'], format: date-time }
+        assets:
+          type: array
+          items: { $ref: '#/components/schemas/LinkedTaskAsset' }
+    LinkedTaskAsset:
+      type: object
+      additionalProperties: false
+      required: [id, url]
+      properties:
+        id: { type: string, format: uuid }
+        url: { type: [string, 'null'], format: uri, description: Safe Google Drive viewer link when a current file exists. }
+    TargetedDelivery:
+      type: object
+      additionalProperties: false
+      required: [target, delivered, claimed, gap, placeholder]
+      properties:
+        target: { type: [integer, 'null'], minimum: 0 }
+        delivered:
+          type: object
+          additionalProperties: false
+          required: [drafts, finals]
+          properties: { drafts: { type: integer, minimum: 0 }, finals: { type: integer, minimum: 0 } }
+        claimed:
+          type: object
+          description: Confirmed shared-login claims already included in delivered.
+          additionalProperties: false
+          required: [drafts, finals]
+          properties: { drafts: { type: integer, minimum: 0 }, finals: { type: integer, minimum: 0 } }
+        gap: { type: [integer, 'null'], minimum: 0 }
+        placeholder: { type: boolean }

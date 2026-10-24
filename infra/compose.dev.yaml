@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: pulse
+      POSTGRES_USER: pulse
+      POSTGRES_PASSWORD: ${PULSE_POSTGRES_PASSWORD:?set_PULSE_POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pulse -d pulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - pulse-postgres:/var/lib/postgresql/data
+      - ./postgres/roles-dev.sql:/docker-entrypoint-initdb.d/10-pulse-roles.sql:ro
+
+  pulse:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://pulse:${PULSE_POSTGRES_PASSWORD:?set_PULSE_POSTGRES_PASSWORD}@postgres:5432/pulse
+      MIGRATE_DATABASE_URL: postgresql://pulse:${PULSE_POSTGRES_PASSWORD:?set_PULSE_POSTGRES_PASSWORD}@postgres:5432/pulse
+      PULSE_INGEST_PORT: "8082"
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+volumes:
+  pulse-postgres:
