@@ -1,0 +1,31 @@
+/* The bell beside insights in the header: a dot with the unread count; it opens the notification panel. */
+.bell { position: relative; display: grid; width: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; cursor: pointer; }
+.bell:hover { background: var(--theme-surface-subtle); }
+.bell:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.bell[aria-expanded="true"] { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); color: var(--theme-action); }
+.count { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border: 2px solid var(--theme-canvas); border-radius: 999px;
+  background: var(--theme-danger, #d4373f); color: #fff; font-size: 11px; font-weight: 700; line-height: 14px; text-align: center; font-variant-numeric: tabular-nums; }
+@media (max-width: 899.98px) {
+  .bell { width: 44px; height: 44px; border-color: transparent; background: transparent; }
+  .count { top: 2px; right: 2px; }
+}
+/* LAYOUT-SWEEP: on the header's rhythm, frameless like the avatar beside it. */
+@media (min-width: 900px) {
+  .bell { width: 34px; height: 34px; border-color: transparent; border-radius: 50%; background: transparent; color: var(--theme-text-muted); }
+  .bell:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+  .count { top: -3px; right: -4px; }
+}
+/* Owner workbench (20 Oct 2026): on a phone the count sits on the bell's shoulder, smaller, so the bell stays visible. */
+@media (max-width: 899.98px) {
+  :global(html:not([data-pulse-focus])) .count { top: 5px; right: auto; left: calc(50% + 3px); min-width: 16px; height: 16px; padding: 0 4px; font-size: 10px; line-height: 12px; }
+}
+/* Owner workbench (20 Oct 2026): in Focus mode's capsule the count sits on the bell's shoulder, small enough to leave
+   the bell readable and to stop short of the avatar beside it. */
+:global(html[data-pulse-focus]) .count { top: 3px; right: auto; left: calc(50% + 1px); min-width: 15px; height: 15px; padding: 0 3px; border-width: 1.5px; font-size: 9.5px; line-height: 12px; }
+/* ATT: news that is only for your information: a small dot, no number (the number is what needs you). */
+.news { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; box-sizing: border-box; border: 1.5px solid var(--theme-canvas); border-radius: 50%; background: var(--theme-action); }
+/* FLOAT-2 (device audit, 22 Oct 2026): on a phone every control here takes a 44 px press. */
+@media (max-width: 899.98px) {
+  .bell::before { content: ""; position: absolute; inset: min(0px, calc((100% - 44px) / 2)); }
+  :global(html[data-pulse-focus]) .bell::before { inset: -4px; }
+}

@@ -1,0 +1,19 @@
+.card { flex: none; border: 1px solid color-mix(in srgb, var(--theme-border) 52%, transparent); border-radius: 12px; background: var(--theme-surface); }
+.card summary { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 16px; cursor: pointer; list-style: none; }
+.card summary::-webkit-details-marker { display: none; }
+.card summary:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; border-radius: 12px; }
+.title { font-size: 14px; font-weight: 650; }
+.total { display: inline-grid; min-width: 20px; height: 20px; place-items: center; padding: 0 6px; border-radius: 999px; background: color-mix(in srgb, var(--theme-warning) 14%, var(--theme-surface)); color: var(--theme-warning); font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.chevron { margin-left: auto; color: var(--theme-text-muted); transition: transform 160ms ease; }
+.card[open] .chevron { transform: rotate(90deg); }
+.tasks { margin: 0; padding: 0 6px 6px; list-style: none; }
+.task { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border-radius: 9px; color: inherit; text-decoration: none; }
+.task:hover { background: var(--theme-surface-subtle); }
+.task:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; }
+.task > svg { color: var(--theme-text-muted); }
+.text { display: grid; gap: 1px; min-width: 0; }
+.text b { font-size: 13.5px; font-weight: 600; line-height: 1.35; }
+.text small { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+.count { min-width: 24px; padding: 1px 7px; border: 1px solid var(--theme-border); border-radius: 999px; color: var(--theme-text); font-size: 12px; font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; }
+.clear { display: flex; align-items: center; gap: 8px; margin: 0; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--theme-border) 52%, transparent); border-radius: 12px; background: var(--theme-surface); color: var(--theme-success); font-size: 13px; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .chevron { transition: none; } }
