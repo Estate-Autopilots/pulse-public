@@ -1,0 +1,48 @@
+openapi: 3.1.0
+info: { title: Pulse co-worker hand-off relay, version: 1.0.0 }
+security: [{ agentKey: [] }]
+paths:
+  /api/v0/agent/handoffs/{id}/updates:
+    parameters: [{ in: path, name: id, required: true, schema: { type: string, format: uuid } }]
+    post:
+      summary: Report own filed work in its original conversation for human review
+      description: Agent key alone, through agentTx. Text is trimmed and truncated to 600 characters. Previously delivered commentId returns its original message even under a new status/clientId. Identical clientId retries return the existing message; conflicting reuse fails. Only the filing co-worker with current conversation membership and accepting-leader access may post. No writes after in_review/cancelled except identical retries. Never completes work.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [clientId, state, text]
+              properties:
+                clientId: { type: string, format: uuid }
+                commentId: { type: string, format: uuid, description: Optional board comment identity, unique within this hand-off independently of status/clientId }
+                state: { enum: [started, progress, in_review, blocked, cancelled] }
+                text: { type: string, minLength: 1 }
+      responses:
+        '200':
+          description: AI-authored conversation message and immutable board reference
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [id, state, boardRef]
+                properties:
+                  id: { type: string, format: uuid }
+                  state: { enum: [started, progress, in_review, blocked, cancelled] }
+                  boardRef: { type: string }
+        '400': { description: Invalid state, blank text or conflicting clientId }
+        '401': { description: Missing/revoked/disabled key or mixed human credentials }
+        '403': { description: Foreign co-worker/org, no current access, unfiled or stopped hand-off }
+  /api/v0/agent/handoffs/poll:
+    post:
+      summary: Admit due board reads for own oldest 50 open filed hand-offs
+      description: Atomic durable admission across restarts/concurrent runners. At least five minutes between reads, thirty after three unchanged/failed reads; a new update resets the counter. In-review/cancelled work is excluded. Returns handoffs with id, boardRef, durable commentIds and conversation participant names for de-identification only. Run in the existing runner tick, sequentially; no daemon. Configure PULSE_PAPERCLIP_URL with this install's HTTPS board UI base to enable conversation board links.
+      responses:
+        '200': { description: '{handoffs: [{id, boardRef, commentIds, names}]} (at most 50); each admits one issue get plus one comments read' }
+        '401': { description: Agent key alone required }
+components:
+  securitySchemes:
+    agentKey: { type: apiKey, in: header, name: x-pulse-agent-key }

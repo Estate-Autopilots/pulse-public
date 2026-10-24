@@ -1,0 +1,69 @@
+/* Pager: a region that shows what fits and turns pages for the rest. Nothing in it scrolls. */
+.pager { display: flex; flex-direction: column; min-width: 0; min-height: 0; outline: 0; }
+.view { display: flex; flex-direction: column; min-width: 0; }
+.view > * { flex: none; }
+.view [data-page-hidden] { display: none !important; }
+.end { display: block; height: 0; }
+.bar { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 4px; height: 42px; padding: 6px 2px 0; color: var(--theme-text-muted); font-size: 12px; font-variant-numeric: tabular-nums; user-select: none; }
+.count { min-width: 0; padding: 0 6px; font-size: 13px; white-space: nowrap; }
+.count b { color: var(--theme-text); font-weight: 550; }
+.arrow { display: inline-grid; flex: none; width: 32px; height: 32px; place-items: center; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease, transform 120ms cubic-bezier(0.16, 1, 0.3, 1), opacity 120ms ease; }
+.arrow:hover:not(:disabled) { border-color: var(--theme-border-strong); background: var(--theme-surface-subtle); }
+.arrow:active:not(:disabled) { transform: scale(0.92); }
+.arrow:disabled { opacity: 0.38; cursor: default; }
+.arrow:focus-visible, .dot:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.dots { display: inline-flex; align-items: center; gap: 2px; margin-right: auto; padding-left: 2px; }
+.dot { position: relative; width: 14px; height: 20px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.dot::after { content: ""; position: absolute; top: 7px; left: 4px; width: 6px; height: 6px; border-radius: 3px; background: var(--theme-border-strong); transition: width 220ms cubic-bezier(0.16, 1, 0.3, 1), left 220ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms ease; }
+.dot:hover::after { background: var(--theme-text-muted); }
+.dot[aria-current]::after { left: 0; width: 14px; background: var(--theme-action); }
+.pager[data-compact] > .bar { height: 42px; padding: 0 8px 4px; gap: 2px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, var(--theme-surface)); }
+.pager[data-compact] .arrow { width: 32px; height: 32px; border-color: transparent; border-radius: 6px; background: transparent; }
+.pager[data-compact] .arrow:hover:not(:disabled) { background: var(--theme-surface-subtle); }
+.pager[data-compact] .count { margin-right: auto; padding-left: 6px; font-size: 12px; }
+@media (min-width: 1180px) and (min-height: 600px) {
+  .pager { flex: 1 1 0; }
+  .view { flex: 1 1 0; min-height: 0; overflow: hidden; }
+}
+@media (max-width: 1179.98px), (max-height: 599.98px) {
+  .bar { justify-content: space-between; padding-bottom: 4px; }
+}
+/* Deck: stacked rows when the container is tall enough, one row at a time with a switch when it is not. */
+.deck { min-width: 0; }
+.deckInner { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.deckHead { display: flex; flex: none; align-items: flex-end; gap: 12px; min-width: 0; }
+.deckHead > * { flex: 1 1 auto; min-width: 0; }
+.deckHead:has(> [class*="__tabs"]) { border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); }
+.deckHead > [class*="__tabs"] { flex: 0 1 auto; border-bottom: 0; }
+.deckHead:not(:has(> :not(.deckSwitch))) { justify-content: flex-start; }
+.deckSwitch { display: none !important; flex: none !important; margin: 0 0 5px 8px; }
+.deckView { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+@media (min-width: 1180px) and (min-height: 600px) {
+  .deck { flex: 1 1 0; min-height: 0; container: deck / size; }
+  .deckInner { height: 100%; }
+  .deckView { flex: 1 1 0; min-height: 0; }
+  .deckView > * { flex: none; }
+  .deckView > :last-child { flex: 1 1 0; min-height: 0; }
+  .deckInner > :not(.deckView):not(.deckHead) { flex: none; }
+  @container deck (max-height: 559.98px) { .deck[data-tall="560"] .deckSwitch { display: inline-flex !important; } .deck[data-tall="560"] .deckView:not([data-on]) { display: none; } }
+  @container deck (max-height: 639.98px) { .deck[data-tall="640"] .deckSwitch { display: inline-flex !important; } .deck[data-tall="640"] .deckView:not([data-on]) { display: none; } }
+  @container deck (max-height: 719.98px) { .deck[data-tall="720"] .deckSwitch { display: inline-flex !important; } .deck[data-tall="720"] .deckView:not([data-on]) { display: none; } }
+  @container deck (max-height: 799.98px) { .deck[data-tall="800"] .deckSwitch { display: inline-flex !important; } .deck[data-tall="800"] .deckView:not([data-on]) { display: none; } }
+  @container deck (max-height: 879.98px) { .deck[data-tall="880"] .deckSwitch { display: inline-flex !important; } .deck[data-tall="880"] .deckView:not([data-on]) { display: none; } }
+  @container deck (max-height: 959.98px) { .deck[data-tall="960"] .deckSwitch { display: inline-flex !important; } .deck[data-tall="960"] .deckView:not([data-on]) { display: none; } }
+  @container deck (max-height: 1039.98px) { .deck[data-tall="1040"] .deckSwitch { display: inline-flex !important; } .deck[data-tall="1040"] .deckView:not([data-on]) { display: none; } }
+}
+/* LAYOUT-SWEEP: a pager pages lists; anything in it that is not a list row (one row taller than the room, a chart, a
+   form) scrolls inside the view instead of being cut off. When paging fits, nothing overflows and no bar shows. */
+@media (min-width: 1180px) and (min-height: 600px) {
+  .view { overflow-x: hidden; overflow-y: auto; }
+  .view:not([data-ready]) { overflow-y: hidden; }
+}
+/* LAYOUT-SWEEP: below a computer's width a table that is wider than its pager scrolls sideways inside the view instead
+   of losing its last columns. */
+@media (max-width: 1179.98px), (max-height: 599.98px) {
+  .pager:has(table) > .view { overflow-x: auto; overflow-y: hidden; }
+}
+/* EST-1200: on a phone the page dots (14 px) are too small to press and too close to widen; the arrows and the count
+   carry the paging, and the 32 px arrows take a 44 px press. */
+@media (max-width: 899.98px) { .dots { display: none; } .arrow { position: relative; } .arrow::after { content: ""; position: absolute; inset: -7px; } }

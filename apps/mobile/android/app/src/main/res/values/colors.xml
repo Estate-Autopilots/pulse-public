@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pulse_canvas">#F6F6FA</color>
+    <color name="pulse_action">#5B45D6</color>
+    <color name="colorPrimary">#5B45D6</color>
+    <color name="colorPrimaryDark">#F6F6FA</color>
+    <color name="colorAccent">#5B45D6</color>
+    <color name="pulse_widget_text">#20202B</color>
+    <color name="pulse_widget_muted">#555565</color>
+    <color name="pulse_widget_surface">#F7F7FB</color>
+</resources>
