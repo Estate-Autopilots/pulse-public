@@ -1,0 +1,139 @@
+{
+  "version": "identity-attribution/v0",
+  "cases": [
+    {
+      "name": "verified individual account",
+      "event": {"event_id": "event-001", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-individual"},
+      "account_links": [
+        {"evidence_id": "link-001", "account_id": "acct-individual", "person_id": "person-a", "is_shared": false, "verified": true, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null}
+      ],
+      "declarations": [],
+      "expected": {"person_id": "person-a", "method": "individual_account", "confidence": 1.0, "reason": null, "evidence_ids": ["event-001", "link-001"]}
+    },
+    {
+      "name": "shared account explicit declaration",
+      "event": {"event_id": "event-002", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-shared"},
+      "account_links": [
+        {"evidence_id": "link-002", "account_id": "acct-shared", "person_id": null, "is_shared": true, "verified": true, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null}
+      ],
+      "declarations": [
+        {"evidence_id": "decl-002", "event_id": "event-002", "person_id": "person-b", "claim": "owns"}
+      ],
+      "expected": {"person_id": "person-b", "method": "declaration", "confidence": 1.0, "reason": null, "evidence_ids": ["event-002", "link-002", "decl-002"]}
+    },
+    {
+      "name": "conflicting declarations",
+      "event": {"event_id": "event-003", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-shared"},
+      "account_links": [],
+      "declarations": [
+        {"evidence_id": "decl-003a", "event_id": "event-003", "person_id": "person-a", "claim": "owns"},
+        {"evidence_id": "decl-003b", "event_id": "event-003", "person_id": "person-b", "claim": "owns"}
+      ],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "conflicting_declarations", "evidence_ids": ["event-003", "decl-003a", "decl-003b"]}
+    },
+    {
+      "name": "missing actor and no declaration",
+      "event": {"event_id": "event-004", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": null},
+      "account_links": [],
+      "declarations": [],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "actor_missing", "evidence_ids": ["event-004"]}
+    },
+    {
+      "name": "unlinked actor",
+      "event": {"event_id": "event-005", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-unlinked"},
+      "account_links": [],
+      "declarations": [],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "actor_unlinked", "evidence_ids": ["event-005"]}
+    },
+    {
+      "name": "declaration conflicts with verified account",
+      "event": {"event_id": "event-006", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-individual"},
+      "account_links": [
+        {"evidence_id": "link-006", "account_id": "acct-individual", "person_id": "person-a", "is_shared": false, "verified": true, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null}
+      ],
+      "declarations": [
+        {"evidence_id": "decl-006", "event_id": "event-006", "person_id": "person-b", "claim": "owns"}
+      ],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "account_declaration_conflict", "evidence_ids": ["event-006", "link-006", "decl-006"]}
+    },
+    {
+      "name": "expired individual link does not attribute",
+      "event": {"event_id": "event-007", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-individual"},
+      "account_links": [
+        {"evidence_id": "link-007", "account_id": "acct-individual", "person_id": "person-a", "is_shared": false, "verified": true, "valid_from": "2026-08-01T00:00:00Z", "valid_to": "2026-09-01T00:00:00Z"}
+      ],
+      "declarations": [],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "no_active_account_link", "evidence_ids": ["event-007", "link-007"]}
+    },
+    {
+      "name": "shared account without declaration remains unresolved",
+      "event": {"event_id": "event-008", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-shared"},
+      "account_links": [
+        {"evidence_id": "link-008", "account_id": "acct-shared", "person_id": null, "is_shared": true, "verified": true, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null}
+      ],
+      "declarations": [],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "shared_account_requires_declaration", "evidence_ids": ["event-008", "link-008"]}
+    },
+    {
+      "name": "linked person rejects ownership",
+      "event": {"event_id": "event-009", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-individual"},
+      "account_links": [
+        {"evidence_id": "link-009", "account_id": "acct-individual", "person_id": "person-a", "is_shared": false, "verified": false, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null}
+      ],
+      "declarations": [
+        {"evidence_id": "decl-009", "event_id": "event-009", "person_id": "person-a", "claim": "not_mine"}
+      ],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "account_declaration_conflict", "evidence_ids": ["event-009", "link-009", "decl-009"]}
+    },
+    {
+      "name": "same person both owns and rejects",
+      "event": {"event_id": "event-010", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-unlinked"},
+      "account_links": [],
+      "declarations": [
+        {"evidence_id": "decl-010a", "event_id": "event-010", "person_id": "person-a", "claim": "owns"},
+        {"evidence_id": "decl-010b", "event_id": "event-010", "person_id": "person-a", "claim": "not_mine"}
+      ],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "conflicting_declarations", "evidence_ids": ["event-010", "decl-010a", "decl-010b"]}
+    },
+    {
+      "name": "two verified individual links conflict",
+      "event": {"event_id": "event-011", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-individual"},
+      "account_links": [
+        {"evidence_id": "link-011a", "account_id": "acct-individual", "person_id": "person-a", "is_shared": false, "verified": true, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null},
+        {"evidence_id": "link-011b", "account_id": "acct-individual", "person_id": "person-b", "is_shared": false, "verified": true, "valid_from": "2026-09-15T00:00:00Z", "valid_to": null}
+      ],
+      "declarations": [],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "conflicting_individual_account_links", "evidence_ids": ["event-011", "link-011a", "link-011b"]}
+    },
+    {
+      "name": "unverified individual link stays unresolved",
+      "event": {"event_id": "event-012", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-individual"},
+      "account_links": [
+        {"evidence_id": "link-012", "account_id": "acct-individual", "person_id": "person-a", "is_shared": false, "verified": false, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null}
+      ],
+      "declarations": [],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "individual_account_unverified", "evidence_ids": ["event-012", "link-012"]}
+    },
+    {
+      "name": "shared and verified individual links conflict",
+      "event": {"event_id": "event-013", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-mixed"},
+      "account_links": [
+        {"evidence_id": "link-013a", "account_id": "acct-mixed", "person_id": null, "is_shared": true, "verified": true, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null},
+        {"evidence_id": "link-013b", "account_id": "acct-mixed", "person_id": "person-a", "is_shared": false, "verified": true, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null}
+      ],
+      "declarations": [],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "conflicting_account_links", "evidence_ids": ["event-013", "link-013a", "link-013b"]}
+    },
+    {
+      "name": "declaration conflicts with unverified individual link",
+      "event": {"event_id": "event-014", "occurred_at": "2026-10-01T12:00:00Z", "actor_account_id": "acct-individual"},
+      "account_links": [
+        {"evidence_id": "link-014", "account_id": "acct-individual", "person_id": "person-a", "is_shared": false, "verified": false, "valid_from": "2026-09-01T00:00:00Z", "valid_to": null}
+      ],
+      "declarations": [
+        {"evidence_id": "decl-014", "event_id": "event-014", "person_id": "person-b", "claim": "owns"}
+      ],
+      "expected": {"person_id": null, "method": "unresolved", "confidence": null, "reason": "account_declaration_conflict", "evidence_ids": ["event-014", "link-014", "decl-014"]}
+    }
+  ]
+}

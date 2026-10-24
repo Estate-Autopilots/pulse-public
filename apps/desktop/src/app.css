@@ -1,0 +1,22 @@
+/* The Pulse window's own screens: a calm centred card on the Pulse canvas. */
+:root { color-scheme: light dark; }
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: #f6f6fa; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body { background: #111118; } }
+:root[data-theme="dark"] body { background: #111118; }
+* { scrollbar-width: none; }
+::-webkit-scrollbar { display: none; }
+.app-stage { display: grid; place-items: center; min-height: 100%; padding: 32px; box-sizing: border-box; }
+.app-card { width: min(440px, 100%); align-items: center; gap: 16px; padding: 40px 40px 32px; border-radius: 24px; text-align: center;
+  background: var(--pc-surface); box-shadow: 0 1px 2px rgb(24 20 60 / 6%), 0 24px 64px rgb(24 20 60 / 10%); animation: pc-enter .35s cubic-bezier(.2, .8, .2, 1) both; }
+.app-card .pc-head { flex-direction: column; text-align: center; }
+.app-card .pc-hello { justify-items: center; }
+.app-card .pc-pip, .app-pip { margin: 0; }
+.app-title, .app-card .pc-title { font-size: 24px; letter-spacing: -.02em; }
+.app-text, .app-card .pc-sub { max-width: 340px; margin: 0 auto; font-size: 14px; line-height: 1.5; }
+.app-card .pc-actions { width: 100%; margin-top: 8px; }
+.app-card .pc-code { width: 100%; }
+.app-card .pc-form { width: 100%; text-align: left; }
+.app-card .pc-status { text-align: center; }
+@media (prefers-reduced-motion: reduce) { .app-card { animation: none; } }
