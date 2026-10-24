@@ -1,0 +1,39 @@
+/* Who can do what: a clean table on a desktop, one card per rule on a phone. The viewer's own column is tinted. */
+.wrap { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; padding: 16px 18px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.head h2 { margin: 0; font-size: 16px; font-weight: 650; }
+.head p { max-width: 760px; margin: 4px 0 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.head b { color: var(--theme-text); font-weight: 600; }
+.scroll { min-height: 0; overflow: auto; }
+.table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+.table th, .table td { padding: 10px 12px; border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 65%, transparent); text-align: left; vertical-align: top; }
+.table thead th { position: sticky; top: 0; z-index: 1; background: var(--theme-surface); color: var(--theme-text); font-size: 12px; font-weight: 650; white-space: nowrap; }
+.table thead th small { display: block; color: var(--theme-text-muted); font-weight: 500; }
+.table tbody th { width: 34%; font-weight: 500; }
+.table tbody th b { display: block; color: var(--theme-text); font-size: 13px; font-weight: 600; }
+.table tbody th small { display: block; margin-top: 2px; color: var(--theme-text-muted); font-size: 12px; line-height: 1.4; }
+.table [data-mine] { background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); }
+.table tbody tr:last-child th, .table tbody tr:last-child td { border-bottom: 0; }
+.fixed, .value { display: inline-flex; align-items: center; gap: 5px; color: var(--theme-text); }
+.fixed svg { color: var(--theme-text-muted); }
+.choose select { height: 32px; max-width: 100%; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.choose select:hover { border-color: var(--theme-border-strong); }
+.changed { display: flex; align-items: center; gap: 3px; margin-top: 4px; color: var(--theme-action); font-size: 11px; font-weight: 600; }
+.foot { margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 760px) {
+  .wrap { padding: 14px; }
+  .table thead { display: none; }
+  .table, .table tbody, .table tr, .table th, .table td { display: block; width: auto; }
+  .table tr { margin-bottom: 12px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; }
+  .table tbody th { width: auto; padding: 0 0 8px; border: 0; }
+  .table td { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px dashed color-mix(in srgb, var(--theme-border) 70%, transparent); }
+  .table td::before { content: attr(data-label); color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+  .table td:last-child { border-bottom: 0; }
+  .table td[data-mine] { margin: 0 -6px; padding: 6px; border-radius: 6px; }
+  .changed { grid-column: 2; margin-top: 0; }
+  .choose, .choose select { width: 100%; font-size: 14px; }
+}
+
+/* UX-TASKS-2: how Pulse names the work, above the rules; one scroll on a desktop */
+.stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; }
+@media (min-width: 1180px) and (min-height: 600px) { .stack { flex: 1 1 0; overflow-y: auto; } }

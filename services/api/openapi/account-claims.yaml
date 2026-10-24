@@ -1,0 +1,131 @@
+openapi: 3.1.0
+info: { title: Pulse uploader account claims, version: 1.0.0 }
+paths:
+  /v1/accounts/claimable:
+    get:
+      summary: List unlinked uploader accounts used in the signed-in person's work projects
+      responses:
+        '200':
+          description: Claimable account metadata; client domains and client identity evidence are excluded
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [accounts]
+                properties:
+                  accounts:
+                    type: array
+                    items: { $ref: '#/components/schemas/ClaimableUploaderAccount' }
+        '403': { description: An active staff account is required }
+  /v1/accounts/claims:
+    get:
+      summary: List the signed-in person's account claims or claims they may review
+      parameters:
+        - { name: status, in: query, required: false, schema: { type: string, enum: [pending, confirmed, rejected, reverted] } }
+      responses:
+        '200':
+          description: Own claims, plus manager reports or organisation claims for HR and admins
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [claims]
+                properties:
+                  claims:
+                    type: array
+                    items: { $ref: '#/components/schemas/UploaderAccountClaim' }
+        '403': { description: A personal account is required }
+  /v1/accounts/{id}/claim:
+    post:
+      summary: Create a pending self-claim for an unlinked uploader account
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: false }
+      responses:
+        '200':
+          description: The signed-in staff member's pending claim
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UploaderAccountClaim' }
+        '400': { description: Invalid account identifier or request body }
+        '403': { description: An active staff account is required }
+        '404': { description: Uploader account was not found }
+        '409': { description: Account is linked, shared, client-associated, outside the person's work projects, or already claimed }
+  /v1/accounts/{id}/claim/decide:
+    post:
+      summary: Confirm or reject a pending uploader account claim
+      description: A newly ambiguous claim may be rejected by an authorized reviewer; confirmation still requires the account to pass current eligibility checks.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [confirmed, rejected] }
+                reason: { type: string, minLength: 1, maxLength: 240 }
+      responses:
+        '200':
+          description: Updated account claim
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UploaderAccountClaim' }
+        '400': { description: Invalid decision or request body }
+        '403': { description: Admin, HR, or the claimant's manager is required; self-decisions are denied }
+        '404': { description: Pending claim was not found }
+        '409': { description: Claim changed, or confirmation is blocked by current account eligibility }
+  /v1/accounts/{id}/claim/revert:
+    post:
+      summary: Revert a confirmed uploader account claim
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: false }
+      responses:
+        '200':
+          description: Reverted claim; account attribution is unlinked
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UploaderAccountClaim' }
+        '403': { description: Admin, HR, or the claimant's manager is required; self-reversals are denied }
+        '404': { description: Confirmed claim was not found }
+        '409': { description: Account or claim changed before the reversal }
+components:
+  schemas:
+    ClaimableUploaderAccount:
+      type: object
+      additionalProperties: false
+      required: [id, handle, deliveryCount, lastDelivery]
+      properties:
+        id: { type: string, format: uuid }
+        handle: { type: string }
+        deliveryCount: { type: integer, minimum: 1 }
+        lastDelivery: { type: string, format: date-time }
+    UploaderAccountClaim:
+      type: object
+      additionalProperties: false
+      required: [id, accountId, handle, personId, status, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        accountId: { type: string, format: uuid }
+        handle: { type: string }
+        personId: { type: string, format: uuid }
+        personName: { type: string }
+        status: { type: string, enum: [pending, confirmed, rejected, reverted] }
+        createdAt: { type: string, format: date-time }
+        decidedBy: { type: [string, 'null'], format: uuid }
+        decidedAt: { type: [string, 'null'], format: date-time }
+        reason: { type: [string, 'null'], minLength: 1, maxLength: 240 }

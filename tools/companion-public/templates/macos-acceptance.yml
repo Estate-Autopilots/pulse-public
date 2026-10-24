@@ -1,0 +1,91 @@
+name: Pulse Companion macOS installer smoke
+on:
+  workflow_call:
+    inputs:
+      run_id: {required: true, type: string}
+      build_repo: {required: true, type: string}
+      notification_proof: {required: true, type: boolean}
+      macos_runner: {required: false, type: string, default: macos-latest}
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Pulse Companion builds run containing the DMG to test
+        required: true
+        default: '37885235267'
+      build_repo:
+        description: Repository containing the reviewed installer
+        required: true
+        default: Estate-Autopilots/pulse-companion
+      macos_runner:
+        description: Hosted OS for cross-version installer acceptance
+        type: choice
+        options: [macos-latest, macos-15]
+        default: macos-latest
+      notification_proof:
+        description: Grant notification permission through the real UI and prove a delivered ping
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  actions: read
+jobs:
+  installed-panel:
+    runs-on: ${{ inputs.macos_runner || 'macos-latest' }}
+    timeout-minutes: 15
+    env:
+      BUILD_RUN: ${{ inputs.run_id || '37885235267' }}
+      BUILD_REPO: ${{ inputs.build_repo || github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Verify the installer source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$BUILD_REPO/actions/runs/$BUILD_RUN" > "$RUNNER_TEMP/build-run.json"
+          python3 - <<'PY'
+          import json,os
+          r=json.load(open(os.environ['RUNNER_TEMP']+'/build-run.json'))
+          assert os.environ['BUILD_REPO'] in ['Estate-Autopilots/pulse', 'Estate-Autopilots/pulse-companion']
+          assert r['name']=='Pulse Companion builds'
+          assert r['head_branch']==('main' if os.environ['BUILD_REPO'].endswith('/pulse-companion') else 'apps/companion')
+          with open(os.environ['GITHUB_ENV'],'a') as f:
+            f.write('BUILD_SHA='+r['head_sha']+'\n')
+          PY
+      - uses: actions/download-artifact@v7
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ env.BUILD_REPO }}
+          run-id: ${{ env.BUILD_RUN }}
+          name: companion-desktop-macos-${{ env.BUILD_SHA }}
+          path: installer
+      - name: Mount the actual DMG and launch its app
+        run: |
+          mkdir -p screens "$RUNNER_TEMP/pulse-mounted"
+          dmg=$(find installer -name '*.dmg' -print -quit)
+          test -n "$dmg"
+          hdiutil attach "$dmg" -readonly -nobrowse -mountpoint "$RUNNER_TEMP/pulse-mounted"
+          ditto "$RUNNER_TEMP/pulse-mounted/Pulse.app" "$RUNNER_TEMP/Pulse.app"
+          app="$RUNNER_TEMP/Pulse.app"
+          echo "PULSE_MAC_APP=$app" >> "$GITHUB_ENV"
+          test -x "$app/Contents/MacOS/pulse-desktop"
+          "$app/Contents/MacOS/pulse-desktop" --pinned > screens/macos-app.log 2>&1 &
+          pulse_pid=$!
+          trap 'kill "$pulse_pid" 2>/dev/null || true; hdiutil detach "$RUNNER_TEMP/pulse-mounted" || true' EXIT
+          sleep 15
+          kill -0 "$pulse_pid"
+          screencapture -x screens/macos-installed-panel.png
+          codesign --verify --deep --strict "$app"
+          codesign -d -r- "$app" > screens/designated-requirement.txt 2>&1
+          python3 - <<'PY'
+          import json,os
+          json.dump({'source':os.environ['BUILD_SHA'],'run':os.environ['BUILD_RUN'],'installer':'DMG mounted read-only','appProcessAliveAfterSeconds':15},open('screens/receipt.json','w'),indent=2)
+          PY
+      - name: Request permission and prove a real Notification Center ping
+        if: inputs.notification_proof
+        run: bash apps/desktop/scripts/mac-notification-acceptance.sh
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: companion-macos-installed-panel-${{ env.BUILD_SHA }}
+          path: screens/
+          if-no-files-found: error

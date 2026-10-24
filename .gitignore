@@ -1,0 +1,27 @@
+.env
+*.env
+node_modules/
+__pycache__/
+.venv/
+.next/
+dist/
+target/
+coverage/
+.pytest_cache/
+.ruff_cache/
+*.log
+.turbo/
+*.tsbuildinfo
+test-results/
+playwright-report/
+
+.next-build/
+
+.next-matrix/
+
+# Expo-generated native projects; generated and built on hosted runners.
+# Phone app shell: native projects are source; build outputs and copied web assets are not.
+apps/mobile/android/.gradle/
+apps/mobile/android/build/
+apps/mobile/android/app/build/
+apps/mobile/ios/App/build/
