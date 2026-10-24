@@ -1,0 +1,56 @@
+/* R55: the Models board and a model's talent tabs. Desktop fills the window (fit page); phones scroll and tables
+   become cards. */
+.board { display: grid; gap: 12px; min-width: 0; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); }
+.board > section, .side > section { min-height: 0; }
+.side { display: grid; gap: 12px; min-height: 0; grid-template-rows: minmax(0, 1fr) auto; }
+.rank td { vertical-align: middle; }
+.rank tr[data-new] td { color: var(--theme-text-muted); }
+.person { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.person > span:last-child { display: grid; min-width: 0; }
+.person :global(a) { font-weight: 600; }
+.who { min-width: 220px; max-width: 420px; }
+.who span[title] { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.score { display: inline-flex; align-items: center; gap: 8px; margin-right: 8px; vertical-align: middle; }
+.score i { display: inline-block; width: 72px; height: 6px; border-radius: 3px; background: var(--theme-surface-subtle); overflow: hidden; }
+.score em { display: block; height: 100%; background: var(--theme-action); border-radius: 3px; }
+.score b { font-variant-numeric: tabular-nums; min-width: 2ch; }
+.works { list-style: none; margin: 0; padding: 0; display: grid; }
+.works li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-top: 1px solid var(--theme-border); }
+.works li:first-child { border-top: 0; }
+.works li > span:first-child { display: grid; min-width: 0; }
+.works small, .rate small { color: var(--theme-text-muted); font-size: 12px; }
+.rate { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.note { margin: 0; padding: 10px 12px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+
+/* A model's profile: the talent overview and its tables. */
+.talentGrid { display: grid; gap: 12px; min-width: 0; grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.6fr); }
+.talentGrid > section, .talentGrid > div > section { min-height: 0; }
+.stack { display: grid; gap: 12px; min-height: 0; grid-template-rows: auto minmax(0, 1fr); }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--theme-border); }
+.facts > div { background: var(--theme-surface); padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
+.facts b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.facts small { color: var(--theme-text-muted); font-size: 12px; }
+.why { margin: 0; padding: 10px 12px; font-size: 13px; line-height: 1.45; }
+.media { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.media li { padding: 10px 12px; display: grid; gap: 4px; min-width: 0; border-right: 1px solid var(--theme-border); border-bottom: 1px solid var(--theme-border); }
+.media li > a, .media li > span:first-child { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.media small { color: var(--theme-text-muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
+
+@media (min-width: 1180px) and (min-height: 600px) {
+  .board, .talentGrid { grid-template-rows: minmax(0, 1fr); }
+  .side { grid-template-rows: minmax(0, 1fr) auto; }
+}
+@media (max-width: 1179.98px), (max-height: 599.98px) {
+  .board, .talentGrid { grid-template-columns: minmax(0, 1fr); }
+  .side, .stack { grid-template-rows: auto; }
+}
+@media (max-width: 899.98px) {
+  .rank thead { display: none; }
+  .rank tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px; padding: 10px 12px; border-top: 1px solid var(--theme-border); }
+  .rank td { border: 0; padding: 0; text-align: left; }
+  .rank td.who { grid-column: 1 / -1; max-width: none; min-width: 0; }
+  .rank td[data-label="Rank"] { display: none; }
+  .rank td[data-label]:not(.who)::before { content: attr(data-label); display: block; color: var(--theme-text-muted); font-size: 12px; }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

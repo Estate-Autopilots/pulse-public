@@ -1,0 +1,37 @@
+[package]
+name = "pulse-desktop"
+version = "1.0.2"
+description = "Pulse Companion: check in, take a break and check out from the tray"
+authors = ["Estate Autopilots"]
+edition = "2021"
+
+[lib]
+name = "pulse_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = "2.7.1"
+
+[dependencies]
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+tauri = { version = "2.12.1", features = ["tray-icon", "image-png"] }
+tauri-plugin-autostart = "2.7.0"
+tauri-plugin-global-shortcut = "2.4.0"
+tauri-plugin-notification = "2.5.1"
+tauri-plugin-single-instance = "2.5.2"
+tauri-plugin-updater = "=2.13.2"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+url = "2"
+pulse-desktop-core = { path = "../core" }
+
+[target.'cfg(windows)'.dependencies]
+tauri-winrt-notification = "=0.8.1"
+windows = { version = "0.62", features = ["UI_Notifications"] }
+keyring = { version = "3", features = ["windows-native"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+mac-usernotifications = "=0.3.1"
+keyring = { version = "3", features = ["apple-native"] }
+# Already in the tree through keyring: lets Pulse read saved sign-ins without ever showing a Keychain prompt.
+security-framework = "3"
