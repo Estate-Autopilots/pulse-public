@@ -1,0 +1,53 @@
+/* EST-1363: the Sales X-Ray app. Theme tokens only, so light and dark follow. */
+.hero { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 16px; padding: 20px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); max-width: 880px; }
+.mark { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 12px; background: color-mix(in oklab, var(--theme-action) 12%, transparent); color: var(--theme-action); }
+.heroText { display: grid; gap: 12px; min-width: 0; }
+.heroText h2 { margin: 0; font-size: 18px; font-weight: 650; }
+.heroText p { margin: 0; color: var(--theme-text-muted); font-size: 14px; }
+.lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.lists h3 { margin: 0 0 6px; font-size: 12px; font-weight: 600; color: var(--theme-text-muted); text-transform: none; }
+.lists ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.lists li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+.lists li > svg { flex: none; margin-top: 2px; color: var(--theme-success); }
+.connect { display: grid; gap: 6px; justify-items: start; }
+.small { font-size: 12px !important; }
+.error { margin: 0; color: var(--theme-danger); font-size: 13px; }
+.text { margin: 0; font-size: 14px; color: var(--theme-text); }
+.account { display: grid; grid-template-columns: 18px auto minmax(0, 1fr); gap: 8px; align-items: center; margin: 0 0 8px; color: var(--theme-text); }
+.account > span { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; }
+.account small { color: var(--theme-text-muted); font-size: 12px; justify-self: end; }
+.rows { list-style: none; margin: 0; padding: 4px 14px 10px; display: grid; }
+.rows > li + li { border-top: 1px solid var(--theme-border); }
+.row { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; min-height: 48px; padding: 8px 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.row:hover b { text-decoration: underline; }
+.row:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 6px; }
+.row > svg { color: var(--theme-text-muted); }
+.row[data-overdue] > svg { color: var(--theme-danger); }
+.main { display: grid; gap: 2px; min-width: 0; }
+.main b { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.main small { color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.more { display: flex; justify-content: center; padding: 4px 14px 14px; }
+.loading { display: grid; gap: 8px; padding: 10px 14px 14px; }
+.facts { display: grid; gap: 10px; margin: 0; }
+.facts > div { display: grid; grid-template-columns: minmax(110px, 38%) minmax(0, 1fr); gap: 10px; }
+.facts dt { color: var(--theme-text-muted); font-size: 12px; }
+.facts dd { margin: 0; font-size: 13px; overflow-wrap: anywhere; }
+.events { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.events li { display: grid; gap: 2px; }
+.events b { font-size: 13px; font-weight: 600; }
+.events small { color: var(--theme-text-muted); font-size: 12px; }
+.ask { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: end; padding: 12px 14px 0; }
+.question { width: 100%; min-height: 44px; resize: vertical; padding: 10px 12px; border: 1px solid var(--theme-border-strong); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; }
+.question:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.starters { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px 14px; }
+.starter { display: inline-flex; gap: 6px; align-items: center; min-height: 32px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text); font: inherit; font-size: 13px; cursor: pointer; }
+.starter:hover { border-color: var(--theme-border-strong); }
+.starter:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.answer { display: grid; gap: 8px; margin: 12px 14px 14px; padding: 14px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface-subtle); }
+.answer header { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.answer p { margin: 0; white-space: pre-wrap; font-size: 14px; line-height: 1.5; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 899.98px) { .row { min-height: 52px; } .ask { grid-template-columns: minmax(0, 1fr); } .account { grid-template-columns: 18px minmax(0, 1fr); } .account small { grid-column: 2; justify-self: start; } }
+@media (max-width: 599.98px) { .hero { grid-template-columns: minmax(0, 1fr); padding: 16px; } }
+.sendWorkflows { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; max-width: 420px; }
+.sentOk { color: var(--theme-success); font-size: 12px; }
