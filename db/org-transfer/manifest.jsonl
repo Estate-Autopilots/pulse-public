@@ -1,0 +1,547 @@
+{"class":"copy","jsonb":{},"table":"privacy.access_log"}
+{"class":"copy","jsonb":{"scope":[]},"table":"privacy.consent"}
+{"class":"copy","jsonb":{},"table":"privacy.notice"}
+{"class":"copy","jsonb":{},"table":"privacy.notice_ack"}
+{"class":"copy","jsonb":{},"table":"privacy.request"}
+{"class":"copy","jsonb":{},"table":"pulse.account"}
+{"class":"copy","jsonb":{},"table":"pulse.account_claim"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.activity_observation"}
+{"class":"copy","jsonb":{},"reason":"Preserve canonical advertising records and copied lead.ad references through the ad/ad_set/campaign FK chain. Recompute org-derived UUID5 identities with entity_id(target_org, key) on import; replay may omit source CIDs if the organisation code changes.","table":"pulse.ad"}
+{"class":"rebuild","jsonb":{},"reason":"workgraph v3 projection; replay under target org to derive org-scoped UUID5 IDs and dependent rows.","table":"pulse.ad_metric_day"}
+{"class":"copy","jsonb":{},"reason":"Preserve canonical advertising records and copied lead.ad references through the ad/ad_set/campaign FK chain. Recompute org-derived UUID5 identities with entity_id(target_org, key) on import; replay may omit source CIDs if the organisation code changes.","table":"pulse.ad_set"}
+{"class":"copy","jsonb":{},"table":"pulse.agent_budget_grant"}
+{"class":"copy","jsonb":{},"table":"pulse.agent_event"}
+{"class":"copy","jsonb":{},"table":"pulse.agent_handoff"}
+{"class":"copy","jsonb":{},"table":"pulse.agent_handoff_update"}
+{"class":"copy","jsonb":{"autonomy":[],"budget_restore":[],"group_approvers":[]},"table":"pulse.agent_member"}
+{"class":"copy","jsonb":{},"table":"pulse.agent_memory"}
+{"class":"copy","jsonb":{"budgets":[]},"table":"pulse.agent_org_ai"}
+{"class":"copy","jsonb":{},"table":"pulse.agent_output"}
+{"class":"copy","jsonb":{"action":[]},"table":"pulse.agent_proposal"}
+{"class":"copy","jsonb":{},"table":"pulse.agent_run"}
+{"class":"copy","jsonb":{},"reason":"Retain connection configuration; sealed provider credentials require target rekey/reconnect.","table":"pulse.ai_connection"}
+{"class":"copy","jsonb":{},"table":"pulse.ai_setting"}
+{"class":"copy","jsonb":{"facts":[]},"table":"pulse.ai_workspace"}
+{"class":"copy","jsonb":{},"table":"pulse.app_feedback"}
+{"class":"copy","jsonb":{"settings":[]},"table":"pulse.app_setting"}
+{"class":"copy","jsonb":{},"table":"pulse.app_tester"}
+{"class":"copy","jsonb":{},"reason":"Canonical delivery/workgraph records referenced by copied history; indexed deliveries also writes these records. Preserve facts and recompute org-derived UUID5 identities with entity_id(target_org, key) on import; replay may omit source CIDs if the organisation code changes.","table":"pulse.asset"}
+{"class":"copy","jsonb":{},"table":"pulse.ats_acceptance"}
+{"class":"copy","jsonb":{"after":[],"before":[]},"table":"pulse.ats_check"}
+{"class":"copy","jsonb":{},"table":"pulse.ats_job"}
+{"class":"copy","jsonb":{"match":[]},"table":"pulse.ats_pick"}
+{"class":"copy","jsonb":{},"table":"pulse.ats_requirement"}
+{"class":"copy","jsonb":{"weights":[]},"table":"pulse.ats_weights"}
+{"class":"copy","jsonb":{"client":[],"end_client":[]},"table":"pulse.attendance_break"}
+{"class":"copy","jsonb":{},"table":"pulse.attendance_close_policy"}
+{"class":"copy","jsonb":{},"table":"pulse.attendance_correction_time"}
+{"class":"copy","jsonb":{"client":[],"out_client":[]},"table":"pulse.attendance_entry"}
+{"class":"copy","jsonb":{},"table":"pulse.attendance_event"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.attendance_exception"}
+{"class":"copy","jsonb":{},"table":"pulse.attendance_leave_overlap"}
+{"class":"copy","jsonb":{},"table":"pulse.attendance_presence_state"}
+{"class":"copy","jsonb":{},"table":"pulse.attendance_provisional_close"}
+{"class":"copy","jsonb":{},"table":"pulse.attendance_regularisation"}
+{"class":"copy","jsonb":{},"table":"pulse.attendance_signal"}
+{"class":"rebuild","jsonb":{"evidence":[]},"reason":"workgraph v3 projection; replay under target org to derive org-scoped UUID5 IDs and dependent rows.","table":"pulse.attribution"}
+{"class":"copy","jsonb":{"changes":["changes.client_id.after","changes.client_id.before","changes.lead_person_id.after","changes.lead_person_id.before","changes.manager_id.after","changes.manager_id.before","changes.owner_id.after","changes.owner_id.before","changes.project_id.after","changes.project_id.before","changes.unit_id.after","changes.unit_id.before"]},"table":"pulse.audit_event"}
+{"class":"skip","reason":"Transient authentication rate-limit buckets; restart on the target.","table":"pulse.auth_rate"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.blocker"}
+{"class":"copy","jsonb":{},"table":"pulse.booking"}
+{"class":"copy","jsonb":{},"table":"pulse.brief_preference"}
+{"class":"copy","jsonb":{},"table":"pulse.buyer_identity"}
+{"class":"copy","jsonb":{},"reason":"Preserve canonical advertising records and copied lead.ad references through the ad/ad_set/campaign FK chain. Recompute org-derived UUID5 identities with entity_id(target_org, key) on import; replay may omit source CIDs if the organisation code changes.","table":"pulse.campaign"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_annotation"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_approval"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_call"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse.chat_call_event"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_call_party"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_channel"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_event"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_flow_follow"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_former_member"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_intent_decision"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_member"}
+{"class":"copy","jsonb":{"attachments":["attachments[].id","attachments[].task"]},"table":"pulse.chat_message"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_message_revision"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_reaction"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_receipt"}
+{"class":"skip","reason":"Refresh cache timestamp; recompute from copied chat records.","table":"pulse.chat_refresh_state"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_star"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_task_follow"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_task_handshake"}
+{"class":"copy","jsonb":{},"table":"pulse.chat_voice_play"}
+{"class":"copy","jsonb":{},"table":"pulse.cid_counter"}
+{"class":"copy","jsonb":{"custom":[]},"reason":"Canonical clients, including opshub UUID5 rows; preserve authored facts and remap IDs.","table":"pulse.client"}
+{"class":"copy","jsonb":{},"table":"pulse.client_contact"}
+{"class":"copy","jsonb":{},"table":"pulse.client_relationship"}
+{"class":"copy","jsonb":{},"table":"pulse.coach_config"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.coach_request"}
+{"class":"copy","jsonb":{},"table":"pulse.coach_suggestion"}
+{"class":"copy","jsonb":{"cursor":[]},"table":"pulse.collector_cursor"}
+{"class":"copy","jsonb":{},"table":"pulse.comp_change"}
+{"class":"copy","jsonb":{},"table":"pulse.comp_claim"}
+{"class":"copy","jsonb":{"detail":["detail.changeId","detail.taskId"]},"table":"pulse.comp_event"}
+{"class":"copy","jsonb":{"ref":["ref.changeId"]},"table":"pulse.comp_item"}
+{"class":"copy","jsonb":{},"table":"pulse.comp_letter"}
+{"class":"copy","jsonb":{},"table":"pulse.comp_offer"}
+{"class":"copy","jsonb":{},"reason":"Retain signed offer decisions; importer must invalidate/reissue the bearer capability.","table":"pulse.comp_offer_link"}
+{"class":"copy","jsonb":{},"table":"pulse.comp_pause"}
+{"class":"copy","jsonb":{"claim_categories":[],"components":[],"letters":[]},"table":"pulse.comp_policy"}
+{"class":"copy","jsonb":{},"table":"pulse.comp_probation"}
+{"class":"copy","jsonb":{},"table":"pulse.comp_probation_review"}
+{"class":"copy","jsonb":{},"table":"pulse.comp_record"}
+{"class":"copy","jsonb":{"legal":[]},"table":"pulse.comp_settlement"}
+{"class":"copy","jsonb":{"settings":[]},"table":"pulse.companion_notification_settings"}
+{"class":"copy","jsonb":{},"table":"pulse.companion_presence"}
+{"class":"copy","jsonb":{},"table":"pulse.connector_batch"}
+{"class":"copy","jsonb":{"manifest":[],"proposed":[]},"reason":"Retain collector bindings and provenance; source signing credentials require target reenrollment.","table":"pulse.connector_install"}
+{"class":"copy","jsonb":{"provenance":[]},"table":"pulse.connector_record"}
+{"class":"copy","jsonb":{},"table":"pulse.connector_source"}
+{"class":"copy","jsonb":{},"table":"pulse.contact_note"}
+{"class":"copy","jsonb":{"custom":[]},"table":"pulse.contact_profile"}
+{"class":"copy","jsonb":{"proposed":[]},"table":"pulse.correction"}
+{"class":"copy","jsonb":{},"table":"pulse.creative_sprint"}
+{"class":"copy","jsonb":{},"table":"pulse.creative_sprint_item"}
+{"class":"copy","jsonb":{},"table":"pulse.delivery"}
+{"class":"copy","jsonb":{},"table":"pulse.delivery_claim"}
+{"class":"copy","jsonb":{},"reason":"Preserve device identity, assignments and consent evidence FKs. Importer must set revoked_at, clear public_key to a constraint-valid inert value, and require fresh target device enrollment.","table":"pulse.device"}
+{"class":"copy","jsonb":{},"table":"pulse.device_assignment"}
+{"class":"copy","jsonb":{},"table":"pulse.drive_backfill_emission"}
+{"class":"copy","jsonb":{},"table":"pulse.drive_change"}
+{"class":"copy","jsonb":{},"table":"pulse.drive_change_gap"}
+{"class":"copy","jsonb":{},"table":"pulse.drive_extract"}
+{"class":"copy","jsonb":{},"table":"pulse.drive_extract_policy"}
+{"class":"copy","jsonb":{},"table":"pulse.drive_extract_review"}
+{"class":"copy","jsonb":{},"table":"pulse.drive_source"}
+{"class":"copy","jsonb":{},"table":"pulse.drive_source_file"}
+{"class":"skip","reason":"One-time enrollment capabilities; issue fresh target codes.","table":"pulse.enrolment_code"}
+{"class":"copy","jsonb":{},"reason":"Retain signed acceptance history; importer must invalidate/reissue the bearer capability.","table":"pulse.erp_accept_link"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_asset"}
+{"class":"copy","jsonb":{"buyer":[],"decision":[],"design":[],"reference":[],"request_result":[],"seller":[]},"table":"pulse.erp_document"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_document_file"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_engagement"}
+{"class":"copy","jsonb":{"detail":["detail.payment"]},"table":"pulse.erp_event"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_followup"}
+{"class":"copy","jsonb":{"milestones":[],"source":[]},"table":"pulse.erp_item"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_item_addon"}
+{"class":"copy","jsonb":{"snapshot":["snapshot.id","snapshot.parts[].itemId"]},"table":"pulse.erp_item_version"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_line"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_milestone"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_package_part"}
+{"class":"copy","jsonb":{"source":[]},"table":"pulse.erp_party"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_payment"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_series"}
+{"class":"copy","jsonb":{"company":[],"fields":[]},"table":"pulse.erp_settings"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_stock_move"}
+{"class":"copy","jsonb":{"design":[]},"table":"pulse.erp_template"}
+{"class":"copy","jsonb":{},"table":"pulse.erp_template_default"}
+{"class":"copy","jsonb":{"data":["data.actor_ref","data.asset_ref","data.assignee_ref","data.author_ref","data.by_ref","data.changed_by_ref","data.file_refs[]","data.into_ref","data.last_modifying_user","data.md5","data.offer_id","data.office_ref","data.organiser_ref","data.owner","data.person_ref","data.placement","data.project_ref","data.requested_by_ref","data.sha256","data.task_ref"]},"table":"pulse.event"}
+{"class":"copy","jsonb":{"data":["data.project_name_hash"]},"table":"pulse.event_ephemeral"}
+{"class":"copy","jsonb":{},"table":"pulse.external_identity_binding"}
+{"class":"copy","jsonb":{"fields":[]},"table":"pulse.field_form"}
+{"class":"copy","jsonb":{"fields":[]},"table":"pulse.field_form_version"}
+{"class":"copy","jsonb":{},"reason":"Canonical delivery/workgraph records referenced by copied history; indexed deliveries also writes these records. Preserve facts and recompute org-derived UUID5 identities with entity_id(target_org, key) on import; replay may omit source CIDs if the organisation code changes.","table":"pulse.file"}
+{"class":"copy","jsonb":{},"table":"pulse.file_correction"}
+{"class":"copy","jsonb":{},"table":"pulse.fin_entry"}
+{"class":"copy","jsonb":{"after":[],"before":[]},"table":"pulse.fin_entry_event"}
+{"class":"copy","jsonb":{},"table":"pulse.fin_entry_file"}
+{"class":"copy","jsonb":{},"table":"pulse.fin_entry_settings"}
+{"class":"copy","jsonb":{},"table":"pulse.fin_wa_decision"}
+{"class":"copy","jsonb":{},"table":"pulse.fin_wa_screen"}
+{"class":"copy","jsonb":{},"table":"pulse.flow_alert"}
+{"class":"copy","jsonb":{"preset":[]},"table":"pulse.flow_block"}
+{"class":"copy","jsonb":{},"table":"pulse.flow_comment"}
+{"class":"copy","jsonb":{},"table":"pulse.flow_intake"}
+{"class":"copy","jsonb":{},"table":"pulse.flow_link"}
+{"class":"copy","jsonb":{"definition":["definition.steps[].settings.formId","definition.steps[].settings.personId","definition.steps[].settings.templateId","definition.steps[].settings.workflowId","definition.steps[].sop.processId","definition.steps[].who.personId"],"writeup":[]},"table":"pulse.flow_process"}
+{"class":"copy","jsonb":{"compiled":["compiled.steps.*.settings.formId","compiled.steps.*.settings.personId","compiled.steps.*.settings.templateId","compiled.steps.*.settings.workflowId","compiled.steps.*.sop.processId","compiled.steps.*.who.personId"],"definition":["definition.steps[].settings.formId","definition.steps[].settings.personId","definition.steps[].settings.templateId","definition.steps[].settings.workflowId","definition.steps[].sop.processId","definition.steps[].who.personId"]},"table":"pulse.flow_process_version"}
+{"class":"copy","jsonb":{"data":["data.clientId","data.items[].personId","data.items[].recordId","data.personId","data.projectId","data.recordId","data.taskId"],"source":[]},"table":"pulse.flow_record"}
+{"class":"copy","jsonb":{"def":[]},"table":"pulse.flow_record_type"}
+{"class":"copy","jsonb":{"data":["data.clientId","data.items[].personId","data.items[].recordId","data.personId","data.projectId","data.recordId","data.taskId"]},"table":"pulse.flow_record_version"}
+{"class":"copy","jsonb":{"compiled":["compiled.steps.*.settings.formId","compiled.steps.*.settings.personId","compiled.steps.*.settings.templateId","compiled.steps.*.settings.workflowId","compiled.steps.*.sop.processId","compiled.steps.*.who.personId"],"definition":["definition.steps[].settings.formId","definition.steps[].settings.personId","definition.steps[].settings.templateId","definition.steps[].settings.workflowId","definition.steps[].sop.processId","definition.steps[].who.personId"],"fields":["fields.*"],"people":["people.*"]},"table":"pulse.flow_run"}
+{"class":"copy","jsonb":{},"table":"pulse.flow_run_step"}
+{"class":"copy","jsonb":{"meta":["meta.by"]},"table":"pulse.flow_step_event"}
+{"class":"copy","jsonb":{"value":["value.by","value.clientId","value.formId","value.ids[]","value.items[].id","value.items[].recordId","value.leadId","value.personId","value.projectId","value.recordId","value.submissionId","value.taskId","value[].by","value[].formId","value[].ids[]","value[].recordId","value[].submissionId"]},"table":"pulse.flow_value"}
+{"class":"rebuild","jsonb":{},"reason":"workgraph v3 projection; replay under target org to derive org-scoped UUID5 IDs and dependent rows.","table":"pulse.folder"}
+{"class":"copy","jsonb":{},"table":"pulse.form_event"}
+{"class":"copy","jsonb":{"answers":[],"fields":[],"location":[]},"table":"pulse.form_submission"}
+{"class":"copy","jsonb":{},"table":"pulse.geo_import"}
+{"class":"copy","jsonb":{},"table":"pulse.help_rating"}
+{"class":"copy","jsonb":{},"table":"pulse.hiring_application"}
+{"class":"copy","jsonb":{},"table":"pulse.holiday"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse.hq_brand"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse.hq_brand_version"}
+{"class":"copy","jsonb":{},"table":"pulse.hq_feature"}
+{"class":"copy","jsonb":{},"table":"pulse.hq_idea"}
+{"class":"copy","jsonb":{},"table":"pulse.hq_idea_vote"}
+{"class":"copy","jsonb":{"anchors":[],"bonuses":[],"deliverables":[],"delivery":[],"naming":[],"problems":[],"tiers":[]},"table":"pulse.hq_offer"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_cofounder"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_comp_credit"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_comp_use"}
+{"class":"copy","jsonb":{"previous_entry":[]},"table":"pulse.hr_correction_effect"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_emergency"}
+{"class":"copy","jsonb":{"handover":[]},"table":"pulse.hr_employment"}
+{"class":"copy","jsonb":{"details":[]},"table":"pulse.hr_flow"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_flow_event"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_flow_policy"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_mail_outbox"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.hr_month_history"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_pod"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_policy"}
+{"class":"copy","jsonb":{"config":[]},"table":"pulse.hr_rule_version"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_rule_waiver"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_ticket"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_ticket_event"}
+{"class":"copy","jsonb":{},"table":"pulse.hr_work_pattern"}
+{"class":"copy","jsonb":{},"table":"pulse.identity_assertion"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.identity_link"}
+{"class":"copy","jsonb":{},"table":"pulse.identity_pair_decision"}
+{"class":"copy","jsonb":{},"table":"pulse.import_batch"}
+{"class":"copy","jsonb":{},"table":"pulse.index_file"}
+{"class":"copy","jsonb":{},"table":"pulse.index_version"}
+{"class":"copy","jsonb":{},"table":"pulse.input"}
+{"class":"copy","jsonb":{},"table":"pulse.insight_decision"}
+{"class":"copy","jsonb":{"packet":[]},"table":"pulse.insight_receipt"}
+{"class":"copy","jsonb":{},"table":"pulse.install"}
+{"class":"copy","jsonb":{},"table":"pulse.kpi"}
+{"class":"copy","jsonb":{},"table":"pulse.kpi_update"}
+{"class":"copy","jsonb":{},"table":"pulse.kudos"}
+{"class":"copy","jsonb":{},"reason":"Canonical research_seed UUID5 lead rows; preserve source facts and remap IDs.","table":"pulse.lead"}
+{"class":"copy","jsonb":{},"table":"pulse.lead_answer"}
+{"class":"copy","jsonb":{},"table":"pulse.lead_touch"}
+{"class":"copy","jsonb":{},"table":"pulse.leave_adjustment"}
+{"class":"copy","jsonb":{},"table":"pulse.leave_request"}
+{"class":"copy","jsonb":{},"table":"pulse.leave_type"}
+{"class":"copy","jsonb":{},"table":"pulse.legal_organization"}
+{"class":"copy","jsonb":{},"table":"pulse.lifecycle_case"}
+{"class":"copy","jsonb":{"reasons":[]},"table":"pulse.lifecycle_review"}
+{"class":"copy","jsonb":{},"table":"pulse.lifecycle_signal"}
+{"class":"copy","jsonb":{"result":[]},"table":"pulse.lifecycle_step"}
+{"class":"copy","jsonb":{},"table":"pulse.locality"}
+{"class":"skip","reason":"Install-local password credentials; provision target accounts through the account-link flow.","table":"pulse.login_credential"}
+{"class":"skip","reason":"Browser session bearer digests; people must sign in again.","table":"pulse.login_session"}
+{"class":"copy","jsonb":{},"table":"pulse.market_price"}
+{"class":"copy","jsonb":{},"table":"pulse.milestone"}
+{"class":"copy","jsonb":{},"table":"pulse.money_permission"}
+{"class":"copy","jsonb":{},"table":"pulse.native_ack"}
+{"class":"skip","reason":"Device request acknowledgement/replay cache; restart after enrollment.","table":"pulse.native_batch"}
+{"class":"copy","jsonb":{"capabilities":[]},"reason":"Preserve device identity and native activity/history FKs. Importer must set revoked_at, clear push_token and any device key/token columns, and require fresh target device enrollment.","table":"pulse.native_device"}
+{"class":"copy","jsonb":{"data":[]},"table":"pulse.native_event"}
+{"class":"copy","jsonb":{},"table":"pulse.native_log"}
+{"class":"copy","jsonb":{},"table":"pulse.native_log_revision"}
+{"class":"copy","jsonb":{},"table":"pulse.native_permission"}
+{"class":"copy","jsonb":{"resources":["resources[].projectId"],"shoots":["shoots[].personId","shoots[].projectId"]},"table":"pulse.native_policy"}
+{"class":"copy","jsonb":{},"table":"pulse.native_push_delivery"}
+{"class":"copy","jsonb":{},"table":"pulse.native_window"}
+{"class":"copy","jsonb":{},"table":"pulse.notification"}
+{"class":"copy","jsonb":{},"table":"pulse.notification_delivery"}
+{"class":"copy","jsonb":{},"table":"pulse.notification_pref"}
+{"class":"copy","jsonb":{},"table":"pulse.notification_reminder"}
+{"class":"copy","jsonb":{},"table":"pulse.notification_reminder_policy"}
+{"class":"copy","jsonb":{"attributes":[]},"table":"pulse.offering"}
+{"class":"copy","jsonb":{},"table":"pulse.onboarding_document_kind"}
+{"class":"copy","jsonb":{},"table":"pulse.onboarding_sort_receipt"}
+{"class":"copy","jsonb":{},"table":"pulse.org"}
+{"class":"copy","jsonb":{},"table":"pulse.org_brand"}
+{"class":"copy","jsonb":{},"table":"pulse.org_domain"}
+{"class":"copy","jsonb":{},"table":"pulse.org_handover"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.org_line_proposal"}
+{"class":"copy","jsonb":{},"table":"pulse.org_module"}
+{"class":"copy","jsonb":{"history":["history[].by"],"words":[]},"table":"pulse.org_pack"}
+{"class":"copy","jsonb":{},"table":"pulse.org_pilot_check"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse.org_screen_view"}
+{"class":"copy","jsonb":{},"table":"pulse.org_source"}
+{"class":"copy","jsonb":{},"table":"pulse.org_storage"}
+{"class":"copy","jsonb":{},"table":"pulse.organization_contact"}
+{"class":"copy","jsonb":{},"table":"pulse.outcome_signal"}
+{"class":"copy","jsonb":{},"table":"pulse.party_org"}
+{"class":"copy","jsonb":{},"table":"pulse.password_reset_request"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_adjustment"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_budget"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_ledger_entry"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_ledger_total"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_payout"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_payslip"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_plan_role"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_run"}
+{"class":"copy","jsonb":{"detail":[]},"table":"pulse.pay_run_event"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_run_line"}
+{"class":"copy","jsonb":{},"table":"pulse.pay_scenario"}
+{"class":"copy","jsonb":{"attendance":[],"statutory":[]},"table":"pulse.pay_settings"}
+{"class":"copy","jsonb":{},"table":"pulse.payroll_notice_permission"}
+{"class":"copy","jsonb":{},"table":"pulse.payroll_processed_notice"}
+{"class":"copy","jsonb":{"field_sources":[]},"table":"pulse.people_profile"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.people_work_link"}
+{"class":"copy","jsonb":{"after_state":["after_state.assigneeId","after_state.ownerId"],"before_state":["before_state.assigneeId","before_state.ownerId"]},"table":"pulse.people_work_receipt"}
+{"class":"copy","jsonb":{},"reason":"Canonical people, including talent_index UUID5 rows; preserve facts and remap IDs, never discard on replay.","table":"pulse.person"}
+{"class":"copy","jsonb":{},"table":"pulse.person_experience"}
+{"class":"copy","jsonb":{"options":[]},"table":"pulse.person_flag"}
+{"class":"copy","jsonb":{},"table":"pulse.person_lifecycle"}
+{"class":"copy","jsonb":{"detail":[]},"table":"pulse.person_lifecycle_event"}
+{"class":"copy","jsonb":{},"table":"pulse.person_photo"}
+{"class":"copy","jsonb":{},"table":"pulse.person_shift"}
+{"class":"copy","jsonb":{},"table":"pulse.person_skill"}
+{"class":"copy","jsonb":{},"table":"pulse.person_skill_evidence"}
+{"class":"copy","jsonb":{},"table":"pulse.person_source"}
+{"class":"copy","jsonb":{},"table":"pulse.person_status"}
+{"class":"copy","jsonb":{},"table":"pulse.person_work_terms"}
+{"class":"copy","jsonb":{},"table":"pulse.phase"}
+{"class":"copy","jsonb":{},"table":"pulse.pilot_feedback_given"}
+{"class":"copy","jsonb":{"questions":[]},"table":"pulse.pilot_feedback_shown"}
+{"class":"copy","jsonb":{},"table":"pulse.pilot_feedback_tally"}
+{"class":"copy","jsonb":{},"table":"pulse.place"}
+{"class":"copy","jsonb":{},"table":"pulse.policy_ack"}
+{"class":"copy","jsonb":{},"table":"pulse.policy_document"}
+{"class":"copy","jsonb":{},"table":"pulse.policy_docx"}
+{"class":"skip","reason":"Ephemeral document-editor access tokens; open a fresh editor session.","table":"pulse.policy_editor_session"}
+{"class":"copy","jsonb":{},"table":"pulse.pool_batch"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.pool_proposal"}
+{"class":"skip","reason":"Ephemeral browser presence heartbeat cache; recreate from new sessions.","table":"pulse.presence_browser"}
+{"class":"copy","jsonb":{"wifi":[]},"table":"pulse.presence_office"}
+{"class":"copy","jsonb":{},"table":"pulse.profile_change"}
+{"class":"copy","jsonb":{},"reason":"Canonical projects, including opshub UUID5 rows; preserve authored facts and remap IDs.","table":"pulse.project"}
+{"class":"copy","jsonb":{},"table":"pulse.project_category"}
+{"class":"copy","jsonb":{},"table":"pulse.project_contact"}
+{"class":"copy","jsonb":{},"table":"pulse.project_location"}
+{"class":"copy","jsonb":{},"table":"pulse.project_location_change"}
+{"class":"copy","jsonb":{},"table":"pulse.project_location_member"}
+{"class":"copy","jsonb":{},"table":"pulse.project_member"}
+{"class":"skip","reason":"Source-local log positions; initialise target projection replay from the transferred log.","table":"pulse.projection_cursor"}
+{"class":"copy","jsonb":{},"table":"pulse.projection_error"}
+{"class":"copy","jsonb":{},"table":"pulse.quality_signal"}
+{"class":"copy","jsonb":{"payload":["payload.actor","payload.asset_id","payload.data.actor_ref","payload.data.asset_ref","payload.data.assignee_ref","payload.data.author_ref","payload.data.by_ref","payload.data.changed_by_ref","payload.data.file_refs[]","payload.data.into_ref","payload.data.last_modifying_user","payload.data.md5","payload.data.offer_id","payload.data.office_ref","payload.data.organiser_ref","payload.data.owner","payload.data.person_ref","payload.data.placement","payload.data.project_ref","payload.data.requested_by_ref","payload.data.sha256","payload.data.task_ref","payload.id","payload.org_id","payload.person_id","payload.project","payload.project_id","payload.subject","payload.task_id"]},"table":"pulse.raw_inbox"}
+{"class":"copy","jsonb":{"locator":[]},"table":"pulse.raw_object"}
+{"class":"copy","jsonb":{},"table":"pulse.record_annotation"}
+{"class":"copy","jsonb":{},"table":"pulse.record_change"}
+{"class":"copy","jsonb":{},"table":"pulse.record_link"}
+{"class":"copy","jsonb":{"kept_fields_after":["kept_fields_after.legal_org_id","kept_fields_after.relationship_owner_id"],"kept_fields_before":["kept_fields_before.legal_org_id","kept_fields_before.relationship_owner_id"],"moved":[]},"table":"pulse.record_merge"}
+{"class":"copy","jsonb":{"fields":[]},"table":"pulse.record_type"}
+{"class":"copy","jsonb":{"evidence":[],"source_seen":[]},"table":"pulse.relation_edge"}
+{"class":"copy","jsonb":{},"table":"pulse.relation_node_type"}
+{"class":"copy","jsonb":{},"table":"pulse.relation_reviewer"}
+{"class":"copy","jsonb":{"counts":[]},"table":"pulse.relation_run"}
+{"class":"copy","jsonb":{},"table":"pulse.research_engagement"}
+{"class":"copy","jsonb":{},"table":"pulse.research_import"}
+{"class":"copy","jsonb":{},"table":"pulse.research_month"}
+{"class":"copy","jsonb":{},"table":"pulse.research_notice"}
+{"class":"copy","jsonb":{"escalations":[],"scores":[],"strengths":[]},"table":"pulse.review"}
+{"class":"copy","jsonb":{"evidence":["evidence.options[].id","evidence.personId","evidence.projectId"],"proposed":["proposed.chosen","proposed.options[].id","proposed.personId","proposed.projectId"]},"table":"pulse.review_item"}
+{"class":"copy","jsonb":{"region":[]},"table":"pulse.review_note"}
+{"class":"copy","jsonb":{},"table":"pulse.review_rule"}
+{"class":"copy","jsonb":{},"table":"pulse.role_assignment"}
+{"class":"copy","jsonb":{"packet":[]},"table":"pulse.role_brief"}
+{"class":"copy","jsonb":{},"table":"pulse.role_seat"}
+{"class":"copy","jsonb":{"explanation":[],"projection_versions":[]},"table":"pulse.score"}
+{"class":"copy","jsonb":{},"table":"pulse.seat_holding"}
+{"class":"copy","jsonb":{},"table":"pulse.sensitive_permission"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse.sheet_view"}
+{"class":"copy","jsonb":{},"table":"pulse.shift"}
+{"class":"skip","reason":"Session sign-in deduplication cache; recreate from target sign-ins.","table":"pulse.signin_seen"}
+{"class":"copy","jsonb":{"starting_fields":[]},"table":"pulse.site_visit"}
+{"class":"copy","jsonb":{},"table":"pulse.site_visit_field_note"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse.site_visit_field_set"}
+{"class":"copy","jsonb":{},"table":"pulse.site_visit_history"}
+{"class":"copy","jsonb":{},"table":"pulse.skill_concept"}
+{"class":"copy","jsonb":{},"table":"pulse.skill_mapping"}
+{"class":"copy","jsonb":{},"table":"pulse.skill_rubric"}
+{"class":"copy","jsonb":{"counts":[]},"table":"pulse.skill_source"}
+{"class":"copy","jsonb":{},"table":"pulse.skill_term"}
+{"class":"copy","jsonb":{},"table":"pulse.skill_verification"}
+{"class":"copy","jsonb":{"doc":[]},"table":"pulse.sop"}
+{"class":"copy","jsonb":{},"table":"pulse.sop_source"}
+{"class":"copy","jsonb":{"doc":[]},"table":"pulse.sop_version"}
+{"class":"copy","jsonb":{"evidence":[],"payload":["payload.actor","payload.asset_id","payload.data.actor_ref","payload.data.asset_ref","payload.data.assignee_ref","payload.data.author_ref","payload.data.by_ref","payload.data.changed_by_ref","payload.data.file_refs[]","payload.data.into_ref","payload.data.last_modifying_user","payload.data.md5","payload.data.offer_id","payload.data.office_ref","payload.data.organiser_ref","payload.data.owner","payload.data.person_ref","payload.data.placement","payload.data.project_ref","payload.data.requested_by_ref","payload.data.sha256","payload.data.task_ref","payload.id","payload.org_id","payload.person_id","payload.project","payload.project_id","payload.subject","payload.task_id"]},"table":"pulse.source_observation"}
+{"class":"copy","jsonb":{},"table":"pulse.space"}
+{"class":"copy","jsonb":{"items":[]},"reason":"Retain stack content; share capabilities require target invalidation/reissue.","table":"pulse.stack_set"}
+{"class":"copy","jsonb":{"metrics":[],"sources":[]},"table":"pulse.stack_tool"}
+{"class":"copy","jsonb":{},"table":"pulse.story_product"}
+{"class":"copy","jsonb":{"changes":[],"media":[],"tests":[]},"table":"pulse.story_version"}
+{"class":"copy","jsonb":{"stats":[]},"table":"pulse.sync_run"}
+{"class":"copy","jsonb":{},"table":"pulse.talent_alias"}
+{"class":"copy","jsonb":{},"table":"pulse.talent_media"}
+{"class":"copy","jsonb":{"counts":[],"sources":[]},"table":"pulse.talent_run"}
+{"class":"copy","jsonb":{"source":[]},"table":"pulse.talent_shoot"}
+{"class":"copy","jsonb":{"ai_suggestion":[],"evidence":[]},"reason":"Canonical authored and directly written task records with event-subject IDs, not org-derived UUID5 projections. Preserve authored fields/history and remap identity/references on import; Projector.rebuild retains imported and edited tasks.","table":"pulse.task"}
+{"class":"copy","jsonb":{},"table":"pulse.task_attachment"}
+{"class":"copy","jsonb":{"signals":["signals[].events[].actor"]},"table":"pulse.task_auto_done"}
+{"class":"copy","jsonb":{},"table":"pulse.task_check"}
+{"class":"copy","jsonb":{},"table":"pulse.task_companion"}
+{"class":"copy","jsonb":{},"table":"pulse.task_event"}
+{"class":"copy","jsonb":{"detail":[]},"table":"pulse.task_flag"}
+{"class":"copy","jsonb":{},"table":"pulse.task_link"}
+{"class":"copy","jsonb":{},"table":"pulse.task_member"}
+{"class":"copy","jsonb":{"plan":[]},"table":"pulse.task_plan"}
+{"class":"copy","jsonb":{},"table":"pulse.task_proof"}
+{"class":"copy","jsonb":{},"table":"pulse.task_repeat"}
+{"class":"copy","jsonb":{},"table":"pulse.task_same"}
+{"class":"copy","jsonb":{"cond":["cond.offer_id.eq"]},"table":"pulse.task_signal"}
+{"class":"copy","jsonb":{},"table":"pulse.task_signal_hit"}
+{"class":"copy","jsonb":{},"table":"pulse.task_timer"}
+{"class":"copy","jsonb":{},"table":"pulse.telemetry_daily"}
+{"class":"copy","jsonb":{"detail":[]},"table":"pulse.telemetry_event"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse.tenant_config"}
+{"class":"copy","jsonb":{"steps":[]},"table":"pulse.tenant_setup"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.time_entry"}
+{"class":"copy","jsonb":{},"table":"pulse.unit"}
+{"class":"copy","jsonb":{"sections":[]},"table":"pulse.update_post"}
+{"class":"copy","jsonb":{},"table":"pulse.update_receipt"}
+{"class":"copy","jsonb":{},"table":"pulse.update_request"}
+{"class":"copy","jsonb":{},"table":"pulse.value_override"}
+{"class":"copy","jsonb":{"evidence":[]},"reason":"Canonical delivery/workgraph records referenced by copied history; indexed deliveries also writes these records. Preserve facts and recompute org-derived UUID5 identities with entity_id(target_org, key) on import; replay may omit source CIDs if the organisation code changes.","table":"pulse.version"}
+{"class":"copy","jsonb":{},"table":"pulse.visit"}
+{"class":"skip","jsonb":{},"reason":"Credential-bound push delivery/retry state references skipped web_push_subscription endpoints; recreate target subscriptions and delivery state.","table":"pulse.web_push_delivery"}
+{"class":"skip","reason":"Browser push endpoints and authentication keys; subscribe again on the target.","table":"pulse.web_push_subscription"}
+{"class":"copy","jsonb":{},"table":"pulse.work_ask"}
+{"class":"copy","jsonb":{},"table":"pulse.work_category"}
+{"class":"copy","jsonb":{},"table":"pulse.work_comment"}
+{"class":"copy","jsonb":{},"table":"pulse.work_credit"}
+{"class":"copy","jsonb":{},"table":"pulse.work_domain"}
+{"class":"copy","jsonb":{},"table":"pulse.work_event"}
+{"class":"copy","jsonb":{},"table":"pulse.work_project"}
+{"class":"copy","jsonb":{"evidence":[]},"table":"pulse.work_project_link"}
+{"class":"copy","jsonb":{"detail":[]},"table":"pulse.work_review"}
+{"class":"copy","jsonb":{"tiles":[]},"table":"pulse.work_role"}
+{"class":"copy","jsonb":{},"table":"pulse.work_role_holder"}
+{"class":"copy","jsonb":{},"table":"pulse.work_rule"}
+{"class":"copy","jsonb":{"config":[]},"table":"pulse.work_saved_view"}
+{"class":"copy","jsonb":{},"table":"pulse.work_settings"}
+{"class":"copy","jsonb":{},"table":"pulse.work_unit"}
+{"class":"copy","jsonb":{"asked":[],"config":[],"uses":[]},"table":"pulse.work_view_pref"}
+{"class":"copy","jsonb":{"definition":["definition.steps[].assign.personId","definition.steps[].config.workflowId","definition.steps[].handoff.workflowId","definition.steps[].personId","definition.steps[].sopId"],"trigger":[]},"table":"pulse.workflow"}
+{"class":"copy","jsonb":{},"table":"pulse.workflow_board"}
+{"class":"copy","jsonb":{"context":["context.clientId","context.fromRun","context.fromStep","context.personId","context.projectId","context.recordId"],"definition":["definition.steps[].assign.personId","definition.steps[].config.workflowId","definition.steps[].handoff.workflowId","definition.steps[].personId","definition.steps[].sopId"]},"table":"pulse.workflow_run"}
+{"class":"copy","jsonb":{},"table":"pulse.workflow_run_step"}
+{"class":"copy","jsonb":{"definition":["definition.steps[].assign.personId","definition.steps[].config.workflowId","definition.steps[].handoff.workflowId","definition.steps[].personId","definition.steps[].sopId"],"trigger":[]},"table":"pulse.workflow_version"}
+{"class":"copy","jsonb":{},"table":"pulse.workspace_alias"}
+{"class":"copy","jsonb":{"members":[]},"table":"pulse.workspace_group"}
+{"class":"copy","jsonb":{},"table":"pulse.zone"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.accountant_access"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.acq_enquiry"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.acq_envelope"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.acq_identity"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.acq_lead_media"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.acq_link"}
+{"class":"copy","jsonb":{"body":[],"manual":[]},"table":"pulse_priv.acq_snapshot"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.acq_source"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.acq_spend"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.acq_stage"}
+{"class":"copy","jsonb":{"contact":[]},"table":"pulse_priv.acq_subject"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.ad_account"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.ad_funding"}
+{"class":"skip","reason":"Install-bound agent credential hashes; issue new target keys.","table":"pulse_priv.agent_key"}
+{"class":"skip","reason":"Install-local application credentials; provision new target secrets.","table":"pulse_priv.app_secret"}
+{"class":"skip","reason":"Encrypted TOTP seeds and recovery credentials tied to auth_key; enroll two-step again.","table":"pulse_priv.auth_account"}
+{"class":"skip","reason":"Short-lived sign-in challenges; people must sign in again.","table":"pulse_priv.auth_challenge"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.auth_event"}
+{"class":"skip","reason":"Source authentication encryption key; generate a fresh target key.","table":"pulse_priv.auth_key"}
+{"class":"skip","reason":"One-time reset/invitation/email verification tokens; issue fresh target links.","table":"pulse_priv.auth_link"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.auth_policy"}
+{"class":"skip","reason":"Remembered device credentials; trust must be established again.","table":"pulse_priv.auth_seen_device"}
+{"class":"copy","jsonb":{},"reason":"Canonical research_seed UUID5 buyer rows; preserve source facts and remap IDs.","table":"pulse_priv.buyer"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.cash_balance"}
+{"class":"skip","reason":"Install-local catalogue API credential digests; issue fresh target keys.","table":"pulse_priv.catalog_key"}
+{"class":"skip","reason":"Public catalogue bearer share tokens; issue fresh target shares.","table":"pulse_priv.catalog_offer"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.chat_channel_photo"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.chat_file"}
+{"class":"copy","jsonb":{"participants":[],"stats":[]},"table":"pulse_priv.chat_import_batch"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.chat_import_message"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.chat_name"}
+{"class":"copy","jsonb":{"aliases":[],"capabilities":[]},"table":"pulse_priv.chat_provider_binding"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.chat_provider_receipt"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.chat_voice_transcript"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.client_project_value"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.delivery_blocker"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.delivery_edge"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.delivery_event"}
+{"class":"copy","jsonb":{"baseline":[],"calendar":[]},"table":"pulse_priv.delivery_plan"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.delivery_readiness"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.delivery_review_policy"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.delivery_task"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.delivery_template"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.drive_payload"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_access"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_baseline"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_break"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_consent"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_coverage"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_credit"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_dispute"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_experiment"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_kudos"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.fair_note"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.fair_notice"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.fair_preference"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.fair_projection"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.finance_allocation"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.finance_decision"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.finance_desk_file"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.finance_desk_payroll"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.finance_desk_record"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.finance_desk_send"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.finance_document"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.finance_live_filed"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.finance_live_model"}
+{"class":"copy","jsonb":{"body":[],"source":[]},"table":"pulse_priv.finance_live_record"}
+{"class":"copy","jsonb":{"counts":[]},"table":"pulse_priv.finance_live_run"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.finance_live_source"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.finance_source"}
+{"class":"copy","jsonb":{},"reason":"Retain flow integration configuration; live hook capabilities require target rotation.","table":"pulse_priv.flow_hook"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.form_file"}
+{"class":"skip","reason":"Short-lived OAuth state, browser nonces and PKCE verifiers; restart sign-in.","table":"pulse_priv.google_auth_attempt"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.google_identity"}
+{"class":"skip","reason":"Session-bound OAuth linking challenges; restart account linking.","table":"pulse_priv.google_link_attempt"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.google_settings"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.handover_setting"}
+{"class":"copy","jsonb":{"components":[]},"table":"pulse_priv.hr_compensation"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.hr_contact"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.hr_document"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.hr_file"}
+{"class":"copy","jsonb":{"snapshot":[]},"table":"pulse_priv.hr_payslip"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.identity_document"}
+{"class":"copy","jsonb":{"data":[]},"table":"pulse_priv.install_event"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.install_event_counter"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.money_category"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.money_match"}
+{"class":"copy","jsonb":{"evidence":[],"payload":[]},"table":"pulse_priv.money_observation"}
+{"class":"copy","jsonb":{"candidates":[]},"table":"pulse_priv.money_party"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.money_party_evidence"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.money_plan"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.money_tool_detail"}
+{"class":"skip","reason":"One-time pairing codes and poll credentials; pair again on the target.","table":"pulse_priv.native_pair"}
+{"class":"skip","reason":"Device access/refresh token families; issue new credentials after enrollment.","table":"pulse_priv.native_token"}
+{"class":"copy","jsonb":{},"reason":"Retain accepted invitation history; importer must revoke/reissue live invitation capabilities.","table":"pulse_priv.org_invite"}
+{"class":"copy","jsonb":{"bank_summary":[],"details":[],"steps":[]},"table":"pulse_priv.person_onboarding"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.person_private"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.person_resume"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.portal_ack"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.portal_document"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.portal_feedback"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.portal_grant"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.portal_policy"}
+{"class":"copy","jsonb":{},"reason":"Retain principal identity for portal history; reset password and require fresh sign-in.","table":"pulse_priv.portal_principal"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.portal_publication"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.portal_release"}
+{"class":"skip","reason":"One-time portal password-reset capabilities; issue fresh target links.","table":"pulse_priv.portal_reset"}
+{"class":"skip","reason":"Client portal bearer session digests; people must sign in again.","table":"pulse_priv.portal_session"}
+{"class":"copy","jsonb":{"body":[]},"table":"pulse_priv.portal_support"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.profile_proposal"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.pulse_licence"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.raw_blob"}
+{"class":"copy","jsonb":{"cursor":[]},"reason":"Immutable raw provenance has org-scoped UUID5 IDs; copy observations and remap IDs, do not recapture.","table":"pulse_priv.raw_capture"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.review_upload"}
+{"class":"skip","reason":"Short-lived OAuth state and PKCE challenges; restart authorization.","table":"pulse_priv.sales_xray_attempt"}
+{"class":"skip","reason":"Source-bound OAuth client credentials; register fresh target credentials.","table":"pulse_priv.sales_xray_client"}
+{"class":"skip","reason":"Sealed OAuth access and refresh tokens; reconnect on the target.","table":"pulse_priv.sales_xray_link"}
+{"class":"copy","jsonb":{},"reason":"Preserve service-key identity referenced by update_post and update_request history. Importer must set revoked_at, clear key_hash to a constraint-valid inert value and any token columns, and provision fresh target credentials.","table":"pulse_priv.service_key"}
+{"class":"copy","jsonb":{"body":[]},"reason":"Retain shared-stack history; bearer shares require target invalidation/reissue.","table":"pulse_priv.stack_share"}
+{"class":"copy","jsonb":{},"reason":"Retain invitation/delivery history; importer must revoke/reissue live invitation capabilities.","table":"pulse_priv.staff_invitation"}
+{"class":"copy","jsonb":{"source":[]},"table":"pulse_priv.talent_fee"}
+{"class":"copy","jsonb":{"pip_suggestion":[]},"table":"pulse_priv.task_value_retired"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.telegram_person"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.v1_call"}
+{"class":"skip","reason":"Credential-bound HTTP idempotency/replay response cache; do not replay on the target.","table":"pulse_priv.v1_replay"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.webhook_delivery"}
+{"class":"copy","jsonb":{},"reason":"Retain endpoint configuration; source signing secrets require target key rotation.","table":"pulse_priv.webhook_endpoint"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.work_credit_retired"}
+{"class":"copy","jsonb":{},"table":"pulse_priv.work_file"}
