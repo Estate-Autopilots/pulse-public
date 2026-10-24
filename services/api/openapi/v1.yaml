@@ -1,0 +1,2126 @@
+# Pulse API v1: OpenAPI 3.1 written as JSON (which is YAML), generated from services/api/src/v1.ts and compared in CI
+# by services/api/test/v1.test.mjs. Regenerate: cd services/api && pnpm build && V1_OPENAPI_WRITE=1 node --test test/v1.test.mjs
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Pulse API v1",
+    "version": "1.0.0",
+    "description": "One bearer key per call and nothing else: `psvc_` (a connected app, acting as the AI member it is bound to), `pak_` (an AI employee) or a personal token. Access is the key's area scopes (`<area>.read|write` for tasks, projects, people, chats, docs, billing, workflows, companies, search, events; granted explicitly, none by default) ∩ what its principal may see on the screens ∩ the company whose address is called. A cookie, session or Access identity beside the key: 401. Refusals are `application/problem+json` with the request id (also `X-Request-Id`); every response is `Cache-Control: no-store`; unknown path, query or body fields: 400. Lists use items + nextCursor with limit 1..100 and a token/company/filter-bound opaque cursor; adapters seek by ascending immutable id under row security, never offsets. Authenticated tokens have independent process-local 120/min budgets (4096 active windows); failed auth uses its separate service budget. RateLimit-Limit/Remaining/Reset describe the budget (Reset is seconds); 429 includes Retry-After. Writes require a UUID Idempotency-Key; identical input replays the committed status/body for 24 hours, changed input returns 409. The install-local service paths (`/api/v1/service/…`, `/api/v1/catalog/items`) keep their own contract, inlined here from service.yaml: a `psvc_` key holding the `serviceKey` scope each operation names, and `{ \"error\" }` refusals."
+  },
+  "servers": [
+    {
+      "url": "https://{installHost}",
+      "variables": {
+        "installHost": {
+          "default": "pulse.example.com"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "paths": {
+    "/api/v1/catalog/items": {
+      "get": {
+        "summary": "Scope catalog.read: active catalogue entries (unchanged EST-1064 contract, see catalog.yaml)",
+        "description": "Accepts the existing `pcat_` catalogue key or a `psvc_` key holding `catalog.read`. No query parameters.",
+        "responses": {
+          "200": {
+            "description": "Active entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "kind",
+                          "name",
+                          "description",
+                          "price",
+                          "currency",
+                          "taxRate",
+                          "publicLink"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "service",
+                              "product",
+                              "consumable",
+                              "package"
+                            ]
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "price": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 1000000000000
+                          },
+                          "currency": {
+                            "type": "string",
+                            "const": "INR"
+                          },
+                          "taxRate": {
+                            "type": "number"
+                          },
+                          "publicLink": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown query parameter",
+            "invalid cursor/limit or invalid body": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing",
+            "malformed": null,
+            "unknown or revoked key": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks this scope",
+            "another company's host on a multi-company server": null,
+            "or an endpoint outside the service API": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited; Retry-After: 60",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "serviceKey": [
+              "catalog.read"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/service/clients": {
+      "get": {
+        "summary": "Scope clients.read: this install's clients, minimal fields",
+        "description": "Every client except the company's own internal record, ordered by id. Only the fields below: no contacts, phone numbers, emails, addresses, billing, documents, payments, people, HR, attendance or finance detail.",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Opaque; from the previous page's nextCursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            }
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "required": false,
+            "description": "1.1. Exact lookup by phone number, E.164 (e.g. +919812345678; a 10-digit Indian number is read as +91). Not combinable with cursor/limit. Matched server-side against the keyed digests Pulse already keeps (leads) or the stored client number (clients); the number never appears in the response, logs or audit (audit holds key id + match count). At most 5 rows; 30 lookups per minute per key (429).",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\+?[0-9 ()-]{10,20}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page, or with `phone` at most 5 exact matches and nextCursor null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "items",
+                    "nextCursor"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "name",
+                          "status",
+                          "salesperson"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "enum": [
+                              "prospect",
+                              "active",
+                              "paused",
+                              "churned",
+                              null
+                            ]
+                          },
+                          "salesperson": {
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "id",
+                                  "name"
+                                ],
+                                "description": "An active staff member of this install; display name only",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "The client's relationship owner while an active staff member"
+                          }
+                        }
+                      }
+                    },
+                    "nextCursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Pass back as `cursor` for the next page; null on the last page"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown query parameter",
+            "invalid cursor/limit or invalid body": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing",
+            "malformed": null,
+            "unknown or revoked key": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks this scope",
+            "another company's host on a multi-company server": null,
+            "or an endpoint outside the service API": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited; Retry-After: 60",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "serviceKey": [
+              "clients.read"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/service/leads": {
+      "get": {
+        "summary": "Scope leads.read: this install's open and closed leads (acquisition enquiries), minimal fields",
+        "description": "Withdrawn and test enquiries are excluded; ordered by id. Only the fields below: no phone numbers, emails, messages, source/ad/spend data, identity keys, people, HR, attendance or finance detail. 404 when the install has the acquisition module switched off.",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Opaque; from the previous page's nextCursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            }
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "required": false,
+            "description": "1.1. Exact lookup by phone number, E.164 (e.g. +919812345678; a 10-digit Indian number is read as +91). Not combinable with cursor/limit. Matched server-side against the keyed digests Pulse already keeps (leads) or the stored client number (clients); the number never appears in the response, logs or audit (audit holds key id + match count). At most 5 rows; 30 lookups per minute per key (429).",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\+?[0-9 ()-]{10,20}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page, or with `phone` at most 5 exact matches and nextCursor null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "items",
+                    "nextCursor"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "name",
+                          "stage",
+                          "receivedAt",
+                          "salesperson"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "The enquirer's name as Pulse shows it; null when unknown"
+                          },
+                          "stage": {
+                            "type": "string",
+                            "description": "Latest stage as Pulse shows it (e.g. new, contacted, visit_planned, booked, lost)"
+                          },
+                          "receivedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "salesperson": {
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "id",
+                                  "name"
+                                ],
+                                "description": "An active staff member of this install; display name only",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "The enquiry's owner while an active staff member"
+                          }
+                        }
+                      }
+                    },
+                    "nextCursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown query parameter",
+            "invalid cursor/limit or invalid body": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing",
+            "malformed": null,
+            "unknown or revoked key": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks this scope",
+            "another company's host on a multi-company server": null,
+            "or an endpoint outside the service API": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found on this install or module switched off",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited; Retry-After: 60",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "serviceKey": [
+              "leads.read"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/service/quotes": {
+      "post": {
+        "summary": "Scope quotes.draft.create: create a DRAFT quotation from catalogue items",
+        "description": "Always creates a draft quotation (no number, not issued, not sent) for one client or one lead of this install. Every line is an active catalogue item; its name, SAC, unit and GST rate come from the catalogue. `rate` defaults to the catalogue price; if any line's rate differs from the catalogue price the quotation carries `ownerApprovalNeeded: true`, and Pulse refuses to issue it until someone with the leadership role issues it (that is the approval, recorded in the ERP log). Staff edits to the draft recompute the flag. GST figures are Pulse's own (same arithmetic as a staff draft). Created drafts are audited with the key id; the key cannot read, edit, issue, send, convert or delete documents afterwards. 404 when the install has the money module off.",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "description": "A fresh UUID per intended quotation. Replaying the same key with the same body returns the same draft (200); with a different body, 409.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "lines"
+                ],
+                "oneOf": [
+                  {
+                    "required": [
+                      "clientId"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "leadId"
+                    ]
+                  }
+                ],
+                "properties": {
+                  "clientId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "leadId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "salespersonId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Active staff member; default: the client's or lead's salesperson"
+                  },
+                  "lines": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "itemId",
+                        "qty"
+                      ],
+                      "properties": {
+                        "itemId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "An active catalogue entry from /api/v1/catalog/items"
+                        },
+                        "qty": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "maximum": 100000,
+                          "multipleOf": 0.001
+                        },
+                        "rate": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 1000000000000,
+                          "description": "INR paise per unit before GST; default the catalogue price; any other value sets ownerApprovalNeeded"
+                        },
+                        "details": {
+                          "type": "string",
+                          "maxLength": 1000,
+                          "description": "Optional line note shown under the item name"
+                        }
+                      }
+                    }
+                  },
+                  "notes": {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "sourceRef": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "1.1. Caller's source id (e.g. the Sales X-Ray analysis id), shown in the quotation's ERP history; not printed on the quotation"
+                  },
+                  "validUntil": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Default: issue date + 30 days"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Idempotent replay of an earlier identical request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "status",
+                    "number",
+                    "clientId",
+                    "leadId",
+                    "salesperson",
+                    "ownerApprovalNeeded",
+                    "currency",
+                    "validUntil",
+                    "lines",
+                    "taxable",
+                    "tax",
+                    "total",
+                    "link",
+                    "sourceRef"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "const": "draft"
+                    },
+                    "number": {
+                      "type": "null",
+                      "description": "Drafts have no number; Pulse numbers a quotation when staff issue it"
+                    },
+                    "clientId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    },
+                    "leadId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    },
+                    "salesperson": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "description": "An active staff member of this install; display name only",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "ownerApprovalNeeded": {
+                      "type": "boolean"
+                    },
+                    "currency": {
+                      "const": "INR"
+                    },
+                    "validUntil": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "lines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "itemId",
+                          "name",
+                          "qty",
+                          "rate",
+                          "catalogueRate",
+                          "gstRate",
+                          "taxable",
+                          "tax",
+                          "total"
+                        ],
+                        "properties": {
+                          "itemId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "qty": {
+                            "type": "number"
+                          },
+                          "rate": {
+                            "type": "integer"
+                          },
+                          "catalogueRate": {
+                            "type": "integer",
+                            "description": "The catalogue price when the draft was created"
+                          },
+                          "gstRate": {
+                            "type": "number"
+                          },
+                          "taxable": {
+                            "type": "integer"
+                          },
+                          "tax": {
+                            "type": "integer",
+                            "description": "CGST+SGST or IGST for this line"
+                          },
+                          "total": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "taxable": {
+                      "type": "integer"
+                    },
+                    "tax": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Including GST and rounding"
+                    },
+                    "link": {
+                      "type": "string",
+                      "description": "Relative staff path on this install: /quotes/{id}"
+                    },
+                    "sourceRef": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Draft created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "status",
+                    "number",
+                    "clientId",
+                    "leadId",
+                    "salesperson",
+                    "ownerApprovalNeeded",
+                    "currency",
+                    "validUntil",
+                    "lines",
+                    "taxable",
+                    "tax",
+                    "total",
+                    "link",
+                    "sourceRef"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "const": "draft"
+                    },
+                    "number": {
+                      "type": "null",
+                      "description": "Drafts have no number; Pulse numbers a quotation when staff issue it"
+                    },
+                    "clientId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    },
+                    "leadId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    },
+                    "salesperson": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "description": "An active staff member of this install; display name only",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "ownerApprovalNeeded": {
+                      "type": "boolean"
+                    },
+                    "currency": {
+                      "const": "INR"
+                    },
+                    "validUntil": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "lines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "itemId",
+                          "name",
+                          "qty",
+                          "rate",
+                          "catalogueRate",
+                          "gstRate",
+                          "taxable",
+                          "tax",
+                          "total"
+                        ],
+                        "properties": {
+                          "itemId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "qty": {
+                            "type": "number"
+                          },
+                          "rate": {
+                            "type": "integer"
+                          },
+                          "catalogueRate": {
+                            "type": "integer",
+                            "description": "The catalogue price when the draft was created"
+                          },
+                          "gstRate": {
+                            "type": "number"
+                          },
+                          "taxable": {
+                            "type": "integer"
+                          },
+                          "tax": {
+                            "type": "integer",
+                            "description": "CGST+SGST or IGST for this line"
+                          },
+                          "total": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "taxable": {
+                      "type": "integer"
+                    },
+                    "tax": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Including GST and rounding"
+                    },
+                    "link": {
+                      "type": "string",
+                      "description": "Relative staff path on this install: /quotes/{id}"
+                    },
+                    "sourceRef": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown query parameter",
+            "invalid cursor/limit or invalid body": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing",
+            "malformed": null,
+            "unknown or revoked key": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks this scope",
+            "another company's host on a multi-company server": null,
+            "or an endpoint outside the service API": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found on this install or module switched off",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency-Key already used with a different body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "No salesperson (none given and the client/lead has none, or not an active staff member), or the ERP company state is not set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited; Retry-After: 60",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "serviceKey": [
+              "quotes.draft.create"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/service/tasks/mine": {
+      "get": {
+        "summary": "Scope tasks.read: the signed-in WAS person's own open tasks (EST-1392 §6)",
+        "description": "Google ID token: JWKS, iss, aud, exp + 60 s, email_verified, allowed hd, active (iss, sub) link. Open/in-progress/blocked/in-review, at most 200 tasks, earliest due first; no notes, value, timers, activity or cross-person counts. No query. Audit key id + person id; never token.",
+        "parameters": [
+          {
+            "name": "Pulse-Person-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 8192
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The person's tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "personId",
+                    "items",
+                    "generatedAt"
+                  ],
+                  "properties": {
+                    "personId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "generatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "items": {
+                      "type": "array",
+                      "maxItems": 200,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "title",
+                          "status",
+                          "dueAt",
+                          "bucket",
+                          "dueSoon",
+                          "link"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "open",
+                              "in_progress",
+                              "blocked",
+                              "in_review"
+                            ]
+                          },
+                          "dueAt": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "format": "date-time"
+                          },
+                          "bucket": {
+                            "enum": [
+                              "overdue",
+                              "due_today",
+                              "upcoming",
+                              "no_due_date"
+                            ],
+                            "description": "Install calendar day"
+                          },
+                          "dueSoon": {
+                            "type": "boolean",
+                            "description": "Open/in-progress/blocked and due between now and 24 h from now"
+                          },
+                          "link": {
+                            "type": "string",
+                            "description": "/tasks/{id}"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown query parameter",
+            "invalid cursor/limit or invalid body": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid service credential, or `person_token_invalid` (bad or expired person token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`person_not_linked` (no active linked staff person), or as Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited; Retry-After: 60",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "serviceKey": [
+              "tasks.read"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/service/people": {
+      "get": {
+        "summary": "Scope people.read: this install's staff directory, minimal fields",
+        "description": "Active/inactive staff only; current role keys and department/team/pod units. No personal, HR, activity or performance data.",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "Opaque; from the previous page's nextCursor"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page; nextCursor is null on the last page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "items",
+                    "nextCursor"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "name",
+                          "workEmail",
+                          "roles",
+                          "teams",
+                          "active",
+                          "link"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "workEmail": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "roles": {
+                            "type": "array",
+                            "items": {
+                              "enum": [
+                                "admin",
+                                "hr",
+                                "leadership",
+                                "finance",
+                                "manager",
+                                "pgs",
+                                "head_pgs"
+                              ]
+                            }
+                          },
+                          "teams": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "active": {
+                            "type": "boolean"
+                          },
+                          "link": {
+                            "type": "string",
+                            "description": "/people/{id}"
+                          }
+                        }
+                      }
+                    },
+                    "nextCursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown query parameter",
+            "invalid cursor/limit or invalid body": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing",
+            "malformed": null,
+            "unknown or revoked key": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks this scope",
+            "another company's host on a multi-company server": null,
+            "or an endpoint outside the service API": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited; Retry-After: 60",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "serviceKey": [
+              "people.read"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/service/quotes/{id}/ready-notice": {
+      "post": {
+        "summary": "Scope notify.quote_ready: tell the quote's salesperson the draft is ready",
+        "description": "Sends one fixed notice, only to the quotation's salesperson, never to anyone else and never with caller text: \"Quotation ready for <client or lead name>: <n> item(s), INR <total incl. GST>\" plus \" · owner approval needed\" when flagged, linking to `/quotes/{id}` on this install (sign-in required; the salesperson sees that one quotation read-only). Delivered like other Pulse notices (inbox, plus the person's own push/email settings). Only for draft quotations created through a service key on this install. One notice per quotation: a repeat call sends nothing and returns the first `notifiedAt` with `repeat: true`. No request body. 404 when the install has the money module off.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notice sent now, or already sent earlier",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "notifiedAt",
+                    "repeat"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "notifiedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "repeat": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown query parameter",
+            "invalid cursor/limit or invalid body": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing",
+            "malformed": null,
+            "unknown or revoked key": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks this scope",
+            "another company's host on a multi-company server": null,
+            "or an endpoint outside the service API": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such quotation on this install, not a service-created draft, or money module off",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited; Retry-After: 60",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "serviceKey": [
+              "notify.quote_ready"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/service/chats/{chatId}/messages": {
+      "post": {
+        "summary": "Scope chats.post: post as the key's bound AI member in a member chat",
+        "description": "No read operation. An identical slot retry returns the original IDs without another file or notification; changed text, image or chat returns 409. Membership and active AI identity are rechecked on every call. Body cap 3 MiB; PNG/JPEG magic must match the declared MIME; decoded image cap 2 MiB (413).",
+        "parameters": [
+          {
+            "name": "chatId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-(am|pm)$"
+            },
+            "description": "Real calendar date; slot unique per AI member across keys and chats"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "text"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 12000
+                  },
+                  "image": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "name",
+                      "mime",
+                      "bytes"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      },
+                      "mime": {
+                        "type": "string",
+                        "enum": [
+                          "image/png",
+                          "image/jpeg"
+                        ]
+                      },
+                      "bytes": {
+                        "type": "string",
+                        "contentEncoding": "base64",
+                        "description": "Canonical base64; at most 2097152 decoded bytes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Slot replay",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "messageId",
+                    "chatId",
+                    "replayed"
+                  ],
+                  "properties": {
+                    "messageId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "chatId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "replayed": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Posted; normal chat notifications queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "messageId",
+                    "chatId",
+                    "replayed"
+                  ],
+                  "properties": {
+                    "messageId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "chatId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "replayed": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown query parameter",
+            "invalid cursor/limit or invalid body": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing",
+            "malformed": null,
+            "unknown or revoked key": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Key lacks this scope",
+            "another company's host on a multi-company server": null,
+            "or an endpoint outside the service API": null,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Slot already used for another message"
+          },
+          "413": {
+            "description": "Image or request body exceeds its limit"
+          },
+          "429": {
+            "description": "Rate limited; Retry-After: 60",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "serviceKey": [
+              "chats.post"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "`psvc_<key id>_<secret>`, `pak_<prefix>_<secret>` or a personal token; scopes are the area grants."
+      },
+      "serviceKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "`psvc_<key UUID>_<43-character base64url secret>`; scopes fixed at issue; bound to the issuing install; digest only at rest; revocable per key"
+      }
+    },
+    "parameters": {
+      "cursor": {
+        "name": "cursor",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "limit": {
+        "name": "limit",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^(?:[1-9]|[1-9][0-9]|100)$",
+          "default": "100"
+        }
+      }
+    },
+    "headers": {
+      "RateLimit-Limit": {
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "description": "Requests limit in this budget"
+      },
+      "RateLimit-Remaining": {
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "description": "Requests remaining in this budget"
+      },
+      "RateLimit-Reset": {
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "description": "Seconds until the process-local window resets"
+      },
+      "Retry-After": {
+        "description": "Seconds before retrying a 429",
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "responses": {
+      "Problem": {
+        "description": "A refusal or failure; 429 includes Retry-After",
+        "headers": {
+          "RateLimit-Limit": {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Requests limit in this budget"
+          },
+          "RateLimit-Remaining": {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Requests remaining in this budget"
+          },
+          "RateLimit-Reset": {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Seconds until the process-local window resets"
+          },
+          "Retry-After": {
+            "$ref": "#/components/headers/Retry-After"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "requestId"
+        ],
+        "properties": {
+          "type": {
+            "const": "about:blank"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "detail": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          }
+        }
+      }
+    }
+  }
+}
