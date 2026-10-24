@@ -1,0 +1,3 @@
+import {cookies,headers} from 'next/headers';
+import {hostHeader} from '../lib/host-mode.mjs';
+export async function portalApi<T>(path:string):Promise<{data?:T;error?:string}>{const token=(await cookies()).get('pulse_client_session')?.value;if(!token)return {error:'Sign in with your EA-issued client login.'};try{const r=await fetch(`${process.env.PULSE_API_URL??'http://127.0.0.1:8081'}/api/v0/portal${path}`,{headers:{'x-pulse-client-session':token,...hostHeader(await headers())},cache:'no-store',signal:AbortSignal.timeout(15000)});const d=await r.json();return r.ok?{data:d}:{error:d.error??'Client work unavailable'};}catch{return {error:'Client service reconnecting. Try again.'};}}
