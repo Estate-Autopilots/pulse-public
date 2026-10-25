@@ -1,0 +1,43 @@
+openapi: 3.1.0
+info: { title: Pulse salesperson quotation, version: 1.0.0 }
+paths:
+  /api/v0/quotes/{id}:
+    get:
+      summary: Read one quotation as its salesperson or a Billing reader
+      description: Normal staff sign-in. Returns only the quotation projection; no buyer contact details. Money is integer INR paise. Lead names are unavailable in v1, so name is "a lead received <D Mon>" in the company's timezone. Money module off answers 404.
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200':
+          description: Read-only quotation
+          content: { application/json: { schema: { $ref: '#/components/schemas/SalespersonQuote' } } }
+        '400': { description: Invalid quotation id }
+        '401': { description: Sign-in required }
+        '404': { description: Not a quotation visible to this viewer }
+components:
+  schemas:
+    SalespersonQuote:
+      type: object
+      additionalProperties: false
+      required: [id, name, status, validUntil, lines, taxable, tax, total, ownerApprovalNeeded, canOpenErp]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        status: { type: string }
+        validUntil: { type: [string, 'null'], format: date }
+        lines:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [name, qty, rate, gstRate, total]
+            properties:
+              name: { type: string }
+              qty: { type: number }
+              rate: { type: integer }
+              gstRate: { type: number }
+              total: { type: integer }
+        taxable: { type: integer }
+        tax: { type: integer }
+        total: { type: integer }
+        ownerApprovalNeeded: { type: boolean }
+        canOpenErp: { type: boolean }
