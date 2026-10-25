@@ -1,0 +1,58 @@
+/* CHAT-V6: reminders and scheduled messages in one place; the emoji picker; a found message far back; the dock's threads. */
+.later { display: flex; flex-direction: column; padding-bottom: 16px; }
+.title { display: flex; align-items: baseline; gap: 8px; margin: 14px 18px 6px; color: var(--theme-text); font-size: 13px; font-weight: 700; }
+.title small { color: var(--theme-text-muted); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.items { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0 12px; list-style: none; }
+.item { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.item[data-failed] { border-color: color-mix(in srgb, var(--theme-danger) 50%, var(--theme-border)); }
+.item[data-failed] .head > span { color: var(--theme-danger); }
+.item[data-rang] { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); }
+.item p { margin: 0; overflow: hidden; color: var(--theme-text); font-size: 14px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.item p b { font-weight: 600; }
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.head > b { flex: 1 1 auto; min-width: 0; overflow: hidden; font-size: 13.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.head > span { flex: none; }
+.none { margin: 4px 18px 8px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+.allLink { display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* The emoji picker: above the message box on a computer, a sheet across the bottom on a phone. */
+.picker { position: absolute; left: 12px; bottom: calc(100% + 4px); z-index: 20; display: flex; flex-direction: column; width: min(372px, calc(100% - 24px)); height: min(400px, 60vh); overflow: hidden; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); box-shadow: 0 14px 36px rgb(0 0 0 / 20%); }
+.pickerTop { display: flex; align-items: center; gap: 6px; padding: 8px 8px 4px; }
+.pickerSearch { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; height: 36px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-canvas); color: var(--theme-text-muted); }
+.pickerSearch:focus-within { border-color: color-mix(in srgb, var(--theme-action) 60%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 14%, transparent); }
+.pickerSearch input { flex: 1; min-width: 0; border: 0; background: none; color: var(--theme-text); font: inherit; font-size: 14px; outline: none; }
+.pickerSearch input::-webkit-search-cancel-button { display: none; }
+.pickerSearch input:focus, .pickerSearch input:focus-visible { outline: none !important; box-shadow: none !important; }
+.pickerSearch button, .pickerClose { display: grid; place-items: center; flex: none; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--theme-text-muted); cursor: pointer; }
+.pickerClose { width: 36px; height: 36px; }
+.pickerSearch button:hover, .pickerClose:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.pickerTabs { display: flex; gap: 2px; padding: 2px 8px 4px; overflow-x: auto; border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); scrollbar-width: none; }
+.pickerTabs button { flex: 1 0 34px; height: 34px; padding: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 8px 8px 0 0; background: none; font-size: 18px; line-height: 1; cursor: pointer; filter: grayscale(.6); opacity: .75; }
+.pickerTabs button:hover { background: var(--theme-surface-subtle); opacity: 1; }
+.pickerTabs button[aria-selected="true"] { border-bottom-color: var(--theme-action); filter: none; opacity: 1; }
+.pickerBody { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 6px 8px; scrollbar-width: thin; }
+.pickerHead { pointer-events: none; position: sticky; top: 0; z-index: 1; margin: 0; padding: 8px 6px 4px; background: var(--theme-surface); color: var(--theme-text-muted); font-size: 11.5px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+.pickerGrid { display: grid; }
+.pickerGrid button { aspect-ratio: 1; min-height: 36px; max-height: 44px; padding: 0; border: 0; border-radius: 8px; background: none; font-size: 22px; line-height: 1; cursor: pointer; }
+.pickerGrid button:hover { background: var(--theme-surface-subtle); }
+.pickerGrid button[data-active] { background: color-mix(in srgb, var(--theme-action) 14%, var(--theme-surface)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--theme-action) 55%, transparent); }
+.pickerNone { margin: 16px 8px; color: var(--theme-text-muted); font-size: 13px; text-align: center; }
+@media (max-width: 600px), (pointer: coarse) {
+  .picker { left: 0; right: 0; bottom: 100%; width: 100%; height: min(46vh, 380px); border-width: 1px 0 0; border-radius: 16px 16px 0 0; box-shadow: 0 -8px 24px rgb(0 0 0 / 14%); }
+  .pickerGrid button { min-height: 44px; font-size: 26px; }
+  .pickerTabs button { height: 40px; font-size: 20px; }
+}
+/* A reaction picked from the whole set (the bubble's + and the phone's sheet). */
+.reactPicker { position: fixed; left: 50%; top: 50%; bottom: auto; transform: translate(-50%, -50%); z-index: 80; }
+@media (max-width: 600px), (pointer: coarse) { .reactPicker { position: fixed; top: auto; bottom: 0; transform: none; left: 0; height: min(52vh, 420px); padding-bottom: var(--pulse-safe-bottom, env(safe-area-inset-bottom, 0px)); } }
+.reactBackdrop { position: fixed; inset: 0; z-index: 79; background: rgb(0 0 0 / 28%); }
+
+/* A long conversation draws only what is near the screen (vlist.ts): it keeps its place itself. */
+.vlog { overflow-anchor: none; }
+/* The spacers standing in for what is not drawn: the list is a column of flex items, and an empty item would shrink. */
+.space { flex: none; }
+.vlog > [data-vk] { content-visibility: visible; contain-intrinsic-size: none; }
+.awayBar { align-self: center; margin: 10px 0 4px; padding: 6px 14px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface); color: var(--theme-text-muted); font: inherit; font-size: 12.5px; cursor: pointer; }
+.awayBar b { color: var(--theme-action); font-weight: 600; }
+/* Sweep: emoji drawn in colour where the text font has plain outline glyphs for some (seen on Linux desktops). */
+.pickerGrid button, .pickerTabs button { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif; }

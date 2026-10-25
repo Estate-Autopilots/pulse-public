@@ -1,0 +1,16 @@
+name: gdrive_extract
+version: 1.0.0
+source_kind: pull
+provider: google_drive
+auth: google_service_account
+scopes: [https://www.googleapis.com/auth/drive.readonly]
+emits: []
+purposes: [delivery]
+sensitivity: 2
+schedule: { poll: 10m }
+backfill: { source: none, note: only files the R44 feed has accepted under a root with a content approval in force }
+consent: notice
+filters:
+  roots: pulse.drive_extract_policy rows in force on approved pulse.drive_source roots (owner errands E08/E13)
+  content: approved formats only (text, csv, pdf, docx, Google Docs/Sheets/Slides exports); no OCR
+  excluded: [chats and WhatsApp exports, government ID material, EA Team Member Details, salary, finance]

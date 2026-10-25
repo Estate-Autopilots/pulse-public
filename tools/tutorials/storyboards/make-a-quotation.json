@@ -1,0 +1,310 @@
+{
+ "id": "make-a-quotation",
+ "title": {
+  "en": "Make a quotation",
+  "hi": "Quotation banaiye"
+ },
+ "persona": "Meera Shah (founder of Brightside Studio); all fictional",
+ "takes": [
+  {
+   "id": "q1",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/erp"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "tap",
+     "text": "New quotation",
+     "mark": "new",
+     "zoom": 1.3
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "Start the quotation",
+     "mark": "startq",
+     "zoom": 1.35
+    },
+    {
+     "do": "appear",
+     "text": "Draft · numbered when approved",
+     "mark": "draft",
+     "zoom": 0,
+     "sfx": "none",
+     "timeout": 60000
+    },
+    {
+     "do": "wait",
+     "ms": 1500
+    },
+    {
+     "do": "tap",
+     "text": "Add a line",
+     "exact": true,
+     "mark": "addline",
+     "zoom": 1.3
+    },
+    {
+     "do": "type",
+     "value": "Showroom launch film",
+     "mark": "what",
+     "zoom": 1.3,
+     "delay": 35,
+     "label": "Name on the quotation"
+    },
+    {
+     "do": "type",
+     "value": "45000",
+     "mark": "rate",
+     "zoom": 1.3,
+     "delay": 60,
+     "within": {
+      "sel": "[role=dialog]"
+     },
+     "sel": "input[placeholder='₹ before GST']"
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "Done",
+     "exact": true,
+     "mark": "lineDone",
+     "zoom": 1.3
+    },
+    {
+     "do": "wait",
+     "ms": 1200
+    },
+    {
+     "do": "appear",
+     "role": "button",
+     "name": "/^Approve/",
+     "mark": "approve",
+     "zoom": 1.25
+    },
+    {
+     "do": "wait",
+     "ms": 1800
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "q1",
+   "from": "rate",
+   "to": "end",
+   "hook": {
+    "en": "A quotation in a minute",
+    "hi": "Quotation, ek minute mein"
+   },
+   "chapter": {
+    "en": "In short",
+    "hi": "Short mein"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] A clean quotation, in under a minute!",
+     "cap": "A clean *quotation,* in under a *minute!*"
+    },
+    "hi": {
+     "say": "[excited] साफ़ quotation, एक minute से कम में!",
+     "cap": "Saaf *quotation,* ek *minute* se kam mein!"
+    }
+   }
+  },
+  {
+   "id": "start",
+   "take": "q1",
+   "from": "new",
+   "to": "draft",
+   "to_offset": -2,
+   "chapter": {
+    "en": "Start",
+    "hi": "Shuru"
+   },
+   "line": {
+    "en": {
+     "say": "In Billing, tap New quotation, then Start.",
+     "cap": "In *Billing,* tap *New* *quotation,* then *Start.*"
+    },
+    "hi": {
+     "say": "Billing में New quotation, फिर Start दबाइए।",
+     "cap": "*Billing* mein *New* *quotation,* phir *Start* dabaiye."
+    }
+   }
+  },
+  {
+   "id": "lines",
+   "take": "q1",
+   "from": "draft",
+   "to": "approve",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Lines",
+    "hi": "Lines"
+   },
+   "line": {
+    "en": {
+     "say": "Choose the client, and add a line with its price.",
+     "cap": "Choose the *client,* and add a *line* with its price."
+    },
+    "hi": {
+     "say": "Client चुनिए, और price के साथ line जोड़िए।",
+     "cap": "*Client* chuniye, aur price ke saath *line* jodiye."
+    }
+   }
+  },
+  {
+   "id": "approve",
+   "take": "q1",
+   "from": "approve",
+   "to": "end",
+   "payoff": true,
+   "chapter": {
+    "en": "Total and approve",
+    "hi": "Total aur approve"
+   },
+   "line": {
+    "en": {
+     "say": "[happy] GST is added for you. Approve, and send!",
+     "cap": "*GST* is added for you. *Approve,* and send!"
+    },
+    "hi": {
+     "say": "[happy] GST अपने आप जुड़ता है। Approve कीजिए, और भेजिए!",
+     "cap": "*GST* apne aap judta hai. *Approve* kijiye, aur bhejiye!"
+    }
+   }
+  }
+ ],
+ "end": {
+  "frames": 30,
+  "text": {
+   "en": "Learn more in Pulse",
+   "hi": "Aur seekhiye Pulse mein"
+  }
+ },
+ "screens": {
+  "setup": [
+   {
+    "do": "login",
+    "user": "meera.shah"
+   },
+   {
+    "do": "goto",
+    "url": "/erp"
+   }
+  ],
+  "steps": [
+   {
+    "do": "appear",
+    "text": "New quotation"
+   },
+   {
+    "shot": "01",
+    "settle": 1200,
+    "focus": {
+     "text": "New quotation"
+    }
+   },
+   {
+    "do": "tap",
+    "text": "New quotation"
+   },
+   {
+    "do": "appear",
+    "role": "button",
+    "name": "Start the quotation"
+   },
+   {
+    "shot": "02",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "Start the quotation"
+    }
+   },
+   {
+    "do": "tap",
+    "role": "button",
+    "name": "Start the quotation"
+   },
+   {
+    "do": "appear",
+    "text": "Draft · numbered when approved"
+   },
+   {
+    "do": "wait",
+    "ms": 2500
+   },
+   {
+    "do": "tap",
+    "text": "Add a line",
+    "exact": true
+   },
+   {
+    "do": "wait",
+    "ms": 1200
+   },
+   {
+    "do": "type",
+    "value": "Showroom launch film",
+    "delay": 20,
+    "label": "Name on the quotation"
+   },
+   {
+    "do": "type",
+    "value": "45000",
+    "delay": 20,
+    "within": {
+     "sel": "[role=dialog]"
+    },
+    "sel": "input[placeholder='₹ before GST']"
+   },
+   {
+    "shot": "03",
+    "settle": 1500,
+    "focus": {
+     "label": "Name on the quotation"
+    }
+   },
+   {
+    "do": "tap",
+    "role": "button",
+    "name": "Done",
+    "exact": true
+   },
+   {
+    "do": "wait",
+    "ms": 1500
+   },
+   {
+    "shot": "04",
+    "settle": 800,
+    "focus": {
+     "text": "Choose the client"
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,268 @@
+{
+ "id": "chats-basics",
+ "title": {
+  "en": "Chat with your team",
+  "hi": "Team se chat kijiye"
+ },
+ "persona": "Meera Shah (founder of Brightside Studio); all fictional",
+ "takes": [
+  {
+   "id": "c1",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/chats"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "appear",
+     "mark": "tabs",
+     "zoom": 1.25,
+     "role": "tab",
+     "name": "/^Unread/",
+     "sfx": "none"
+    },
+    {
+     "do": "wait",
+     "ms": 1300
+    },
+    {
+     "do": "tap",
+     "mark": "open",
+     "zoom": 1.3,
+     "text": "Greenleaf launch"
+    },
+    {
+     "do": "appear",
+     "mark": "chat",
+     "zoom": 0,
+     "sel": "textarea[aria-label^='Message']",
+     "sfx": "none"
+    },
+    {
+     "do": "wait",
+     "ms": 1200
+    },
+    {
+     "do": "type",
+     "mark": "typing",
+     "value": "Morning! Sharing the menu shoot plan by noon.",
+     "zoom": 1.25,
+     "delay": 35,
+     "sel": "textarea[aria-label^='Message']"
+    },
+    {
+     "do": "press",
+     "key": "Enter",
+     "mark": "sent"
+    },
+    {
+     "do": "wait",
+     "ms": 2200
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "c1",
+   "from": "sent",
+   "from_offset": -6,
+   "to": "end",
+   "hook": {
+    "en": "Team chat, inside Pulse",
+    "hi": "Team chat, Pulse ke andar"
+   },
+   "chapter": {
+    "en": "In short",
+    "hi": "Short mein"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] Your team, your clients, one chat!",
+     "cap": "Your *team,* your *clients,* one chat!"
+    },
+    "hi": {
+     "say": "[excited] आपकी team, आपके clients, एक ही chat!",
+     "cap": "Aapki *team,* aapke *clients,* ek hi chat!"
+    }
+   }
+  },
+  {
+   "id": "tabs",
+   "take": "c1",
+   "from": "start",
+   "to": "open",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Find a chat",
+    "hi": "Chat dhoondhiye"
+   },
+   "line": {
+    "en": {
+     "say": "Unread, Clients and Groups filter the list.",
+     "cap": "*Unread,* *Clients* and *Groups* filter the list."
+    },
+    "hi": {
+     "say": "Unread, Clients और Groups से list छांटिए।",
+     "cap": "*Unread,* *Clients* aur *Groups* se list chhaantiye."
+    }
+   }
+  },
+  {
+   "id": "open",
+   "take": "c1",
+   "from": "open",
+   "to": "sent",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Type a message",
+    "hi": "Message likhiye"
+   },
+   "line": {
+    "en": {
+     "say": "Open a chat, and type your message.",
+     "cap": "Open a *chat,* and type your message."
+    },
+    "hi": {
+     "say": "Chat खोलिए, और अपना message लिखिए।",
+     "cap": "*Chat* kholiye, aur apna message likhiye."
+    }
+   }
+  },
+  {
+   "id": "sent",
+   "take": "c1",
+   "from": "sent",
+   "to": "end",
+   "payoff": true,
+   "chapter": {
+    "en": "Send",
+    "hi": "Send"
+   },
+   "line": {
+    "en": {
+     "say": "[happy] Send! Type at to mention, hash for a task.",
+     "cap": "Send! Type *at* to mention, *hash* for a task."
+    },
+    "hi": {
+     "say": "[happy] Send! At से mention, hash से task।",
+     "cap": "Send! *At* se mention, *hash* se task."
+    }
+   }
+  }
+ ],
+ "end": {
+  "frames": 30,
+  "text": {
+   "en": "More tutorials: Pulse, Learn",
+   "hi": "Aur tutorials: Pulse, Learn"
+  }
+ },
+ "screens": {
+  "setup": [
+   {
+    "do": "login",
+    "user": "meera.shah"
+   },
+   {
+    "do": "goto",
+    "url": "/chats"
+   }
+  ],
+  "steps": [
+   {
+    "do": "appear",
+    "role": "tab",
+    "name": "/^Unread/"
+   },
+   {
+    "shot": "01",
+    "settle": 1200,
+    "focus": {
+     "role": "tab",
+     "name": "/^Unread/"
+    }
+   },
+   {
+    "do": "tap",
+    "text": "Greenleaf launch"
+   },
+   {
+    "do": "appear",
+    "sel": "textarea[aria-label^='Message']",
+    "timeout": 60000
+   },
+   {
+    "do": "wait",
+    "ms": 2500
+   },
+   {
+    "do": "type",
+    "value": "Morning! Sharing the menu shoot plan by noon.",
+    "delay": 20,
+    "sel": "textarea[aria-label^='Message']"
+   },
+   {
+    "shot": "02",
+    "settle": 1200,
+    "focus": {
+     "sel": "textarea[aria-label^='Message']"
+    }
+   },
+   {
+    "shot": "03",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "@ mention"
+    }
+   },
+   {
+    "do": "goto",
+    "url": "/chats"
+   },
+   {
+    "do": "appear",
+    "role": "button",
+    "name": "New chat"
+   },
+   {
+    "do": "tap",
+    "role": "button",
+    "name": "New chat"
+   },
+   {
+    "do": "appear",
+    "role": "button",
+    "name": "/^New group/"
+   },
+   {
+    "shot": "04",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "/^New group/"
+    }
+   }
+  ]
+ }
+}

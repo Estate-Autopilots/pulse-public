@@ -1,0 +1,25 @@
+{
+  "about": "PRODUCT-MAP: what Pulse's repo scan (services/api/src/product-map-scan.ts) cannot read from the code: the roles a signed-in person has (services/api/src/routes.ts Viewer.role, settings Screens and menu) and which roles each word of the shell's `access` field reaches (packages/ui-shell/src/shell.tsx pagesForRole).",
+  "navFiles": ["packages/ui-shell/src/shell.tsx"],
+  "roles": [
+    { "key": "person", "name": "Team member", "description": "Staff who do the work: designers, editors, salespeople; chats, tasks, their own desk." },
+    { "key": "manager", "name": "Pod manager", "description": "Leads a pod: the team's work, reviews, people in the pod." },
+    { "key": "pgs", "name": "Pod growth strategist", "description": "Runs client growth for a pod: clients, projects, processes." },
+    { "key": "hr", "name": "HR", "description": "HR desk only: people, attendance, leave, policies; never clients, money or admin." },
+    { "key": "finance", "name": "Finance", "description": "Money: billing, invoices, the cash book." },
+    { "key": "leadership", "name": "Leadership", "description": "The company's leaders: everything the team sees plus leadership, finance and the network." },
+    { "key": "admin", "name": "Organisation admin", "description": "Sets Pulse up for the organisation: settings, screens, modules, audit." }
+  ],
+  "access": {
+    "all": ["person", "manager", "pgs", "finance", "leadership", "admin"],
+    "work": ["person", "manager", "pgs", "finance", "leadership", "admin"],
+    "admin": ["leadership", "admin"],
+    "hr": ["hr", "leadership", "admin"]
+  },
+  "accessAdd": {
+    "/erp": ["finance"],
+    "/dashboard": ["hr"], "/tasks": ["hr"], "/chats": ["hr"], "/me": ["hr"], "/people": ["hr"], "/review-data": ["hr"], "/updates": ["hr"]
+  },
+  "entries": ["/dashboard", "/chats", "/hr", "/login"],
+  "ignore": ["/kit", "/insights-demo", "/hidden", "/frame-check"]
+}
