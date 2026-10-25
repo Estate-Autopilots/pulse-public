@@ -1,0 +1,24 @@
+/* Only Round 11 surfaces opt into a viewport on phones. Other workflows retain their layouts. */
+@media(max-width:899px){
+ html:has([data-round11]),body:has([data-round11]){height:100%;overflow:hidden}
+ main:has(> [data-round11]){height:calc(100dvh - 104px)!important;max-height:calc(100dvh - 104px)!important;min-height:0!important;padding:0!important;overflow:hidden;flex:none!important}
+ [data-round11]{height:100%;display:flex!important;flex-direction:column;overflow:hidden;gap:10px!important;padding:10px 16px!important}
+ [data-round11]>*{flex:none;min-width:0}
+ [data-round11]>[data-grow],[data-round11]>[data-pager]{flex:1 1 0!important;min-height:0}
+ [data-round11]>header{gap:6px!important;margin:0!important}
+ [data-round11]>header>div:first-child{display:flex;gap:8px;align-items:center}
+ [data-round11]>header h2{font-size:16px!important}
+ [data-round11]>header>div:first-child>div{display:none}
+ [data-round11]>header a{font-size:10px!important;padding:5px 8px!important;min-height:30px}
+ [data-round11] [data-pager]{flex:1;min-height:0}
+ /* EST-1201: the view pages rows; anything taller than its room (an empty state, one tall row) scrolls inside it instead
+    of being cut off (Acquisition's "No enquiries" text at 360 px), as LAYOUT-SWEEP does on a computer. */
+ [data-round11] [data-pager-view]{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto}
+ [data-round11],[data-round11] *{scrollbar-width:none}
+ [data-round11] ::-webkit-scrollbar{display:none}
+}
+/* MOBILE-QA: a phone turned sideways moves the tab bar to a 64 px rail on the left (shell, landscape) and the top bar to
+   44 px; the padding:0 above put a fitted page (My work) under the rail ("…rk", "…dit you can understand"). */
+@media(max-width:899px) and (max-height:500px) and (orientation:landscape){
+ main:has(> [data-round11]){padding:0 0 0 calc(78px + var(--pulse-safe-left,0px))!important;height:calc(100dvh - 44px)!important;max-height:calc(100dvh - 44px)!important}
+}
