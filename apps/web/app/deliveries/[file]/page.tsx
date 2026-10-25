@@ -1,0 +1,11 @@
+import Link from 'next/link';
+import {api} from '../../lib/api';
+import {Message,Page,PageHeader,styles,Pager} from '../../ui';
+import {RecordForm} from '../../records';
+import {text,s,time,type Row} from '../../company/common';
+import css from '../../company/company.module.css';
+export default async function Delivery({params}:{params:Promise<{file:string}>}) {
+ const {file}=await params,r=await api<Row>(`files/${encodeURIComponent(file)}`);if(r.error)return <Message text={r.error}/>;const d=r.data;if(!d)return null;const projects=d.projects as Row[];
+ return <Page fit><PageHeader title={text(d.displayName)} context={[text(d.projectName),d.editedBy?`Edited by ${d.editedBy}`:'Imported display name']} actions={d.canEdit?<RecordForm path={`files/${encodeURIComponent(file)}/correct`} title="Correct delivery" label="Rename / move / flag" fields={[{key:'displayName',label:'Display name',required:true},{key:'projectId',label:'Correct project',type:'select',options:projects.map(p=>({value:s(p.id),label:s(p.name)}))},{key:'wrongReason',label:'Wrong data: reason',type:'textarea'}]} values={{displayName:s(d.displayName),projectId:s(d.projectId),wrongReason:s(d.wrongReason)}} note="File ID and its Drive URL stay stable. The corrected project controls its client through that project’s client record. Corrections survive sync."/>:null}/>
+ <p className={css.note}>Original source name: {text(d.sourceName)} · {text(d.path)}{d.wrongReason?` · Flag: ${d.wrongReason}`:''}</p><div className={css.controls}><a className={styles.btn} href={`https://drive.google.com/file/d/${encodeURIComponent(file)}/view`} target="_blank" rel="noreferrer">Open Drive file</a>{d.projectId?<Link className={styles.btn} href={`/projects/${d.projectId}`}>Open project</Link>:null}</div><Pager className={css.sheet} primary><table><thead><tr><th>When</th><th>Operation</th><th>Account</th><th>Human attribution</th></tr></thead><tbody>{(d.actors as Row[]).map((a,i)=><tr key={i}><td>{time(a.at)}</td><td>{text(a.operation)}</td><td>{text(a.actor_account)}</td><td>{text(a.human_attribution)}<span className={styles.cellSub}>{text(a.basis)}</span></td></tr>)}</tbody></table>{!(d.actors as Row[]).length?<p>No operation actor was captured for this file. Owner and last-modifier metadata cannot establish an uploader.</p>:null}</Pager></Page>;
+}

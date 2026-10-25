@@ -1,0 +1,6 @@
+[Unit]
+Description=Refresh staging and idle dev from the production system of record
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/eadev/.local/lib/pulse-release/pulse-data-refresh.py
+TimeoutStartSec=3600
