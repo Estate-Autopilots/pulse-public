@@ -1,0 +1,32 @@
+[package]
+name = "pulse-desktop-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+base64 = "0.22"
+minisign-verify = "0.2"
+chacha20poly1305 = "0.10"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+time = { version = "0.3", features = ["formatting", "local-offset", "parsing"] }
+ulid = "1"
+url = "2"
+uuid = { version = "1", features = ["v4"] }
+flate2 = "1"
+quick-xml = "0.38"
+md-5 = "0.10"
+tiny_http = "0.12"
+chrono-tz = "=0.10.4"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_System_Threading", "Win32_System_SystemInformation", "Win32_Foundation"] }
+keyring = { version = "3", features = ["windows-native"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3", features = ["apple-native"] }

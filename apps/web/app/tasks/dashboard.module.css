@@ -1,0 +1,165 @@
+/* The management dashboard: calm, one screen on a desktop, one column on a phone. Marks are thin and one colour (the
+   iris, a validated step per theme); state colours appear only for state (late, at risk), always with an icon and a word. */
+.dash { --mark: #5b45d6; --mark-soft: color-mix(in srgb, #5b45d6 34%, var(--theme-surface)); --track: color-mix(in srgb, #5b45d6 12%, var(--theme-surface));
+  display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+:global(:root[data-theme="dark"]) .dash { --mark: #8d7cf2; --mark-soft: color-mix(in srgb, #8d7cf2 40%, var(--theme-surface)); --track: color-mix(in srgb, #8d7cf2 16%, var(--theme-surface)); }
+.empty { margin: 0; padding: 12px 14px 16px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.empty b { display: block; margin-bottom: 2px; color: var(--theme-text); font-weight: 600; }
+.muted { color: var(--theme-text-muted); }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.scope { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.scopeLabel { color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+
+/* Six tiles */
+.tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+.tile { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); border-radius: 14px; background: var(--theme-surface); }
+.tileLabel { display: inline-flex; align-items: center; gap: 5px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+.tileValue { color: var(--theme-text); font-size: 26px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.15; }
+.tile small { color: var(--theme-text-muted); font-size: 12px; line-height: 1.35; }
+.tile[data-tone="danger"] .tileLabel { color: var(--theme-danger); }
+.tile[data-tone="warning"] .tileLabel { color: var(--theme-warning); }
+
+/* The grid: who is working on what on the left, today's list and client work, then throughput and what is stuck. */
+.grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; min-width: 0; }
+.load { grid-column: 1; grid-row: 1 / span 2; }
+.act { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.client { grid-column: 3; grid-row: 1; }
+.flow { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.stuck { grid-column: 3; grid-row: 2; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+@media (min-width: 1180px) and (min-height: 600px) { .dash { flex: 1 1 0; min-height: 0; } .grid { flex: 1 1 0; min-height: 0; } }
+@media (max-width: 1179.98px), (max-height: 599.98px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; }
+  .load { grid-column: 1 / -1; grid-row: auto; max-height: 560px; }
+  .act, .client, .flow, .stuck { grid-column: auto; grid-row: auto; }
+  .act, .client { max-height: 460px; }
+}
+@media (max-width: 1179.98px) and (min-width: 761px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .act { order: 1; } .load { order: 2; } .stuck { order: 3; } .client { order: 4; } .flow { order: 5; }
+}
+
+/* Act on today */
+.actList { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; margin: 0; padding: 0 6px 8px; overflow-y: auto; list-style: none; counter-reset: act; }
+.actList li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 52px; padding: 7px 8px; border-radius: 10px; }
+.actList li + li { border-top: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); }
+.actList li:hover { background: color-mix(in srgb, var(--theme-surface-subtle) 70%, transparent); }
+.actIcon { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; background: var(--track); color: var(--mark); }
+li[data-kind="overdue"] .actIcon, li[data-kind="risk"] .actIcon { background: color-mix(in srgb, var(--theme-danger) 11%, var(--theme-surface)); color: var(--theme-danger); }
+li[data-kind="blocked"] .actIcon { background: color-mix(in srgb, var(--theme-warning) 12%, var(--theme-surface)); color: var(--theme-warning); }
+li[data-kind="tidy"] .actIcon, li[data-kind="file"] .actIcon { background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.actMain { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.actTitle { overflow: hidden; color: var(--theme-text); font-size: 14px; font-weight: 600; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.actTitle:hover { color: var(--theme-action); }
+.actMain small { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.actBtn { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 8px; color: var(--theme-text); font-size: 12px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.actBtn:hover { border-color: var(--theme-action); color: var(--theme-action); }
+
+/* Workload rows: who, a thin bar of open work (one colour), then the numbers in words */
+.loadList { display: flex; flex-direction: column; margin: 0; padding: 0 6px 6px; list-style: none; }
+.loadList li { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(36px, 0.8fr) auto; align-items: center; gap: 10px; min-height: 38px; padding: 3px 8px; border-radius: 8px; }
+.loadList .rest { display: block; min-height: 0; padding: 8px; color: var(--theme-text-muted); font-size: 12px; }
+.who { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--theme-text); text-decoration: none; }
+.who span { display: flex; flex-direction: column; min-width: 0; overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.who small { color: var(--theme-text-muted); font-size: 11px; font-weight: 500; }
+.who:hover span { color: var(--theme-action); }
+.bar { display: block; height: 8px; border-radius: 4px; background: var(--track); }
+.bar i { display: block; height: 100%; min-width: 4px; border-radius: 4px; background: var(--mark); }
+.bar i[data-empty] { min-width: 0; }
+.nums { display: grid; grid-template-columns: 24px 48px 52px; align-items: center; gap: 4px; font-size: 12px; font-variant-numeric: tabular-nums; text-align: right; }
+.nums b { color: var(--theme-text); font-size: 13px; }
+.nums > span:nth-child(2) { color: var(--theme-text-muted); }
+.late { display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px; color: var(--theme-danger); font-weight: 600; }
+
+/* Client projects: name, a meter, one line of facts */
+.clientList { display: flex; flex-direction: column; margin: 0; padding: 0 6px 6px; list-style: none; }
+.clientList li { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; border-radius: 8px; }
+.clientList li + li { border-top: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); }
+.clientTop { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.clientName { flex: 1 1 auto; min-width: 0; overflow: hidden; color: var(--theme-text); font-size: 13px; font-weight: 600; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.clientName:hover { color: var(--theme-action); }
+.risk { display: inline-flex; flex: none; align-items: center; gap: 3px; color: var(--theme-danger); font-size: 11px; font-weight: 650; }
+.meter { display: block; height: 6px; border-radius: 3px; background: var(--track); }
+.meter i { display: block; height: 100%; min-width: 3px; border-radius: 3px; background: var(--mark); }
+li[data-risk] .meter i { background: var(--theme-danger); }
+.clientMeta { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.clientMeta b { color: var(--theme-text); font-weight: 600; }
+
+/* Finished per week: one series of columns */
+.chart { display: flex; flex: 1 1 auto; flex-direction: column; gap: 6px; min-height: 0; margin: 0; padding: 4px 14px 12px 34px; }
+.plot { position: relative; display: grid; flex: 1 1 auto; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; align-items: end; gap: 2px; min-height: 120px; border-bottom: 1px solid var(--theme-border); }
+.gridline { position: absolute; right: 0; left: 0; height: 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); pointer-events: none; }
+.gridline i { position: absolute; top: -8px; left: -28px; width: 22px; color: var(--theme-text-muted); font-size: 11px; font-style: normal; text-align: right; font-variant-numeric: tabular-nums; }
+.col { position: relative; display: flex; justify-content: center; align-items: flex-end; height: 100%; outline: none; cursor: default; }
+.colBar { width: min(24px, 70%); min-height: 2px; border-radius: 4px 4px 0 0; background: var(--mark-soft); transition: filter 120ms ease; }
+.col[data-now] .colBar { background: var(--mark); }
+.colBar[data-zero] { min-height: 0; }
+.col:hover .colBar, .col:focus-visible .colBar { filter: brightness(1.08) saturate(1.1); }
+.col:focus-visible { box-shadow: inset 0 0 0 2px var(--theme-focus); border-radius: 6px; }
+.colValue { position: absolute; color: var(--theme-text); font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.tip { position: absolute; z-index: 3; bottom: calc(100% + 6px); left: 50%; display: none; flex-direction: column; gap: 1px; min-width: 120px; padding: 7px 10px; border: 1px solid var(--theme-border);
+  border-radius: 8px; background: var(--theme-surface); box-shadow: 0 8px 24px rgb(8 12 22 / 14%); color: var(--theme-text-muted); font-size: 12px; white-space: nowrap; transform: translateX(-50%); }
+.tip b { color: var(--theme-text); font-size: 13px; }
+.col:hover .tip, .col:focus-visible .tip { display: flex; }
+.col:first-child .tip, .col:nth-child(2) .tip { left: 0; transform: none; }
+.col:last-child .tip { right: 0; left: auto; transform: none; }
+.axis { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; gap: 2px; color: var(--theme-text-muted); font-size: 11px; text-align: center; white-space: nowrap; }
+.axis span:last-child { color: var(--theme-text); font-weight: 600; }
+
+/* Blocked and help: people lists */
+.people { display: flex; flex-direction: column; margin: 0; padding: 0 6px 8px; list-style: none; }
+.people li { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; min-height: 42px; padding: 4px 8px; }
+.people li > span { display: flex; flex-direction: column; min-width: 0; font-size: 13px; }
+.people a { color: var(--theme-text); text-decoration: none; }
+.people a:hover b { color: var(--theme-action); }
+.people b { font-weight: 600; }
+.people small { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Who is working on what: people (who and what now, a thin bar of open work, then numbers in words) */
+.whoList { display: flex; flex-direction: column; margin: 0; padding: 0 6px 6px; list-style: none; }
+.whoList li { display: grid; grid-template-columns: minmax(0, 2fr) minmax(30px, 0.7fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 3px 8px; border-radius: 8px; }
+.whoList li:hover { background: color-mix(in srgb, var(--theme-surface-subtle) 70%, transparent); }
+.whoList .rest { display: block; min-height: 0; padding: 8px; color: var(--theme-text-muted); font-size: 12px; }
+.whoNums { display: grid; grid-template-columns: 82px 44px 54px; align-items: center; gap: 6px; color: var(--theme-text-muted); font-size: 12px; font-variant-numeric: tabular-nums; text-align: right; }
+.whoNums b { color: var(--theme-text); font-size: 13px; }
+.whoNums em { display: inline-flex; align-items: center; gap: 2px; margin-left: 5px; font-style: normal; }
+.whoNums > span:first-child { white-space: nowrap; }
+/* Pods and departments: name and facts, eight weeks of value (one colour, this week full), then the week's numbers */
+.groupList { display: flex; flex-direction: column; margin: 0; padding: 0 6px 6px; list-style: none; }
+.groupList li { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(96px, 1fr) auto; align-items: center; gap: 12px; min-height: 52px; padding: 4px 8px; border-radius: 8px; }
+.groupList li + li { border-top: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); }
+.groupName { display: flex; flex-direction: column; min-width: 0; color: var(--theme-text); text-decoration: none; }
+.groupName b { overflow: hidden; font-size: 13.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.groupName small { overflow: hidden; color: var(--theme-text-muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+.groupName:hover b { color: var(--theme-action); }
+.minis { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); align-items: end; gap: 2px; height: 34px; }
+.mini { position: relative; display: flex; align-items: flex-end; height: 100%; outline: none; }
+.mini i { display: block; width: 100%; border-radius: 3px 3px 0 0; background: var(--mark-soft); }
+.mini[data-now] i { background: var(--mark); }
+.mini i[data-zero] { height: 2px !important; background: var(--track); }
+.mini:hover .tip { display: flex; }
+.mini:first-child .tip, .mini:nth-child(2) .tip { left: 0; transform: none; }
+.mini:last-child .tip, .mini:nth-last-child(2) .tip { right: 0; left: auto; transform: none; }
+.groupNums { display: grid; grid-template-columns: 52px 52px 44px; gap: 6px; color: var(--theme-text-muted); font-size: 12px; font-variant-numeric: tabular-nums; text-align: right; }
+.groupNums b { color: var(--theme-text); font-size: 13px; }
+@media (max-width: 560px) {
+  .whoList li { grid-template-columns: minmax(0, 1fr) auto; }
+  .whoList .bar { display: none; }
+  .whoNums { grid-template-columns: 70px 38px 46px; }
+  .groupList li { grid-template-columns: minmax(0, 1fr) auto; }
+  .minis { grid-column: 1 / -1; grid-row: 2; height: 28px; }
+}
+/* LAYOUT-SWEEP (a layout fix only): below a computer's width these panels grow with their rows instead of cutting the
+   last ones off at a fixed height (the page scrolls there anyway). */
+@media (max-width: 1179.98px), (max-height: 599.98px) { .load, .act, .client { max-height: none; } }
+/* On a laptop the second row is ~240 px: "Who needs help" ran past the bottom of "Blocked, and who it waits on" with
+   no way to reach it. The panel scrolls instead. */
+.stuck { overflow-y: auto; overscroll-behavior: contain; }
+
+/* TASKS-3: calmer panels; the last week's label is "Now" so it never runs off the chart. */
+.dash :global(section) { border-radius: 14px; }
+.actMore { padding: 4px 8px 10px; }
+.actMore summary { color: var(--theme-action); font-size: 13px; font-weight: 600; cursor: pointer; list-style: none; padding: 4px 8px; }
+.actMore summary::-webkit-details-marker { display: none; }
