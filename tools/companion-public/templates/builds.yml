@@ -1,0 +1,324 @@
+name: Pulse Companion builds
+# Internal test builds of the Pulse apps on GitHub's runners (the VPS stays cool): Windows MSI/EXE and macOS DMG
+# (Tauri) and the Chrome extension ZIP, plus screenshots of each app running on a real runner. Unsigned for
+# Windows/macOS until the owner provides certificates. Nothing is published from here: desktop releases go through
+# desktop-release.yml, the phone app (Capacitor shell) through mobile.yml, whose promote step alone moves the
+# phone's update channel. Pushes run this build only when asked (workflow_dispatch).
+on:
+  push:
+    branches: [main]
+    # Every commit on this client-only, guarded export is a release input, including
+    # acceptance workflows and release notes. Channel pointer tags do not push main.
+  workflow_dispatch:
+    inputs:
+      macos_ping_build:
+        description: Existing public build run for notification-only acceptance (does not build or publish)
+        type: string
+      version:
+        description: Optional version override for the controlled upgrade acceptance
+        type: string
+      notes:
+        description: Short text Pip shows for this release
+        type: string
+      channel:
+        type: choice
+        options: [test, stable]
+        default: test
+      validation_only:
+        description: Compile/test without signing or publication (never advances an update channel)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ${{ inputs.macos_ping_build && format('macos-ping-{0}', inputs.macos_ping_build) || 'companion-release' }}
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: ${{ github.event_name == 'workflow_dispatch' && !inputs.macos_ping_build }}
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      notes: ${{ steps.notes.outputs.notes }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - name: Require signing configuration
+        if: ${{ !inputs.validation_only }}
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          ANDROID_SIGNING_STORE_BASE64: ${{ secrets.ANDROID_SIGNING_STORE_BASE64 }}
+          ANDROID_SIGNING_PASSWORD: ${{ secrets.ANDROID_SIGNING_PASSWORD }}
+          MACOS_SIGNING_P12_BASE64: ${{ secrets.MACOS_SIGNING_P12_BASE64 }}
+          MACOS_SIGNING_P12_PASSWORD: ${{ secrets.MACOS_SIGNING_P12_PASSWORD }}
+        run: node apps/desktop/scripts/check-release.mjs
+      - id: version
+        env: { GH_TOKEN: '${{ github.token }}', REQUESTED_VERSION: '${{ inputs.version }}' }
+        # Build-only: the committed versions are used as they are (desktop-release.yml and mobile.yml publish).
+        run: echo "version=$(node -p "require('./apps/desktop/package.json').version")" >> "$GITHUB_OUTPUT"
+      - id: notes
+        env: { REQUESTED_NOTES: '${{ inputs.notes }}' }
+        run: |
+          node --input-type=module -e 'import {execFileSync} from "node:child_process"; import {appendFileSync,readFileSync} from "node:fs"; const notes=(process.env.REQUESTED_NOTES||readFileSync("apps/desktop/WHATS_NEW.md","utf8")).trim().replace(/[\r\n]/g," ").slice(0,2000); appendFileSync(process.env.GITHUB_OUTPUT,`notes=${notes}\n`);'
+  desktop:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, platform: windows, bundles: 'nsis,msi', target: '' }
+          - { os: macos-latest, platform: macos, bundles: 'app,dmg', target: universal-apple-darwin }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - uses: dtolnay/rust-toolchain@stable
+      # rust-toolchain.toml pins the toolchain; the universal Mac build needs both Apple targets on that toolchain.
+      - if: matrix.platform == 'macos'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            apps/desktop/core
+            apps/desktop/src-tauri
+      - run: corepack enable && pnpm install --frozen-lockfile
+      # The panel tests open the real quick panel in Chromium (R20b); without it the test step waits forever.
+      - run: pnpm --dir apps/desktop exec playwright install chromium
+      - run: node --test --test-concurrency=2 packages/companion/test/*.test.js
+      - run: pnpm --dir apps/desktop run build && pnpm --dir apps/desktop test
+      - run: cargo test -j2 --manifest-path apps/desktop/core/Cargo.toml -- --test-threads=2
+      # Keep one self-signed identity across every Mac build. The login Keychain store separately preserves sign-in
+      # across updates without an Apple Team ID. Signing material comes only from GitHub secrets.
+      - name: Load the stable Mac signing identity
+        if: matrix.platform == 'macos'
+        shell: bash
+        env:
+          P12: ${{ secrets.MACOS_SIGNING_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.MACOS_SIGNING_P12_PASSWORD }}
+        run: |
+          if [ -z "$P12" ] || [ -z "$P12_PASSWORD" ]; then echo "Stable Mac signing identity is required"; exit 1; fi
+          kc="$RUNNER_TEMP/pulse-signing.keychain-db"; kcpw=$(openssl rand -hex 16)
+          printf '%s' "$P12" | base64 --decode > "$RUNNER_TEMP/pulse.p12"
+          security create-keychain -p "$kcpw" "$kc"
+          security set-keychain-settings -t 3600 -u "$kc"
+          security unlock-keychain -p "$kcpw" "$kc"
+          security import "$RUNNER_TEMP/pulse.p12" -k "$kc" -P "$P12_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$kcpw" "$kc" > /dev/null
+          security list-keychains -d user -s "$kc" $(security list-keychains -d user | tr -d '"')
+          security find-certificate -c "Pulse Code Signing" -p "$kc" > "$RUNNER_TEMP/pulse-signing.pem"
+          sudo security add-trusted-cert -d -r trustRoot -p codeSign -k /Library/Keychains/System.keychain "$RUNNER_TEMP/pulse-signing.pem"
+          rm -f "$RUNNER_TEMP/pulse.p12"
+          security find-identity -v -p codesigning "$kc" | grep -q '"Pulse Code Signing"'
+          echo "APPLE_SIGNING_IDENTITY=Pulse Code Signing" >> "$GITHUB_ENV"
+      - name: Build installers
+        shell: bash
+        env:
+          CARGO_BUILD_JOBS: 2
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ''
+          VALIDATION_ONLY: ${{ inputs.validation_only }}
+        run: |
+          args=()
+          if [ "$VALIDATION_ONLY" = true ]; then args+=(--config '{"bundle":{"createUpdaterArtifacts":false}}'); fi
+          pnpm --dir apps/desktop exec tauri build --bundles '${{ matrix.bundles }}' ${{ matrix.target && format('--target {0}', matrix.target) || '' }} "${args[@]}"
+      - run: cargo test -j2 --manifest-path apps/desktop/src-tauri/Cargo.toml -- --test-threads=2
+      - name: Screenshot the panel on the runner (Windows)
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force screens | Out-Null
+          $app = Start-Process -FilePath apps/desktop/src-tauri/target/release/pulse-desktop.exe -ArgumentList '--pinned' -PassThru
+          Start-Sleep -Seconds 15
+          Get-Process pulse-desktop -ErrorAction SilentlyContinue | Format-Table Id, MainWindowTitle, Responding
+          if ($app.HasExited) { throw "Pulse exited with code $($app.ExitCode)" }
+          Add-Type -AssemblyName System.Windows.Forms,System.Drawing
+          Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class PulseWindows { [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hWnd); }'
+          $app.Refresh(); $panel = $app.MainWindowHandle
+          if ($panel -eq 0) { throw 'Pulse panel handle missing' }
+          [System.Windows.Forms.SendKeys]::SendWait('^%p'); Start-Sleep -Seconds 2
+          if ([PulseWindows]::IsWindowVisible($panel)) { throw 'Global shortcut did not hide the panel' }
+          [System.Windows.Forms.SendKeys]::SendWait('^%p'); Start-Sleep -Seconds 2
+          if (-not [PulseWindows]::IsWindowVisible($panel)) { throw 'Global shortcut did not reopen the panel' }
+          $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+          $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+          $g = [System.Drawing.Graphics]::FromImage($bmp); $g.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+          $bmp.Save("screens/windows-desktop.png", [System.Drawing.Imaging.ImageFormat]::Png)
+          Stop-Process -Id $app.Id -Force
+          Start-Sleep -Seconds 2
+          # Today, Inbox, Chats and an open conversation (synthetic demo data), Settings and the Pulse window, light and dark.
+          function Shot([string]$name, [string[]]$launch) {
+            $p = if ($launch.Count) { Start-Process -FilePath apps/desktop/src-tauri/target/release/pulse-desktop.exe -ArgumentList $launch -PassThru } else { Start-Process -FilePath apps/desktop/src-tauri/target/release/pulse-desktop.exe -PassThru }
+            Start-Sleep -Seconds 12
+            if ($p.HasExited) { throw "Pulse exited while showing $name" }
+            $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+            $g = [System.Drawing.Graphics]::FromImage($bmp); $g.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+            $bmp.Save("screens/$name.png", [System.Drawing.Imaging.ImageFormat]::Png); $g.Dispose(); $bmp.Dispose()
+            Stop-Process -Id $p.Id -Force; Start-Sleep -Seconds 2
+          }
+          foreach ($theme in 'light','dark') {
+            foreach ($tab in 'today','inbox','chats','conversation') { Shot "windows-$theme-$tab" @('--pinned','--demo',"--tab=$tab","--theme=$theme") }
+            Shot "windows-$theme-settings" @('--settings=general',"--theme=$theme")
+            Shot "windows-$theme-privacy" @('--settings=privacy',"--theme=$theme")
+          }
+          Shot 'windows-app-window' @()
+      - name: Show a real Windows toast through Pulse's registered identity
+        if: matrix.platform == 'windows'
+        continue-on-error: true
+        shell: powershell
+        run: |
+          $proof = Join-Path $env:RUNNER_TEMP 'ping-proof'; New-Item -ItemType Directory -Force $proof | Out-Null
+          $env:PULSE_ACCEPTANCE_DIR = $proof
+          $ping = Start-Process apps/desktop/src-tauri/target/release/pulse-desktop.exe -ArgumentList '--ping-acceptance' -PassThru
+          Start-Sleep -Seconds 4
+          Add-Type -AssemblyName System.Windows.Forms,System.Drawing
+          $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds; $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+          $g = [System.Drawing.Graphics]::FromImage($bmp); $g.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size); $bmp.Save("screens/windows-toast.png", [System.Drawing.Imaging.ImageFormat]::Png)
+          $ping.WaitForExit(30000) | Out-Null
+          [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
+          $history = @([Windows.UI.Notifications.ToastNotificationManager]::History.GetHistory('com.pulse.work')).Count
+          $setting = "$([Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('com.pulse.work').Setting)"
+          $receipt = Get-Content (Join-Path $proof 'ping.json') -Raw | ConvertFrom-Json
+          @{shown=$receipt.shown; error=$receipt.error; historyCount=$history; setting=$setting} | ConvertTo-Json | Set-Content screens/windows-toast.json
+          if ($history -lt 1 -or $setting -ne 'Enabled') { throw "Toast not delivered: history $history, setting $setting" }
+      - name: Screenshot the panel on the runner (macOS)
+        if: matrix.platform == 'macos'
+        run: |
+          mkdir -p screens
+          dmg=$(find apps/desktop/src-tauri/target -path '*bundle/dmg/*.dmg' -print -quit)
+          test -n "$dmg"
+          mkdir -p "$RUNNER_TEMP/pulse-mount"
+          hdiutil attach "$dmg" -readonly -nobrowse -mountpoint "$RUNNER_TEMP/pulse-mount"
+          app=$(find "$RUNNER_TEMP/pulse-mount" -maxdepth 2 -name '*.app' -print -quit)
+          test -n "$app"
+          installer_sha=$(shasum -a 256 "$dmg" | cut -d' ' -f1)
+          mkdir -p "$HOME/Applications"
+          installed="$HOME/Applications/Pulse.app"
+          test ! -e "$installed"
+          ditto "$app" "$installed"
+          hdiutil detach "$RUNNER_TEMP/pulse-mount"
+          app="$installed"
+          "$app/Contents/MacOS/pulse-desktop" --pinned > screens/macos-app.log 2>&1 &
+          app_pid=$!
+          sleep 15
+          kill -0 "$app_pid"
+          screencapture -x screens/macos-desktop.png
+          PULSE_ACCEPTANCE_DIR="$PWD/screens" PULSE_ACCEPTANCE_ADDRESS=https://pulse.estateautopilots.com "$app/Contents/MacOS/pulse-desktop" --admission-acceptance
+          node -e 'const r=JSON.parse(require("fs").readFileSync("screens/admission.json")).result.Ok;if(!r?.readDenied||!r?.refreshDenied||!r?.signedOutOnly)throw Error("Installed native HTTPS admission failed")'
+          # Real OS keyboard events against the installed DMG app; no browser or mock IPC.
+          osascript -e 'tell application "System Events" to key code 53'
+          sleep 2
+          cat > "$RUNNER_TEMP/panel-proof.swift" <<'SWIFT'
+          import Cocoa
+          let pid = Int32(CommandLine.arguments[1])!
+          let expected = CommandLine.arguments[2] == "visible"
+          let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as! [[String: Any]]
+          let panels = windows.filter { ($0[kCGWindowOwnerPID as String] as? Int32) == pid && (($0[kCGWindowBounds as String] as? [String: Any])?["Width"] as? Double ?? 0) >= 300 }
+          if panels.isEmpty == expected { fatalError("Keyboard visibility assertion failed") }
+          if expected {
+            let b = CGRect(dictionaryRepresentation: panels[0][kCGWindowBounds as String] as! CFDictionary)!
+            let screens = NSScreen.screens
+            let top = screens[0].frame.maxY
+            let inside = screens.contains { screen in
+              let f = screen.visibleFrame
+              let work = CGRect(x:f.minX, y:top-f.maxY, width:f.width, height:f.height)
+              return work.insetBy(dx:-2,dy:-2).contains(b)
+            }
+            if !inside { fatalError("Panel outside monitor work area") }
+          }
+          SWIFT
+          swift "$RUNNER_TEMP/panel-proof.swift" "$app_pid" hidden
+          osascript -e 'tell application "System Events" to key code 35 using {control down, option down}'
+          sleep 2
+          swift "$RUNNER_TEMP/panel-proof.swift" "$app_pid" visible
+          if pgrep -x 'Google Chrome|Safari|Firefox|Microsoft Edge'; then echo 'Browser was running'; exit 1; fi
+          printf '{"installedFromDmg":true,"diskImageDetached":true,"installerSha256":"%s","escapeDismissed":true,"keyboardReopened":true,"placementInsideWorkArea":true,"browserProcesses":0,"buildCommit":"%s"}\n' "$installer_sha" "$GITHUB_SHA" > screens/macos-reliability.json
+          kill "$app_pid"; wait "$app_pid" 2>/dev/null || true; sleep 2
+          codesign -dvvv "$app" > screens/macos-signature.txt 2>&1 || true
+          codesign -d -r- "$app" >> screens/macos-signature.txt 2>&1 || true
+          # Today, Inbox, Chats and an open conversation (synthetic demo data), Settings and the Pulse window, light and dark.
+          shot() { name=$1; shift; "$app/Contents/MacOS/pulse-desktop" "$@" > "screens/$name.log" 2>&1 & pid=$!; sleep 12; kill -0 "$pid"; screencapture -x "screens/$name.png"; kill "$pid"; wait "$pid" 2>/dev/null || true; sleep 2; }
+          for theme in light dark; do
+            for tab in today inbox chats conversation; do shot "macos-$theme-$tab" --pinned --demo "--tab=$tab" "--theme=$theme"; done
+            shot "macos-$theme-settings" --settings=general "--theme=$theme"
+            shot "macos-$theme-privacy" --settings=privacy "--theme=$theme"
+          done
+          shot macos-app-window
+          echo "PULSE_MAC_APP=$app" >> "$GITHUB_ENV"
+      # Install build N, sign in (a synthetic credential stored exactly like a real sign-in), update to N+1 (same
+      # identity, different code), read it back with Keychain prompts disabled: no prompt, still signed in.
+      - name: Prove the saved sign-in survives an update without a Keychain prompt
+        if: matrix.platform == 'macos' && env.APPLE_SIGNING_IDENTITY != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          proof="$PWD/screens/keychain"; mkdir -p "$proof/n" "$proof/n1"
+          for v in n n1; do mkdir -p "$RUNNER_TEMP/$v"; ditto "$PULSE_MAC_APP" "$RUNNER_TEMP/$v/Pulse.app"; done
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 99.0.1" -c "Set :CFBundleVersion 99.0.1" "$RUNNER_TEMP/n1/Pulse.app/Contents/Info.plist"
+          codesign --force --options runtime --sign "$APPLE_SIGNING_IDENTITY" "$RUNNER_TEMP/n1/Pulse.app"
+          for v in n n1; do codesign -dvvv "$RUNNER_TEMP/$v/Pulse.app" > "$proof/$v/signature.txt" 2>&1; codesign -d -r- "$RUNNER_TEMP/$v/Pulse.app" >> "$proof/$v/signature.txt" 2>&1; done
+          if [ "$(grep CDHash= "$proof/n/signature.txt")" = "$(grep CDHash= "$proof/n1/signature.txt")" ]; then echo "N+1 must be different code"; exit 1; fi
+          grep -qiE 'certificate (leaf|root) = H"de66190258537c00e1fe958a2f2380074d9fc58a"' "$proof/n/signature.txt"
+          grep -qiE 'certificate (leaf|root) = H"de66190258537c00e1fe958a2f2380074d9fc58a"' "$proof/n1/signature.txt"
+          run() { PULSE_ACCEPTANCE_DIR="$proof/$1" perl -e 'alarm 60; exec @ARGV' "$RUNNER_TEMP/$1/Pulse.app/Contents/MacOS/pulse-desktop" --keychain-acceptance "$2"; }
+          run n write
+          run n write-legacy
+          run n1 read
+          run n1 read-legacy
+          run n clear
+          node -e 'const r=(n,f)=>JSON.parse(require("fs").readFileSync(`${process.argv[1]}/${n}/keychain-${f}.json`)).result.read;const a=r("n1","read"),b=r("n1","read-legacy");console.log(JSON.stringify({updatedBuild:a,appPartitionItem:b}));if(a!=="found")throw Error("N+1 could not read the sign-in silently: "+a);if(!["found","unreadable","missing"].includes(b))throw Error("unexpected legacy result "+b);' "$proof"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: companion-desktop-${{ matrix.platform }}-${{ github.sha }}
+          path: |
+            apps/desktop/src-tauri/target/**/release/bundle/nsis/*.exe
+            apps/desktop/src-tauri/target/**/release/bundle/msi/*.msi
+            apps/desktop/src-tauri/target/**/release/bundle/dmg/*.dmg
+            apps/desktop/src-tauri/target/**/release/bundle/**/*.sig
+            apps/desktop/src-tauri/target/**/release/bundle/**/*.app.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: companion-screens-${{ matrix.platform }}-${{ github.sha }}
+          path: screens/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  chrome:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - run: node apps/chrome-extension/scripts/sync-shared.mjs --check && node --test --test-concurrency=2 apps/chrome-extension/test/*.test.js
+      - run: node apps/chrome-extension/scripts/package.mjs pulse-chrome.zip && node apps/chrome-extension/scripts/package.mjs pulse-chrome-web-store.zip
+      - uses: actions/upload-artifact@v7
+        with:
+          name: companion-chrome-${{ github.sha }}
+          path: |
+            pulse-chrome.zip
+            pulse-chrome-web-store.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  windows-tray:
+    if: ${{ !inputs.validation_only }}
+    needs: desktop
+    uses: ./.github/workflows/windows-tray-acceptance.yml
+    with:
+      build_run: ${{ format('{0}', github.run_id) }}
+      artifact_name: companion-desktop-windows-${{ github.sha }}
+
+  macos-pings:
+    if: ${{ inputs.macos_ping_build != '' }}
+    uses: ./.github/workflows/macos-acceptance.yml
+    with:
+      run_id: ${{ inputs.macos_ping_build }}
+      build_repo: Estate-Autopilots/pulse-companion
+      notification_proof: true

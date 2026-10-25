@@ -1,0 +1,51 @@
+{
+  "appId": "com.pulse.work.mobile",
+  "appName": "Pulse",
+  "webDir": "www",
+  "loggingBehavior": "debug",
+  "appendUserAgent": "PulseShell/1.1.4",
+  "zoomEnabled": false,
+  "server": {
+    "url": "https://pulse.estateautopilots.com",
+    "allowNavigation": [],
+    "errorPath": "offline.html",
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "ios": {
+    "contentInset": "never",
+    "allowsLinkPreview": false,
+    "preferredContentMode": "mobile"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover"
+    },
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "launchShowDuration": 1200,
+      "launchFadeOutDuration": 200,
+      "showSpinner": false
+    },
+    "LocalNotifications": {
+      "iconColor": "#5B45D6"
+    },
+    "PushNotifications": {
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
+    },
+    "CapacitorHttp": {
+      "enabled": false
+    },
+    "CapacitorCookies": {
+      "enabled": false
+    }
+  }
+}
