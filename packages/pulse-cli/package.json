@@ -1,0 +1,5 @@
+{
+  "name": "@pulse/cli", "private": true, "version": "1.0.0", "type": "module",
+  "engines": { "node": ">=20" }, "bin": { "pulse": "dist/pulse.mjs" },
+  "scripts": { "build": "node build.mjs", "lint": "node --check pulse.mjs", "test": "node --test --test-concurrency=2 test.mjs" }
+}

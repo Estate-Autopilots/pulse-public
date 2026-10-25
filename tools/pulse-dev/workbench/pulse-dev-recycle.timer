@@ -1,0 +1,8 @@
+[Unit]
+Description=Check the Pulse dev server's memory every 10 minutes
+[Timer]
+OnBootSec=10min
+OnCalendar=*-*-* *:05/10:00 UTC
+AccuracySec=1m
+[Install]
+WantedBy=timers.target
