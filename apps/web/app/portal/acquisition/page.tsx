@@ -1,0 +1,7 @@
+import Link from 'next/link';import {portalApi} from '../api';import {Page,PageHeader,Panel,Message,styles} from '../../ui';
+import { SelectField } from "../../kit/select-field";
+export default async function ClientAcquisition({searchParams}:{searchParams:Promise<Record<string,string>>}){
+ const q=await searchParams,scope=await portalApi<{projects:{id:string;title:string}[]}>(''),project=q.project??scope.data?.projects[0]?.id;
+ const r=project?await portalApi<{enquiries:number;verifiedBookings:number;coverage:string;eaRevenue:string;buyerPoolIncluded:boolean}>('/acquisition?project='+encodeURIComponent(project)):{error:'No authorized project'};
+ return <Page fit viewport><PageHeader title="Project acquisition" actions={<Link href={'/portal?project='+encodeURIComponent(project??'')} className={styles.btn}>Project home</Link>}/>{r.data?<><form action="/portal/acquisition"><SelectField name="project" aria-label="Authorized client project" defaultValue={project}>{scope.data?.projects.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}</SelectField><button className={styles.btn}>Open</button></form><Panel title="Recorded project outcomes" sub="Selected client-controller projection"><p>{r.data.enquiries} recorded enquiries · {r.data.verifiedBookings} verified active bookings</p><p>{r.data.coverage}</p><p>{r.data.eaRevenue}</p><p>Contact your assigned EA owner to review missing CRM outcome coverage. Source availability and cohort maturity affect interpretation.</p></Panel></>:<Message text={r.error??'Project access unavailable'}/>}</Page>;
+}
