@@ -1,0 +1,11 @@
+export const PIP_WORDS: Record<string, string[]>;
+export function norm(s: unknown): string;
+export type Meaning = { word: string; alts: string[] };
+export function understand(query: string): { question: boolean; intent: "change" | null; keywords: string[]; groups: Meaning[]; expanded: string[] };
+export function near(a: string, b: string): boolean;
+type Field = { n: string; w: string[]; c: string };
+export type Searchable = { label: string; synonyms?: readonly string[]; path?: readonly string[]; sub?: string | null; keywords?: string | null };
+export function prepare<T extends Searchable>(item: T): T & { _m: { label: Field; syn: Field[]; path: Field; sub: Field } };
+export function score(item: { _m?: unknown }, query: string, options?: { groups?: Meaning[] }): number;
+export function recentBoost(key: string, recent: { key: string; at: number; n: number }[], now?: number): number;
+export function rank<T extends { _m?: unknown }>(items: T[], query: string, options?: { groups?: Meaning[]; boost?: (item: T) => number; min?: number; limit?: number }): { item: T; score: number }[];
