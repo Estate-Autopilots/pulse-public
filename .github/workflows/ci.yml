@@ -1,0 +1,359 @@
+# Full exact-head gate. Every required cell executes; ci aggregates without re-running the suite.
+name: CI
+on:
+  pull_request:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main, 'ci/**', 'release/**']
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+env:
+  PULSE_CI: '1'
+  PULSE_CI_STRICT: '1'
+  PULSE_CI_AFFECTED: '0'
+  CARGO_BUILD_JOBS: '2'
+  RAYON_NUM_THREADS: '2'
+  UV_CONCURRENT_BUILDS: '2'
+  NEXT_TELEMETRY_DISABLED: '1'
+jobs:
+  lint_unit:
+    name: lint-typecheck-unit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      # The desktop address-step tests drive Chromium; without it they fail and leave their server open.
+      - uses: ./.github/actions/ci-setup
+        with:
+          browser: 'true'
+      - run: bash tools/ci.sh
+        env:
+          PULSE_CI_GROUPS: tools,js,smoke
+
+  web_build:
+    name: web-build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: ./.github/actions/ci-setup
+      - uses: actions/cache@v6.1.0
+        with:
+          path: apps/web/.next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+      - run: corepack pnpm --dir apps/web exec next build
+      - name: Package build without caches or duplicate standalone dependencies
+        run: tar -czf "$RUNNER_TEMP/web.tgz" --exclude=.next/cache --exclude=.next/standalone -C apps/web .next
+      # One name per run (one head SHA): "Re-run failed jobs" restores it, "Re-run all jobs" replaces it.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-${{ github.run_id }}
+          path: ${{ runner.temp }}/web.tgz
+          overwrite: true
+          retention-days: 2
+
+  language:
+    name: ${{ matrix.group }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [python, schemas, rust]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: ./.github/actions/ci-setup
+      - name: Read pinned Rust toolchain
+        if: matrix.group == 'rust'
+        id: rust
+        run: |
+          channel=$(sed -nE 's/^[[:space:]]*channel[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' rust-toolchain.toml)
+          [[ -n "$channel" && "$channel" != *$'\n'* ]]
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+      - uses: dtolnay/rust-toolchain@master
+        if: matrix.group == 'rust'
+        with:
+          toolchain: ${{ steps.rust.outputs.channel }}
+      - uses: Swatinem/rust-cache@v2.9.2
+        if: matrix.group == 'rust'
+        with:
+          workspaces: apps/desktop/core -> target
+      - run: bash tools/ci.sh
+        env:
+          PULSE_CI_GROUPS: ${{ matrix.group }}
+
+  database:
+    name: ${{ startsWith(matrix.cell, 'page') && format('page-matrix-{0}', matrix.cell == 'page1' && '1' || '2') || format('db-{0}', matrix.cell) }}
+    needs: web_build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        cell: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', page1, page2]
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_DB: pulse_ci
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --tmpfs /var/lib/postgresql/data:rw,size=2g
+          --health-cmd "pg_isready -U postgres -d pulse_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      PULSE_CI_GROUPS: db
+      PULSE_CI_DATABASE_URL: postgresql://postgres@localhost:5432/pulse_ci
+      PULSE_CI_DB_CELL: ${{ matrix.cell }}
+      PULSE_CI_DB_SHARDS: '1'
+      PULSE_PAGE_MATRIX: ${{ startsWith(matrix.cell, 'page') && '1' || '0' }}
+      PULSE_PAGE_MATRIX_SHARD: ${{ matrix.cell == 'page1' && '1/2' || matrix.cell == 'page2' && '2/2' || '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: ./.github/actions/ci-setup
+        with:
+          browser: 'true'
+          web: 'true'
+      - name: Tune disposable database durability
+        run: |
+          psql "$PULSE_CI_DATABASE_URL" -Xv ON_ERROR_STOP=1 <<'SQL'
+          ALTER SYSTEM SET fsync = 'off';
+          ALTER SYSTEM SET synchronous_commit = 'off';
+          ALTER SYSTEM SET full_page_writes = 'off';
+          SELECT pg_reload_conf();
+          SQL
+      - name: Run the complete database cell
+        run: |
+          if [[ "$PULSE_CI_DB_CELL" == page* ]]; then
+            export PULSE_PHONE_MATRIX_DIR="$RUNNER_TEMP/phone-matrix"
+          fi
+          bash tools/ci.sh
+        env:
+          PULSE_MATRIX_RECEIPT: ${{ runner.temp }}/role-matrix.json
+          PULSE_CI_DURATIONS_OUT: ${{ runner.temp }}/db-durations.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: db-${{ matrix.cell }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/db-durations.json
+            ${{ runner.temp }}/role-matrix.json
+          retention-days: 7
+
+  playwright:
+    name: playwright-${{ matrix.cell }}
+    needs: web_build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {cell: '01', shard: '1/6'}
+          - {cell: '02', shard: '2/6'}
+          - {cell: '03', shard: '3/6'}
+          - {cell: '04', shard: '4/6'}
+          - {cell: '05', shard: '5/6'}
+          - {cell: '06', shard: '6/6'}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: ./.github/actions/ci-setup
+        with:
+          browser: 'true'
+          web: 'true'
+      - run: bash tools/ci.sh
+        env:
+          PULSE_CI_GROUPS: e2e
+          PULSE_CI_E2E_SHARD: ${{ matrix.shard }}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-${{ matrix.cell }}-${{ github.run_attempt }}
+          path: tests/e2e/test-results
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: task-table-entry-${{ matrix.cell }}-${{ github.run_attempt }}
+          path: tests/e2e/test-results/**/table-entry-*.png
+          if-no-files-found: ignore
+          retention-days: 7
+
+  secrets:
+    name: secrets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - run: bash tools/check-secrets.sh --all
+
+  image:
+    # The root Dockerfile is what ea-deploy builds for staging and production: it must build on every change.
+    name: image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: docker/setup-buildx-action@v4.4.1
+      - name: docker build with reusable layers
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          load: true
+          pull: true
+          tags: pulse:ci
+          cache-from: type=gha,scope=pulse-image
+          # Keep default-branch cache stable; PRs read it without exporting every branch's layers.
+          cache-to: ${{ github.event_name != 'pull_request' && 'type=gha,scope=pulse-image,mode=min' || '' }}
+      - name: container starts and answers /healthz (no database -> 503, but the server is up)
+        run: |
+          set -euo pipefail
+          docker run -d --name pulse-ci -p 18080:8080 \
+            -e PULSE_DATABASE_URL_INGEST=postgresql://nobody@127.0.0.1:1/none \
+            -e PULSE_DATABASE_URL_WORKER=postgresql://nobody@127.0.0.1:1/none pulse:ci
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18080/healthz || true)
+            if [ "$code" = 503 ] || [ "$code" = 200 ]; then echo "healthz answered $code"; break; fi
+            if [ "$i" = 30 ]; then docker logs pulse-ci; exit 1; fi
+            sleep 1
+          done
+          # EST-2290: the packaged API loads every file it reads beside dist/ (the v1 reference inlines service.yaml).
+          docker exec pulse-ci node --input-type=module -e "const { v1OpenApi } = await import('/app/services/api/dist/v1.js'); if (!v1OpenApi().paths['/api/v1/service/clients'].get.security[0].serviceKey) process.exit(1)"
+
+  desktop_windows:
+    # Windows build of the desktop agent (Tauri 2) on the public mirror's free Windows runners: native tests, review
+    # screenshots and unsigned NSIS/MSI installers as a run artefact. Signing keys never reach a public runner; a
+    # release signs on our server after download (spec 10 section 3.3).
+    name: desktop-windows
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      CARGO_BUILD_JOBS: '4'
+      RAYON_NUM_THREADS: '4'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2.9.2
+        with:
+          workspaces: apps/desktop/src-tauri -> target
+      - name: Install JS dependencies
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/desktop build
+      - run: pnpm --dir tests/e2e exec playwright install chromium
+      - name: Capture desktop UI review screenshots
+        env:
+          PULSE_DESKTOP_SCREENSHOT_DIR: desktop-ui-screenshots
+        run: pnpm --dir apps/desktop screenshots
+      - name: Test the native pause control
+        run: cargo test -j4 --manifest-path apps/desktop/src-tauri/Cargo.toml
+      - name: Build unsigned per-user installers
+        # No updater signatures here: the updater key never reaches a public runner (a release signs on our server).
+        run: pnpm --dir apps/desktop exec tauri build --bundles nsis,msi --config '{"bundle":{"createUpdaterArtifacts":false}}'
+      - run: node apps/desktop/scripts/create-build-metadata.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pulse-desktop-windows-${{ github.sha }}
+          path: |
+            apps/desktop/src-tauri/target/release/bundle/nsis/
+            apps/desktop/src-tauri/target/release/bundle/msi/
+            apps/desktop/src-tauri/target/release/bundle/pulse-desktop-manifest.json
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pulse-desktop-ui-screenshots-${{ github.sha }}
+          path: apps/desktop/desktop-ui-screenshots/**/*.png
+          if-no-files-found: error
+          retention-days: 14
+
+  ci:
+    name: ci
+    needs: [lint_unit, web_build, language, database, playwright, secrets, image, desktop_windows]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Require every predecessor to succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          results = json.loads(os.environ['NEEDS'])
+          assert len(results) == 8 and all(job['result'] == 'success' for job in results.values()), results
+          PY
+
+  staging:
+    # After a green main commit, fast-forward `staging` to it. Off unless repo variable PULSE_REF_WRITER is
+    # `github`: in local mode pulse-train is the only writer of staging (EST-294).
+    needs: [ci, image]
+    if: vars.PULSE_REF_WRITER == 'github' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    concurrency:
+      group: staging
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Fast-forward staging
+        run: |
+          set -euo pipefail
+          sha=$(git rev-parse HEAD)
+          if git rev-parse --verify --quiet refs/remotes/origin/staging >/dev/null; then
+            if git merge-base --is-ancestor "$sha" origin/staging; then
+              echo "staging already contains $sha (a newer green main got there first)"
+              exit 0
+            fi
+            if ! git merge-base --is-ancestor origin/staging "$sha"; then
+              echo "::error::staging ($(git rev-parse --short origin/staging)) is not an ancestor of $sha; refusing a non-fast-forward move"
+              exit 1
+            fi
+          fi
+          # A plain push is fast-forward only: it fails rather than rewrite staging.
+          git push origin "$sha:refs/heads/staging"
+          echo "staging -> $sha" | tee -a "$GITHUB_STEP_SUMMARY"

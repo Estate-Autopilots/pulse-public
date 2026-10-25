@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pulse widget, small (2×1): status, time worked, one action. Same ids as the medium one (the ones it hides stay gone). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/attendance_root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="12dp" android:paddingEnd="6dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:background="@drawable/attendance_background">
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/attendance_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Open Pulse to sign in" android:textSize="13sp" android:textColor="@color/pulse_widget_text" android:maxLines="2" android:ellipsize="end" />
+        <TextView android:id="@+id/attendance_worked" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="@color/pulse_widget_text" android:maxLines="1" android:ellipsize="end" android:visibility="gone" />
+        <TextView android:id="@+id/attendance_next" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
+        <TextView android:id="@+id/attendance_updated" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
+    </LinearLayout>
+    <Button android:id="@+id/attendance_primary" android:layout_width="wrap_content" android:layout_height="44dp" android:minWidth="64dp" android:paddingStart="8dp" android:paddingEnd="8dp" android:text="Open" android:textSize="13sp" android:textAllCaps="false" android:textColor="@color/pulse_action" />
+</LinearLayout>
