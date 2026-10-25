@@ -1,0 +1,333 @@
+/* Team & HR: the today card, a person's month, leave balances, request lists and the performance chart. */
+.today { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; padding: 18px 20px; border: 1px solid var(--theme-border); border-radius: 12px;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface)), var(--theme-surface) 55%); animation: hr-in 200ms ease-out both; }
+.today[data-state="in"] { border-color: color-mix(in srgb, var(--theme-success) 40%, var(--theme-border)); background: linear-gradient(120deg, color-mix(in srgb, var(--theme-success) 9%, var(--theme-surface)), var(--theme-surface) 55%); }
+.today[data-state="break"] { border-color: color-mix(in srgb, var(--theme-warning) 40%, var(--theme-border)); background: linear-gradient(120deg, color-mix(in srgb, var(--theme-warning) 9%, var(--theme-surface)), var(--theme-surface) 55%); }
+.today[data-state="done"], .today[data-state="off"], .today[data-state="holiday"], .today[data-state="leave"] { background: var(--theme-surface); }
+.todayMain { display: grid; flex: 1 1 320px; gap: 4px; min-width: 0; }
+.todayEyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+.todayTitle { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.25; }
+.todayLine { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0; color: var(--theme-text-muted); font-size: 14px; }
+.todayLine b { color: var(--theme-text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.todayActions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.todayHint { flex-basis: 100%; color: var(--theme-text-muted); font-size: 12px; text-align: right; }
+.bigBtn { height: 38px !important; padding: 0 16px !important; font-size: 14px !important; }
+.pulse { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--theme-border-strong); }
+.pulse[data-state="in"] { background: var(--theme-success); box-shadow: 0 0 0 0 color-mix(in srgb, var(--theme-success) 50%, transparent); animation: hr-pulse 2s ease-out infinite; }
+.pulse[data-state="break"] { background: var(--theme-warning); }
+@keyframes hr-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--theme-success) 45%, transparent); } 100% { box-shadow: 0 0 0 9px transparent; } }
+@keyframes hr-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+.monthNav { display: inline-flex; align-items: center; gap: 2px; font-size: 13px; }
+.monthNav b { min-width: 108px; font-weight: 600; text-align: center; }
+
+.calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; padding: 4px 14px 12px; }
+.weekday { padding: 2px 6px 4px; color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+.day { position: relative; display: grid; align-content: start; gap: 1px; min-height: 66px; padding: 6px 7px; border: 1px solid var(--soft, var(--theme-border)); border-radius: 8px; background: var(--theme-surface); font-size: 12px; overflow: hidden; transition: border-color 120ms ease, transform 120ms ease; }
+.day:hover { border-color: var(--theme-border-strong); }
+.day::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: transparent; }
+.day[data-status="office"]::before { background: var(--theme-success); }
+.day[data-status="wfh"]::before { background: var(--theme-action); }
+.day[data-status="field"]::before { background: color-mix(in srgb, var(--theme-action) 55%, var(--theme-success)); }
+.day[data-status="leave"] { background: color-mix(in srgb, var(--theme-warning) 8%, var(--theme-surface)); }
+.day[data-status="leave"]::before { background: var(--theme-warning); }
+.day[data-status="holiday"] { background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.day[data-status="absent"] { background: color-mix(in srgb, var(--theme-danger) 6%, var(--theme-surface)); }
+.day[data-status="absent"]::before { background: var(--theme-danger); }
+.day[data-status="off"], .day[data-status="untracked"] { background: var(--theme-surface-subtle); border-color: transparent; }
+.day[data-status="upcoming"] .dayNo { opacity: 0.7; }
+.day[data-today] { border-color: var(--theme-action); box-shadow: 0 0 0 1px var(--theme-action); }
+.dayNo { color: var(--theme-text-muted); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.day[data-today] .dayNo { color: var(--theme-action); }
+.dayMain { font-weight: 550; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dayMain i { margin: 0 2px; color: var(--theme-text-muted); font-style: normal; }
+.dayNote { overflow: hidden; color: var(--theme-text-muted); text-overflow: ellipsis; white-space: nowrap; }
+.dayTags { display: flex; flex-wrap: wrap; gap: 3px; }
+.dayTags em { padding: 0 5px; border-radius: 4px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 12px; font-style: normal; font-weight: 500; line-height: 16px; white-space: nowrap; }
+.dayTags em[data-kind="late"] { background: color-mix(in srgb, var(--theme-warning) 14%, var(--theme-surface)); color: var(--theme-warning); }
+.dayTags em[data-kind="wfh"], .dayTags em[data-kind="field"] { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action); }
+.dayTags em[data-kind="leave"] { background: color-mix(in srgb, var(--theme-warning) 12%, var(--theme-surface)); color: var(--theme-warning); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; padding: 0 14px 12px; color: var(--theme-text-muted); font-size: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 9px; height: 9px; border-radius: 3px; background: var(--theme-border-strong); }
+.legend i[data-status="office"], .legend i[data-status="final"] { background: var(--theme-success); }
+.legend i[data-status="wfh"], .legend i[data-status="draft"] { background: var(--theme-action); }
+.legend i[data-status="field"] { background: color-mix(in srgb, var(--theme-action) 55%, var(--theme-success)); }
+.legend i[data-status="leave"] { background: var(--theme-warning); }
+.legend i[data-status="holiday"] { background: color-mix(in srgb, var(--theme-action) 30%, var(--theme-surface)); }
+.legend i[data-status="absent"] { background: var(--theme-danger); }
+.legend i[data-status="off"] { background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1px var(--theme-border); }
+.legend i[data-status="base"] { height: 0; border-top: 2px dashed var(--theme-text-muted); border-radius: 0; background: none; width: 14px; }
+/* R43: the month calendar reads at a glance in both themes — firmer day edges, a wider status bar, real tints for
+   leave, holidays and missing days, and weekly offs hatched (not a colour alone). A day takes keyboard focus and can be
+   picked; its story shows under the grid (.dayDetail). Rows are display: contents so the 7-column grid is unchanged. */
+.week { display: contents; }
+.day { border-color: var(--theme-border); cursor: pointer; }
+.day::before { width: 4px; }
+.day[data-status="leave"] { background: color-mix(in srgb, var(--theme-warning) 14%, var(--theme-surface)); }
+.day[data-status="holiday"] { background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); }
+.day[data-status="holiday"]::before { background: color-mix(in srgb, var(--theme-action) 60%, var(--theme-surface)); }
+.day[data-status="absent"] { background: color-mix(in srgb, var(--theme-danger) 10%, var(--theme-surface)); }
+.day[data-status="off"] { border-style: dashed; border-color: var(--theme-border); background: repeating-linear-gradient(135deg, var(--theme-surface-subtle) 0 6px, color-mix(in srgb, var(--theme-border) 70%, var(--theme-surface-subtle)) 6px 7px); }
+.day[data-status="untracked"] { background: var(--theme-surface-subtle); border-color: transparent; }
+.day[data-status="leave"] .dayNote, .day[data-status="holiday"] .dayNote, .day[data-status="absent"] .dayNote { color: color-mix(in srgb, var(--theme-text) 82%, var(--theme-surface)); font-weight: 550; }
+.day[data-today] { box-shadow: 0 0 0 2px var(--theme-action); }
+.day[data-work] { border-color: color-mix(in srgb, var(--theme-success) 60%, var(--theme-border)); }
+.dayTags em[data-kind="work"] { background: color-mix(in srgb, var(--theme-success) 14%, var(--theme-surface)); color: var(--theme-success); }
+.day:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.day[aria-selected="true"] { border-color: var(--theme-action); box-shadow: inset 0 0 0 1px var(--theme-action); }
+.day[aria-selected="true"][data-today] { box-shadow: 0 0 0 2px var(--theme-action), inset 0 0 0 1px var(--theme-action); }
+.dayDetail { min-height: 2.8em; margin: 0; padding: 2px 14px 8px; color: var(--theme-text); font-size: 13px; line-height: 1.45; }
+.dayDetail b { margin-right: 4px; }
+.legend i { width: 11px; height: 11px; }
+.legend i[data-status="off"] { background: repeating-linear-gradient(135deg, var(--theme-surface-subtle) 0 3px, var(--theme-border-strong) 3px 4px); }
+.offHours { margin: 0 14px 12px; color: var(--theme-text-muted); font-size: 12px; }
+.offHours summary { width: fit-content; padding: 4px 0; color: var(--theme-action); font-weight: 550; cursor: pointer; }
+.offHours summary:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 4px; }
+.offHoursBody { display: grid; gap: 6px; max-width: 72ch; padding: 4px 0 2px; line-height: 1.5; }
+.offHoursBody p { margin: 0; }
+/* A phone cell has room for one time: the check-in shows (the dash was already hidden, so the two times ran together
+   as "09:5218:40"); the check-out is in the day's details. */
+@media (max-width: 760px) { .dayDetail { padding-inline: 8px; } .offHours { margin-inline: 8px; } .dayOut { display: none; } }
+@media (prefers-reduced-motion: reduce) { .day { transition: none; } }
+
+.stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; margin: 0; border-top: 1px solid var(--soft, var(--theme-border)); }
+.stats > div { display: grid; gap: 1px; padding: 9px 14px; border-left: 1px solid var(--soft, var(--theme-border)); }
+.stats > div:first-child { border-left: 0; }
+.stats dt { color: var(--theme-text-muted); font-size: 12px; }
+.stats dd { margin: 0; font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.stats > div[data-warn] dd { color: var(--theme-warning); }
+
+.balances { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; padding: 4px 14px 14px; }
+.balance { display: grid; align-content: start; gap: 4px; min-width: 0; padding: 12px 14px; border: 1px solid var(--soft, var(--theme-border)); border-radius: 10px; background: color-mix(in srgb, var(--theme-surface-subtle) 40%, var(--theme-surface)); }
+.balanceName { display: flex; align-items: center; gap: 8px; color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+.balanceValue { display: flex; align-items: baseline; gap: 6px; font-size: 24px; font-weight: 650; letter-spacing: -0.03em; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.balanceValue small { color: var(--theme-text-muted); font-size: 13px; font-weight: 500; letter-spacing: 0; }
+.balanceValue[data-open] { font-size: 18px; letter-spacing: -0.01em; }
+.balanceBar { display: flex; height: 5px; margin: 2px 0; border-radius: 3px; background: color-mix(in srgb, var(--theme-success) 22%, var(--theme-surface)); overflow: hidden; }
+.balanceBar i { background: var(--theme-text-muted); transition: width 300ms ease; }
+.balanceBar i[data-pending] { background: var(--theme-warning); }
+.balanceMeta { color: var(--theme-text); font-size: 12px; }
+.balanceRule { color: var(--theme-text-muted); font-size: 12px; }
+
+.request { align-items: flex-start !important; padding-top: 9px !important; padding-bottom: 9px !important; }
+.request > span:last-child { flex-wrap: wrap; justify-content: flex-end; }
+
+.reply { display: grid; gap: 8px; padding: 12px 14px 14px; border-top: 1px solid var(--soft, var(--theme-border)); }
+.reply textarea { width: 100%; min-height: 72px; padding: 9px 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; resize: vertical; }
+.reply textarea:focus { outline: 2px solid var(--theme-focus); outline-offset: 0; border-color: transparent; }
+.replyFoot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.check { display: inline-flex; align-items: center; gap: 7px; color: var(--theme-text-muted); font-size: 12px; cursor: pointer; }
+.controls { display: grid; gap: 10px; padding: 4px 14px 14px; }
+.thread { margin: 0; padding: 4px 14px 14px; list-style: none; display: grid; gap: 10px; }
+.msg { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; }
+.msg > span:first-child { grid-row: span 2; }
+.msgHead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-size: 13px; }
+.msgHead b { font-weight: 600; }
+.msgHead small { color: var(--theme-text-muted); font-size: 12px; }
+.msgBody { margin: 0; padding: 8px 11px; border: 1px solid var(--soft, var(--theme-border)); border-radius: 4px 10px 10px 10px; background: var(--theme-surface); font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg[data-internal] .msgBody { border-style: dashed; border-color: color-mix(in srgb, var(--theme-warning) 45%, var(--theme-border)); background: color-mix(in srgb, var(--theme-warning) 6%, var(--theme-surface)); }
+.msg[data-mine] .msgBody { background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.event { display: flex; align-items: center; gap: 8px; padding-left: 2px; color: var(--theme-text-muted); font-size: 12px; }
+.event::before { content: ""; width: 6px; height: 6px; margin: 0 10px 0 9px; border-radius: 50%; background: var(--theme-border-strong); }
+.resolution { margin: 0 14px 14px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--theme-success) 35%, var(--theme-border)); border-radius: 10px; background: color-mix(in srgb, var(--theme-success) 7%, var(--theme-surface)); font-size: 14px; line-height: 1.5; }
+.resolution b { display: block; margin-bottom: 2px; color: var(--theme-success); font-size: 12px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+
+.skills { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 14px 14px; }
+.skill { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 9px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface); font-size: 12px; font-weight: 500; }
+.skill button { display: grid; width: 16px; height: 16px; margin-right: -4px; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.skill button:hover { background: var(--theme-surface-subtle); color: var(--theme-danger); }
+.skillAdd { display: inline-flex; flex: 1 1 220px; gap: 6px; max-width: 320px; }
+.skillAdd input { flex: 1; min-width: 0; height: 26px; padding: 0 9px; border: 1px dashed var(--theme-border-strong); border-radius: 999px; background: transparent; color: var(--theme-text); font: inherit; font-size: 12px; }
+.skillAdd input:focus { outline: 2px solid var(--theme-focus); outline-offset: 0; border-style: solid; border-color: transparent; }
+
+.perf { display: grid; gap: 6px; padding: 14px 14px 0; }
+.perfPlot { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); align-items: end; gap: 6px; height: 150px; border-bottom: 1px solid var(--theme-border); }
+.perfCol { position: relative; display: flex; flex-direction: column-reverse; align-items: stretch; height: 100%; min-width: 0; }
+.perfCol i { display: block; min-height: 0; transition: height 300ms ease; }
+.perfCol i[data-kind="final"] { background: var(--theme-success); border-radius: 0; }
+.perfCol i[data-kind="draft"] { background: var(--theme-action); border-radius: 3px 3px 0 0; }
+.perfCol b { order: 3; padding-bottom: 2px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: center; }
+.perfCol[data-current] { opacity: 0.6; }
+.perfCol:hover { opacity: 0.85; }
+.perfBase { position: absolute; right: 0; left: 0; z-index: 1; height: 0; border-top: 1.5px dashed var(--theme-text-muted); pointer-events: none; }
+.perfBase em { position: absolute; right: 0; bottom: 3px; padding: 0 5px; border-radius: 4px; background: var(--theme-surface); color: var(--theme-text-muted); font-size: 12px; font-style: normal; }
+.perfAxis { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; color: var(--theme-text-muted); font-size: 12px; text-align: center; white-space: nowrap; }
+.perf .legend { padding: 4px 0 12px; }
+
+.deskHead { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.deskHead > div { display: grid; gap: 2px; min-width: 0; }
+.deskHead h2 { margin: 0; font-size: 20px; font-weight: 650; letter-spacing: -0.02em; }
+.deskHead p { display: flex; flex-wrap: wrap; gap: 2px 10px; margin: 0; color: var(--theme-text-muted); font-size: 14px; }
+.upcoming { margin: 0; padding: 0; list-style: none; }
+.upcoming li { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 14px; border-top: 1px solid var(--soft, var(--theme-border)); font-size: 13px; }
+.upcoming li:first-child { border-top: 0; }
+.upcoming time { display: grid; justify-items: center; padding: 3px 0; border: 1px solid var(--soft, var(--theme-border)); border-radius: 7px; background: var(--theme-surface-subtle); font-size: 12px; line-height: 1.2; color: var(--theme-text-muted); text-transform: uppercase; }
+.upcoming time b { color: var(--theme-text); font-size: 14px; font-weight: 650; }
+.upcoming small { display: block; color: var(--theme-text-muted); font-size: 12px; }
+
+@media (max-width: 760px) {
+  .today { padding: 14px; }
+  .todayActions { width: 100%; }
+  .todayActions > button { flex: 1; }
+  .todayHint { text-align: left; }
+  .calendar { gap: 3px; padding: 4px 8px 10px; }
+  .day { min-height: 50px; padding: 4px; }
+  .dayMain { font-size: 12px; white-space: normal; }
+  .dayMain i { display: none; }
+  .dayTags em { padding: 0 3px; font-size: 12px; }
+  .dayNote { font-size: 12px; white-space: normal; }
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .stats > div:nth-child(4) { border-left: 0; }
+  .stats > div:nth-child(n + 4) { border-top: 1px solid var(--soft, var(--theme-border)); }
+  .request { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) { .today, .pulse { animation: none; } }
+
+/* My desk overview fits the window: the month, leave and what is coming up side by side. */
+.today { flex: none; padding: 14px 18px; }
+.todayActions { display: grid; grid-auto-flow: column; grid-template-rows: auto auto; align-items: center; justify-content: end; gap: 6px 8px; }
+.todayActions > :not(.todayHint) { grid-row: 1; }
+.todayHint { grid-row: 2; grid-column: 1 / -1; min-height: 16px; }
+.meFit { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.meCol { display: grid; grid-auto-rows: minmax(0, 1fr); gap: 12px; min-width: 0; min-height: 0; }
+@media (max-width: 1179.98px), (max-height: 599.98px) { .meFit { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; } .meCol { grid-auto-rows: auto; } }
+@media (min-width: 1180px) and (max-height: 820px) {
+ .calendar { gap: 3px; padding-bottom: 6px; }
+ .day { min-height: 44px; padding: 4px; }
+ .day > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (min-width: 1180px) and (max-height: 820px) { .day { min-height: 40px; padding: 3px; } }
+@media (min-width: 1180px) and (max-height: 820px) { .day { min-height: 38px; } }
+@media (min-width: 1180px) and (min-height: 600px) {
+ .calendar.calendar { flex: 1 1 0; min-height: 0; grid-template-rows: 22px repeat(var(--weeks), minmax(0, 1fr)); }
+ .calendar .day { min-height: 0; }
+ .day:has(.dayMain) { grid-template-columns: 18px minmax(0, 1fr); gap: 1px 3px; }
+ /* "Off", "Leave", "No check-in" sit beside the date, so a short cell never clips them. */
+ .day:has(.dayNote) { grid-template-columns: 18px minmax(0, 1fr); align-content: start; gap: 1px 6px; }
+ .dayMain { overflow: hidden; text-overflow: ellipsis; }
+ .dayTags { grid-column: 1 / -1; }
+}
+
+/* Round 6: skills chips and the add field are 32 px targets. */
+.skill { height: 32px; padding: 0 4px 0 12px; font-size: 13px; }
+.skill button { width: 28px; height: 28px; margin-right: 0; }
+.skillAdd { min-width: 0; max-width: min(360px, 100%); }
+/* RELEASE-5: the field's built-in width (size 20) kept the form 347 px wide on a 320 px phone; it fills the room it has. */
+.skillAdd input { width: 0; }
+.skillAdd input { height: 32px; padding: 0 12px; font-size: 13px; }
+
+/* Attendance views (round 6): the month calendar gets the window; today and the month's numbers sit beside it.
+   Calendar cells keep 12 px text and at least 48 px; a shorter window gets the month as its own part instead. */
+.monthFit { grid-template-columns: minmax(0, 2.2fr) minmax(320px, 1fr); grid-template-rows: minmax(0, 1fr); }
+.threeFit { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
+.monthSide { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; }
+.monthSide > * { flex: none; }
+.monthSide > [class*="__panelFill"] { flex: 1 1 0; min-height: 120px; }
+.monthSide .today { flex-direction: column; align-items: stretch; gap: 12px; }
+.monthSide .todayMain { flex: none; }
+.monthSide .todayActions { justify-content: start; }
+.monthSide .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.monthSide .stats > div { padding: 10px 14px; border-left: 0; border-top: 1px solid var(--soft, var(--theme-border)); }
+.monthSide .stats > div:nth-child(even) { border-left: 1px solid var(--soft, var(--theme-border)); }
+.monthSide .stats dd { font-size: 18px; }
+.balances[data-stacked] { grid-template-columns: minmax(0, 1fr); }
+.balances[data-stacked] .balance { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; column-gap: 12px; padding: 10px 14px; }
+.balances[data-stacked] .balanceName { font-size: 13px; }
+.balances[data-stacked] .balanceValue { grid-row: 1; grid-column: 2; font-size: 20px; }
+.balances[data-stacked] .balanceBar, .balances[data-stacked] .balanceMeta, .balances[data-stacked] .balanceRule { grid-column: 1 / -1; }
+@media (min-width: 1180px) and (min-height: 600px) {
+  .monthFit .calendar .day { min-height: 0; padding: 5px 7px; }
+  .monthFit .day > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (max-width: 1179.98px), (max-height: 599.98px) {
+  .monthFit, .threeFit { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+}
+
+/* Attendance averages (MOBILE-SHELL): a headline number and one line; how it is counted sits behind one tap. */
+/* Attendance averages (HR-POLISH): the number and the "to review" chip on one line, what it means under it, how it is
+   counted in a popover. Padded like the panel's title, so nothing sits on the card's edge. */
+.avg { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 12px; min-width: 0; padding: 0 14px 10px; }
+.stats + .avg { padding-top: 10px; border-top: 1px solid var(--soft, var(--theme-border)); }
+.avgValue { grid-row: 1; grid-column: 1; min-width: 0; color: var(--theme-text); font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.avgFlag { grid-row: 1; grid-column: 2; justify-self: end; }
+.avgLine { grid-row: 2; grid-column: 1 / -1; min-width: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.4; }
+.avgChip { display: inline-flex; align-items: center; gap: 2px; height: 26px; padding: 0 10px; border: 1px solid color-mix(in srgb, var(--theme-warning) 35%, var(--theme-border)); border-radius: 999px; background: color-mix(in srgb, var(--theme-warning) 9%, var(--theme-surface)); color: var(--theme-warning) !important; font-size: 12px; font-weight: 600; white-space: nowrap; transition: border-color 120ms ease; }
+a.avgChip { padding-right: 6px; }
+a.avgChip:hover { border-color: var(--theme-warning); }
+.avgPop { position: relative; grid-row: 3; grid-column: 1 / -1; justify-self: start; }
+.avgPop > summary { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; color: var(--theme-text-muted); font-size: 12px; font-weight: 500; list-style: none; cursor: pointer; }
+.avgPop > summary::-webkit-details-marker { display: none; }
+.avgPop > summary:hover, .avgPop[open] > summary { color: var(--theme-text); }
+.avgPopBody { position: absolute; z-index: 30; top: calc(100% + 2px); left: -6px; width: min(340px, calc(100vw - 48px)); padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); box-shadow: var(--theme-shadow, 0 8px 24px rgb(15 27 51 / 14%)); color: var(--theme-text-muted); font-size: 12px; line-height: 1.5; }
+.avgPopBody p { margin: 0; overflow-wrap: anywhere; }
+.avgPopBody p + p { margin-top: 6px; }
+.avgPopBody a { color: var(--theme-action); font-weight: 550; }
+.avgMore { color: var(--theme-text-muted); font-size: 12px; line-height: 1.55; }
+.avgMore summary { display: inline-flex; align-items: center; min-height: 32px; color: var(--theme-action); font-size: 13px; font-weight: 550; cursor: pointer; list-style: none; }
+.avgMore summary::-webkit-details-marker { display: none; }
+.avgMore summary::after { content: "›"; margin-left: 6px; transition: transform 160ms ease; }
+.avgMore[open] summary::after { transform: rotate(90deg); }
+.avgMore p { margin: 6px 0; overflow-wrap: anywhere; }
+.avgCompact { display: flex; flex-wrap: wrap; align-items: center; justify-content: inherit; gap: 0 4px; min-width: 0; color: var(--theme-text-muted); font-size: 12px; line-height: 1.4; }
+.avgCompact > span { white-space: nowrap; }
+.avgCompact .avgMore summary { display: inline-grid; width: 24px; min-height: 24px; padding: 0; place-items: center; border-radius: 6px; color: var(--theme-text-muted); }
+.avgCompact .avgMore summary::after { content: none; }
+.avgCompact .avgMore summary:hover, .avgCompact .avgMore[open] summary { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.avgCompact .avgMore[open] { flex-basis: 100%; }
+.avgMoreBody { max-width: 340px; margin-left: auto; padding: 6px 0 2px; text-align: left; white-space: normal; }
+@media (max-width: 899.98px) { .avgMore summary { min-height: 44px; } }
+
+/* Leave request: leave types as tappable choices with what is free (MOBILE-SHELL). */
+.kinds { margin: 0; padding: 0; border: 0; min-width: 0; }
+.kinds legend { margin-bottom: 6px; padding: 0; }
+.kindGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.kind { position: relative; display: grid; gap: 2px; min-height: 52px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: var(--theme-text); cursor: pointer; }
+.kind input { position: absolute; opacity: 0; pointer-events: none; }
+.kind b { font-size: 14px; font-weight: 600; }
+.kind small { color: var(--theme-text-muted); font-size: 12px; }
+.kind[data-on] { border-color: var(--theme-action); background: color-mix(in srgb, var(--theme-action) 8%, var(--theme-surface)); box-shadow: inset 0 0 0 1px var(--theme-action); }
+.kind:has(input:focus-visible) { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+@media (max-width: 899.98px) { .kindGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Pip on the Today card: always on phones (it has no floating dock there), a quiet companion on computers. */
+.today { position: relative; }
+.todayPip { position: absolute; top: 10px; right: 12px; display: grid; place-items: center; width: 52px; height: 52px; pointer-events: none; }
+.todayPip ~ .todayMain { padding-right: 56px; }
+@media (min-width: 900px) { .todayPip { display: none; } .todayPip ~ .todayMain { padding-right: 0; } }
+
+/* Working mode has its own full row on a phone. Every choice stays readable next to the check-in action. */
+.todayActions > .todayOfficeCheck { grid-column: 1 / -1; grid-row: 3; min-width: 0; }
+@media (max-width: 899.98px) {
+  .todayActions { display: flex; flex-wrap: wrap; justify-content: flex-start; width: 100%; min-width: 0; }
+  .todayActions > [role="group"] { flex: 1 1 100%; width: 100%; height: auto; min-height: 48px; }
+  .todayActions > [role="group"] > button { flex: 1; min-height: 44px; padding-inline: 8px; }
+  .todayActions > button { flex: 1; min-height: 44px; }
+  .todayHint { flex-basis: 100%; text-align: left; }
+  .todayActions > .todayOfficeCheck { flex: 1 1 100%; }
+}
+.todayLine a { color: var(--theme-action); font-weight: 600; text-decoration: none; } .todayLine a:hover { text-decoration: underline; }
+/* LAYOUT-SWEEP: where the page scrolls (tablets, phones) the month's side panels take their own height; basis 0 there
+   clamped them to 120 px and cut off their content. */
+@media (max-width: 1179.98px), (max-height: 599.98px) { .monthSide > [class*="__panelFill"] { flex: none; } }
+
+/* POLISH-1: a month calendar never squeezes below readable days (the date and the times, then a tag: "Late",
+   "Home"). On a short or busy desktop page the view scrolls instead (RELEASE-DEV measured 127 px at 1440×900; My desk →
+   Attendance → Your month had 35 px rows with its tags cut off). Wider screens still grow the rows. */
+@media (min-width: 1180px) and (min-height: 600px) {
+  .calendar.calendar { flex: 1 0 auto; min-height: calc(22px + var(--weeks, 6) * 54px); grid-template-rows: 22px repeat(var(--weeks), minmax(50px, 1fr)); }
+}
+
+/* UX-5A: on a day of approved leave, the check-in asks first (a small popover; a sheet on phones). */
+.leaveAsk { display: grid; gap: 6px; max-width: 320px; padding: 14px 14px 12px; font-size: 13.5px; line-height: 1.4; }
+.leaveAsk b { font-size: 14.5px; }
+.leaveAsk small { color: var(--theme-text-muted); font-size: 12px; }
+.leaveAskButtons { display: grid; gap: 6px; margin: 6px 0 2px; }
+.leaveAskButtons .btn, .leaveAskButtons button { justify-content: center; }
+@media (max-width: 599.98px) { .leaveAsk { max-width: none; padding: 16px 16px calc(14px + var(--pulse-safe-bottom, 0px)); } .leaveAskButtons button { min-height: 44px; } }
+
+/* UX-5A: My desk's compact "today" (TodayCard compact): the state and the buttons, nothing else. */
+.today[data-compact] { gap: 10px; padding: 14px; border-radius: 16px; }
+.today[data-compact] .todayTitle { font-size: 17px; }
+.today[data-compact] .todayHint { display: none; }
+.today[data-compact] .todayLine { font-size: 12.5px; }
