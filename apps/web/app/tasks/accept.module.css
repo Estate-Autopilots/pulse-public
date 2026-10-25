@@ -1,0 +1,16 @@
+/* UX-5A: accepting work (accept.tsx). The rating row, the points as the result, the note. */
+.choice { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; min-width: 0; }
+.result { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px; border-radius: 999px; background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface));
+  color: var(--theme-text); font-size: 13px; font-weight: 550; white-space: nowrap; font-variant-numeric: tabular-nums; cursor: help; }
+.result b { font-weight: 700; }
+.result svg { color: var(--theme-action); }
+.result[data-compact] { height: 26px; padding: 0 8px; font-size: 12.5px; }
+.result[data-empty] { padding: 0; background: none; color: var(--theme-text-muted); font-weight: 500; cursor: default; }
+.result:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.note { width: 100%; min-height: 76px; box-sizing: border-box; padding: 8px 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface);
+  color: var(--theme-text); font: inherit; font-size: 14px; line-height: 1.45; resize: vertical; }
+.note:hover { border-color: var(--theme-border-strong); }
+.note:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 0; border-color: transparent; }
+.linkBtn { align-self: flex-start; padding: 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 13px; font-weight: 550; cursor: pointer; }
+.linkBtn:hover { text-decoration: underline; }
+@media (max-width: 899.98px) { .linkBtn { min-height: 44px; } }

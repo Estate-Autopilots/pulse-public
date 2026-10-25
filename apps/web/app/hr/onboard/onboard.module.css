@@ -1,0 +1,124 @@
+/* HR → Onboard team. Desktop: a table that pages inside the window; phones: cards. */
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.team { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.funnel { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.funnel li { position: relative; display: grid; gap: 2px; padding: 10px 12px; overflow: hidden; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.funnel b { font-size: 22px; font-variant-numeric: tabular-nums; }
+.funnel span { color: var(--theme-text-muted); font-size: 12px; }
+.funnel i { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--theme-action); }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.filters { display: flex; gap: 4px; overflow-x: auto; padding: 3px; border-radius: 10px; background: var(--theme-surface-subtle); scrollbar-width: none; }
+.filters button { display: inline-flex; align-items: center; gap: 6px; flex: none; min-height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: var(--theme-text-muted); font: 600 12px/1 inherit; cursor: pointer; white-space: nowrap; }
+.filters button[aria-pressed="true"] { background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.filters span { min-width: 18px; padding: 2px 5px; border-radius: 999px; background: var(--theme-surface-subtle); font-variant-numeric: tabular-nums; }
+.bulk { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; }
+.tableWrap { min-height: 0; overflow: auto; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { position: sticky; top: 0; z-index: 1; padding: 8px 10px; border-bottom: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text-muted); font-size: 12px; font-weight: 600; text-align: left; white-space: nowrap; }
+.table td { padding: 8px 10px; border-bottom: 1px solid var(--theme-border); vertical-align: middle; }
+.table tr:last-child td { border-bottom: 0; }
+.pick { width: 28px; }
+.who { display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.who span { display: grid; min-width: 0; }
+.who b { font-weight: 600; }
+.who small, .sub { display: block; color: var(--theme-text-muted); font-size: 11px; }
+.meter { display: block; width: 96px; height: 6px; overflow: hidden; border-radius: 999px; background: var(--theme-surface-subtle); }
+.meter i { display: block; height: 100%; border-radius: inherit; background: var(--theme-warning); }
+.meter i[data-done] { background: var(--theme-success); }
+.apps { display: inline-flex; gap: 6px; color: var(--theme-text-muted); }
+.apps svg { opacity: 0.35; }
+.apps svg[data-on] { opacity: 1; color: var(--theme-success); }
+.never { color: var(--theme-warning); font-weight: 600; }
+.rowActions { white-space: nowrap; text-align: right; }
+.rowActions > * + * { margin-left: 6px; }
+.empty { margin: 0; padding: 20px; color: var(--theme-text-muted); text-align: center; }
+.foot, .fine { margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.invites { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.invites li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 6px 0; border-bottom: 1px solid var(--theme-border); }
+.invites span { grid-column: 1; color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.invites li > :last-child { grid-row: 1 / 3; grid-column: 2; align-self: center; }
+.confirm { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+
+@media (min-width: 1180px) and (min-height: 600px) { .tableWrap { flex: 1 1 0; } }
+@media (max-width: 899.98px) {
+  .funnel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .funnel li:first-child { grid-column: 1 / -1; }
+  .table thead { display: none; }
+  .table, .table tbody { display: block; }
+  /* One card per person: who and the next step, the profile bar, three small facts, then the actions. */
+  .table tr { display: grid; grid-template-columns: 24px repeat(3, minmax(0, 1fr)); grid-template-areas: "pick person person stage" ". profile profile profile" ". signed first apps" ". actions actions actions";
+    gap: 8px 10px; align-items: center; padding: 12px; border-bottom: 1px solid var(--theme-border); }
+  .table td { display: block; padding: 0; border: 0; min-width: 0; }
+  .table td.pick { grid-area: pick; }
+  .table td[data-label="Person"] { grid-area: person; }
+  .table td[data-label="Next step"] { grid-area: stage; justify-self: end; text-align: right; }
+  .table td[data-label="Profile"] { grid-area: profile; }
+  .table td[data-label="Signed in"] { grid-area: signed; }
+  .table td[data-label="First check-in"] { grid-area: first; }
+  .table td[data-label="Apps"] { grid-area: apps; }
+  .table td[data-label]::before { content: attr(data-label); display: block; color: var(--theme-text-muted); font-size: 11px; }
+  .table td[data-label="Person"]::before, .table td[data-label="Next step"]::before, .table td[data-label="Profile"]::before { display: none; }
+  .table td.rowActions { grid-area: actions; text-align: left; }
+  .meter { width: 100%; }
+}
+
+/* The person drawer */
+.person { display: grid; gap: 14px; }
+.person h3 { margin: 0 0 6px; font-size: 14px; }
+.personLine { margin: 0; font-size: 14px; }
+.personLine span { color: var(--theme-text-muted); }
+.docList { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.docList li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 8px 0; border-top: 1px solid var(--theme-border); }
+.docName { display: grid; flex: 1 1 200px; min-width: 0; }
+.docName small { color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.masked { font-size: 13px; letter-spacing: 0.04em; }
+.docTools { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.reject { display: flex; gap: 6px; flex: 1 1 100%; }
+.reject input { flex: 1; min-height: 34px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; }
+.details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin: 0; }
+.details dt { color: var(--theme-text-muted); font-size: 12px; }
+.details dd { margin: 0; font-size: 13px; overflow-wrap: anywhere; }
+@media (max-width: 599.98px) { .details { grid-template-columns: minmax(0, 1fr); } }
+/* PEOPLE-CONTACTS: on a narrow phone a long name and the next-step badge do not share a line (they overlapped). */
+@media (max-width: 519.98px) {
+  .table tr { grid-template-areas: "pick person person person" ". stage stage stage" ". profile profile profile" ". signed first apps" ". actions actions actions"; }
+  .table td[data-label="Next step"] { justify-self: start; text-align: left; }
+  .table td[data-label="Person"] { min-width: 0; }
+}
+
+/* Settings */
+.settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; min-height: 0; overflow: auto; }
+.card { display: grid; gap: 10px; align-content: start; padding: 16px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); }
+.card h3 { margin: 0; font-size: 15px; }
+.card h4 { margin: 6px 0 0; font-size: 13px; }
+.card p { margin: 0; }
+.choices { display: grid; gap: 8px; }
+.choice { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; cursor: pointer; }
+.choice input { margin: 3px 0 0; accent-color: var(--theme-action); }
+.choice span { display: grid; gap: 2px; }
+.choice small { color: var(--theme-text-muted); font-size: 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; }
+.row > label { flex: 1 1 200px; }
+.kinds { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.kinds li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.kinds li > input { flex: 1 1 180px; min-height: 34px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; }
+.kinds label { display: inline-flex; gap: 4px; align-items: center; font-size: 12px; }
+@media (max-width: 1023.98px) { .settings { grid-template-columns: minmax(0, 1fr); } }
+
+/* Rollout kit */
+.kit { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 12px; min-height: 0; }
+.kitNav { display: grid; gap: 6px; align-content: start; }
+.kitNav button { display: grid; gap: 2px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+.kitNav button[aria-current="true"] { border-color: var(--theme-action); box-shadow: inset 3px 0 0 var(--theme-action); }
+.kitNav small { color: var(--theme-text-muted); font-size: 12px; }
+.kitDoc { display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); }
+.kitHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--theme-border); font-size: 12px; color: var(--theme-text-muted); }
+.kitHead b { color: var(--theme-warning); }
+.kitBody { min-height: 0; overflow: auto; padding: 4px 18px 18px; font-size: 14px; line-height: 1.55; }
+@media (min-width: 1180px) and (min-height: 600px) { .kitNav { overflow: auto; min-height: 0; } }
+@media (max-width: 899.98px) { .kit { grid-template-columns: minmax(0, 1fr); } .kitNav { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* PEOPLE-CONTACTS: bank details on file (never what they are): missing, waiting for HR's check, checked. */
+.bank { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; color: var(--theme-text-muted); font-size: 11px; }
+.bank[data-state="missing"] { color: color-mix(in srgb, var(--theme-warning) 85%, var(--theme-text)); }
+.bank[data-state="pending"] a { color: var(--theme-action); font-weight: 600; }
+.bank[data-state="confirmed"] { color: var(--theme-success); }

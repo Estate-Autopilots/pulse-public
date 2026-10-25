@@ -1,0 +1,4 @@
+.panel { padding-bottom: var(--pulse-companion-dock, 0px); }
+@media (max-width: 760px) {
+  .panel { padding-bottom: calc(var(--pulse-companion-dock, 0px) + 74px + env(safe-area-inset-bottom, 0px)); }
+}

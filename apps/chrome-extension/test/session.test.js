@@ -1,0 +1,4 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {sameSession,ownedEvents} from '../session.js';
+const state={api:'https://native.example.test',session:'synthetic',personId:'one',deviceId:'device-one',trackingEpoch:'before'};
+test('logout, re-enrollment and even a brief pause invalidate a sampled interval',()=>{assert.equal(sameSession(state,{...state}),true);for(const patch of [{session:null},{deviceId:'new-device'},{personId:'two'},{trackingEpoch:'after-pause'}])assert.equal(sameSession(state,{...state,...patch}),false);});
+test('transparency and queue select only the current person/device and unexpired events',()=>{const at=new Date().toISOString();const own={id:'own',personId:'one',deviceId:'device-one',at};assert.deepEqual(ownedEvents([own,{...own,id:'other-person',personId:'two'},{...own,id:'other-device',deviceId:'new-device'},{...own,id:'expired',at:'2000-01-01T00:00:00Z'}],state),[own]);});
