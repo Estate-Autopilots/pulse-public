@@ -1,0 +1,68 @@
+/* BILLING-KIT: one line per thing (LineList, LineRow), the +/− Stepper and the OpenAmount box. Theme tokens only. */
+.list { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+
+.row { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-width: 0; min-height: 48px; padding: 6px 12px;
+  border-top: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); background: var(--theme-surface); }
+.row:first-child { border-top: 0; }
+.row[data-press]:hover { background: color-mix(in srgb, var(--theme-surface-subtle) 60%, var(--theme-surface)); }
+.row[data-selected] { background: color-mix(in srgb, var(--theme-action) 8%, var(--theme-surface)); box-shadow: inset 3px 0 0 var(--theme-action); }
+.row[data-tone="needed"] { background: color-mix(in srgb, var(--theme-warning) 9%, var(--theme-surface)); }
+.row[data-tone="muted"] .title { color: var(--theme-text-muted); }
+
+/* The row's own button or link: stretched over the whole row, so pressing anywhere opens it. */
+.main { display: flex; flex: 1 1 160px; align-items: center; gap: 10px; min-width: 0; padding: 4px 0; border: 0; background: transparent; color: inherit; font: inherit;
+  text-align: left; text-decoration: none; cursor: default; -webkit-tap-highlight-color: transparent; }
+button.main, a.main { cursor: pointer; }
+button.main::after, a.main::after { content: ""; position: absolute; inset: 0; }
+button.main:focus-visible, a.main:focus-visible { outline: none; }
+button.main:focus-visible::after, a.main:focus-visible::after { border-radius: 8px; box-shadow: inset 0 0 0 2px var(--theme-focus); }
+.lead { display: grid; flex: none; place-items: center; color: var(--theme-text-muted); }
+.text { display: flex; flex: 1 1 auto; flex-direction: column; gap: 1px; min-width: 0; }
+.title { overflow: hidden; color: var(--theme-text); font-size: 14px; font-weight: 600; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.sub { overflow: hidden; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.end { position: relative; z-index: 1; display: flex; flex: none; align-items: center; gap: 8px; }
+.amount { position: relative; display: flex; flex: none; flex-direction: column; align-items: flex-end; min-width: 72px; color: var(--theme-text); font-size: 14px; font-weight: 650;
+  font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; pointer-events: none; }
+.amount small { color: var(--theme-text-muted); font-size: 12px; font-weight: 450; }
+
+/* −/+ */
+.stepper { display: inline-flex; flex: none; align-items: center; overflow: hidden; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface); }
+.stepBtn { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; background: transparent; color: var(--theme-action); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.stepBtn:hover:not(:disabled) { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); }
+.stepBtn:active:not(:disabled) { transform: scale(0.92); }
+.stepBtn:disabled { color: var(--theme-text-muted); opacity: 0.45; cursor: not-allowed; }
+.stepBtn:focus-visible, .stepValue:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; border-radius: 999px; }
+/* Two classes: a Stepper inside a form label (ui.module.css's `.field input`) keeps its own look. */
+.stepper .stepValue { flex: none; width: 4ch; min-width: 30px; height: 32px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 700;
+  font-variant-numeric: tabular-nums; text-align: center; }
+.stepper { width: max-content; }
+
+/* An open amount */
+.open { display: inline-flex; flex: none; align-items: center; gap: 8px; }
+.openInput { width: 120px; height: 34px; padding: 0 9px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text);
+  font: inherit; font-size: 14px; font-variant-numeric: tabular-nums; text-align: right; }
+.open[data-state="needed"] .openInput { border-style: dashed; border-color: color-mix(in srgb, var(--theme-warning) 75%, var(--theme-border)); }
+.openInput:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.openLink { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 2px; border: 0; background: transparent; color: var(--theme-text-muted);
+  font: inherit; font-size: 12.5px; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.openLink:hover { color: var(--theme-text); }
+.openNo { color: var(--theme-text-muted); font-size: 13px; font-style: italic; }
+
+@media (max-width: 899.98px) {
+  .stepBtn { width: 44px; height: 44px; }
+  .stepper .stepValue { height: 44px; }
+  .openInput { height: 44px; }
+  .openLink { min-height: 44px; }
+}
+/* A phone: names wrap to two lines instead of losing their end. */
+@media (max-width: 599.98px) {
+  .title { display: -webkit-box; overflow: hidden; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+}
+@media (max-width: 419.98px) {
+  .row { padding: 6px 10px; gap: 4px 10px; }
+  .amount { min-width: 0; }
+  .openInput { width: 104px; }
+  .row[data-stack] .main { flex-basis: 100%; }
+  .row[data-stack] .end { margin-left: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .stepBtn:active:not(:disabled) { transform: none; } }

@@ -1,0 +1,8 @@
+/* The project page (owner workbench, 21 Oct 2026): a glance strip over the tasks; settings and history in the side. */
+.glance { display: grid; gap: 10px; padding: 14px 18px; border-radius: var(--ds-radius-xl); background: var(--theme-surface); box-shadow: var(--ds-elev-1); }
+.bar { display: block; height: 6px; overflow: hidden; border-radius: 6px; background: color-mix(in srgb, var(--theme-text) 8%, transparent); }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--theme-action); }
+.settings { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 14px 14px; }
+.fold > summary { display: flex; align-items: center; gap: 7px; padding: 12px 14px; color: var(--theme-text); font-size: var(--ds-text-md); font-weight: var(--ds-weight-strong); cursor: pointer; list-style: none; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary small { margin-left: auto; color: var(--theme-text-muted); font-weight: var(--ds-weight-regular); }
