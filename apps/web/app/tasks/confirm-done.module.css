@@ -1,0 +1,4 @@
+/* EST-997: the circle asks before it closes a task (confirm-done.tsx). A ring, not a size change: nothing moves. */
+button.armed { border-color: var(--theme-success); color: var(--theme-success); background: color-mix(in srgb, var(--theme-success) 14%, var(--theme-surface)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-success) 30%, transparent); }
+@media (prefers-reduced-motion: no-preference) { button.armed { animation: ask 900ms ease-in-out infinite alternate; } }
+@keyframes ask { to { box-shadow: 0 0 0 5px color-mix(in srgb, var(--theme-success) 12%, transparent); } }

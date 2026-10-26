@@ -1,0 +1,126 @@
+/* CHAT-SHELL (22 Oct 2026): the chat-first home, the intent chips under messages and the drop target. */
+
+/* ---------- Intent chips ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 5px 2px 0; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px 0 9px; border: 1px solid color-mix(in srgb, var(--theme-action) 28%, transparent); border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-action) 8%, var(--theme-surface)); color: var(--theme-action); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  animation: chip-in 260ms var(--ds-ease, ease) both; transition: background var(--ds-fast, 140ms) ease, transform var(--ds-fast, 140ms) var(--ds-ease, ease); }
+.chip:hover { background: color-mix(in srgb, var(--theme-action) 15%, var(--theme-surface)); }
+.chip:active { transform: scale(.96); }
+@keyframes chip-in { from { opacity: 0; translate: 0 4px; } }
+
+/* ---------- Dropping files and links on the conversation ---------- */
+.drop { position: absolute; inset: 8px; z-index: 25; display: grid; place-items: center; border: 2px dashed color-mix(in srgb, var(--theme-action) 60%, transparent); border-radius: 16px;
+  background: color-mix(in srgb, var(--theme-action) 8%, color-mix(in srgb, var(--theme-surface) 82%, transparent)); backdrop-filter: blur(2px); pointer-events: none; animation: chip-in 160ms ease both; }
+.drop span { display: grid; justify-items: center; gap: 8px; color: var(--theme-action); font-size: 15px; font-weight: 650; }
+.drop small { color: var(--theme-text-muted); font-size: 12.5px; font-weight: 500; }
+
+/* ---------- The chat-first home ---------- */
+.start { position: relative; flex: 1 1 0; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; background: var(--chat-bg, var(--theme-canvas)); }
+.startTop { position: sticky; top: 0; z-index: 2; display: flex; justify-content: flex-end; padding: 10px 12px 0; pointer-events: none; }
+.startToggle { pointer-events: auto; position: relative; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: none; color: var(--theme-text-muted); cursor: pointer; }
+.startToggle:hover { background: var(--ds-hover); color: var(--theme-text); }
+.startMain { width: min(720px, 100%); margin: 0 auto; padding: clamp(16px, 9vh, 96px) 24px 32px; display: grid; gap: 14px; }
+.hello { display: flex; align-items: center; gap: 12px; margin: 0; font-size: clamp(24px, 3vw, 30px); font-weight: 650; letter-spacing: -0.02em; animation: rise 360ms var(--ds-ease, ease) both; }
+.lede { margin: -6px 0 6px; color: var(--theme-text-muted); font-size: 14.5px; animation: rise 360ms 40ms var(--ds-ease, ease) both; }
+@keyframes rise { from { opacity: 0; translate: 0 8px; } }
+.box { position: relative; display: grid; border: 1px solid var(--theme-border); border-radius: 20px; background: var(--theme-surface); box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 12px 32px rgb(24 20 60 / 6%);
+  transition: border-color var(--ds-fast, 140ms) ease, box-shadow var(--ds-base, 220ms) var(--ds-ease, ease); animation: rise 360ms 80ms var(--ds-ease, ease) both; }
+.box:focus-within { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-action) 12%, transparent), 0 14px 36px rgb(24 20 60 / 8%); }
+.box textarea { min-height: 58px; max-height: 180px; padding: 16px 18px 6px; border: 0; background: none; color: var(--theme-text); font: inherit; font-size: 15.5px; line-height: 1.45; resize: none; outline: none; }
+.box textarea:focus, .box textarea:focus-visible { outline: none; box-shadow: none; }
+.box textarea::placeholder { color: color-mix(in srgb, var(--theme-text-muted) 85%, transparent); }
+.boxBar { display: flex; align-items: center; gap: 6px; padding: 6px 8px 8px 12px; }
+.boxChip { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 11px; border: 1px solid var(--theme-border); border-radius: 999px; background: none; color: var(--theme-text-muted); font: inherit; font-size: 12.5px; font-weight: 550; cursor: pointer;
+  transition: background var(--ds-fast, 140ms) ease, color var(--ds-fast, 140ms) ease; }
+.boxChip:hover { background: var(--ds-hover); color: var(--theme-text); }
+.boxChip > span { font-weight: 700; }
+.go { margin-left: auto; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--theme-text); color: var(--theme-surface); cursor: pointer;
+  transition: opacity var(--ds-fast, 140ms) ease, transform var(--ds-fast, 140ms) var(--ds-ease, ease); }
+.go:disabled { opacity: .25; cursor: default; }
+.go:not(:disabled):active { transform: scale(.92); }
+.box[data-filled] .go { background: var(--theme-action); color: var(--theme-action-text); }
+.rows { display: grid; gap: 2px; margin: 0 8px 8px; padding-top: 6px; border-top: 1px solid var(--ds-line, var(--theme-border)); }
+.rows button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border: 0; border-radius: 10px; background: none; color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+.rows button[aria-selected="true"] { background: var(--ds-hover); }
+.rows button > span:last-child { display: grid; min-width: 0; }
+.rows b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13.5px; font-weight: 600; }
+.rows small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--theme-text-muted); }
+.rowIcon { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); font-weight: 700; font-size: 13px; }
+.nothing { margin: 0 18px 14px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.nothing button { padding: 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.quick { display: flex; flex-wrap: wrap; gap: 8px; animation: rise 360ms 120ms var(--ds-ease, ease) both; }
+.quick button { display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px; border: 1px solid var(--ds-line, var(--theme-border)); border-radius: 999px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 550; cursor: pointer;
+  transition: transform var(--ds-fast, 140ms) var(--ds-ease, ease), box-shadow var(--ds-fast, 140ms) ease; }
+.quick button:hover { box-shadow: var(--ds-elev-2); transform: translateY(-1px); }
+.quick button svg { color: var(--theme-action); }
+.recent { margin-top: 14px; display: grid; gap: 8px; animation: rise 360ms 160ms var(--ds-ease, ease) both; }
+.recent h3 { margin: 0; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--theme-text-muted); }
+.recentGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.recentGrid button { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; border: 0; border-radius: 14px; background: var(--theme-surface); box-shadow: var(--ds-elev-1); color: var(--theme-text); font: inherit; text-align: left; cursor: pointer;
+  transition: transform var(--ds-fast, 140ms) var(--ds-ease, ease), box-shadow var(--ds-fast, 140ms) ease; }
+.recentGrid button:hover { box-shadow: var(--ds-elev-2); transform: translateY(-1px); }
+.recentText { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.recentGrid b { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.recentGrid b i { flex: none; display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--theme-action); color: var(--theme-action-text); font-size: 10.5px; font-style: normal; font-weight: 700; }
+.recentGrid small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--theme-text-muted); font-size: 12.5px; }
+.recentGrid time { flex: none; align-self: flex-start; color: var(--theme-text-muted); font-size: 11.5px; }
+.startFoot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--ds-line, var(--theme-border)); color: var(--theme-text-muted); font-size: 12.5px; }
+.startFoot > button, .startFoot > a { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: var(--theme-text-muted); font: inherit; font-weight: 550; cursor: pointer; text-decoration: none; }
+.startFoot > button:hover, .startFoot > a:hover { color: var(--theme-action); }
+.lockNote { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; font-size: 11.5px; }
+@media (max-width: 899.98px) {
+  .startTop { display: none; }
+  .startMain { padding: 20px 14px 28px; }
+  .hello { font-size: 23px; }
+  .box textarea { font-size: 16px; }
+  .recentGrid { grid-template-columns: 1fr; }
+  .lockNote { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .hello, .lede, .box, .quick, .recent, .chip, .drop { animation: none; } }
+
+/* ---------- Needs you (J1, J12) ---------- */
+.needs { margin-top: 10px; display: grid; gap: 8px; animation: rise 360ms 150ms var(--ds-ease, ease) both; }
+.needs > h3 { margin: 0; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--theme-text-muted); }
+.needGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; }
+.need { display: grid; align-content: start; gap: 2px; padding: 12px 10px 8px; border-radius: 16px; background: var(--theme-surface); box-shadow: var(--ds-elev-1); }
+.need h4 { display: flex; align-items: center; gap: 7px; margin: 0 6px 6px; font-size: 13px; font-weight: 650; }
+.need h4 svg { color: var(--theme-action); }
+.need h4 i { display: inline-grid; place-items: center; min-width: 20px; height: 18px; padding: 0 6px; border-radius: 9px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 11px; font-style: normal; font-weight: 700; }
+.need h4 i[data-tone="late"] { background: color-mix(in srgb, var(--theme-danger) 14%, var(--theme-surface)); color: var(--theme-danger); }
+.needRow { display: flex; align-items: center; gap: 6px; min-height: 44px; border-radius: 10px; transition: background var(--ds-fast, 140ms) ease; }
+.needRow:hover { background: var(--ds-hover); }
+.needMain { flex: 1; min-width: 0; display: grid; gap: 1px; padding: 5px 6px; border: 0; background: none; color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+.needMain b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13.5px; font-weight: 550; }
+.needMain small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--theme-text-muted); }
+.due { flex: none; display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 6px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 11.5px; font-weight: 600; }
+.due[data-late] { background: color-mix(in srgb, var(--theme-danger) 12%, var(--theme-surface)); color: var(--theme-danger); }
+.doneBtn { flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin-right: 4px; border: 1.5px solid var(--theme-border-strong); border-radius: 50%; background: var(--theme-surface); color: transparent; cursor: pointer;
+  transition: border-color var(--ds-fast, 140ms) ease, color var(--ds-fast, 140ms) ease, background var(--ds-fast, 140ms) ease, transform var(--ds-fast, 140ms) var(--ds-ease, ease); }
+.doneBtn:hover { border-color: var(--theme-success); color: var(--theme-success); }
+.doneBtn:active { transform: scale(.9); background: var(--theme-success); color: #fff; }
+.nudge { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 28px; margin-right: 4px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.nudge:hover { border-color: color-mix(in srgb, var(--theme-action) 50%, transparent); color: var(--theme-action); }
+.needMore { justify-self: start; margin: 4px 6px 2px; padding: 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.needMore:hover { text-decoration: underline; text-underline-offset: 2px; }
+.clear { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--theme-surface); box-shadow: var(--ds-elev-1); color: var(--theme-text-muted); font-size: 13.5px; }
+.needSk { display: grid; gap: 8px; padding: 6px; }
+.needSk span { height: 30px; border-radius: 8px; background: var(--theme-surface-subtle); animation: sk 1.2s ease-in-out infinite; }
+@keyframes sk { 50% { opacity: .5; } }
+@media (max-width: 899.98px) { .needGrid { grid-template-columns: 1fr; } .doneBtn { width: 40px; height: 40px; } }
+
+/* Owner workbench UI (22 Oct 2026): the side panel's toggle on the chat home is a labelled floating pill (glass, as the
+   Focus home keeps glass for floating controls), not a lone icon in the empty top corner. */
+.startToggle { width: auto; height: 34px; gap: 7px; grid-auto-flow: column; padding: 0 13px 0 11px; border-radius: 999px; background: var(--ds-glass-strong);
+  -webkit-backdrop-filter: var(--ds-glass-blur); backdrop-filter: var(--ds-glass-blur); box-shadow: var(--ds-glass-edge), 0 6px 18px rgb(20 18 50 / 8%);
+  color: var(--theme-text); font: inherit; font-size: 12.5px; font-weight: 600; transition: transform var(--ds-fast, 140ms) var(--ds-ease, ease), box-shadow var(--ds-fast, 140ms) ease; }
+.startToggle::after { content: "Side panel"; }
+.startToggle[aria-pressed="true"]::after { content: "Hide panel"; }
+.startToggle:hover { background: var(--ds-glass-strong); transform: translateY(-1px); box-shadow: var(--ds-glass-edge), var(--ds-glass-shadow); }
+.startToggle > svg { color: var(--theme-action); }
+@media (prefers-reduced-transparency: reduce) { .startToggle { background: var(--theme-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+
+/* Owner workbench UI: in the header row, at its right end (beside the bell), not in a band of its own above the home. */
+.startBar { display: flex; flex: 1 1 auto; align-items: center; justify-content: flex-end; min-width: 0; padding: 0 8px; }
+.startBar .startToggle { height: 32px; box-shadow: var(--ds-glass-edge); }
+@media (min-width: 900px) { .startMain { padding-top: clamp(16px, 6vh, 64px); } }
