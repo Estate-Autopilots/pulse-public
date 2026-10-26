@@ -1,0 +1,14 @@
+/* R47: imported WhatsApp history, read-only. */
+.dialog { width: min(640px, 100%); height: min(760px, calc(100dvh - 32px)); }
+.dialog h2 { display: inline-flex; align-items: center; gap: 8px; }
+.note { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.5; }
+.list { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 2px; padding: 8px; border-radius: 12px; background: var(--chat-bg, var(--theme-surface-subtle)); }
+.slot { display: flex; flex-direction: column; }
+.message { align-self: flex-start; max-width: min(85%, 520px); margin-top: 4px; padding: 6px 10px 6px; border-radius: 12px; background: var(--bubble-in, var(--theme-surface)); box-shadow: 0 1px 0.5px rgb(11 20 26 / 13%); font-size: 14px; line-height: 1.42; }
+.message[data-mine] { align-self: flex-end; background: var(--bubble-out, var(--theme-surface)); }
+.message b { display: block; font-size: 12.5px; color: var(--theme-action); }
+.message b small { font-weight: 500; color: var(--theme-text-muted); }
+.message p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.message time { display: block; text-align: right; font-size: 11px; color: var(--theme-text-muted); }
+.media { display: inline-flex; align-items: center; gap: 6px; color: var(--theme-text-muted); font-size: 13px; font-style: italic; }
+.banner { align-self: center; display: inline-flex; align-items: center; gap: 7px; margin: 6px 0 4px; padding: 6px 14px; border: 0; border-radius: 999px; background: var(--theme-surface); color: var(--theme-action); font: inherit; font-size: 12.5px; font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / 8%); cursor: pointer; }

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# pulse-dev-warm: after the dev web server (re)starts, compile the routes people open first so nobody waits for the
+# first compile of /dashboard (20–60 s on this box). Runs at idle priority, one route at a time, without an identity
+# header: the route compiles and renders its "sign in" message, so no API call, no audit row and no data is touched.
+#
+#   pulse-dev-warm [port]        default port 3200; PULSE_DEV_WARM_ROUTES overrides the list (comma-separated)
+set -u
+PORT=${1:-${PULSE_DEV_PORT:-3200}}
+ROUTES=${PULSE_DEV_WARM_ROUTES:-/dashboard,/leadership,/people,/projects,/clients,/tasks,/me,/me/work,/hr,/finance,/acquisition,/delivery,/map,/settings,/contacts,/briefs,/chats,/money}
+LOG=${PULSE_DEV_WARM_LOG:-$HOME/ea-intel/logs/pulse-dev-warm.log}
+mkdir -p "$(dirname "$LOG")"
+stamp() { date -u +%FT%TZ; }
+
+# Wait for the server to answer at all (the dev server compiles its proxy first: up to a minute or two under load).
+# Any HTTP status counts: /healthz says 503 whenever the API is slow, which says nothing about the dev server.
+for _ in $(seq 120); do
+  [[ $(curl -s -o /dev/null -m 10 -w '%{http_code}' "http://127.0.0.1:$PORT/healthz" 2>/dev/null || echo 000) != 000 ]] && break
+  sleep 2
+done
+
+started=$(date +%s)
+IFS=, read -ra list <<< "$ROUTES"
+for route in "${list[@]}"; do
+  t0=$(date +%s%N)
+  code=$(curl -s -o /dev/null -m 180 -w '%{http_code}' "http://127.0.0.1:$PORT$route" 2>/dev/null || true); code=${code:-000}
+  ms=$(( ($(date +%s%N) - t0) / 1000000 ))
+  printf '%s warm %s %s %sms\n' "$(stamp)" "$route" "$code" "$ms" >> "$LOG"
+done
+printf '%s warmed %s routes in %ss\n' "$(stamp)" "${#list[@]}" "$(( $(date +%s) - started ))" >> "$LOG"

@@ -1,0 +1,7 @@
+[Unit]
+Description=Restart the Pulse dev server at 02:30 IST
+[Timer]
+OnCalendar=*-*-* 02:30:00 Asia/Kolkata
+AccuracySec=1m
+[Install]
+WantedBy=timers.target

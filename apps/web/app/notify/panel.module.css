@@ -1,0 +1,126 @@
+/* The notification panel: a floating card under the bell on a computer, a full-screen sheet on a phone. */
+.layer { position: fixed; z-index: var(--ds-z-popover, 90); inset: 0; pointer-events: none; }
+.panel { position: fixed; top: 54px; display: flex; flex-direction: column; width: min(412px, calc(100vw - 24px)); max-height: min(680px, calc(100dvh - 72px));
+  overflow: hidden; border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-surface); color: var(--theme-text); pointer-events: auto;
+  box-shadow: 0 24px 60px rgb(24 20 60 / 18%), 0 3px 10px rgb(24 20 60 / 7%); transform-origin: calc(100% - 24px) -8px;
+  animation: panel-in 360ms linear(0, .2 6%, .58 15%, .86 25%, 1.01 36%, 1.04 45%, 1.02 60%, 1) both; }
+:root[data-theme="dark"] .panel { box-shadow: 0 24px 60px rgb(0 0 0 / 55%), 0 0 0 1px rgb(255 255 255 / 4%); }
+@keyframes panel-in { from { opacity: 0; transform: translateY(-6px) scale(.94); } }
+
+.head { display: flex; flex: none; align-items: center; gap: 8px; padding: 14px 12px 8px 18px; }
+.head h2 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -0.01em; }
+.count { flex: 1 1 auto; color: var(--theme-text-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.headBtn, .close, .read, .settings { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: transparent; color: var(--theme-text-muted); font: inherit; cursor: pointer; }
+.headBtn { min-height: 32px; padding: 0 10px; border-radius: 9px; font-size: 13px; font-weight: 600; }
+.headBtn:disabled { opacity: .45; cursor: default; }
+.close { width: 34px; height: 34px; border-radius: 10px; }
+.headBtn:not(:disabled):hover, .close:hover, .read:hover, .settings:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+
+.filters { display: flex; flex: none; gap: 6px; padding: 2px 16px 10px; overflow-x: auto; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.filters button { display: inline-flex; flex: none; align-items: center; gap: 6px; min-height: 30px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 999px;
+  background: var(--theme-surface); color: var(--theme-text-muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.filters button[aria-pressed="true"] { border-color: transparent; background: color-mix(in srgb, var(--theme-action) 13%, var(--theme-surface)); color: var(--theme-action); }
+.filters b { min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--theme-action); color: var(--theme-action-text); font-size: 11px; line-height: 18px; text-align: center; }
+
+.scroll { flex: 1 1 auto; min-height: 0; padding: 0 8px 10px; overflow-y: auto; overscroll-behavior: contain; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); }
+.group h3 { display: flex; align-items: center; gap: 8px; margin: 12px 10px 4px; color: var(--theme-text-muted); font-size: 12px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+.group h3 span { padding: 0 6px; border-radius: 999px; background: var(--theme-surface-subtle); font-size: 11px; letter-spacing: 0; line-height: 18px; }
+.group ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+
+.card { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr) 28px; gap: 10px; padding: 10px 6px 10px 10px; border-radius: 13px; outline: none; transition: background-color 120ms ease; }
+.card:hover { background: var(--theme-surface-subtle); }
+.card:focus-visible { box-shadow: inset 0 0 0 2px var(--theme-focus); }
+.card[data-unread] { background: color-mix(in srgb, var(--theme-action) 5%, transparent); }
+.card[data-unread]:hover { background: color-mix(in srgb, var(--theme-action) 9%, transparent); }
+.lead { display: grid; place-items: start center; padding-top: 1px; }
+.typeIcon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 11px; background: color-mix(in srgb, var(--theme-action) 11%, var(--theme-surface)); color: var(--theme-action); }
+.main { display: grid; gap: 3px; min-width: 0; }
+.title { display: -webkit-box; overflow: hidden; color: var(--theme-text); font-size: 14px; font-weight: 550; line-height: 1.35; text-decoration: none; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.card[data-unread] .title { font-weight: 650; }
+.title:hover { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--theme-text) 35%, transparent); text-underline-offset: 3px; }
+.title:focus-visible { border-radius: 4px; outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.body { display: -webkit-box; margin: 0; overflow: hidden; color: var(--theme-text-muted); font-size: 13px; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+.meta { margin: 0; color: var(--theme-text-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.side { display: grid; justify-items: center; align-content: start; gap: 6px; padding-top: 4px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--theme-action); }
+.read { width: 28px; height: 28px; border-radius: 8px; opacity: 0; }
+.card:hover .read, .card:focus-within .read, .read:focus-visible { opacity: 1; }
+
+.actionArea { display: grid; gap: 6px; margin-top: 6px; }
+.buttons, .reply { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.primary, .secondary, .ghost { min-height: 30px; padding: 0 12px; border-radius: 9px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
+.primary { border: 1px solid transparent; background: var(--theme-action); color: var(--theme-action-text); }
+.primary:hover:not(:disabled) { background: var(--theme-action-hover); }
+.secondary { border: 1px solid var(--theme-border-strong, var(--theme-border)); background: var(--theme-surface); color: var(--theme-text); }
+.secondary:hover:not(:disabled) { background: var(--theme-surface-subtle); }
+.ghost { border: 0; background: transparent; color: var(--theme-text-muted); }
+.primary:disabled, .secondary:disabled { opacity: .6; cursor: progress; }
+.primary:focus-visible, .secondary:focus-visible, .ghost:focus-visible, .headBtn:focus-visible, .close:focus-visible, .read:focus-visible, .filters button:focus-visible, .inbox:focus-visible, .settings:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.reply input { flex: 1 1 160px; min-width: 0; min-height: 32px; padding: 0 10px; border: 1px solid var(--theme-border-strong, var(--theme-border)); border-radius: 9px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; }
+.reply input:focus { border-color: var(--theme-action); outline: 2px solid color-mix(in srgb, var(--theme-action) 25%, transparent); }
+.choice { display: inline-flex; flex-basis: 100%; min-width: 0; }
+.done, .stateLabel { display: inline-flex; align-items: center; gap: 5px; margin: 4px 0 0; font-size: 13px; font-weight: 600; }
+.done { color: var(--theme-success, #1a7f4b); animation: done-in 260ms ease-out both; }
+.stateLabel { color: var(--theme-text-muted); font-weight: 550; }
+.error { margin: 0; color: var(--theme-danger, #c62f3a); font-size: 13px; }
+@keyframes done-in { from { opacity: 0; transform: translateY(3px); } }
+
+.empty { display: grid; justify-items: center; gap: 6px; padding: 36px 24px 40px; text-align: center; }
+.empty p { display: grid; gap: 4px; max-width: 280px; margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+.empty b { color: var(--theme-text); font-size: 15px; }
+.skeleton { display: grid; gap: 10px; padding: 16px 10px; }
+.skeleton span { height: 52px; border-radius: 12px; background: linear-gradient(90deg, var(--theme-surface-subtle), color-mix(in srgb, var(--theme-surface-subtle) 40%, var(--theme-surface)), var(--theme-surface-subtle)); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.ping { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 10px; margin: 0; padding: 8px 16px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); color: var(--theme-text-muted); font-size: 12px; line-height: 1.4; }
+.ping button { flex: none; min-height: 28px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 12px; font-weight: 650; cursor: pointer; }
+.foot { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px 10px 14px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); }
+.inbox { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 10px; border-radius: 9px; color: var(--theme-action); font-size: 13px; font-weight: 650; text-decoration: none; }
+.inbox:hover { background: color-mix(in srgb, var(--theme-action) 9%, transparent); }
+.settings { min-height: 32px; padding: 0 10px; border-radius: 9px; font-size: 13px; font-weight: 600; text-decoration: none; }
+
+/* Phone: the whole screen, above the tab bar, with the phone's safe areas; it rises instead of popping. */
+.layer[data-phone] { background: rgb(8 12 22 / 32%); pointer-events: auto; animation: fade 160ms ease-out both; }
+.layer[data-phone] .panel { inset: 0; width: 100%; max-height: none; border: 0; border-radius: 0; transform-origin: 50% 100%;
+  padding: var(--pulse-safe-top, env(safe-area-inset-top, 0px)) var(--pulse-safe-right, 0px) var(--pulse-safe-bottom, env(safe-area-inset-bottom, 0px)) var(--pulse-safe-left, 0px);
+  animation: sheet-in 340ms linear(0, .25 8%, .66 20%, .9 33%, 1.01 48%, 1) both; }
+.layer[data-phone] .head { padding: 10px 8px 8px 18px; }
+.layer[data-phone] .head h2 { font-size: 18px; }
+.layer[data-phone] .headBtn span { display: none; }
+.layer[data-phone] .headBtn, .layer[data-phone] .close { min-width: 44px; min-height: 44px; }
+.layer[data-phone] .read { opacity: 1; width: 36px; height: 36px; }
+.layer[data-phone] .primary, .layer[data-phone] .secondary { min-height: 38px; padding: 0 14px; }
+.layer[data-phone] .filters button { min-height: 36px; }
+@keyframes sheet-in { from { opacity: .4; transform: translateY(28px); } }
+@keyframes fade { from { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .panel, .layer[data-phone], .layer[data-phone] .panel, .done { animation: none; }
+  .skeleton span { animation: none; }
+}
+
+/* ATT: urgent sits on top with a quiet red edge; a stack folds several of one kind into one line. */
+.group[data-priority="urgent"] h3 { color: var(--theme-danger, #c62828); }
+.group[data-priority="urgent"] .card { box-shadow: inset 3px 0 0 var(--theme-danger, #c62828); }
+.stack { list-style: none; }
+.stack[data-unread] > .card { background: color-mix(in srgb, var(--theme-action) 5%, transparent); }
+.stack[data-unread] > .card .title { font-weight: 650; }
+.stackToggle { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.stackToggle svg { flex: none; color: var(--theme-text-muted); transition: transform 140ms ease; }
+.stackToggle svg[data-open] { transform: rotate(180deg); }
+.stackToggle:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 6px; }
+.stackItems { margin: 0 0 4px 22px; padding: 0 0 0 10px; border-left: 2px solid var(--theme-border-subtle, var(--theme-surface-subtle)); }
+/* FLOAT-2 (device audit): a long link in a title wraps inside the card (a Google Docs address ran past the screen). */
+.title { overflow-wrap: anywhere; }
+.main { overflow-wrap: anywhere; }
+/* FLOAT-2: a phone's fingers: the panel's own controls are at least 44 px to press. */
+@media (max-width: 899.98px) {
+  .headBtn { min-height: 44px; }
+  .close { width: 44px; height: 44px; }
+  .filters button { min-height: 44px; }
+  .stackToggle { position: relative; min-height: 32px; }
+  .stackToggle::after { content: ""; position: absolute; inset: -8px -4px; }
+  .read { width: 44px; height: 44px; }
+  .reply input { min-height: 44px; }
+}
