@@ -1,0 +1,56 @@
+{
+  "id": "02-focus-home",
+  "title": {"en": "Focus home: your day in one glance", "hi": "Focus home: poora din ek nazar mein"},
+  "persona": "Meera Shah, founder of Brightside Studio (fictional demo company)",
+  "takes": [
+    {
+      "id": "r2",
+      "setup": [
+        {"do": "login", "user": "meera.shah"},
+        {"do": "storage", "key": "pulse.home.snooze", "value": null},
+        {"do": "cookie", "name": "pulse.home.mode", "value": "focus"},
+        {"do": "goto", "url": "/dashboard"}
+      ],
+      "steps": [
+        {"do": "mark", "mark": "start"},
+        {"do": "wait", "ms": 1300},
+        {"do": "appear", "sel": "section[aria-label=\"At a glance\"]", "mark": "glance", "zoom": 1.18, "sfx": "none"},
+        {"do": "wait", "ms": 1500},
+        {"do": "appear", "sel": "section[aria-label=\"Next up\"]", "mark": "nextup", "zoom": 1.22, "sfx": "none"},
+        {"do": "wait", "ms": 1500},
+        {"do": "tap", "role": "button", "name": "Later", "exact": true, "mark": "later", "zoom": 1.3},
+        {"do": "wait", "ms": 1500},
+        {"do": "mark", "mark": "next2"},
+        {"do": "tap", "role": "link", "name": "Max", "exact": true, "mark": "max", "zoom": 1.35},
+        {"do": "wait", "ms": 1800},
+        {"do": "mark", "mark": "maxview"},
+        {"do": "scroll", "dy": 640, "mark": "scroll"},
+        {"do": "wait", "ms": 1500},
+        {"do": "tap", "role": "link", "name": "Focus", "exact": true, "mark": "focus", "zoom": 1.35},
+        {"do": "wait", "ms": 1500},
+        {"do": "tap", "sel": "section[aria-label=\"Next up\"] :is(a,button)", "nth": 0, "mark": "cta", "zoom": 1.35},
+        {"do": "wait", "ms": 2200},
+        {"do": "mark", "mark": "end"}
+      ]
+    }
+  ],
+  "beats": [
+    {"id": "hook", "take": "r2", "from": "start", "from_offset": 20, "to": "glance", "to_offset": 30, "camera": {"cx": 585, "cy": 760, "z": 1.0},
+     "hook": {"en": "Your day in one glance", "hi": "Poora din, ek nazar mein"},
+     "line": {"en": {"say": "[excited] Your whole day... in one glance!", "cap": "Your whole day... in *one* *glance!*"},
+              "hi": {"say": "[excited] आपका पूरा दिन, एक नज़र में!", "cap": "Aapka poora din, ek *nazar* mein!"}}},
+    {"id": "glance", "take": "r2", "from": "glance", "to": "nextup", "to_offset": -4,
+     "line": {"en": {"say": "Focus shows only what matters. Like money owed to you.", "cap": "*Focus* shows only what matters. Like money owed to you."},
+              "hi": {"say": "Focus सिर्फ ज़रूरी चीज़ें दिखाता है, जैसे clients का बाकी पैसा।", "cap": "*Focus* sirf zaroori cheezein dikhata hai, jaise clients ka baaki paisa."}}},
+    {"id": "nextup", "take": "r2", "from": "nextup", "to": "next2",
+     "line": {"en": {"say": "Next up is the one thing to do now. Not now? Tap Later.", "cap": "*Next* *up* is the one thing to do now. Not now? Tap Later."},
+              "hi": {"say": "Next up बताता है अभी क्या करना है। अभी नहीं? Later दबाइए।", "cap": "*Next* *up* batata hai abhi kya karna hai. Abhi nahi? Later dabaiye."}}},
+    {"id": "max", "take": "r2", "from": "max", "to": "focus", "to_offset": -6,
+     "line": {"en": {"say": "Want every number? Switch to Max.", "cap": "Want every number? Switch to *Max.*"},
+              "hi": {"say": "सारे numbers चाहिए? Max पर जाइए।", "cap": "Saare numbers chahiye? *Max* par jaiye."}}},
+    {"id": "done", "take": "r2", "from": "focus", "to": "end", "payoff": true,
+     "line": {"en": {"say": "[happy] Back to Focus. One tap, and it's done.", "cap": "Back to Focus. *One* *tap,* and it's done."},
+              "hi": {"say": "[happy] वापस Focus पर। एक tap, और काम हो गया।", "cap": "Wapas Focus par. *Ek* *tap,* aur kaam ho gaya."}}}
+  ],
+  "end": {"frames": 27, "text": {"en": "Your day, one glance", "hi": "Din ek nazar mein"}}
+}

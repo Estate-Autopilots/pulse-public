@@ -1,0 +1,84 @@
+apply plugin: 'com.android.application'
+
+// Pulse for Android: the production Pulse web app in a thin Capacitor shell. The application id and the durable
+// release key are the Expo app's (com.pulse.work.mobile), so this build installs over 0.3.5/1.0.0 on testers' phones.
+// versionCode follows the Pulse formula major*1000000 + minor*1000 + patch; the published Expo 1.0.0 APK is 1000000.
+def pulseVersion = '1.1.4'
+def pulseCode = pulseVersion.tokenize('.').collect { it as int }.with { it[0] * 1000000 + it[1] * 1000 + it[2] }
+
+android {
+    namespace = "com.pulse.work.mobile"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.pulse.work.mobile"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode pulseCode
+        versionName pulseVersion
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        // The durable Pulse signing identity comes only from the build runner's secrets (PKCS12, alias "pulse").
+        if (System.getenv("PULSE_ANDROID_KEYSTORE")) {
+            pulseRelease {
+                storeFile file(System.getenv("PULSE_ANDROID_KEYSTORE"))
+                storeType "PKCS12"
+                storePassword System.getenv("PULSE_ANDROID_KEY_PASSWORD")
+                keyAlias "pulse"
+                keyPassword System.getenv("PULSE_ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Validation builds without the secret are signed with the debug key so the emulator can install them;
+            // they cannot replace a published Pulse APK.
+            signingConfig System.getenv("PULSE_ANDROID_KEYSTORE") ? signingConfigs.pulseRelease : signingConfigs.debug
+        }
+    }
+    testBuildType "release"
+    lint {
+        abortOnError false
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation "androidx.browser:browser:$androidxBrowserVersion"
+    implementation "androidx.work:work-runtime:$androidxWorkVersion"
+    // PRESENCE-ONBOARD: OS-managed geofences for office arrival (battery-friendly; Pulse never polls location).
+    implementation "com.google.android.gms:play-services-location:21.3.0"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test:runner:1.7.0"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+// Real push needs the owner's Firebase project. Until google-services.json exists the FCM seam stays idle and the
+// shell uses its WorkManager background check instead.
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
