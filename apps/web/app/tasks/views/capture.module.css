@@ -1,0 +1,10 @@
+/* Capture never joins the layout's horizontal/vertical scrolling surface. */
+.capture { flex: none; min-width: 0; }
+.capture input, .capture button, .capture [role="option"] { min-height: var(--ds-control-lg); }
+.capture [aria-label="What this task will have"] > span { min-height: var(--ds-control-lg); height: auto; }
+@media (max-width: 640px) {
+  .capture button[aria-label] { min-width: var(--ds-control-lg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .capture *, .capture *::before, .capture *::after { animation: none !important; transition: none !important; }
+}
