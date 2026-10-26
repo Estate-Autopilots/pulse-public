@@ -1,0 +1,19 @@
+name: meta_ads
+version: 1.0.0
+source_kind: pull
+provider: Meta Marketing API
+emits: [ads.metrics.daily]
+purposes: [outcomes]
+sensitivity: 0
+auth: system_user_token
+scopes: [ads_read]
+schedule:
+  hourly: today
+  nightly_reconcile: 28d
+  weekly_reconcile: 28d
+backfill:
+  default_days: 28
+consent: notice
+filters:
+  buyer_fields: false
+  writes: false

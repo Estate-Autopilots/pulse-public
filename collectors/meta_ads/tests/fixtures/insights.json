@@ -1,0 +1,59 @@
+[
+  {
+    "account_currency": "INR",
+    "campaign_id": "1001",
+    "campaign_name": "EA0584 Kevaleto Rogotipil",
+    "adset_id": "3001",
+    "adset_name": "Women 25-44",
+    "ad_id": "91001",
+    "ad_name": "EA0584-HK03-v2 · Reels",
+    "date_start": "2026-10-02",
+    "impressions": "1600",
+    "reach": "1400",
+    "spend": "1600.00",
+    "inline_link_clicks": "20",
+    "inline_link_click_ctr": "1.25",
+    "actions": [
+      {"action_type": "lead", "value": "8"},
+      {"action_type": "video_view", "value": "120"}
+    ],
+    "publisher_platform": "facebook",
+    "platform_position": "reels"
+  },
+  {
+    "account_currency": "INR",
+    "campaign_id": "1002",
+    "campaign_name": "EA0585 Project Oak",
+    "adset_id": "3002",
+    "adset_name": "Retargeting",
+    "ad_id": "91002",
+    "ad_name": "EA0585-MV01 · Feed",
+    "date_start": "2026-10-02",
+    "impressions": "500",
+    "reach": "450",
+    "spend": "250.00",
+    "inline_link_clicks": "5",
+    "inline_link_click_ctr": "1.00",
+    "actions": [{"action_type": "video_view", "value": "60"}],
+    "publisher_platform": "instagram",
+    "platform_position": "feed"
+  },
+  {
+    "account_currency": "INR",
+    "campaign_id": "1003",
+    "campaign_name": "EA0586 Project Pine",
+    "adset_id": "3003",
+    "adset_name": "Broad",
+    "ad_id": "91003",
+    "ad_name": "Unresolved creative",
+    "date_start": "2026-10-02",
+    "impressions": "1000",
+    "reach": "800",
+    "spend": "900.00",
+    "inline_link_clicks": "10",
+    "inline_link_click_ctr": "1.00",
+    "actions": [{"action_type": "lead", "value": "3"}],
+    "publisher_platform": "facebook",
+    "platform_position": "feed"
+  }
+]
