@@ -1,0 +1,12 @@
+export type Box = { w: number; h: number };
+export type View = { x: number; y: number; scale: number; angle: number };
+export function exifOrientation(buffer: ArrayBuffer | Uint8Array): number;
+export function withOrientation(jpeg: ArrayBuffer | Uint8Array, orientation: number): Uint8Array;
+export function orient(orientation: number, w: number, h: number): { width: number; height: number; matrix: [number, number, number, number, number, number] };
+export function minScale(frame: Box, image: Box, angle: number): number;
+export function clampView(view: View, frame: Box, image: Box, max?: number): View;
+export function covers(view: View, frame: Box, image: Box): boolean;
+export function zoomAt(view: View, factor: number, at?: { x: number; y: number }): View;
+export function framePointToImage(view: View, image: Box, point: { x: number; y: number }): { x: number; y: number };
+export function outputSize(frame: Box, view: View, aspect: number, long?: number, least?: number): { width: number; height: number };
+export function spring(from: number, to: number, velocity: number, dt: number, stiffness?: number): { value: number; velocity: number };
