@@ -1,0 +1,10 @@
+.desktopOnly { composes: desktopOnly from "../people/accounts/editors.module.css"; }
+.mobileOnly { composes: mobileOnly from "../people/accounts/editors.module.css"; }
+.weekNavigation { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.metrics { composes: metrics from "../people/accounts/editors.module.css"; }
+.claimNote { color: var(--theme-text-muted); font-size: 12px; font-weight: 400; }
+/* LAYOUT-SWEEP: the week switch is the page's main control; compact (arrows beside the week) it fits the header beside
+   Pip's island at 1280 px instead of waiting behind "More". */
+.weekStep { width: 32px; padding: 0; justify-content: center; }
+.weekNavigation { flex-wrap: nowrap; gap: 6px; }
+.weekNavigation > span { white-space: nowrap; font-variant-numeric: tabular-nums; }

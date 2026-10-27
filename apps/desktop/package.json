@@ -1,0 +1,17 @@
+{
+  "name": "@pulse/desktop",
+  "private": true,
+  "version": "1.0.2",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "tauri": "tauri",
+    "test": "node --test --test-concurrency=2 tests/build-metadata.test.mjs tests/panel.test.mjs tests/update-panel.test.mjs tests/address-step.test.mjs tests/app-window-search.test.mjs tests/desktop-publisher.test.mjs ../../plugins/premiere/tests/event-contract.test.mjs && node tests/accessibility.test.js",
+    "screenshots": "node scripts/capture-panel.mjs && node scripts/capture-settings.mjs",
+    "icons": "node scripts/make-icons.mjs && tauri icon src-tauri/icons/source-1024.png -o src-tauri/icons"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.1",
+    "@playwright/test": "1.55.0"
+  }
+}
