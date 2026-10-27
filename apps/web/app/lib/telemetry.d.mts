@@ -1,0 +1,35 @@
+export const ENDPOINT: string;
+export const REQUEST_HEADER: string;
+export function scrub(text: unknown, max?: number): string | null;
+export function safeLabel(text: unknown, max?: number): string | null;
+export function pathTemplate(raw: unknown): string | null;
+export function screenOf(href: string): string | null;
+export function platformOf(ua: string | null | undefined, globals?: Record<string, unknown>): { plat: "web" | "android" | "ios" | "desktop"; shell: string | null };
+export function deviceClass(ua: string | null | undefined, shortSide: number, coarse: boolean): "phone" | "tablet" | "desktop";
+export function selectorOf(el: unknown): string | null;
+export type Described = { name: string | null; sel: string | null; tag: string; role?: string; nav: boolean; expanded?: boolean; type?: string };
+export function describe(target: unknown, location?: { href: string }): Described | null;
+export function describeForm(form: unknown, location: { href: string }): { name: string | null; fields: string[] };
+export function randomId(bytes?: number): string;
+export type TelemetryEvent = { k: string; t: number; n?: string; p?: string | null; d?: number; v?: number; s?: number; r?: string; x?: Record<string, unknown> };
+export function createQueue(options: {
+  send: (body: string) => Promise<{ ok: boolean; status: number }>;
+  sendFinal?: (body: string) => boolean;
+  context: () => Record<string, unknown>;
+  store?: (events: TelemetryEvent[]) => void;
+  offline?: () => boolean;
+  now?: () => number;
+  max?: number;
+  batch?: number;
+}): {
+  push(ev: TelemetryEvent): void;
+  flush(final?: boolean): Promise<boolean>;
+  state(): { size: number; off: boolean; dropped: number; sending: boolean };
+  restore(events: unknown): void;
+};
+export type Telemetry = { release: string; route(): void; error(source: string, error: unknown): void };
+export function startTelemetry(options?: { release?: string; sample?: number; enabled?: boolean }): Telemetry | null;
+export function telemetryRoute(): void;
+export function recentSteps(n?: number): { at: string; kind: string; name?: string; page?: string; ms?: number; status?: number }[];
+export function reportError(error: unknown, source?: string): void;
+export function telemetryEvent(kind: string, fields?: { n?: string; d?: number; v?: number; x?: Record<string, string | number | boolean> }): void;

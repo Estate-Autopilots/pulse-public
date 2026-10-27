@@ -1,0 +1,309 @@
+/* People: directory filters and cards, profile sections, restricted HR blocks. */
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; min-width: 0; }
+.filterGroup { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.filterLabel { color: var(--theme-text-muted); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface); color: var(--theme-text-muted); font: inherit; font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: border-color 120ms ease, background-color 120ms ease, color 120ms ease, transform 80ms ease; }
+.chip:hover { border-color: var(--theme-border-strong); color: var(--theme-text); }
+.chip:active { transform: scale(0.97); }
+.chip[aria-pressed="true"] { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: var(--accent-soft, color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface))); color: var(--theme-action); }
+.chip small { color: inherit; font-size: 12px; font-variant-numeric: tabular-nums; opacity: 0.75; }
+.chip:focus-visible, .viewBtn:focus-visible, .card:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.searchBox { position: relative; display: flex; flex: 1 1 220px; align-items: center; max-width: 320px; }
+.searchBox svg { position: absolute; left: 9px; color: var(--theme-text-muted); pointer-events: none; }
+.searchBox input { width: 100%; height: 32px; padding: 0 10px 0 30px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.searchBox input:focus { outline: 2px solid var(--theme-focus); outline-offset: 0; border-color: transparent; }
+.spacer { flex: 1 1 0; }
+.viewSwitch { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface-subtle); }
+.viewBtn { display: grid; width: 28px; height: 26px; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.viewBtn[aria-pressed="true"] { background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 0 0 1px var(--theme-border), 0 1px 2px rgb(15 27 51 / 6%); }
+
+.group { display: grid; gap: 8px; min-width: 0; }
+.groupHead { display: flex; align-items: baseline; gap: 8px; margin: 6px 2px 0; font-size: 13px; font-weight: 650; letter-spacing: -0.005em; }
+.groupHead small { color: var(--theme-text-muted); font-size: 12px; font-weight: 400; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(248px, 1fr)); gap: 12px; }
+.card { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; padding: 14px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: inherit; text-decoration: none; transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease; animation: card-in 200ms ease-out both; }
+.card:hover { border-color: var(--theme-border-strong); box-shadow: 0 6px 18px rgb(15 27 51 / 8%); transform: translateY(-2px); }
+.card:active { transform: translateY(0); }
+.card[data-status="inactive"], .card[data-status="offboarded"] { background: var(--theme-surface-subtle); }
+.card[data-status="inactive"] .cardName, .card[data-status="offboarded"] .cardName { color: var(--theme-text-muted); }
+.cardTop { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.cardText { display: grid; gap: 2px; min-width: 0; }
+.cardName { overflow: hidden; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; text-overflow: ellipsis; white-space: nowrap; }
+.cardRole { overflow: hidden; color: var(--theme-text-muted); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.cardTags { display: flex; flex-wrap: wrap; gap: 5px; min-height: 22px; }
+.cardText { flex: 1; }
+.empId { flex: none; padding: 2px 7px; border: 1px solid var(--theme-border); border-radius: 6px; background: var(--theme-surface-subtle); color: var(--theme-text); font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; white-space: nowrap; }
+.empId[data-none] { border-style: dashed; color: var(--theme-text-muted); font-weight: 400; }
+.skillTag { display: inline-flex; align-items: center; height: 22px; max-width: 14ch; padding: 0 7px; overflow: hidden; border: 1px dashed var(--theme-border-strong, var(--theme-border)); border-radius: 999px; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.skillCell { display: block; max-width: 26ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cardFacts { overflow: hidden; text-align: right; text-overflow: ellipsis; }
+.cardTop .confirm { flex: none; align-self: flex-start; }
+.clear { height: 28px; padding: 0 6px; border: 0; border-radius: 6px; background: none; color: var(--theme-action); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
+.clear:hover { text-decoration: underline; }
+.clear:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.cardFoot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 10px; border-top: 1px solid var(--soft); color: var(--theme-text-muted); font-size: 12px; }
+.cardFoot span { display: inline-flex; align-items: center; gap: 5px; min-width: 0; white-space: nowrap; }
+.cardFoot .cardFacts { display: block; }
+.confirm { color: var(--theme-warning); font-weight: 500; }
+.you { color: var(--theme-action); font-weight: 600; }
+@keyframes card-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.copyId { display: inline-flex; align-items: center; gap: 5px; height: 22px; margin: -2px 0; padding: 0 7px; border: 1px solid var(--theme-border); border-radius: 6px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font: inherit; cursor: pointer; transition: border-color 120ms ease, color 120ms ease; }
+.copyId b { color: var(--theme-text); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 600; }
+.copyId:hover { border-color: var(--theme-border-strong); color: var(--theme-text); }
+.copyId:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.copied { color: var(--theme-success); font-size: 12px; font-weight: 500; }
+.copied:empty { display: none; }
+.tree { margin: 0; padding: 2px 0 8px; list-style: none; }
+.treeRow { position: relative; display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 5px 14px; font-size: 13px; }
+.treeRow[data-self] { background: var(--accent-soft, color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface))); }
+.treeElbow { flex: none; width: 12px; height: 16px; margin: -14px -2px 0 -16px; border-bottom: 1px solid var(--theme-border-strong, var(--theme-border)); border-left: 1px solid var(--theme-border-strong, var(--theme-border)); border-bottom-left-radius: 5px; }
+.treeText { display: grid; flex: 1; min-width: 0; }
+.treeText a, .treeText b { overflow: hidden; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
+.treeText a:hover { color: var(--theme-action); }
+.treeText small { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.treeNote { flex: none; color: var(--theme-action); font-size: 12px; font-weight: 500; }
+
+.flag { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; padding: 12px 14px; border-top: 1px solid var(--soft); font-size: 13px; }
+.flag:first-of-type { border-top: 0; }
+.flag > svg { margin-top: 2px; color: var(--theme-warning); }
+.flag p { margin: 0; line-height: 1.5; }
+.flagActions { display: flex; flex-wrap: wrap; gap: 6px; grid-column: 2; padding-top: 4px; }
+.flagBox { border-color: color-mix(in srgb, var(--theme-warning) 38%, var(--theme-border)) !important; }
+.sourceList { margin: 0; padding: 0; list-style: none; }
+.source { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 9px 14px; border-top: 1px solid var(--soft); font-size: 13px; }
+.source:first-child { border-top: 0; }
+.source > svg { color: var(--theme-text-muted); }
+.source b { font-weight: 550; }
+.source small { display: block; color: var(--theme-text-muted); font-size: 12px; }
+.source time, .sourceEnd { color: var(--theme-text-muted); font-size: 12px; white-space: nowrap; }
+.prov { display: block; color: var(--theme-text-muted); font-size: 12px; line-height: 1.45; }
+.prov[data-confirm] { color: var(--theme-warning); }
+.lock { display: inline-flex; align-items: center; gap: 5px; color: var(--theme-text-muted); font-size: 12px; }
+.restricted { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--theme-warning) 30%, var(--theme-border)); border-radius: 10px; background: color-mix(in srgb, var(--theme-warning) 6%, var(--theme-surface)); font-size: 13px; line-height: 1.5; }
+.restricted svg { flex: none; margin-top: 2px; color: var(--theme-warning); }
+.amount { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.amount[data-hidden] { color: var(--theme-text-muted); font-weight: 400; letter-spacing: 0.12em; }
+.docRow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 14px; border-top: 1px solid var(--soft); font-size: 13px; }
+.docRow:first-child { border-top: 0; }
+.docRow > svg { color: var(--theme-text-muted); }
+.docRow small { display: block; overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.tabLock { margin-left: 4px; vertical-align: -1px; opacity: 0.6; }
+@media (max-width: 760px) {
+  .cards { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .searchBox { flex: 1 1 0; min-width: 0; max-width: none; }
+  .spacer { display: none; }
+  .filters > :global(div[role="group"]):first-child { flex: 1 1 100%; }
+  .filterGroup { flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+  .chip { flex: none; }
+  .filterGroup::-webkit-scrollbar { display: none; }
+  .source { grid-template-columns: auto minmax(0, 1fr); }
+  .source time, .sourceEnd { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) { .card { animation: none; transition: none; } }
+
+/* Tracking: the shared-login issue as one compact strip with its three fixes, and one table for the whole team. */
+.issue { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--theme-warning) 30%, var(--theme-border)); border-radius: 12px; background: color-mix(in srgb, var(--theme-warning) 5%, var(--theme-surface)); }
+.issueIcon { display: grid; grid-row: 1 / span 2; align-self: start; width: 32px; height: 32px; place-items: center; border-radius: 9px; background: color-mix(in srgb, var(--theme-warning) 16%, var(--theme-surface)); color: var(--theme-warning); }
+.issue h3 { min-width: 0; margin: 0; font-size: 14px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.35; }
+.issue p { grid-column: 2 / -1; margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+.issue p b { color: var(--theme-text); font-weight: 600; }
+.fixes { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
+.fixes [data-soon] { border-style: dashed; background: transparent; color: var(--theme-text-muted); cursor: default; }
+.trackTabs { display: flex; flex: none; align-items: center; min-width: 0; }
+.trackFit { grid-template-columns: minmax(0, 2.2fr) minmax(340px, 1fr); grid-template-rows: minmax(0, 1fr); }
+.trackFit[data-view="accounts"] { grid-template-columns: minmax(0, 1fr); }
+.trackFit[data-view="accounts"] > .trackPeople { display: none; }
+.trackFit[data-view="claims"] { grid-template-columns: minmax(0, 1fr); }
+.trackFit[data-view="claims"] > .trackPeople { display: none; }
+.trackFit[data-view="claims"] > .trackSide { grid-template-rows: minmax(0, 1fr); }
+.trackSide { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; min-width: 0; min-height: 0; }
+.accountPanels { display: contents; }
+/* The uploader list's track keeps room for its head, one row and its pager (188 px): with the page header in the page
+   (owner workbench, 21 Oct 2026) a 720 px window squeezed it to its title, the list hidden under Claims to confirm. The
+   page scrolls for the rest. */
+.trackFit[data-view="accounts"] > .trackSide { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(188px, 1fr) auto; }
+.trackFit[data-view="claims"] .accountPanels { display: none; }
+.trackPeople { container-type: inline-size; }
+.trackPeople th, .trackPeople td { padding-right: 6px; }
+@container (max-width: 760px) { .trackPeople [data-col="team"] { display: none; } }
+@container (max-width: 620px) { .trackPeople [data-col="signin"] { display: none; } }
+@container (max-width: 480px) { .trackPeople [data-col="attendance"] { display: none; } }
+.signals { display: flex; flex-wrap: wrap; gap: 4px; }
+.signal { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+.signal[data-state="live"] { border-color: color-mix(in srgb, var(--theme-success) 35%, var(--theme-border)); color: var(--theme-success); }
+.signal[data-state="blocked"] { border-color: color-mix(in srgb, var(--theme-warning) 35%, var(--theme-border)); color: var(--theme-warning); }
+.signal[data-state="planned"] { border-style: dashed; color: var(--theme-text-muted); }
+/* A wide window shows the team and the accounts side by side; a narrower one keeps them as two sub-tabs. */
+@media (min-width: 1680px) { .trackTabs { display: none; } }
+@media (max-width: 1679.98px) {
+  .trackFit { grid-template-columns: minmax(0, 1fr); }
+  .trackFit[data-view="people"] > .trackSide, .trackFit[data-view="accounts"] > .trackPeople, .trackFit[data-view="claims"] > .trackPeople { display: none; }
+}
+@media (max-width: 760px) {
+  .issue { grid-template-columns: auto minmax(0, 1fr); }
+  .issue .fixes { grid-column: 1 / -1; justify-content: flex-start; }
+  .issue p { grid-column: 1 / -1; }
+}
+
+/* How Pulse knows: one quiet mark beside a value, and one closed line for the documents behind a record. */
+.provMark { display: inline-grid; width: 16px; height: 16px; margin-left: 6px; place-items: center; border-radius: 50%; color: var(--theme-text-muted); opacity: 0.55; vertical-align: -2px; cursor: help; }
+.provMark:hover, .provMark:focus-visible { opacity: 1; color: var(--theme-text); }
+.know { border: 1px solid var(--theme-border); border-radius: 10px; background: transparent; color: var(--theme-text-muted); font-size: 13px; }
+.know summary { display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 12px; border-radius: 10px; cursor: pointer; list-style: none; font-weight: 500; }
+.know summary::-webkit-details-marker { display: none; }
+.know summary:hover { color: var(--theme-text); }
+.know summary small { margin-left: auto; font-size: 12px; font-weight: 400; }
+.know[open] summary { border-bottom: 1px solid var(--theme-border); border-radius: 10px 10px 0 0; }
+.know summary { white-space: nowrap; }
+.know summary small { overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- Full-screen app feel (round 5A2): one window, nothing scrolls ---------- */
+/* Directory: two short toolbar rows, then a grid or a table paged to the height left. */
+.bar { flex: none; min-width: 0; }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.bar .searchBox { flex: 0 1 300px; width: 300px; max-width: 100%; }
+.viewBtn { width: 32px; padding: 0; justify-content: center; }
+.viewBtn[aria-pressed="true"] { box-shadow: none; }
+.pick { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px 0 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text-muted); font-size: 12px; font-weight: 500; white-space: nowrap; transition: border-color 120ms ease, background-color 120ms ease; }
+.pick:hover { border-color: var(--theme-border-strong); }
+.pick:focus-within { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.pick select { max-width: 16ch; field-sizing: content; padding: 0 16px 0 0; border: 0; outline: 0; background: transparent; color: var(--theme-text); font: inherit; font-weight: 550; text-overflow: ellipsis; appearance: none; cursor: pointer; }
+.pick select option { background: var(--theme-surface); color: var(--theme-text); }
+/* MOBILE-QA: the global select look (globals.css, UI-UPGRADE) outranks `.pick select` (its :not()s add specificity), so the
+   Team chip drew a second bordered 44px box poking out of its 32px pill with two arrows. The chip's select stays bare;
+   its 44px press area overflows the pill invisibly. */
+.pick select:not([multiple]):not([size]) { appearance: none; padding: 0 16px 0 0; border: 0; background: transparent; }
+.pick[data-on] { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: var(--accent-soft, color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface))); }
+/* UI-POLISH-3: the pill holds the kit's SelectField (UI-POLISH swapped the bare select for it): its button draws no
+   second box or second arrow inside the pill ("Team [All▾]" overlapped the pill's own arrow). */
+.pick button[aria-haspopup="listbox"] { width: auto; height: 26px; min-height: 0; gap: 3px; padding: 0; border: 0; background: transparent; box-shadow: none; color: var(--theme-text); font-size: 12px; font-weight: 550; }
+.pick button[aria-haspopup="listbox"]:hover, .pick button[aria-haspopup="listbox"][aria-expanded="true"] { background: transparent; box-shadow: none; }
+.pick button[aria-haspopup="listbox"] svg { width: 13px; height: 13px; }
+.pick[data-on] button[aria-haspopup="listbox"] { color: var(--theme-action); }
+.cards { grid-template-columns: repeat(auto-fill, minmax(272px, 1fr)); align-content: start; }
+.card { align-content: space-between; gap: 10px; padding: 12px 14px; animation: none; border-color: color-mix(in srgb, var(--theme-border) 52%, transparent); transition: border-color 140ms ease, background-color 140ms ease, transform 160ms cubic-bezier(0.16, 1, 0.3, 1); }
+.card:hover { border-color: color-mix(in srgb, var(--theme-border-strong) 80%, transparent); background: var(--hover); box-shadow: none; transform: none; }
+.card:active { transform: scale(0.985); }
+.cardTags { flex-wrap: nowrap; height: 22px; overflow: hidden; }
+.cardTags > * { flex: none; }
+.roster { container-type: inline-size; overflow: hidden; }
+.roster th, .roster td { padding-right: 8px; }
+.clip { display: block; max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.roster .confirm { display: inline-flex; vertical-align: -3px; }
+@container (max-width: 1240px) { .roster [data-wide] { display: none; } }
+@container (max-width: 860px) { .roster [data-mid] { display: none; } }
+@media (max-width: 760px) {
+  .cards { grid-template-columns: minmax(0, 1fr); }
+  .bar .searchBox { flex: 1 1 100%; width: auto; }
+  .filterGroup { max-width: 100%; }
+  .roster { max-width: 100%; overflow-x: auto; }
+}
+
+/* ---------- Round 6: no hollow cards, 32 px targets ---------- */
+/* A Team card is one compact block: avatar beside name, role, tags and the ID/joining line. A page holds 3+ rows. */
+.card.tight { grid-template-columns: auto minmax(0, 1fr); align-content: center; align-items: center; gap: 12px; padding: 12px 14px; }
+.tight .cardText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cardHead { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.cardHead .cardName { flex: 0 1 auto; }
+.tight .cardRole { font-size: 13px; }
+.tight .cardTags { margin-top: 2px; }
+.cardLine { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.cardLine .empId { padding: 1px 6px; }
+.tight .cardFacts { margin-top: auto; overflow: visible; color: var(--theme-text-muted); font-size: 12px; text-align: left; white-space: normal; }
+.cards:has(> .tight) { grid-template-columns: repeat(auto-fill, minmax(268px, 1fr)); }
+.chip { height: 32px; padding: 0 12px; }
+.viewBtn { height: 32px; }
+.pick { height: 32px; }
+.pick select { height: 32px; margin: -1px 0; }
+.searchBox input { height: 36px; font-size: 14px; }
+.copyId { height: 32px; margin: -6px 0; }
+/* EST-1018 (UI sweep): pod chips and the Cards/List switch take a 44 px tap on phone; the toolbar keeps its height. */
+@media (max-width: 760px) {
+  .chip, .viewBtn { position: relative; }
+  .chip::after { content: ""; position: absolute; inset: -6px -4px; }
+  .viewBtn::after { content: ""; position: absolute; inset: -6px 0; }
+}
+
+/* Tracking (round 6): sub-tabs and the shared-login issue share one head row; the table keeps the height. */
+.trackHead { display: flex; flex: none; flex-wrap: wrap; align-items: center; gap: 12px; min-width: 0; }
+.trackHead .issue { display: flex; flex: 1 1 520px; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; padding: 8px 8px 8px 12px; }
+.trackHead .issueIcon { grid-row: auto; align-self: center; }
+.trackHead .issue h3 { flex: 1 1 260px; }
+.trackHead .issue .fixes { margin-left: auto; }
+.explain { margin: 0; padding: 4px 16px 14px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.explain b { color: var(--theme-text); font-weight: 600; }
+/* A narrower window shows the accounts view as two columns: the split and its explanation, then the full-height list. */
+@media (min-width: 1180px) and (min-height: 600px) and (max-width: 1679.98px) {
+  .trackFit[data-view="accounts"] > .trackSide { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(188px, 1fr) auto; }
+  .trackFit[data-view="accounts"] .whoDelivered { align-self: start; }
+}
+
+/* Profile overview (round 6): the record at a glance in three balanced columns instead of five one-panel sub-tabs.
+   Panels keep their own height; the last panel of a column takes what is left and pages its list. */
+.overview { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+.ovCol { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; }
+.ovCol > * { flex: none; }
+@media (min-width: 1180px) and (min-height: 600px) {
+  .overview { grid-template-rows: minmax(0, 1fr); align-items: stretch; }
+  .ovCol > [class*="__panelFill"] { flex: 1 1 0; min-height: 156px; }   /* PEOPLE-CONTACTS: room for one 52 px row under the head and pager */
+}
+@media (max-width: 1179.98px) { .overview { grid-template-columns: minmax(0, 1fr); } }
+/* The identity: the photo button sits off the initials. */
+.identity [class*="__photoBtn"] { right: -8px; bottom: -6px; width: 24px; height: 24px; }
+.overview.wide { grid-template-columns: minmax(0, 1fr); }
+.sourceGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); column-gap: 16px; }
+.sourceGrid .source { border-top: 1px solid var(--soft); }
+/* Identity on one line on a desktop: name and role, then the key facts, then the actions. */
+.idMeta.idMeta { flex: 1 1 auto; align-self: center; gap: 6px 20px; padding: 0; border: 0; }
+.idMeta > span { white-space: nowrap; }
+@media (min-width: 1180px) and (min-height: 600px) {
+  .identity [class*="__profileText"] { flex: 0 1 auto; padding-top: 0; }
+  .identity [class*="__profileActions"] { flex: 0 1 auto; min-width: 0; justify-content: flex-end; padding-top: 0; }
+  .identity [class*="__profileBody"] { flex-wrap: nowrap; padding-bottom: 8px; }
+  .identity [class*="__profileAvatar"] { --size: 52px !important; }
+}
+/* When the window is tall enough for both rows, the record keeps its own height and the sources take the rest. */
+@media (min-width: 1180px) and (min-height: 600px) {
+  @container (min-height: 640px) { [class*="__deckView"]:has(> .recordRow), [class*="__deckView"] > .recordRow { flex: none; } .recordRow { grid-template-rows: auto; } }
+}
+@media (min-width: 1180px) and (min-height: 600px) {
+  .identity [class*="__profileActions"] { flex: 0 1 auto; flex-wrap: wrap; min-width: 0; justify-content: flex-end; }
+}
+.srcCell { max-width: 280px; } .srcCell > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* LAYOUT-SWEEP: on a tablet too, the directory table scrolls sideways rather than cutting its last column. */
+@media (max-width: 1179.98px) { .roster { max-width: 100%; overflow-x: auto; } }
+
+/* PEOPLE-CONTACTS: the profile header's extras: pronouns and tenure stay quiet; "More" is a small menu of the less
+   used links (Observed activity, Tasks, Imported history). */
+.pronouns, .since { color: var(--theme-text-muted); font-weight: 450; }
+.more { position: relative; }
+.more > summary { width: 34px; padding: 0; justify-content: center; list-style: none; cursor: pointer; }
+.more > summary::-webkit-details-marker { display: none; }
+.moreMenu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; display: grid; min-width: 190px; padding: 5px; border: 1px solid var(--theme-border); border-radius: 12px;
+  background: var(--theme-surface); box-shadow: 0 14px 36px rgb(8 12 22 / 18%); animation: more-pop 160ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.moreMenu a { display: flex; align-items: center; min-height: 38px; padding: 0 12px; border-radius: 8px; color: var(--theme-text); font-size: 14px; text-decoration: none; }
+.moreMenu a:hover, .moreMenu a:focus-visible { background: var(--theme-surface-subtle); outline: none; }
+@keyframes more-pop { from { opacity: 0; transform: translateY(-4px); } }
+@media (max-width: 640px) { .moreMenu { right: auto; left: 50%; transform: translateX(-50%); animation: none; } }
+@media (prefers-reduced-motion: reduce) { .moreMenu { animation: none; } }
+/* Owner workbench (21 Oct 2026): on a phone the directory starts sooner. Org chart and People & pay live in the
+   sidebar's Team section (More), so the header keeps only Add member; cards are the phone view, so the view switch goes. */
+@media (max-width: 759.98px) {
+  :global([data-page-header]) a[href="/people/org"], :global([data-page-header]) a[href="/people/pay"] { display: none; }
+  [role="group"][aria-label="View"]:has(.viewBtn) { display: none; }
+}
+/* FLOAT-2 (device audit, 22 Oct 2026): on a phone every control here takes a 44 px press. */
+@media (max-width: 899.98px) {
+  .chip { height: 44px; }
+  .pick select { min-width: 44px; min-height: 44px; }
+}
+
+/* UI-UPGRADE: the header's "More" opens the kit menu. */
+.moreBtn { width: 34px; padding: 0; justify-content: center; }
+
+/* UI-POLISH: the About record in short groups with a quiet heading each, and one label column for all of them. */
+.factHead { margin: 0; padding: 10px 14px 4px; border-top: 1px solid var(--ds-line, var(--theme-border)); color: var(--theme-text-muted); font-size: 11px; font-weight: 650; letter-spacing: .05em; text-transform: uppercase; }
+.factHead:first-of-type { padding-top: 4px; border-top: 0; }
+.factsAligned { grid-template-columns: 104px minmax(0, 1fr); padding-bottom: 10px; }
+.email { overflow-wrap: anywhere; }

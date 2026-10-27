@@ -1,0 +1,89 @@
+{
+ "tutorials": {
+  "ai-employees": {
+   "id": "ai-employees",
+   "seconds": 17.9,
+   "chapters": [
+    {
+     "at": 0.0,
+     "title": "In short"
+    },
+    {
+     "at": 3.1,
+     "title": "A client asks"
+    },
+    {
+     "at": 5.23,
+     "title": "The draft"
+    },
+    {
+     "at": 9.13,
+     "title": "Approve"
+    },
+    {
+     "at": 11.43,
+     "title": "Sent"
+    }
+   ],
+   "voice": true,
+   "video": {
+    "en": "ai-employees-en.mp4",
+    "hi": "ai-employees-hi.mp4"
+   },
+   "captions": {
+    "en": "ai-employees-en.en.vtt",
+    "hi-Latn": "ai-employees-hi.hi-Latn.vtt",
+    "hi": "ai-employees-hi.hi.vtt"
+   },
+   "youtube": {},
+   "poster": "poster.jpg"
+  },
+  "invite-a-client": {
+   "id": "invite-a-client",
+   "seconds": 20.3,
+   "chapters": [
+    {
+     "at": 0.0,
+     "title": "In short"
+    },
+    {
+     "at": 2.8,
+     "title": "Make the link"
+    },
+    {
+     "at": 5.33,
+     "title": "The client joins"
+    },
+    {
+     "at": 8.83,
+     "title": "Shared group"
+    },
+    {
+     "at": 11.2,
+     "title": "Give a task"
+    },
+    {
+     "at": 13.33,
+     "title": "Chat"
+    },
+    {
+     "at": 15.57,
+     "title": "Done"
+    }
+   ],
+   "voice": true,
+   "video": {
+    "en": "invite-a-client-en.mp4",
+    "hi": "invite-a-client-hi.mp4"
+   },
+   "captions": {
+    "en": "invite-a-client-en.en.vtt",
+    "hi-Latn": "invite-a-client-hi.hi-Latn.vtt",
+    "hi": "invite-a-client-hi.hi.vtt"
+   },
+   "youtube": {},
+   "poster": "poster.jpg"
+  }
+ },
+ "made": "2026-10-25"
+}

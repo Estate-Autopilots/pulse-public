@@ -1,0 +1,75 @@
+/* PULSE-ADMIN (1140): the platform admin console. Calm tables and forms on the app's own tokens and controls. */
+.stack { display: grid; gap: 12px; min-width: 0; align-content: start; }
+.split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 12px; align-items: start; min-width: 0; }
+@media (max-width: 1100px) { .split { grid-template-columns: minmax(0, 1fr); } }
+
+.headerLink { composes: btn from "../ui.module.css"; text-decoration: none; }
+.button { composes: btn from "../ui.module.css"; }
+.primary { composes: btn btnPrimary from "../ui.module.css"; }
+.danger { composes: btn from "../ui.module.css"; color: var(--theme-danger); border-color: color-mix(in oklab, var(--theme-danger) 45%, var(--theme-border)); }
+.danger:hover:not(:disabled) { background: color-mix(in oklab, var(--theme-danger) 8%, var(--theme-surface)); }
+.field { composes: field from "../ui.module.css"; }
+.linkButton { border: 0; background: none; padding: 0 0 0 8px; color: var(--theme-action); font: inherit; font-size: 12px; cursor: pointer; }
+
+.tableWrap { overflow-x: auto; min-width: 0; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th, .table td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--theme-border); vertical-align: top; }
+.table th { font-size: 12px; font-weight: 600; color: var(--theme-text-muted); white-space: nowrap; }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr:hover { background: var(--theme-surface-subtle); }
+.table tr[data-quiet] { color: var(--theme-text-muted); }
+.table tr[data-current] { background: color-mix(in oklab, var(--theme-action) 7%, transparent); }
+.table td small { display: block; margin-top: 2px; color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.name { color: var(--theme-text); font-weight: 600; text-decoration: none; }
+.name:hover { color: var(--theme-action); text-decoration: underline; }
+.nowrap { white-space: nowrap; }
+.muted { color: var(--theme-text-muted); }
+.code { font-family: var(--font-mono, ui-monospace, monospace); font-size: 12px; overflow-wrap: anywhere; }
+.badges { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+
+.meter { display: inline-grid; gap: 4px; min-width: 96px; font-variant-numeric: tabular-nums; text-align: left; }
+.meter small { color: var(--theme-text-muted); font-size: 11px; }
+.track { display: block; height: 4px; border-radius: 99px; background: var(--theme-surface-subtle); overflow: hidden; }
+.track i { display: block; height: 100%; border-radius: 99px; background: var(--theme-action); }
+.meter[data-over] i { background: var(--theme-danger); }
+.meter[data-over] > span:first-child { color: var(--theme-danger); }
+
+.search { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--theme-border); }
+.searchField { display: flex; flex: 1 1 280px; align-items: center; gap: 8px; height: 34px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text-muted); }
+.searchField:focus-within { outline: 2px solid var(--theme-focus); outline-offset: 0; border-color: transparent; }
+.searchField input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--theme-text); font: inherit; font-size: 13px; }
+
+.form { display: grid; gap: 10px; padding: 12px 14px 14px; min-width: 0; }
+.form input, .form textarea { width: 100%; box-sizing: border-box; height: 32px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 7px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.form textarea { height: auto; padding: 8px 10px; resize: vertical; }
+.form input:focus-visible, .form textarea:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 0; border-color: transparent; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sub { margin: 6px 0 0; font-size: 12px; font-weight: 600; color: var(--theme-text-muted); text-transform: none; }
+.switches { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2px 18px; }
+.error { margin: 0; padding: 0 14px; color: var(--theme-danger); font-size: 13px; }
+.form .error, .row .error { padding: 0; }
+.done { margin: 0; color: var(--theme-success); font-size: 13px; }
+.note { margin: 0; padding: 8px 14px 12px; color: var(--theme-text-muted); font-size: 13px; }
+.form .note { padding: 0; }
+
+.facts { display: grid; grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); gap: 8px 16px; margin: 0; padding: 12px 14px; font-size: 13px; }
+.facts dt { color: var(--theme-text-muted); }
+.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+
+.list { display: grid; margin: 0; padding: 0; list-style: none; }
+.item { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding: 10px 14px; border-bottom: 1px solid var(--theme-border); font-size: 13px; }
+.item:last-child { border-bottom: 0; }
+.item p { margin: 4px 0 0; }
+.item small { display: block; margin-top: 4px; color: var(--theme-text-muted); font-size: 12px; }
+
+.viewAs { margin: 0 14px 14px; border: 1px solid color-mix(in oklab, var(--theme-info, var(--theme-action)) 40%, transparent); border-radius: 10px; background: color-mix(in oklab, var(--theme-info, var(--theme-action)) 6%, var(--theme-surface)); }
+.viewAsBar { display: flex; align-items: center; gap: 6px; margin: 0; padding: 8px 12px; border-bottom: 1px solid var(--theme-border); font-size: 12px; font-weight: 600; }
+
+@media (max-width: 640px) {
+  .facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .facts dd { margin-bottom: 8px; }
+}
+.chip { display: inline-flex; gap: 4px; align-items: baseline; margin: 0 10px 4px 0; }
+.chip small { display: inline !important; margin: 0 !important; }

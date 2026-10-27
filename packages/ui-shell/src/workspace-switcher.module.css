@@ -1,0 +1,272 @@
+/* Sidebar account switcher: Personal and Organisations, clearly marked. */
+.container {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.trigger:hover,
+.trigger[aria-expanded="true"] {
+  background: var(--lx-surface);
+  box-shadow: var(--lx-shadow-1);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--lx-teal);
+  outline-offset: 1px;
+}
+
+.tile {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--lx-on-teal);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tile[data-kind="personal"] {
+  background: var(--lx-gradient-primary, var(--lx-teal));
+}
+
+.tile[data-kind="organisation"] {
+  background: var(--lx-ink);
+  color: var(--lx-surface);
+}
+
+.copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.2;
+}
+
+.copy b,
+.itemCopy b {
+  overflow: hidden;
+  color: var(--lx-ink);
+  font-size: 14px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy small,
+.itemCopy small {
+  overflow: hidden;
+  color: var(--lx-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex: none;
+  color: var(--lx-muted);
+  transition: transform 200ms var(--lx-ease-pop, ease);
+}
+
+.trigger[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+/* Loading: the same shape, shimmering. */
+.trigger[data-loading] .tile {
+  background: var(--lx-sunken);
+  color: transparent;
+}
+
+.trigger[data-loading] .copy b,
+.trigger[data-loading] .copy small {
+  width: 92px;
+  border-radius: 5px;
+  background: var(--lx-sunken);
+  color: transparent;
+  animation: loading 1.4s ease-in-out infinite;
+}
+
+.trigger[data-loading] .copy small {
+  width: 64px;
+  margin-top: 4px;
+}
+
+/* ---------- Menu ---------- */
+.menu {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 6px);
+  left: 0;
+  display: grid;
+  width: 256px;
+  gap: 1px;
+  padding: 6px;
+  border: 1px solid var(--lx-line);
+  border-radius: 14px;
+  background: var(--lx-surface);
+  box-shadow: var(--lx-shadow-2);
+  transform-origin: top left;
+  animation: menu-in 200ms var(--lx-ease-pop, ease) both;
+}
+
+.group {
+  margin: 6px 8px 3px;
+  color: var(--lx-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.group:first-child {
+  margin-top: 2px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.item:hover,
+.item:focus-visible {
+  background: var(--lx-sunken);
+  outline: none;
+}
+
+.item[data-selected] {
+  background: var(--lx-teal-soft);
+}
+
+.itemCopy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.2;
+}
+
+.check {
+  flex: none;
+  color: var(--lx-teal);
+  animation: check-in 260ms var(--lx-ease-pop, ease) both;
+}
+
+.empty {
+  margin: 2px 8px 4px;
+  color: var(--lx-muted);
+  font-size: 12px;
+}
+
+.separator {
+  height: 1px;
+  margin: 5px 6px;
+  background: var(--lx-line);
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--lx-ink-3);
+  font: 500 13px/1.2 var(--lx-font-ui, inherit);
+  text-align: left;
+}
+
+.action:disabled {
+  cursor: default;
+}
+
+.action svg {
+  color: var(--lx-muted);
+}
+
+.soon {
+  margin-left: auto;
+  padding: 1px 7px;
+  border-radius: 99px;
+  background: var(--lx-sunken);
+  color: var(--lx-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+}
+
+@keyframes check-in {
+  from {
+    transform: scale(0);
+  }
+}
+
+@keyframes loading {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu,
+  .check,
+  .trigger[data-loading] .copy b,
+  .trigger[data-loading] .copy small {
+    animation: none;
+  }
+}
+
+/* The sidebar clips sideways: the menu spans the header row, never past it. */
+.container {
+  position: static;
+}
+.menu {
+  right: 0;
+  width: auto;
+}
+
+/* The organisation's own mark fills its tile (no dark backing behind a logo). */
+/* The organisation's own logo: a bare squircle the size of the rail's Pulse tile, no backing, no rim. The image is
+   scaled a touch past the tile so its own rounded corners never show a sliver of colour behind them. */
+.tile[data-img] { width: 32px; height: 32px; overflow: hidden; border-radius: 9px; background: none !important; box-shadow: none !important; }
+.item .tile[data-img] { width: 28px; height: 28px; border-radius: 8px; }
+.tileImg { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); }
+
+/* Owner workbench UI: an organisation without a logo wears its own colour (the same as the collapsed rail's tile). */
+.tile[data-kind="organisation"][data-hue]:not([data-img]) { background: hsl(var(--org-hue, 172) 48% 38%); color: #fff; }
+:global(:root[data-theme="dark"]) .tile[data-kind="organisation"][data-hue]:not([data-img]) { background: hsl(var(--org-hue, 172) 42% 46%); }

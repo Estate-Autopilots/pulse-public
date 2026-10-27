@@ -1,0 +1,31 @@
+/* WA-MEDIA: what a file moved from WhatsApp shows or says, under it in the bubble. */
+.line { max-width: min(360px, 100%); margin: 2px 0 6px; font-size: 12.5px; line-height: 1.4; color: var(--theme-text-muted); }
+.head { display: flex; align-items: baseline; gap: 6px; width: 100%; padding: 2px 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.head > svg { flex: none; align-self: center; color: var(--theme-action); }
+.head b { flex: none; font-weight: 650; color: var(--theme-text); }
+.head span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.head:hover span, .head:focus-visible span { color: var(--theme-text); }
+.head[aria-expanded="true"] span { white-space: normal; }
+.status { flex: none; padding: 0 6px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 11px; font-style: normal; font-weight: 600; }
+.status[data-status="approved"] { background: color-mix(in srgb, #16a34a 14%, var(--theme-surface)); color: #15803d; }
+.status[data-status="changes_requested"] { background: color-mix(in srgb, #d97706 16%, var(--theme-surface)); color: #b45309; }
+:global(:root[data-theme="dark"]) .status[data-status="approved"] { color: #4ade80; }
+:global(:root[data-theme="dark"]) .status[data-status="changes_requested"] { color: #fbbf24; }
+.body { display: grid; gap: 6px; margin-top: 4px; padding: 8px 10px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); }
+.body p { margin: 0; }
+.figures { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 0; padding: 0; list-style: none; }
+.figures li { display: grid; padding: 2px 8px; border-radius: 8px; background: var(--theme-surface-subtle); font-size: 12px; font-weight: 600; }
+.figures small { overflow: hidden; max-width: 220px; color: var(--theme-text-muted); font-size: 11px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.quality { color: var(--theme-text-muted); font-size: 12px; }
+.muted { color: var(--theme-text-muted); font-size: 11.5px; }
+.more { justify-self: start; padding: 0; border: 0; background: transparent; color: var(--theme-action); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.about { display: grid; gap: 4px; }
+.about details { border-top: 1px solid var(--theme-border); padding-top: 4px; }
+.about summary { cursor: pointer; font-weight: 600; text-transform: capitalize; }
+.about pre { max-height: 220px; margin: 4px 0 0; overflow: auto; font: inherit; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+.facts { display: grid; gap: 2px; margin: 4px 0 0; padding: 0 0 0 4px; }
+.facts > div { display: grid; grid-template-columns: minmax(80px, 34%) 1fr; gap: 6px; }
+.facts dt { color: var(--theme-text-muted); text-transform: capitalize; }
+.facts dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+ol.facts { padding-left: 18px; }
+@media (max-width: 480px) { .line { max-width: 100%; } .head { min-height: 32px; } .facts > div { grid-template-columns: 1fr; gap: 0; } }

@@ -1,0 +1,8 @@
+[Unit]
+Description=Pulse: new bug reports to the owner's Telegram, every minute
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=60s
+AccuracySec=10s
+[Install]
+WantedBy=timers.target
