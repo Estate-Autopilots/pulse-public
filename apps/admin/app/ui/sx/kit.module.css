@@ -1,0 +1,1025 @@
+/* The Sales Xray page kit (ported from Pulse, adapted to teal). Only --sx-*
+   tokens: light and dark come from the token file. Text 12/13/14 px, panel
+   titles 15, page titles 20, figures 24; rows at least 40 px; controls
+   --sx-control-h (32 px, 44 px on touch). */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--sx-muted);
+}
+
+/* ---------- Page header ---------- */
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+  min-width: 0;
+}
+
+.headerText {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  width: fit-content;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--sx-ink);
+}
+
+.title {
+  margin: 0;
+  overflow: hidden;
+  color: var(--sx-ink);
+  font: var(--sx-text-title);
+  letter-spacing: -0.015em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.context {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-sm);
+}
+
+.context > span + span::before {
+  margin: 0 6px;
+  content: "·";
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- Panel ---------- */
+
+.panel {
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--sx-line);
+  border-radius: var(--sx-radius-md);
+  background: var(--sx-surface);
+}
+
+/* Nothing inside a panel (forms, toolbars) can grow wider than the panel. */
+.panel > * {
+  min-width: 0;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--sx-panel-head-h);
+  box-sizing: border-box;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--sx-line);
+}
+
+.panelTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  min-width: 0;
+  margin: 0;
+  color: var(--sx-ink);
+  font: var(--sx-text-panel);
+}
+
+/* A long sub-line drops below the title instead of squeezing it. */
+.panelTitle small {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panelTools {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.panelAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--sx-accent);
+  font-size: var(--sx-text-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.panelFoot {
+  padding: 10px 14px;
+  border-top: 1px solid var(--sx-line);
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+}
+
+/* ---------- Badge, delta, spark, meter ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: var(--sx-badge-h);
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--sx-sunken);
+  color: var(--sx-ink-2);
+  font-size: var(--sx-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge[data-tone="accent"] {
+  background: var(--sx-accent-soft);
+  color: var(--sx-accent);
+}
+
+/* Tinted badges mix their text toward the ink so 12 px text keeps 4.5:1 on
+   any surface, in both themes (axe, 11 Oct). */
+.badge[data-tone="info"] {
+  background: color-mix(in oklab, var(--sx-info) 13%, transparent);
+  color: color-mix(in oklab, var(--sx-info) 74%, var(--sx-ink));
+}
+
+.badge[data-tone="good"] {
+  background: color-mix(in oklab, var(--sx-good) 12%, transparent);
+  color: color-mix(in oklab, var(--sx-good) 78%, var(--sx-ink));
+}
+
+.badge[data-tone="warn"] {
+  background: color-mix(in oklab, var(--sx-warn) 14%, transparent);
+  color: color-mix(in oklab, var(--sx-warn) 70%, var(--sx-ink));
+}
+
+.badge[data-tone="bad"] {
+  background: var(--sx-bad-soft);
+  color: var(--sx-bad);
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-size: var(--sx-text-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.delta[data-trend="up"] {
+  color: var(--sx-good);
+}
+
+.delta[data-trend="down"] {
+  color: var(--sx-bad);
+}
+
+.delta[data-trend="flat"] {
+  color: var(--sx-muted);
+}
+
+/* Any number of bars fits the box: a 30-day spark once spilled into the next tile. */
+.spark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1px;
+  width: 72px;
+  max-width: 100%;
+  height: 24px;
+  overflow: hidden;
+}
+
+.spark i {
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: 1px;
+  background: color-mix(in oklab, var(--sx-accent) 40%, transparent);
+}
+
+.spark i[data-on] {
+  background: var(--sx-accent);
+}
+
+.meter {
+  display: block;
+  width: 100%;
+  min-width: 48px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--sx-sunken);
+}
+
+.meter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--sx-accent);
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--sx-muted);
+}
+
+.dot[data-tone="accent"],
+.dot[data-tone="good"] {
+  background: var(--sx-good);
+}
+
+.dot[data-tone="warn"] {
+  background: var(--sx-warn);
+}
+
+.dot[data-tone="bad"] {
+  background: var(--sx-bad);
+}
+
+/* ---------- KPI tiles ---------- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--sx-line);
+  border-radius: var(--sx-radius-md);
+  background: var(--sx-surface);
+}
+
+.tile {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+  min-height: var(--sx-tile-min-h);
+  box-sizing: border-box;
+  padding: 14px 16px;
+  color: inherit;
+  text-decoration: none;
+  /* Hairlines between tiles in any reflow; the panel's edge hides the outer ones. */
+  box-shadow:
+    -1px 0 0 var(--sx-line),
+    0 -1px 0 var(--sx-line);
+}
+
+a.tile:focus-visible {
+  outline: 2px solid var(--sx-accent);
+  outline-offset: -2px;
+}
+
+a.tile:hover {
+  background: var(--sx-sunken);
+}
+
+.tileLabel {
+  display: flex;
+  align-items: center;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+  font-weight: 600;
+}
+
+.tileMain {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 0;
+  min-height: 32px;
+}
+
+.tileValue {
+  color: var(--sx-ink);
+  font: var(--sx-text-kpi);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.tileValue[data-words] {
+  font: var(--sx-text-panel);
+  letter-spacing: 0;
+}
+
+.tileValue small {
+  margin-left: 3px;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-sm);
+  font-weight: 500;
+}
+
+.tileSpark {
+  display: flex;
+  flex: 0 1 72px;
+  justify-content: flex-end;
+  min-width: 0;
+  margin-left: auto;
+}
+
+/* Two lines, then an ellipsis: one line cut "Jobs that needed more than …". */
+.tileNote {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* ---------- Empty, why, skeleton ---------- */
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 28px 16px;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sx-sunken);
+  color: var(--sx-muted);
+}
+
+.emptyTitle {
+  margin: 0;
+  color: var(--sx-ink);
+  font-size: var(--sx-text-md);
+  font-weight: 600;
+}
+
+.emptyText {
+  max-width: 44ch;
+  margin: 0 0 6px;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-sm);
+}
+
+.why {
+  position: relative;
+}
+
+.why summary {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--sx-muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.why summary::-webkit-details-marker {
+  display: none;
+}
+
+.why summary:hover,
+.why[open] summary {
+  background: var(--sx-sunken);
+  color: var(--sx-ink);
+}
+
+.whyPanel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  right: 0;
+  width: min(320px, 80vw);
+  padding: 10px 12px;
+  border: 1px solid var(--sx-line);
+  border-radius: var(--sx-radius-md);
+  background: var(--sx-surface);
+  box-shadow: var(--lx-shadow-1);
+  color: var(--sx-ink-2);
+  font-size: var(--sx-text-xs);
+}
+
+.whyPanel p {
+  margin: 0;
+}
+
+.whyPanel p + p {
+  margin-top: 6px;
+}
+
+.skeleton {
+  display: block;
+  border-radius: 6px;
+  background: var(--sx-sunken);
+  animation: kit-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes kit-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ---------- Tabs and segmented ---------- */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--sx-line);
+  scrollbar-width: none;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 10px;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tab:hover,
+.tab[aria-current="page"] {
+  color: var(--sx-ink);
+}
+
+.tab[aria-current="page"]::after {
+  position: absolute;
+  right: 8px;
+  bottom: -1px;
+  left: 8px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--sx-accent);
+  content: "";
+}
+
+.tabCount {
+  color: var(--sx-muted);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--sx-radius-sm);
+  background: var(--sx-sunken);
+}
+
+.segment {
+  min-height: calc(var(--sx-control-h) - 4px);
+  padding: 0 10px;
+  border: 0;
+  border-radius: calc(var(--sx-radius-sm) - 2px);
+  background: transparent;
+  color: var(--sx-muted);
+  font: inherit;
+  font-size: var(--sx-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segment[aria-pressed="true"] {
+  background: var(--sx-surface);
+  color: var(--sx-ink);
+  box-shadow: var(--lx-shadow-1);
+}
+
+/* ---------- Avatar ---------- */
+
+.avatar {
+  display: inline-grid;
+  width: var(--size, 24px);
+  height: var(--size, 24px);
+  flex: none;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--sx-accent) 14%, var(--sx-sunken));
+  color: var(--sx-ink-2);
+  font-size: max(10px, calc(var(--size, 24px) * 0.4));
+  font-weight: 700;
+}
+
+.avatar[data-shape="square"] {
+  border-radius: var(--sx-radius-sm);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- List rows ---------- */
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--sx-row-h);
+  box-sizing: border-box;
+  padding: 8px 14px;
+}
+
+/* A row with a link opens from anywhere on it, not just its title text. */
+a.rowTitle::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.row:has(> .rowMain > a.rowTitle):hover {
+  background: color-mix(in oklab, var(--sx-sunken) 70%, transparent);
+}
+
+a.rowTitle:focus-visible {
+  outline: none;
+}
+
+a.rowTitle:focus-visible::after {
+  outline: 2px solid var(--sx-accent);
+  outline-offset: -2px;
+}
+
+/* Controls at a row's end stay clickable above the stretched link. */
+.rowEnd :is(a, button, input, select, textarea, label) {
+  position: relative;
+  z-index: 1;
+}
+
+.row + .row {
+  border-top: 1px solid var(--lx-line-soft);
+}
+
+.rowIcon {
+  display: inline-flex;
+  flex: none;
+  color: var(--sx-muted);
+}
+
+.rowMain {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 1px;
+}
+
+.rowTitle {
+  overflow: hidden;
+  color: var(--sx-ink);
+  font-size: var(--sx-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+a.rowTitle:hover {
+  color: var(--sx-accent);
+}
+
+.rowMeta {
+  display: flex;
+  flex-wrap: wrap;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+}
+
+.rowMeta > span + span::before {
+  margin: 0 6px;
+  content: "·";
+}
+
+.rowEnd > .meter {
+  width: 72px;
+}
+
+.rowEnd {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+}
+
+/* ---------- Table and phone cards ---------- */
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sx-text-sm);
+}
+
+.table th,
+.table td {
+  height: var(--sx-row-h);
+  padding: 0 14px;
+  border-top: 1px solid var(--lx-line-soft);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table thead th {
+  height: var(--sx-table-head-h);
+  border-top: 0;
+  background: var(--sx-sunken);
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table tbody th {
+  color: var(--sx-ink);
+  font-weight: 600;
+}
+
+.table tbody tr:hover {
+  background: color-mix(in oklab, var(--sx-sunken) 60%, transparent);
+}
+
+.table :is(th, td)[data-num] {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.cards {
+  display: none;
+}
+
+.card {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+}
+
+.card > strong {
+  color: var(--sx-ink);
+  font-size: var(--sx-text-sm);
+  font-weight: 600;
+}
+
+.card + .card {
+  border-top: 1px solid var(--lx-line-soft);
+}
+
+@media (max-width: 760px) {
+  /* Phones: tiles two across (r17 S4). */
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tableWrap[data-has-cards] {
+    display: none;
+  }
+
+  .cards {
+    display: grid;
+  }
+}
+
+/* ---------- Buttons ---------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--sx-control-h);
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--sx-line);
+  border-radius: var(--sx-radius-sm);
+  background: var(--sx-surface);
+  color: var(--sx-ink);
+  font: inherit;
+  font-size: var(--sx-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--sx-sunken);
+}
+
+.button[data-variant="primary"] {
+  border-color: transparent;
+  background: var(--sx-accent);
+  color: var(--sx-accent-ink);
+}
+
+.button[data-variant="primary"]:hover:not(:disabled) {
+  background: var(--lx-teal-hover);
+}
+
+.button[data-variant="ghost"] {
+  border-color: transparent;
+  background: transparent;
+  color: var(--sx-ink-2);
+}
+
+.button[data-variant="icon"] {
+  width: var(--sx-control-h);
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--sx-muted);
+}
+
+.button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.button:focus-visible,
+.segment:focus-visible,
+.tab:focus-visible,
+.why summary:focus-visible,
+.inline:focus-visible {
+  outline: 2px solid var(--sx-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Fields and inline edit ---------- */
+
+.field {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: var(--sx-ink);
+  font-size: var(--sx-text-sm);
+}
+
+.fieldLabel {
+  color: var(--sx-ink-2);
+  font-size: var(--sx-text-xs);
+  font-weight: 600;
+}
+
+.field :is(input, select, textarea),
+.inlineInput {
+  width: 100%;
+  min-height: var(--sx-control-h);
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid var(--sx-line);
+  border-radius: var(--sx-radius-sm);
+  background: var(--sx-surface);
+  color: var(--sx-ink);
+  font: inherit;
+  font-size: var(--sx-text-sm);
+}
+
+.field textarea {
+  min-height: 80px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+.field :is(input, select, textarea):focus,
+.inlineInput:focus {
+  border-color: var(--sx-accent);
+  outline: 2px solid var(--sx-accent-soft);
+  outline-offset: 0;
+}
+
+.fieldHint {
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+}
+
+.fieldError {
+  color: var(--sx-bad);
+  font-size: var(--sx-text-xs);
+}
+
+.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: var(--sx-control-h);
+  margin-left: -6px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--sx-radius-sm);
+  background: transparent;
+  color: var(--sx-ink);
+  font: inherit;
+  font-size: var(--sx-text-sm);
+  text-align: left;
+  cursor: text;
+}
+
+.inline > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inline svg {
+  flex: none;
+  color: var(--sx-muted);
+  opacity: 0;
+}
+
+.inline:hover:not(:disabled) {
+  border-color: var(--sx-line);
+}
+
+.inline:hover svg,
+.inline:focus-visible svg {
+  opacity: 1;
+}
+
+.inline:disabled {
+  cursor: default;
+}
+
+.inlineEditing {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.inlineEditing small:empty {
+  display: none;
+}
+
+/* Phones: 16 px fields never trigger zoom-on-focus. */
+@media (max-width: 899.98px) {
+  .field :is(input, select, textarea),
+  .inlineInput {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* ---------- Console additions ---------- */
+
+.page {
+  display: grid;
+  align-content: start;
+  gap: var(--sx-gap);
+  width: 100%;
+  max-width: 1320px;
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 16px 20px 32px;
+}
+
+.page[data-wide] {
+  max-width: none;
+}
+
+.unavailable {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--sx-line);
+  border-radius: var(--sx-radius-md);
+  background: var(--sx-surface);
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+}
+
+.unavailable svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.unavailable span {
+  display: grid;
+  gap: 2px;
+}
+
+.unavailable strong {
+  color: var(--sx-ink);
+  font-size: var(--sx-text-sm);
+  font-weight: 600;
+}
+
+.kbd {
+  display: inline-grid;
+  min-width: 18px;
+  height: 20px;
+  box-sizing: border-box;
+  place-items: center;
+  padding: 0 5px;
+  border: 1px solid var(--sx-line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--sx-surface);
+  color: var(--sx-ink-2);
+  font: 600 var(--sx-text-xs) / 1 var(--lx-font-ui);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar > :is(select, input) {
+  min-height: var(--sx-control-h);
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid var(--sx-line);
+  border-radius: var(--sx-radius-sm);
+  background: var(--sx-surface);
+  color: var(--sx-ink);
+  font: inherit;
+  font-size: var(--sx-text-sm);
+}
+
+.toolbar > input[type="search"] {
+  flex: 1 1 200px;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 12px var(--sx-gutter) 24px;
+  }
+
+  .toolbar > :is(select, input) {
+    flex: 1 1 140px;
+    min-width: 0;
+    font-size: 16px;
+  }
+}

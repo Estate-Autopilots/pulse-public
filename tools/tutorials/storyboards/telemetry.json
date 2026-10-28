@@ -1,0 +1,252 @@
+{
+ "id": "telemetry",
+ "title": {
+  "en": "Find what is slow in Pulse",
+  "hi": "Pulse mein kya slow hai, dekhiye"
+ },
+ "persona": "Meera Shah (founder of Brightside Studio); all fictional",
+ "takes": [
+  {
+   "id": "m1",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/telemetry"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 1000
+    },
+    {
+     "do": "appear",
+     "mark": "overview",
+     "zoom": 1.15,
+     "text": "Slowest pages",
+     "sfx": "none"
+    },
+    {
+     "do": "wait",
+     "ms": 1500
+    },
+    {
+     "do": "scroll",
+     "dy": 500,
+     "mark": "scroll"
+    },
+    {
+     "do": "wait",
+     "ms": 1400
+    },
+    {
+     "do": "tap",
+     "mark": "slowest",
+     "zoom": 1.3,
+     "role": "link",
+     "name": "Slowest",
+     "exact": true
+    },
+    {
+     "do": "appear",
+     "mark": "p95",
+     "zoom": 1.15,
+     "text": "Pages by p95",
+     "timeout": 60000,
+     "sfx": "none"
+    },
+    {
+     "do": "wait",
+     "ms": 1500
+    },
+    {
+     "do": "tap",
+     "mark": "errors",
+     "zoom": 1.3,
+     "role": "link",
+     "name": "Errors",
+     "exact": true
+    },
+    {
+     "do": "wait",
+     "ms": 2200
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "m1",
+   "from": "p95",
+   "to": "errors",
+   "to_offset": -4,
+   "hook": {
+    "en": "What's slow? Find out",
+    "hi": "Kya slow hai? Dekhiye"
+   },
+   "chapter": {
+    "en": "In short",
+    "hi": "Short mein"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] Which page is slow, and for whom?",
+     "cap": "Which page is *slow,* and for *whom?*"
+    },
+    "hi": {
+     "say": "[excited] कौन सा page slow है, और किसके लिए?",
+     "cap": "Kaun sa page *slow* hai, aur *kiske* liye?"
+    }
+   }
+  },
+  {
+   "id": "overview",
+   "take": "m1",
+   "from": "start",
+   "to": "slowest",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Overview",
+    "hi": "Overview"
+   },
+   "line": {
+    "en": {
+     "say": "Overview shows the slowest pages, clicks and errors.",
+     "cap": "*Overview* shows the slowest pages, clicks and errors."
+    },
+    "hi": {
+     "say": "Overview में सबसे slow pages, clicks और errors दिखते हैं।",
+     "cap": "*Overview* mein sabse slow pages, clicks aur errors dikhte hain."
+    }
+   }
+  },
+  {
+   "id": "slowest",
+   "take": "m1",
+   "from": "slowest",
+   "to": "errors",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Slowest",
+    "hi": "Slowest"
+   },
+   "line": {
+    "en": {
+     "say": "Slowest ranks them, beside the day before.",
+     "cap": "*Slowest* ranks them, beside the day before."
+    },
+    "hi": {
+     "say": "Slowest उन्हें rank करता है, कल से तुलना के साथ।",
+     "cap": "*Slowest* unhe rank karta hai, kal se tulna ke saath."
+    }
+   }
+  },
+  {
+   "id": "errors",
+   "take": "m1",
+   "from": "errors",
+   "to": "end",
+   "payoff": true,
+   "chapter": {
+    "en": "Errors",
+    "hi": "Errors"
+   },
+   "line": {
+    "en": {
+     "say": "[happy] Errors shows what failed, and for whom.",
+     "cap": "*Errors* shows what failed, and for whom."
+    },
+    "hi": {
+     "say": "[happy] Errors बताता है क्या fail हुआ, किसके लिए।",
+     "cap": "*Errors* batata hai kya fail hua, kiske liye."
+    }
+   }
+  }
+ ],
+ "end": {
+  "frames": 30,
+  "text": {
+   "en": "More tutorials: Pulse, Learn",
+   "hi": "Aur tutorials: Pulse, Learn"
+  }
+ },
+ "screens": {
+  "setup": [
+   {
+    "do": "login",
+    "user": "meera.shah"
+   },
+   {
+    "do": "goto",
+    "url": "/telemetry"
+   }
+  ],
+  "steps": [
+   {
+    "do": "appear",
+    "text": "Slowest pages"
+   },
+   {
+    "shot": "01",
+    "settle": 1200,
+    "focus": {
+     "role": "link",
+     "name": "Overview"
+    }
+   },
+   {
+    "shot": "02",
+    "settle": 1200,
+    "focus": {
+     "role": "link",
+     "name": "24 hours"
+    }
+   },
+   {
+    "do": "goto",
+    "url": "/telemetry?view=slowest"
+   },
+   {
+    "do": "appear",
+    "text": "Pages by p95"
+   },
+   {
+    "shot": "03",
+    "settle": 1200,
+    "focus": {
+     "role": "link",
+     "name": "Slowest"
+    }
+   },
+   {
+    "do": "goto",
+    "url": "/telemetry?view=errors"
+   },
+   {
+    "do": "wait",
+    "ms": 3000
+   },
+   {
+    "shot": "04",
+    "settle": 1200,
+    "focus": {
+     "role": "link",
+     "name": "Errors"
+    }
+   }
+  ]
+ }
+}

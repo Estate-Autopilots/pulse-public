@@ -1,0 +1,219 @@
+{
+ "id": "product-map",
+ "title": {
+  "en": "Map an app you are building",
+  "hi": "Apne app ka map banaiye"
+ },
+ "persona": "Meera Shah (founder of Brightside Studio); all fictional",
+ "takes": [
+  {
+   "id": "p1",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/product-map"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 1000
+    },
+    {
+     "do": "tap",
+     "mark": "connect",
+     "zoom": 1.3,
+     "role": "button",
+     "name": "Connect an app"
+    },
+    {
+     "do": "appear",
+     "mark": "form",
+     "zoom": 0,
+     "role": "heading",
+     "name": "Connect an app",
+     "timeout": 60000,
+     "sfx": "none"
+    },
+    {
+     "do": "type",
+     "mark": "name",
+     "value": "Brightside client app",
+     "zoom": 1.3,
+     "delay": 35,
+     "label": "Name",
+     "exact": true
+    },
+    {
+     "do": "tap",
+     "mark": "how",
+     "zoom": 1.3,
+     "role": "radio",
+     "name": "/^Visit it live/"
+    },
+    {
+     "do": "wait",
+     "ms": 1200
+    },
+    {
+     "do": "tap",
+     "mark": "code",
+     "zoom": 1.3,
+     "role": "radio",
+     "name": "/^Read its code/"
+    },
+    {
+     "do": "wait",
+     "ms": 1800
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "p1",
+   "from": "how",
+   "to": "end",
+   "hook": {
+    "en": "Map your app",
+    "hi": "App ka map"
+   },
+   "chapter": {
+    "en": "In short",
+    "hi": "Short mein"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] Every screen of your app, mapped!",
+     "cap": "Every *screen* of your app, *mapped!*"
+    },
+    "hi": {
+     "say": "[excited] आपके app की हर screen, एक map में!",
+     "cap": "Aapke app ki har *screen,* ek *map* mein!"
+    }
+   }
+  },
+  {
+   "id": "connect",
+   "take": "p1",
+   "from": "start",
+   "to": "name",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Connect",
+    "hi": "Connect"
+   },
+   "line": {
+    "en": {
+     "say": "Open Product map, and tap Connect an app.",
+     "cap": "Open *Product* *map,* and tap *Connect* an app."
+    },
+    "hi": {
+     "say": "Product map खोलिए, और Connect an app दबाइए।",
+     "cap": "*Product* *map* kholiye, aur *Connect* an app dabaiye."
+    }
+   }
+  },
+  {
+   "id": "how",
+   "take": "p1",
+   "from": "name",
+   "to": "end",
+   "payoff": true,
+   "chapter": {
+    "en": "Name and source",
+    "hi": "Naam aur source"
+   },
+   "line": {
+    "en": {
+     "say": "[happy] Name it, and choose how Pulse reads it.",
+     "cap": "Name it, and choose how *Pulse* *reads* it."
+    },
+    "hi": {
+     "say": "[happy] नाम दीजिए, और चुनिए Pulse उसे कैसे पढ़े।",
+     "cap": "Naam dijiye, aur chuniye *Pulse* use kaise padhe."
+    }
+   }
+  }
+ ],
+ "end": {
+  "frames": 30,
+  "text": {
+   "en": "More tutorials: Pulse, Learn",
+   "hi": "Aur tutorials: Pulse, Learn"
+  }
+ },
+ "screens": {
+  "setup": [
+   {
+    "do": "login",
+    "user": "meera.shah"
+   },
+   {
+    "do": "goto",
+    "url": "/product-map"
+   }
+  ],
+  "steps": [
+   {
+    "do": "appear",
+    "role": "button",
+    "name": "Connect an app"
+   },
+   {
+    "shot": "01",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "Connect an app"
+    }
+   },
+   {
+    "do": "tap",
+    "role": "button",
+    "name": "Connect an app"
+   },
+   {
+    "do": "appear",
+    "role": "heading",
+    "name": "Connect an app",
+    "timeout": 60000
+   },
+   {
+    "do": "type",
+    "value": "Brightside client app",
+    "delay": 20,
+    "label": "Name"
+   },
+   {
+    "shot": "02",
+    "settle": 1200,
+    "focus": {
+     "role": "radio",
+     "name": "/^Read its code/"
+    }
+   },
+   {
+    "shot": "03",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "Connect and read"
+    }
+   }
+  ]
+ }
+}

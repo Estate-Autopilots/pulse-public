@@ -1,0 +1,26 @@
+/* MAILBOX: the "connect your mailbox" card and the quiet "mail not connected" line (mailbox-notice.tsx). Bottom left,
+   above the page, below sheets and dialogs; phones span the width inside the safe areas. */
+.card, .line { position: fixed; z-index: 60; left: max(16px, env(safe-area-inset-left)); bottom: max(16px, env(safe-area-inset-bottom));
+  border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.14); font-size: 13px; }
+.card { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; width: min(440px, calc(100vw - 32px)); padding: 16px; border-radius: 12px; }
+.line { display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 32px); padding: 8px 10px 8px 12px; border-radius: 999px; }
+.line > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.icon { color: var(--theme-warning, #b45309); margin-top: 1px; }
+.body { display: grid; gap: 8px; min-width: 0; }
+.body strong { font-size: 14px; }
+.body p { margin: 0; color: var(--theme-text-muted, inherit); line-height: 1.45; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 4px; }
+.primary { height: 32px; padding: 0 12px; border: 1px solid var(--theme-action); border-radius: 7px; background: var(--theme-action);
+  color: var(--theme-action-text); font: inherit; font-weight: 600; cursor: pointer; }
+.primary:disabled { border-color: var(--theme-border); background: var(--theme-disabled-surface); color: var(--theme-disabled-text); cursor: not-allowed; }
+.quiet, .link { border: 0; background: none; color: var(--theme-action); font: inherit; font-weight: 600; cursor: pointer; padding: 0; }
+.link { white-space: nowrap; }
+.link:disabled { color: var(--theme-disabled-text); cursor: not-allowed; }
+.note { font-size: 12px; }
+.close { display: inline-grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 6px; background: none; color: inherit; cursor: pointer; }
+.close:hover { background: var(--theme-surface-subtle); }
+@media (max-width: 640px) {
+  .card, .line { right: max(16px, env(safe-area-inset-right)); width: auto; bottom: calc(max(16px, env(safe-area-inset-bottom)) + 64px); }
+  .line { border-radius: 12px; }
+}

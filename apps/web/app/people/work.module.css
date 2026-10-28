@@ -1,0 +1,23 @@
+/* PEOPLE-LIVE: work evidence on the person page. */
+.missing { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 14px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.missing svg { flex: none; margin-top: 3px; }
+.mark { display: inline-flex; flex: none; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
+.mark svg { margin-left: 4px; vertical-align: -1px; }
+.trend { display: inline-flex; align-items: flex-end; gap: 14px; height: 46px; padding: 0 6px; }
+.trend > span { position: relative; display: inline-flex; align-items: flex-end; gap: 1px; height: 30px; padding-bottom: 14px; }
+.trend i { display: block; width: 8px; min-height: 2px; border-radius: 2px 2px 0 0; background: var(--theme-action); }
+.trend i[data-suggested] { background: color-mix(in srgb, var(--theme-warning) 55%, transparent); }
+.trend small { position: absolute; bottom: 0; left: 50%; color: var(--theme-text-muted); font-size: 10px; white-space: nowrap; transform: translateX(-50%); }
+.groups { display: grid; gap: 10px; padding: 10px 14px; }
+.group { display: grid; gap: 6px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); }
+.groupHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.groupHead b { font-weight: 600; }
+.group p { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.45; }
+.group ul { display: grid; gap: 4px; margin: 0; padding: 0 0 0 14px; font-size: 12.5px; }
+.group li small { display: block; color: var(--theme-text-muted); }
+/* LAYOUT-SWEEP: on a phone the badge and its buttons take their own line under the title (beside it they left the
+   title 14 px wide). 27 px = the row's icon and gap. */
+@media (max-width: 760px) {
+  li:has(> .mark) { flex-wrap: wrap; }
+  .mark { flex: 1 0 100%; justify-content: flex-start; padding-left: 27px; }
+}

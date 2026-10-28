@@ -1,0 +1,1066 @@
+"use client";
+// One conversation, WhatsApp style: mine on the right, theirs on the left, a chip over each day, ticks on what I sent,
+// a reply quotes the message it answers, reactions under the bubble, actions on hover (desktop) or a long press
+// (phone). Messages draw from the cache at once and sync behind; a send shows immediately and settles when stored.
+import Link from "next/link";
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ClipboardEvent, type CSSProperties, type KeyboardEvent, type ReactNode, type RefObject, type TouchEvent, type MouseEvent as ReactMouseEvent } from "react";
+import { createPortal } from "react-dom";
+import { AlarmClock, Archive, ArrowDown, ArrowLeft, BarChart3, Bell, CalendarDays, Megaphone, BellOff, Check, CheckCheck, CheckCircle2, ChevronDown, CircleAlert, Clock3, Copy, File as FileIcon, Forward, History, Image as ImageIcon, Images, Info, Link2, ListChecks, MailWarning, MessageSquareText, Paperclip, Pencil, Phone, Pin, PinOff, Plus, Reply, Search, SendHorizontal, Smile, Sparkles, Star, StarOff, Trash2, Video, X, SquareSlash, FolderKanban } from "lucide-react";
+import { openCreate } from "../create";
+import { notify as toast } from "@pulse/ui-shell";
+import { Avatar } from "../ui";
+import { AiBadge } from "../kit/ai-badge";
+import { PresenceLine } from "../presence";
+import { clock, dayChip, fullTime, kindLabel, linkDomain, previewLink, rankMentions, sameDay, segments, ticks } from "../lib/chat-format.mjs";
+import { cachedList, cachedThread, saveList, storeVersion, subscribe, updateThread, saveThread } from "./store";
+import { GroupAvatar, go, syncThread } from "./parts";
+import { get, readBase64, send } from "./net";
+import { TaskCard, useTaskCards } from "./task-card";
+import { allChatCommands, chatCommands, findChatCommand, type ChatCommand, type ChatCommandContext, type CommandCard, type WorkKind } from "./commands";
+import { COMMAND_GROUPS } from "./command-centre";
+import { CARD_EVENT, CommandCardView, CommandPalette } from "./command-card";
+import { addToProject } from "./command-centre";
+import cc from "./command-card.module.css";
+import { requestIntent } from "../lib/chat-commands.mjs";
+import { WorkList, type WorkData, type WorkResult } from "./work-list";
+import { taskIntent, type TaskIntent } from "../lib/task-intent.mjs";
+import { zoneDay } from "../lib/zone.mjs";
+import { useOrgZone } from "../org-code";
+import { dueLabel } from "./task-card";
+import wk from "./work.module.css";
+import { ImportedHistory } from "./history";
+import { VoiceNote, VoiceRecorder, isVoice, useVoiceState } from "./voice";
+// WA-MEDIA: what each file moved from WhatsApp shows or says.
+import { WaMediaLine, useWaMedia, type WaMedia } from "./wa-media";
+import { CallLine, callOf } from "../calls/call-line";
+import { RecordingLine, recordingOf } from "../calls/recording-line";
+import { startCall } from "../calls/call-host";
+import type { Attachment, Channel, ChatData, ChatMessage, Member } from "./types";
+import { PanelToggle, droppedRef } from "./workspace/panel";
+import { IntentChips, useAutoOpen, useTypedIntent } from "./workspace/intent";
+import "./workspace/commands";
+import "./ask";
+import { openInPanel } from "./workspace/tabs";
+import ws from "./workspace/workspace.module.css";
+import { draftStore } from "./drafts";
+import css from "./chats.module.css";
+import own from "./history.module.css";
+// CHAT-V3: typing, the outbox, threads, the picture viewer, approvals, seen by, pinned messages, forwarding, the gallery.
+import { iAmTyping, stoppedTyping, typingLine, useTypers } from "./live";
+import { deliver as deliverOut, startOutbox } from "./outbox";
+import { ApprovalCard, ForwardDialog, Gallery, MessageInfo, PinnedBar, SeenBy, TypingBubble, mutedNow, useNotice } from "./v3";
+import { Lightbox, ThreadPane } from "./thread";
+import { ChatAside, MEDIA_EVENT } from "./aside";
+import { LinkPreview } from "./link-preview";
+import { EditHistory } from "./edit-history";
+import { modelName } from "../people/ai/[id]/model";
+import v3 from "./v3.module.css";
+// CHAT-V5: remind me about a message, send a message later.
+import { POLL_EVENT, PollCard, PollDialog, ScheduledBar, WhenDialog, noteEmoji, quickReactions, refreshChatList } from "./v5";
+import { whenWords } from "../lib/chat-v5.mjs";
+import v5 from "./v5.module.css";
+// CHAT-V5 (UX sweep): the find bar with marks, the offline banner, uploads with progress.
+import { FindBar, OfflineBanner, uploadWithProgress, useFindMarks } from "./sweep";
+// CHAT-V6: the emoji picker (search, categories, keyboard).
+import { EmojiPicker } from "./emoji";
+// CHAT-V6: long conversations draw only what is near the screen; a message far back opens with the page around it.
+import { useVirtualLog } from "./vlist";
+import v6 from "./v6.module.css";
+import { fileUrl, waUrl } from "./files";
+import { ImportedMarker, JumpToDate, OmittedFile } from "./native";
+import nat from "./native.module.css";
+// GROUP-ACCESS: a client group read without being a member: Join to post in place of the message box.
+import { JoinBar } from "./browse";
+
+const never = () => () => {};
+/** FEATURES-1024: chat files that open beside the chat (the API serves them inline); anything else downloads. */
+const PANEL_DOCS = /^(application\/pdf|text\/plain)$/;
+const QUICK = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
+const MORE_REACTIONS = ["🎉", "✅", "👀", "🔥", "🙂"];
+const RUN_MS = 5 * 60000;
+// CHAT-SHELL v2: drafts survive leaving the page and reloading (drafts.ts).
+const drafts = draftStore;
+/** CHAT-SHELL v2: the command menu in groups, the work first. */
+// UX-SIMPLE (28 Oct 2026): the groups live with the commands (command-centre.tsx), so the list and the palette agree.
+const GROUPS = COMMAND_GROUPS;
+const cmdGroup = (name: string) => GROUPS.find(([, re]) => re.test(name))?.[0] ?? "More";
+const byGroup = <T extends { name: string }>(list: T[]) => [...list].sort((a, b) => { const g = (n: string) => { const i = GROUPS.findIndex(([, re]) => re.test(n)); return i < 0 ? 9 : i; }; return g(a.name) - g(b.name); });
+/** CHAT-SHELL: what the message box of a conversation starts with (the chat home's "@ravi can you…"). */
+export function setDraft(channelId: string, text: string) { drafts.set(channelId, text); }
+/** The message box's way in for files and links dropped anywhere on the conversation. */
+type ComposerApi = { files: (list: File[]) => void; link: (ref: { name: string; url: string }) => void };
+const first = (name: string) => name.replace(/^(mr|mrs|ms|dr|miss)\.?\s+/i, "").split(" ")[0];
+/** CHAT-V6: a message's place in the list (a sent message keeps the key it had while sending). */
+const keyOf = (m: ChatMessage) => m.clientId ?? m.id;
+const hue = (s: string) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+const isImage = (a: Attachment) => !!a.id && /^image\/(png|jpe?g|gif|webp)$/.test(a.mime ?? "");
+// WA-NATIVE: a video moved from WhatsApp plays in its bubble (its still and the copy every browser plays).
+const isVideo = (a: Attachment) => !!a.id && !!a.wa && /^video\//.test(a.mime ?? "");
+const coarse = () => typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+/** CHAT-V5: @everyone / @here as choices in the people list, and which of them a message uses (@everyone wins). */
+const BROADCASTS = (n: number): Member[] => [{ id: "@everyone", name: "Everyone", username: "everyone", team: `all ${Math.max(0, n - 1)} other members` }, { id: "@here", name: "Everyone active now", username: "here", team: "members active in Pulse now" }];
+const broadcastOf = (text: string): "everyone" | "here" | null => /(^|[^\w.-])@everyone(?![\w.-])/i.test(text) ? "everyone" : /(^|[^\w.-])@here(?![\w.-])/i.test(text) ? "here" : null;
+
+/** `bar`: LAYOUT-SWEEP chat mode puts this header into Pulse's top bar (the conversation's identity, search in it, its
+ *  details); without one it heads the pane as before. */
+type Props = { channel: Channel; data: ChatData; focus: string | null; boot: boolean; onInfo: () => void; onPin: () => void; onBack: () => void; onChanged: () => Promise<void> | void; bar?: HTMLElement | null;
+  /** CHAT-V3: a thread to open (a notification about a reply links to it). */ thread?: string | null };
+export function Conversation({ channel, data, focus, boot, onInfo, onPin, onBack, onChanged, bar, thread: threadParam = null }: Props) {
+  useSyncExternalStore(subscribe, storeVersion, () => 0);
+  // The cache is this browser's: read it only after hydration, so the first client render matches the server's.
+  const ready = useSyncExternalStore(never, () => true, () => false);
+  const thread = ready ? cachedThread(channel.id) : null;
+  const messages = useMemo(() => thread?.messages ?? [], [thread]);
+  const members = thread?.members?.length ? thread.members : data.people.filter((p) => p.id === data.viewer || p.id === channel.peerId);
+  const [loading, setLoading] = useState(!thread), [error, setError] = useState("");
+  const [reply, setReply] = useState<ChatMessage | null>(null), [editing, setEditing] = useState<ChatMessage | null>(null), [sheet, setSheet] = useState<ChatMessage | null>(null);
+  const [confirm, setConfirm] = useState<ChatMessage | null>(null), [flash, setFlash] = useState<string | null>(null), [below, setBelow] = useState(false), [menu, setMenu] = useState(false), [history, setHistory] = useState(false), [dateJump, setDateJump] = useState(false);
+  const list = useRef<HTMLDivElement>(null), nearBottom = useRef(true), posted = useRef(""), olderBusy = useRef(false);
+  // Search inside this conversation: the chat search, kept to this channel.
+  const [searching, setSearching] = useState(false);
+  // CHAT-V5: the words searched for and the match shown, marked in the messages (sweep.tsx).
+  const [findMark, setFindMark] = useState<{ words: string; now: string | null }>({ words: "", now: null });
+  const onFindWords = useCallback((words: string, now: string | null) => setFindMark({ words, now }), []);
+  const [unreadAtOpen] = useState(channel.unread);
+  const me = data.people.find((p) => p.id === data.viewer);
+  const policy = data.policy ?? { editMinutes: 15, removeHours: 48 };
+  const viewer = data.viewer, group = channel.kind !== "direct";
+  // CHAT-V3 (speed): the same list until a name changes (members arrive as a new array on every sync).
+  // CHAT-V5: @everyone and @here read as mentions in a group.
+  const userKey = [...members.map((m) => m.username ?? ""), ...(channel.kind !== "direct" ? ["everyone", "here"] : [])].join(",");
+  const usernames = useMemo(() => userKey.split(","), [userKey]);
+  const taskIds = useMemo(() => [...new Set(messages.flatMap((m) => m.attachments.filter((a) => a.task).map((a) => a.task!)))], [messages]);
+  // CHAT-V3: task cards follow the conversation's live changes (a status changed elsewhere shows on the next sync).
+  const cards = useTaskCards(taskIds, thread?.at ?? 0);
+  const voice = useVoiceState(channel.id, messages, thread?.at ?? 0);
+  const waMedia = useWaMedia(channel.id, !!channel.whatsapp?.native, messages);
+  // CHAT-V3: a thread beside the conversation, the picture viewer, forwarding, message info, the gallery, a notice line.
+  const [threadOf, setThreadOf] = useState<string | null>(threadParam), [lightbox, setLightbox] = useState<{ m: string; f?: string } | null>(null);
+  useEffect(() => { if (threadParam) queueMicrotask(() => setThreadOf(threadParam)); }, [threadParam]);
+  const [forward, setForward] = useState<ChatMessage | null>(null), [infoOf, setInfoOf] = useState<ChatMessage | null>(null), [gallery, setGallery] = useState(false);
+  const [editsOf, setEditsOf] = useState<ChatMessage | null>(null);
+  // CHAT-V6: a reaction chosen from the whole emoji set.
+  const [reactOf, setReactOf] = useState<ChatMessage | null>(null);
+  // CHAT-V5: the message a reminder is being set on; a message (words, files, the reply) waiting for its send time.
+  const [remindOf, setRemindOf] = useState<ChatMessage | null>(null), [later, setLater] = useState<{ text: string; attachments: Attachment[]; quote: ChatMessage | null } | null>(null);
+  const [notice, notify] = useNotice();
+  const [composerKey, setComposerKey] = useState(0);
+  // CHAT-V5 (polls): the poll being written ("/poll Which cover?" or the menu), and votes as they are cast.
+  const [pollDraft, setPollDraft] = useState<string | null>(null);
+  useEffect(() => {
+    const on = (e: Event) => { const d = (e as CustomEvent<{ channelId: string; question: string }>).detail; if (d?.channelId === channel.id) setPollDraft(d.question ?? ""); };
+    window.addEventListener(POLL_EVENT, on); return () => window.removeEventListener(POLL_EVENT, on);
+  }, [channel.id]);
+  const typers = useTypers(channel.id);
+  useEffect(() => { startOutbox(); }, []);
+  // Someone whose message just arrived has stopped typing it.
+  const lastAuthor = messages.at(-1)?.authorId;
+  useEffect(() => { if (lastAuthor && lastAuthor !== data.viewer) stoppedTyping(channel.id, lastAuthor); }, [lastAuthor, channel.id, data.viewer]);
+  // CHAT-WORK: /tasks, /projects and /steps answer the asker alone, under the latest message, until closed.
+  const [work, setWork] = useState<WorkResult[]>([]);
+  useEffect(() => { queueMicrotask(() => setWork([])); }, [channel.id]);
+  useEffect(() => { const el = list.current; if (el && work.length) requestAnimationFrame(() => el.scrollTo({ top: el.scrollHeight, behavior: "smooth" })); }, [work]);
+  function showWork(kind: WorkKind) {
+    const key = crypto.randomUUID(); nearBottom.current = true;
+    setWork((w) => [...w.filter((x) => x.kind !== kind), { key, kind }]);
+    get<WorkData>(`chats/${channel.id}/work?kind=${kind}`).then((data) => setWork((w) => w.map((x) => x.key === key ? { ...x, data } : x)))
+      .catch((e) => setWork((w) => w.map((x) => x.key === key ? { ...x, error: (e as Error).message } : x)));
+  }
+  // CHAT-SHELL: a message that clearly means a place in Pulse opens it beside the chat (once); files and links dropped
+  // anywhere on the conversation (from the desktop, the side panel or Drive) go into the message box.
+  useAutoOpen(messages, channel, viewer, me?.username ?? null, unreadAtOpen);
+  // CHAT-SHELL v2: what the person sends is read too ("open my steps" opens it beside the chat).
+  const typed = useTypedIntent(channel.id);
+  const composer = useRef<ComposerApi | null>(null);
+  const [dropping, setDropping] = useState(false), dragDepth = useRef(0);
+  const carries = (dt: DataTransfer) => dt.types.includes("Files") || dt.types.includes("text/uri-list") || dt.types.includes("application/x-pulse-ref");
+
+  // E2E-4P (owner check, 23 Oct): the thread hung on a centred spinner while the server was loaded. Cached messages show
+  // at once; the fresh page is fetched with a 15 s limit and retried quietly (2, 4, 8, 15 s...); after 4 s with nothing
+  // to show the spinner becomes a calm "Still opening..." line with Try now, and a cached thread only says "Reconnecting...".
+  const [slow, setSlow] = useState(false), [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (boot) return;
+    let live = true, tries = 0, timer = 0, done = false;
+    const slowTimer = window.setTimeout(() => { if (live && !done) setSlow(true); }, 4000);
+    const run = () => syncThread(channel.id).then(() => { done = true; if (live) { setError(""); setLoading(false); setSlow(false); } })
+      .catch(() => { if (!live) return; tries++; setSlow(true); timer = window.setTimeout(run, Math.min(15000, 1000 * 2 ** tries)); });
+    void run();
+    return () => { live = false; window.clearTimeout(timer); window.clearTimeout(slowTimer); };
+  }, [boot, channel.id, attempt]);
+
+  // Read: everything on screen up to the newest stored message, once per new arrival, only while the tab is visible.
+  useEffect(() => {
+    if (boot || !messages.length || channel.moderationOnly) return;
+    const last = [...messages].reverse().find((m) => !m.pending && !m.failed);
+    if (!last || last.createdAt <= posted.current || document.visibilityState !== "visible") return;
+    posted.current = last.createdAt;
+    if (last.authorId === viewer && !channel.unread) return;
+    void send(`chats/${channel.id}/read`, { through: last.createdAt }).then(() => {
+      const l = cachedList(); if (l) saveList({ ...l, channels: l.channels.map((c) => c.id === channel.id ? { ...c, unread: 0, mentions: 0 } : c) });
+    }).catch(() => { posted.current = ""; });
+  }, [boot, messages, channel.id, channel.unread, channel.moderationOnly, viewer]);
+
+  // The unread line sits above the first message that arrived while away.
+  const unreadFrom = useMemo(() => {
+    let n = unreadAtOpen; if (!n) return null;
+    for (let i = messages.length - 1; i >= 0; i--) { const m = messages[i]; if (m.authorId !== viewer && m.kind !== "event" && --n === 0) return m.id; }
+    return null;
+  }, [messages, viewer, unreadAtOpen]);
+  // CHAT-V6: a message further back than the conversation has loaded (a search match, a link, a pinned or quoted one)
+  // opens with the page around it ("away" from the latest): reading down loads on towards the latest and joins it;
+  // the way-down button (or sending) goes back to the latest at once.
+  const [away, setAway] = useState<{ messages: ChatMessage[]; hasMore: boolean; hasNewer: boolean } | null>(null);
+  const rows = away?.messages ?? messages;
+  const keys = useMemo(() => rows.map(keyOf), [rows]);
+  const vlog = useVirtualLog(list, keys, nearBottom);
+  const rowsNow = useRef(rows);
+  useLayoutEffect(() => { rowsNow.current = rows; });
+  const reveal = (id: string) => { const m = rowsNow.current.find((x) => x.id === id); if (!m) return false; nearBottom.current = false; vlog.scrollTo(keyOf(m), "center"); setFlash(id); return true; };
+  /** The live conversation takes over the page read "away" once it reaches the latest. */
+  function joinLive(page: ChatMessage[], hasMore: boolean) {
+    const t = cachedThread(channel.id), live = t?.messages ?? [];
+    const firstLive = live.find((m) => !m.pending && !m.failed && !m.queued)?.createdAt;
+    const joined = [...page.filter((m) => !live.some((x) => x.id === m.id) && (!firstLive || m.createdAt < firstLive)), ...live];
+    if (t) saveThread(channel.id, { ...t, messages: joined, hasMore });
+    setAway(null);
+  }
+  /** CALLS-V2 (CHAT-V6 leftover): my own change to messages (a reaction, an edit, a vote, a reminder...) shows at once
+   *  wherever they are on screen: in the latest pages and on a page opened far back. */
+  function change(fn: (ms: ChatMessage[]) => ChatMessage[]) {
+    updateThread(channel.id, fn);
+    setAway((a) => { if (!a) return a; const ms = fn(a.messages); return ms === a.messages ? a : { ...a, messages: ms }; });
+  }
+  /** The server's version of a message I changed, when it is on a page opened far back (the latest pages sync anyway). */
+  async function settleAway(id: string) {
+    try {
+      const d = await get<{ messages: ChatMessage[]; target: string | null }>(`chats/${channel.id}/messages?around=${encodeURIComponent(id)}`);
+      const fresh = d.messages.find((m) => m.id === id); if (!fresh) return;
+      setAway((a) => a && a.messages.some((m) => m.id === id) ? { ...a, messages: a.messages.map((m) => m.id === id ? fresh : m) } : a);
+    } catch { /* it shows when that part is next loaded */ }
+  }
+  // WA-NATIVE: or the page around the first message of a day (Jump to a date).
+  async function openAround(id: string, day?: string): Promise<boolean> {
+    try {
+      const d = await get<{ messages: ChatMessage[]; hasMore?: boolean; hasNewer: boolean; target: string | null }>(`chats/${channel.id}/messages?${day ? `at=${encodeURIComponent(day)}` : `around=${encodeURIComponent(id)}`}`);
+      if (day && !d.target) { notify("Nothing written on or after that day"); return false; }
+      const at = d.messages.find((m) => m.id === (d.target ?? id)); if (!at) return false;
+      nearBottom.current = false; setBelow(true);
+      if (d.hasNewer) setAway({ messages: d.messages, hasMore: !!d.hasMore, hasNewer: true }); else joinLive(d.messages, !!d.hasMore);
+      vlog.scrollTo(keyOf(at), "center"); setFlash(at.id);
+      return true;
+    } catch (e) { setError((e as Error).message); return false; }
+  }
+
+  // Stay at the bottom while reading the latest; open at the message a link points to.
+  // CHAT-V3: opening a chat with several unread messages starts at the first of them (the unread line), not the bottom;
+  // while reading above, new messages from others are counted on the way-down button.
+  // CHAT-V6: positions are kept by the list itself (vlist.ts): at the bottom it stays there, a target is brought in.
+  const jumped = useRef(false), focused = useRef<string | null>(null), seenCount = useRef(messages.length), [fresh, setFresh] = useState(0);
+  useEffect(() => {
+    const added = messages.slice(seenCount.current).filter((m) => m.authorId !== viewer && !m.pending).length; seenCount.current = messages.length;
+    if (added && (!nearBottom.current || away) && jumped.current) queueMicrotask(() => setFresh((f) => f + added));
+  }, [messages, viewer, away]);
+  useEffect(() => {
+    if (!messages.length) return;
+    if (!jumped.current && !focus && unreadAtOpen >= 4 && unreadFrom) {
+      jumped.current = true; const m = messages.find((x) => x.id === unreadFrom);
+      if (m) { nearBottom.current = false; vlog.scrollTo(keyOf(m), "start", -8); queueMicrotask(() => setBelow(true)); return; }
+    }
+    jumped.current = true;
+    if (focus && focused.current !== focus) {
+      if (messages.some((m) => m.id === focus)) { focused.current = focus; const f = focus; queueMicrotask(() => reveal(f)); return; }
+      // CHAT-V6: not in the latest pages: the page around it.
+      if (!loading) { focused.current = focus; const f = focus; queueMicrotask(() => void openAround(f)); }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reveal/openAround read the newest state; this runs when the messages, the target or the unread line change
+  }, [messages, focus, unreadAtOpen, unreadFrom, loading]);
+  useEffect(() => { if (!flash) return; const t = setTimeout(() => setFlash(null), 2200); return () => clearTimeout(t); }, [flash]);
+  const markStamp = useMemo(() => [rows, vlog.start, vlog.end], [rows, vlog.start, vlog.end]);
+  useFindMarks(searching ? findMark.words : "", findMark.now, list, markStamp);
+  // CHAT-V5: Ctrl+Shift+F searches this chat.
+  useEffect(() => { const k = (e: globalThis.KeyboardEvent) => { if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key ?? "").toLowerCase() === "f") { e.preventDefault(); setSearching(true); } }; window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k); }, []);
+  // RELEASE-5: a conversation opens already settled. Its bubbles are laid out lazily and the list pins to the bottom over
+  // the next frames, which moved what was on screen (0.12 of a phone's screen in UX-5A's layout-shift gate); the list
+  // stays invisible for those frames (its spinner shows before), then appears in place.
+  const [settled, setSettled] = useState(false);
+  useEffect(() => {
+    if (settled || !messages.length) return;
+    const t = setTimeout(() => setSettled(true), 160);
+    return () => clearTimeout(t);
+  }, [settled, messages.length]);
+
+  async function older() {
+    const el = list.current; if (!el || olderBusy.current) return;
+    if (away) {
+      const oldest = away.messages[0]; if (!away.hasMore || !oldest) return;
+      olderBusy.current = true;
+      try {
+        const d = await get<{ messages: ChatMessage[]; hasMore: boolean }>(`chats/${channel.id}/messages?before=${encodeURIComponent(oldest.createdAt)}`);
+        setAway((a) => a && { ...a, messages: [...d.messages.filter((m) => !a.messages.some((x) => x.id === m.id)), ...a.messages], hasMore: d.hasMore });
+      } catch (e) { setError((e as Error).message); } finally { olderBusy.current = false; }
+      return;
+    }
+    const oldest = messages.find((m) => !m.pending); if (!thread?.hasMore || !oldest) return;
+    olderBusy.current = true;
+    try {
+      const d = await get<{ messages: ChatMessage[]; hasMore: boolean }>(`chats/${channel.id}/messages?before=${encodeURIComponent(oldest.createdAt)}`);
+      // The list keeps the message on screen in its place while the page goes in above it (vlist.ts).
+      const t = cachedThread(channel.id); if (t) saveThread(channel.id, { ...t, messages: [...d.messages.filter((m) => !t.messages.some((x) => x.id === m.id)), ...t.messages], hasMore: d.hasMore });
+    } catch (e) { setError((e as Error).message); } finally { olderBusy.current = false; }
+  }
+  /** CHAT-V6: reading down a page opened "away": the next page towards the latest, joining it at the end. */
+  async function newer() {
+    if (!away || olderBusy.current) return;
+    const last = away.messages.at(-1); if (!last) return;
+    olderBusy.current = true;
+    try {
+      const d = await get<{ messages: ChatMessage[]; hasNewer: boolean }>(`chats/${channel.id}/messages?after=${encodeURIComponent(last.createdAt)}`);
+      const page = [...away.messages, ...d.messages.filter((m) => !away.messages.some((x) => x.id === m.id))];
+      if (d.hasNewer) setAway({ ...away, messages: page }); else joinLive(page, away.hasMore);
+    } catch (e) { setError((e as Error).message); } finally { olderBusy.current = false; }
+  }
+  // CHAT-V5 (smooth scrolling): the scroll is measured once per frame, not on every scroll event.
+  const scrollFrame = useRef(0);
+  function onScroll() { if (scrollFrame.current) return; scrollFrame.current = requestAnimationFrame(() => { scrollFrame.current = 0; measureScroll(); }); }
+  function measureScroll() {
+    const el = list.current; if (!el) return;
+    const gap = el.scrollHeight - el.scrollTop - el.clientHeight;
+    nearBottom.current = !away && gap < 120;
+    setBelow(!!away || !nearBottom.current); if (nearBottom.current && fresh) setFresh(0);
+    vlog.onScroll();
+    if (el.scrollTop < 200) void older();
+    if (away && gap < 400) void newer();
+  }
+  // CHAT-V5: bring a found message into view: in its thread when it is a reply, else in the conversation.
+  // CHAT-V6: however far back it is (the page around it is opened when it is not loaded).
+  async function showFound(m: ChatMessage): Promise<boolean> {
+    if (m.parentId) { setThreadOf(m.parentId); return true; }
+    if (reveal(m.id)) return true;
+    return openAround(m.id);
+  }
+  const toBottom = () => {
+    const el = list.current; if (!el) return;
+    const far = !!away || el.scrollHeight - el.scrollTop - el.clientHeight > el.clientHeight * 4;
+    if (away) setAway(null);
+    nearBottom.current = true; setFresh(0); setBelow(false);
+    if (far) el.scrollTop = el.scrollHeight; else el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  };
+
+  // CHAT-V3 (offline): delivered by the outbox; without a connection it waits and goes by itself when it is back.
+  const deliver = useCallback(async (m: ChatMessage): Promise<string | null> => { const id = await deliverOut(channel.id, m); if (id) void onChanged(); return id; }, [channel.id, onChanged]);
+  function sendMessage(text: string, attachments: Attachment[], quote: ChatMessage | null) {
+    if (text.trim()) typed(text);
+    const clientId = crypto.randomUUID();
+    const temp: ChatMessage = { id: `local-${clientId}`, clientId, channelId: channel.id, authorId: viewer, name: me?.name ?? "You", username: me?.username ?? null, photoAt: me?.photoAt, body: text.trim(), parentId: null,
+      quoteId: quote?.id ?? null, quote: quote ? { id: quote.id, authorId: quote.authorId, name: quote.name, body: quote.body.slice(0, 240), removed: false, attachments: quote.attachments.length } : null, kind: "text",
+      createdAt: new Date().toISOString(), editedAt: null, removed: false, replies: 0, attachments, mentions: [], reactions: [], pending: true };
+    nearBottom.current = true; setAway(null); updateThread(channel.id, (ms) => [...ms, temp]); iAmTyping(channel.id, false);
+    return deliver(temp);
+  }
+  // J2: "@rila draft positioning for Skyline by Thu" sent as a task: the message goes at once, then its task (Rila,
+  // due Thursday, the project named) with its card under it; Rila takes it, declines or asks on the card.
+  async function sendAsTask(text: string, offer: TaskIntent<Member>, quote: ChatMessage | null) {
+    const mid = await sendMessage(text, [], quote);
+    if (!mid) return;
+    try {
+      await send("work/tasks", { title: offer.title, assigneeId: offer.assignee.id, dueOn: offer.dueOn, projectId: offer.project?.id ?? null, chatChannelId: channel.id, chatMessageId: mid, chatFollow: true });
+      void syncThread(channel.id);
+    } catch (e) { setError(`The message went, but its task did not: ${(e as Error).message}`); }
+  }
+  function retry(m: ChatMessage) { updateThread(channel.id, (ms) => ms.map((x) => x.clientId === m.clientId ? { ...x, failed: undefined, pending: true } : x)); void deliver({ ...m, failed: undefined, pending: true }); }
+  function discard(m: ChatMessage) { updateThread(channel.id, (ms) => ms.filter((x) => x.clientId !== m.clientId)); }
+  async function react(m: ChatMessage, emoji: string) {
+    if (channel.browsing) return;   // GROUP-ACCESS: reading a client group without being in it: nothing to react with
+    if (!m.reactions.some((r) => r.emoji === emoji && r.mine)) noteEmoji(emoji);
+    change((ms) => ms.map((x) => { if (x.id !== m.id) return x; const r = x.reactions.find((y) => y.emoji === emoji);
+      const reactions = r ? (r.mine ? x.reactions.map((y) => y.emoji === emoji ? { ...y, count: y.count - 1, mine: false } : y).filter((y) => y.count > 0) : x.reactions.map((y) => y.emoji === emoji ? { ...y, count: y.count + 1, mine: true } : y)) : [...x.reactions, { emoji, count: 1, mine: true }];
+      return { ...x, reactions }; }));
+    try { await send(`chats/messages/${m.id}/react`, { emoji }); } catch (e) { setError((e as Error).message); void syncThread(channel.id); void settleAway(m.id); }
+  }
+  async function saveEdit(m: ChatMessage, body: string) {
+    change((ms) => ms.map((x) => x.id === m.id ? { ...x, body: body.trim(), editedAt: new Date().toISOString() } : x)); setEditing(null);
+    try { await send(`chats/messages/${m.id}/edit`, { body }); if (away) void settleAway(m.id); } catch (e) { setError((e as Error).message); void syncThread(channel.id); void settleAway(m.id); }
+  }
+  async function remove(m: ChatMessage) {
+    setConfirm(null);
+    change((ms) => ms.map((x) => x.id === m.id ? { ...x, removed: true, body: "", attachments: [] } : x));
+    try { await send(`chats/messages/${m.id}/remove`, { reason: "Deleted in Chats" }); void onChanged(); } catch (e) { setError((e as Error).message); void syncThread(channel.id); void settleAway(m.id); }
+  }
+  function makeTask(m: ChatMessage | null, title = "") {
+    const who = m && m.authorId !== viewer ? m.authorId : channel.peerId ?? undefined;
+    const text = m ? m.body || m.attachments.map((a) => a.name).join(", ") : "";
+    openCreate({ kind: "task", title: (title || text.split("\n")[0]).slice(0, 120), assigneeId: who, chat: { channelId: channel.id, messageId: m?.id },
+      source: m ? { label: `From ${m.authorId === viewer ? "you" : first(m.name)} in ${channel.kind === "direct" ? "your chat" : channel.name}`, quote: text.slice(0, 300) } : { label: channel.kind === "direct" ? `In your chat with ${first(channel.name)}` : `In ${channel.name}` } });
+  }
+  const canEdit = (m: ChatMessage) => m.authorId === viewer && m.kind !== "event" && !m.removed && !m.pending && Date.now() - Date.parse(m.createdAt) < policy.editMinutes * 60000;
+  const canRemove = (m: ChatMessage) => !m.removed && !m.pending && m.kind !== "event" && (m.authorId === viewer && Date.now() - Date.parse(m.createdAt) < policy.removeHours * 3600000 || data.canModerate && channel.kind !== "direct");
+  const member = !channel.moderationOnly;
+  async function pinMessage(m: ChatMessage, on: boolean) { try { await send(`chats/messages/${m.id}/pin`, { on }); await syncThread(channel.id); notify(on ? "Pinned for everyone in this chat" : "Unpinned"); } catch (e) { setError((e as Error).message); } }
+  async function star(m: ChatMessage) {
+    const on = !m.starred; change((ms) => ms.map((x) => x.id === m.id ? { ...x, starred: on } : x));
+    try { await send(`chats/messages/${m.id}/star`, { on }); notify(on ? "Saved. Find it under Saved messages" : "Removed from saved"); } catch (e) { setError((e as Error).message); void syncThread(channel.id); }
+  }
+  // CHAT-V5: a reminder for me alone; a message sent later as me (it waits in the bar above the box until it goes).
+  async function remind(m: ChatMessage, at: string) {
+    const r = await send<{ id: string }>(`chats/messages/${m.id}/remind`, { at });
+    change((ms) => ms.map((x) => x.id === m.id ? { ...x, reminder: { id: r.id, at } } : x));
+    notify(`I’ll remind you ${whenWords(at)}`);
+  }
+  async function unremind(m: ChatMessage) {
+    if (!m.reminder) return; await send(`chats/reminders/${m.reminder.id}/cancel`);
+    change((ms) => ms.map((x) => x.id === m.id ? { ...x, reminder: null } : x)); notify("Reminder cancelled");
+  }
+  async function scheduleMessage(text: string, attachments: Attachment[], quote: ChatMessage | null, at: string) {
+    await send(`chats/${channel.id}/scheduled`, { body: text.trim(), attachments, quoteId: quote?.id ?? null, at });
+    drafts.set(channel.id, ""); setReply(null); setComposerKey((k) => k + 1); notify(`Scheduled: it sends ${whenWords(at)}`); void onChanged(); refreshChatList();
+  }
+  async function createPoll(question: string, options: string[], multi: boolean) {
+    nearBottom.current = true;
+    const r = await send<{ id: string; message: ChatMessage }>(`chats/${channel.id}/polls`, { question, options, multi, clientId: crypto.randomUUID() });
+    updateThread(channel.id, (ms) => ms.some((x) => x.id === r.id) ? ms : [...ms, r.message]); void onChanged();
+  }
+  async function vote(m: ChatMessage, choices: number[]) {
+    change((ms) => ms.map((x) => x.id === m.id && x.poll ? { ...x, poll: { ...x.poll, votes: [...x.poll.votes.filter(([, who]) => who !== viewer), ...choices.map((c) => [c, viewer] as [number, string])] } } : x));
+    try { await send(`chats/messages/${m.id}/vote`, { choices }); } catch (e) { setError((e as Error).message); void syncThread(channel.id); void settleAway(m.id); }
+  }
+  async function closePoll(m: ChatMessage) { try { await send(`chats/messages/${m.id}/poll-close`); await syncThread(channel.id); } catch (e) { setError((e as Error).message); } }
+  async function askApproval(m: ChatMessage) { try { await send(`chats/messages/${m.id}/approval`, { action: "ask" }); await syncThread(channel.id); } catch (e) { setError((e as Error).message); } }
+  const copyLink = (m: ChatMessage) => { void navigator.clipboard?.writeText(`${window.location.origin}/chats?channel=${channel.id}&message=${m.id}`).then(() => notify("Link copied"), () => notify("Could not copy the link")); };
+  // GROUP-ACCESS: reading a client group without being in it: read its threads, copy, link; nothing that writes.
+  const reading = !!channel.browsing;
+  const actions = (m: ChatMessage): Action[] => [
+    ...(!reading ? [{ key: "reply", label: "Reply", icon: <Reply size={16} />, run: () => setReply(m) }] : []),
+    ...((member || reading && m.replies > 0) && !m.parentId ? [{ key: "thread", label: m.replies ? "Open the thread" : "Start a thread", icon: <MessageSquareText size={16} />, run: () => setThreadOf(m.id) }] : []),
+    ...(!reading ? [{ key: "task", label: "Make a task", icon: <ListChecks size={16} />, run: () => makeTask(m) }] : []),
+    ...(member && m.attachments.some((a) => a.id || a.url) && !m.approval ? [{ key: "approval", label: "Ask for approval", icon: <CheckCircle2 size={16} />, run: () => void askApproval(m) }] : []),
+    ...(!reading ? [{ key: "forward", label: "Forward", icon: <Forward size={16} />, run: () => setForward(m) }] : []),
+    // UX-SIMPLE: the message becomes a task in a project you pick (Kazuk: a chat task lands in the project, with its source).
+    ...(!reading && (m.body || m.attachments.length) ? [{ key: "project", label: "Add to a project", icon: <FolderKanban size={16} />, run: () => void addToProject({ text: m.body || m.attachments.map((a) => a.name).join(", "), from: m.authorId === viewer ? "you" : m.name.split(" ")[0], where: channel.kind === "direct" ? "your chat" : channel.name }) }] : []),
+    ...(member ? [{ key: "pin", label: m.pinnedAt ? "Unpin" : "Pin for everyone", icon: m.pinnedAt ? <PinOff size={16} /> : <Pin size={16} />, run: () => void pinMessage(m, !m.pinnedAt) }] : []),
+    ...(member && m.kind !== "event" && !m.pending ? [{ key: "remind", label: m.reminder ? `Reminder: ${whenWords(m.reminder.at)}` : "Remind me", icon: <AlarmClock size={16} />, run: () => setRemindOf(m) }] : []),
+    ...(!reading ? [{ key: "star", label: m.starred ? "Remove from saved" : "Save for later", icon: m.starred ? <StarOff size={16} /> : <Star size={16} />, run: () => void star(m) }] : []),
+    ...(m.body ? [{ key: "copy", label: "Copy text", icon: <Copy size={16} />, run: () => void navigator.clipboard?.writeText(m.body) }] : []),
+    { key: "link", label: "Copy link", icon: <Link2 size={16} />, run: () => copyLink(m) },
+    ...(m.authorId === viewer && (thread?.readers?.length ?? 0) > 0 ? [{ key: "info", label: "Message info", icon: <Info size={16} />, run: () => setInfoOf(m) }] : []),
+    ...(canEdit(m) ? [{ key: "edit", label: "Edit", icon: <Pencil size={16} />, run: () => { setReply(null); setEditing(m); } }] : []),
+    ...(canRemove(m) ? [{ key: "delete", label: m.authorId === viewer ? "Delete for everyone" : "Remove (moderation)", icon: <Trash2 size={16} />, run: () => setConfirm(m), danger: true }] : []),
+  ];
+
+  // CHAT-V3 (speed): bubbles are drawn again only when their own message changes; what they do goes through one handle
+  // that always reaches the newest state.
+  const [api] = useState<BubbleApi>(() => ({ actions, react, vote, closePoll, sheet: setSheet, retry, discard, reply: setReply, thread: setThreadOf, edits: setEditsOf, reactAny: setReactOf, image: (m: ChatMessage, f: string) => setLightbox({ m: m.id, f }), voice, error: setError,
+    quote: (id: string) => { if (!reveal(id)) void openAround(id); } }));
+  // CHAT-V6: a quoted, pinned or gallery message opens where it is, however far back (the page around it).
+  useEffect(() => { Object.assign(api, { actions, react, vote, closePoll, retry, discard, voice, quote: (id: string) => { if (!reveal(id)) void openAround(id); } }); });
+  // "Seen by" goes under my latest message among the last few.
+  const lastMine = useMemo(() => { for (let i = messages.length - 1; i >= Math.max(0, messages.length - 6); i--) { const m = messages[i]; if (m.authorId === viewer && m.kind !== "event" && !m.pending && !m.failed && !m.removed) return m.id; } return null; }, [messages, viewer]);
+  const typing = typingLine(typers, channel.kind === "direct");
+  // CHAT-V3: an AI employee answering shows like someone typing (from its question's live state).
+  const thinking = useMemo(() => [...new Set(messages.slice(-20).filter((m) => m.agentAsk && ["queued", "leased", "dispatching"].includes(m.agentAsk.state) && m.agentAsk.reason !== "paused" && m.agentAsk.runtimeState !== "out_of_quota").map((m) => m.agentAsk!.agent.replace(/\s*\(AI\)\s*$/, "")))], [messages]); // SIM-CLIENTS: an AI employee by its whole name ("Project Coordinator", not "Project")
+  const muted = mutedNow(channel.mutedUntil);
+  async function mute(until: string | null) { try { await send(`chats/${channel.id}/mute`, { until }); await onChanged(); notify(until ? "Muted: no bell or push, except mentions and replies to you" : "Unmuted"); } catch (e) { setError((e as Error).message); } }
+  // CHAT-V4: mark unread for myself; the chat closes (as in WhatsApp) so opening it again clears the mark.
+  async function markUnread() {
+    try { await send(`chats/${channel.id}/unread`, { on: true }); const l = cachedList(); if (l) saveList({ ...l, channels: l.channels.map((c) => c.id === channel.id ? { ...c, markedUnread: new Date().toISOString() } : c) }); void onChanged(); toast({ id: "chat-unread", tone: "info", title: "Marked as unread", message: `${channel.name} stays unread until you open it.`, timeout: 3000 }); go("", false); }
+    catch (e) { setError((e as Error).message); }
+  }
+  useEffect(() => {
+    if (boot || !channel.markedUnread) return;
+    void send(`chats/${channel.id}/unread`, { on: false }).then(() => { const l = cachedList(); if (l) saveList({ ...l, channels: l.channels.map((c) => c.id === channel.id ? { ...c, markedUnread: null } : c) }); }).catch(() => {});
+  }, [boot, channel.id, channel.markedUnread]);
+  // CHAT-V4: info's media strip opens a picture or the gallery column here.
+  useEffect(() => {
+    const on = (e: Event) => { const d = (e as CustomEvent<{ m?: string; f?: string }>).detail ?? {}; if (d.m && d.f) setLightbox({ m: d.m, f: d.f }); else setGallery(true); };
+    window.addEventListener(MEDIA_EVENT, on); return () => window.removeEventListener(MEDIA_EVENT, on);
+  }, []);
+  async function archive() { try { await send(`chats/${channel.id}/archive`, { on: !channel.archivedAt }); await onChanged(); if (!channel.archivedAt) onBack(); } catch (e) { setError((e as Error).message); } }
+
+  const label = kindLabel(channel.kind);
+  const head = <header className={css.head} data-searching={searching ? "" : undefined}>
+      <button type="button" className={`${css.iconBtn} ${css.back}`} onClick={onBack} aria-label="Back to chats"><ArrowLeft size={20} aria-hidden="true" /></button>
+      <button type="button" className={css.who} onClick={onInfo} aria-label={`${channel.name}: details and members`}>
+        <GroupAvatar channel={channel} size={bar ? 32 : 40} />
+        <span><b>{channel.name}{channel.peerAgent ? <AiBadge employeeId={members.find((p) => p.id === channel.peerId)?.employeeId} /> : null}{muted ? <BellOff size={13} aria-label="Muted" className={v3.muted} style={{ marginLeft: 6, verticalAlign: "-1px" }} /> : null}</b>{typing ? <small className={v3.typingHead} role="status">{typing}</small> : channel.kind === "direct" && channel.peerFormer ? <small>Former member · no longer with the company</small> : channel.kind === "direct" && channel.peerAgent ? <small>AI co-worker · answers in seconds; real work becomes a task</small> : channel.kind === "direct" && channel.peerId ? <PresenceLine id={channel.peerId} className={css.headLine} /> : <small>{[label, `${channel.members} member${channel.members === 1 ? "" : "s"}`, channel.moderationOnly ? (channel.browsing ? "read only" : "moderator view") : ""].filter(Boolean).join(" · ")}</small>}</span>
+      </button>
+      {/* CHAT-VOICE: call from the chat (a person, or a group of up to 8). */}
+      {!channel.moderationOnly && !channel.peerFormer && !channel.peerAgent && channel.members <= 8 && (channel.kind !== "direct" || channel.peerId) ? <>
+        <button type="button" className={css.iconBtn} data-chat-call="voice" onClick={() => startCall(channel.id, false)} aria-label={channel.kind === "direct" ? `Call ${first(channel.name)}` : "Start a group call"} title="Voice call"><Phone size={18} aria-hidden="true" /></button>
+        <button type="button" className={css.iconBtn} data-chat-call="video" onClick={() => startCall(channel.id, true)} aria-label={channel.kind === "direct" ? `Video call ${first(channel.name)}` : "Start a group video call"} title="Video call"><Video size={19} aria-hidden="true" /></button>
+      </> : null}
+      <button type="button" className={css.iconBtn} data-chat-search="" onClick={() => setSearching(!searching)} aria-label={searching ? "Close search" : "Search this chat"} aria-expanded={searching} title="Search this chat"><Search size={18} aria-hidden="true" /></button>
+      <PanelToggle className={`${css.iconBtn} ${css.panelToggle}`} />
+      <span className={css.menuWrap}>
+        <button type="button" className={css.iconBtn} onClick={() => setMenu(!menu)} aria-label="Conversation options" aria-expanded={menu}><ChevronDown size={19} aria-hidden="true" /></button>
+        {menu ? <span className={css.menu} role="menu" onClick={() => setMenu(false)}>
+          {/* POLISH-1: on a narrow phone, search moves into this menu so the name keeps its room. */}
+          <button type="button" role="menuitem" data-chat-search-item="" onClick={() => setSearching(true)}><Search size={16} aria-hidden="true" />Search this chat</button>
+          <button type="button" role="menuitem" onClick={onInfo}><Info size={16} aria-hidden="true" />{channel.kind === "direct" ? "Contact info" : "Group info"}</button>
+          {!channel.moderationOnly ? <button type="button" role="menuitem" onClick={onPin}>{channel.pinnedAt ? <PinOff size={16} aria-hidden="true" /> : <Pin size={16} aria-hidden="true" />}{channel.pinnedAt ? "Unpin chat" : "Pin chat"}</button> : null}
+          {!channel.moderationOnly ? <button type="button" role="menuitem" onClick={() => makeTask(null)}><ListChecks size={16} aria-hidden="true" />Make a task here</button> : null}
+          {!channel.moderationOnly && channel.kind !== "direct" ? <button type="button" role="menuitem" onClick={() => setPollDraft("")} data-poll-open=""><BarChart3 size={16} aria-hidden="true" />Create a poll</button> : null}
+          <button type="button" role="menuitem" onClick={() => setGallery(true)}><Images size={16} aria-hidden="true" />Media, files and links</button>
+          <button type="button" role="menuitem" onClick={() => setDateJump(true)} data-jump-date-open=""><CalendarDays size={16} aria-hidden="true" />Jump to a date</button>
+          {!channel.moderationOnly ? (muted ? <button type="button" role="menuitem" onClick={() => void mute(null)}><Bell size={16} aria-hidden="true" />Unmute</button> : <>
+            <button type="button" role="menuitem" onClick={() => void mute(new Date(Date.now() + 8 * 3600000).toISOString())}><BellOff size={16} aria-hidden="true" />Mute for 8 hours</button>
+            <button type="button" role="menuitem" onClick={() => void mute(new Date(Date.now() + 7 * 86400000).toISOString())}><BellOff size={16} aria-hidden="true" />Mute for a week</button>
+            <button type="button" role="menuitem" onClick={() => void mute("always")}><BellOff size={16} aria-hidden="true" />Mute always</button></>) : null}
+          {!channel.moderationOnly ? <button type="button" role="menuitem" onClick={() => void markUnread()} data-mark-unread=""><MailWarning size={16} aria-hidden="true" />Mark as unread</button> : null}
+          {!channel.moderationOnly ? <button type="button" role="menuitem" onClick={() => void archive()}><Archive size={16} aria-hidden="true" />{channel.archivedAt ? "Unarchive chat" : "Archive chat"}</button> : null}
+          {channel.imported ? <button type="button" role="menuitem" onClick={() => setHistory(true)}><History size={16} aria-hidden="true" />Imported WhatsApp history</button> : null}
+          {channel.whatsapp && !channel.whatsapp.native ? <Link role="menuitem" href={`/chats/whatsapp/${channel.whatsapp.chatId}`}><History size={16} aria-hidden="true" />WhatsApp history</Link> : null}
+        </span> : null}
+      </span>
+      {searching ? <FindBar channel={channel} onShow={showFound} onClose={() => setSearching(false)} onWords={onFindWords} /> : null}
+    </header>;
+  const canWrite = !channel.moderationOnly && !(channel.kind === "direct" && channel.peerFormer);
+  const waiting = messages.filter((m) => m.queued).length, failedOnes = messages.filter((m) => m.failed);
+  return <div className={`${css.chat} ${threadOf || gallery ? v3.withPane : ""} ${searching ? v5.findOn : ""}`}
+    onDragEnter={(e) => { if (!canWrite || !carries(e.dataTransfer)) return; e.preventDefault(); dragDepth.current++; setDropping(true); }}
+    onDragOver={(e) => { if (canWrite && carries(e.dataTransfer)) { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; } }}
+    onDragLeave={() => { if (--dragDepth.current <= 0) { dragDepth.current = 0; setDropping(false); } }}
+    onDrop={(e) => {
+      dragDepth.current = 0; setDropping(false); if (!canWrite) return;
+      const files = [...e.dataTransfer.files]; const ref = files.length ? null : droppedRef(e.dataTransfer);
+      if (!files.length && !ref) return;
+      e.preventDefault(); if (files.length) composer.current?.files(files); else if (ref) composer.current?.link(ref);
+    }}>
+    {dropping ? <div className={ws.drop} aria-hidden="true"><span><Paperclip size={26} />Drop to attach<small>Files up to 5 MB, or a link from the side panel or Drive</small></span></div> : null}
+    {/* The header's name sits inside the details button; screen readers (and a full-screen chat on a phone) still get a heading. */}
+    <h2 className={css.srOnly}>{channel.kind === "direct" ? `Chat with ${channel.name}` : channel.name}</h2>
+    {bar ? createPortal(head, bar) : head}
+    {thread?.pinned?.length ? <PinnedBar pinned={thread.pinned} viewer={viewer} onJump={(m) => api.quote(m.id)} onUnpin={(m) => void pinMessage(m, false)} /> : null}
+    {error ? <p className={css.chatError} role="alert">{error}<button type="button" onClick={() => { setError(""); void syncThread(channel.id).catch((e) => setError((e as Error).message)); }}>Retry</button></p> : null}
+    <div ref={list} className={`${css.messages} ${v6.vlog}`} role="log" aria-label="Messages" aria-busy={loading || undefined} onScroll={onScroll} data-settling={settled || !messages.length ? undefined : ""}>
+      {/* R47: history imported from a WhatsApp export opens apart from the conversation, read-only. */}
+      {channel.imported && !away && !thread?.hasMore ? <button type="button" className={own.banner} disabled={!ready} onClick={() => setHistory(true)}><History size={14} aria-hidden="true" />{channel.imported} earlier message{channel.imported === 1 ? "" : "s"} imported from WhatsApp</button> : null}
+      {/* WA-IMPORT: this chat was made from a WhatsApp group; its whole history (photos, voice notes, files) opens read-only. */}
+      {/* WA-NATIVE: once its history is this chat's own messages, the chat says once, where it begins, that it moved from WhatsApp. */}
+      {channel.whatsapp?.native && (away ? !away.hasMore : !thread?.hasMore) && rows.length ? <ImportedMarker wa={channel.whatsapp} /> : null}
+      {channel.whatsapp && !channel.whatsapp.native && !away && !thread?.hasMore ? <Link className={own.banner} href={`/chats/whatsapp/${channel.whatsapp.chatId}`} data-wa-history=""><History size={14} aria-hidden="true" />{channel.whatsapp.messages.toLocaleString()} messages imported from WhatsApp · open the history</Link> : null}
+      {(away ? away.hasMore : thread?.hasMore) ? <button type="button" className={css.older} onClick={() => void older()}>Earlier messages</button> : null}
+      <div data-vtop="" className={v6.space} style={{ height: vlog.padTop }} aria-hidden="true" />
+      {messages.length && slow && loading ? <p className={css.reconnecting} role="status">Reconnecting…</p> : null}
+      {!messages.length ? <div className={css.chatEmpty} data-chat-empty="">{loading && slow ? <p className={css.stillOpening} role="status">Still opening this conversation…<button type="button" onClick={() => { setSlow(false); setAttempt((a) => a + 1); }}>Try now</button></p> : loading ? <span className={css.spinner} aria-label="Opening the conversation" /> : <><GroupAvatar channel={channel} size={64} /><h3>{channel.kind === "direct" ? `Say hello to ${first(channel.name)}` : `Welcome to ${channel.name}`}</h3><p>{channel.description || (channel.kind === "direct" ? "Only the two of you can read this chat." : `${label}. Only members can read it.`)}</p></>}</div> : null}
+      {rows.slice(vlog.start, vlog.end).map((m, j) => {
+        const i = vlog.start + j, prev = i ? rows[i - 1] : null;
+        const chip = !prev || !sameDay(prev.createdAt, m.createdAt) ? dayChip(m.createdAt) : null;
+        const run = !chip && prev && prev.authorId === m.authorId && prev.kind !== "event" && m.kind !== "event" && Date.parse(m.createdAt) - Date.parse(prev.createdAt) < RUN_MS;
+        return <div key={keyOf(m)} data-vk={keyOf(m)} className={css.slot}>
+          {chip ? <div className={css.day}><span>{chip}</span></div> : null}
+          {m.id === unreadFrom ? <div className={css.unreadLine} data-unread-line=""><span>{unreadAtOpen} unread message{unreadAtOpen === 1 ? "" : "s"}</span></div> : null}
+          {m.kind === "event" ? <EventLine m={m} viewer={viewer} cards={cards} channel={channel} onJump={api.quote} />
+            : <Bubble m={m} mine={m.authorId === viewer} group={group} run={!!run} usernames={usernames} viewer={viewer} myName={me?.username ?? null} tick={ticks(m, thread?.receipts ?? null, viewer)} cards={cards}
+              note={voice.notes[m.id]} transcripts={voice.transcripts} media={waMedia[m.id]} channel={channel} flash={flash === m.id} api={api} />}
+          {m.id === lastMine && group && thread?.readers?.length ? <SeenBy m={m} readers={thread.readers} members={members} onInfo={() => setInfoOf(m)} /> : null}
+        </div>;
+      })}
+      {vlog.padBottom ? <div className={v6.space} style={{ height: vlog.padBottom }} aria-hidden="true" /> : null}
+      {away ? <button type="button" className={v6.awayBar} onClick={() => void newer()} data-away="">Reading earlier messages · <b>more below</b></button> : null}
+      <TypingBubble typers={typers} members={members} direct={channel.kind === "direct"} />
+      {thinking.length ? <div className={v3.typing} role="status" data-ai-thinking=""><span aria-hidden="true"><i /><i /><i /></span><span>{thinking.join(" and ")} {thinking.length === 1 ? "is" : "are"} working on an answer</span></div> : null}
+      {work.map((r) => <WorkList key={r.key} result={r} channelId={channel.id} onClose={() => setWork((w) => w.filter((x) => x.key !== r.key))}
+        onShare={(text, attachments) => { void sendMessage(text, attachments, null); setWork((w) => w.filter((x) => x.key !== r.key)); }} />)}
+    </div>
+    {below ? <button type="button" className={css.toBottom} onClick={toBottom} aria-label={fresh ? `${fresh} new message${fresh === 1 ? "" : "s"}: scroll to the latest` : "Scroll to the latest message"}><ArrowDown size={18} aria-hidden="true" />{fresh ? <span className={v3.newCount}>{fresh > 99 ? "99+" : fresh}</span> : null}</button> : null}
+    {notice}
+    <OfflineBanner waiting={waiting} />
+    {failedOnes.length > 1 ? <p className={v5.failedAll} role="alert" data-failed-all="">{failedOnes.length} messages not sent<button type="button" onClick={() => failedOnes.forEach((m) => retry(m))}>Try all again</button></p> : null}
+    {channel.browsing ? <JoinBar channel={channel} onJoined={onChanged} />
+      : channel.moderationOnly ? <p className={css.readonly}>You’re viewing this group as a moderator. Only its members write here.</p>
+      : channel.kind === "direct" && channel.peerFormer ? <p className={css.readonly}>{channel.name} is no longer with the company. This chat stays for its history.</p>
+      : <><ScheduledBar channelId={channel.id} count={channel.scheduled ?? 0} stamp={thread?.at ?? 0} onChanged={() => { void onChanged(); }} />
+      <Composer key={`${channel.id}:${editing?.id ?? ""}:${composerKey}`} channel={channel} members={members} viewer={viewer} reply={reply} editing={editing} onCancel={() => { setReply(null); setEditing(null); }}
+        onSend={(text, attachments) => { void sendMessage(text, attachments, reply); setReply(null); }} onSendTask={(text, offer) => { void sendAsTask(text, offer, reply); setReply(null); }} onSaveEdit={(text) => editing && void saveEdit(editing, text)} onTask={(title) => makeTask(null, title)} onWork={showWork} apiRef={composer}
+        onLater={(text, attachments) => setLater({ text, attachments, quote: reply })}
+        onEditLast={() => { const m = [...messages].reverse().find((x) => x.authorId === viewer && x.kind !== "event" && !x.poll && canEdit(x)); if (m) { setReply(null); setEditing(m); return true; } return false; }} /></>}
+    {history ? <ImportedHistory channel={channel} viewer={viewer} onClose={() => setHistory(false)} /> : null}
+    {dateJump ? <JumpToDate channel={channel} onPick={(d) => { setDateJump(false); void openAround("", d); }} onClose={() => setDateJump(false)} /> : null}
+    {threadOf ? <ThreadPane key={threadOf} channel={channel} rootId={threadOf} viewer={viewer} me={me} usernames={usernames} onClose={() => setThreadOf(null)} onImage={(m, f) => setLightbox({ m, f })} /> : null}
+    {gallery ? <ChatAside className={v3.pane} label="Media, files and links"><header className={v3.paneHead}><h3>Media, files and links<small>{channel.name}</small></h3><button type="button" className={css.iconBtn} onClick={() => setGallery(false)} aria-label="Close"><X size={18} aria-hidden="true" /></button></header>
+      <div className={v3.paneBody}><Gallery channel={channel} onOpenImage={(m, f) => setLightbox({ m, f })} onJump={(id) => { setGallery(false); api.quote(id); }} /></div></ChatAside> : null}
+    {lightbox ? <Lightbox key={`${lightbox.m}:${lightbox.f ?? ""}`} channel={channel} messageId={lightbox.m} fileId={lightbox.f} viewer={viewer} me={me} usernames={usernames} onClose={() => setLightbox(null)}
+      onGo={(m, f) => setLightbox({ m, f })} onPanel={(f, name) => { setLightbox(null); openInPanel({ href: `file:${f}`, title: name }); }} /> : null}
+    {forward ? <ForwardDialog m={forward} data={data} onClose={() => setForward(null)} onDone={(n) => { setForward(null); notify(`Forwarded to ${n} chat${n === 1 ? "" : "s"}`); void onChanged(); }} /> : null}
+    {editsOf ? <EditHistory m={editsOf} onClose={() => setEditsOf(null)} /> : null}
+    {pollDraft !== null ? <PollDialog question={pollDraft} onCreate={createPoll} onClose={() => setPollDraft(null)} /> : null}
+    {remindOf ? <WhenDialog title="Remind me about this message" kind="reminder" current={remindOf.reminder?.at ?? null} note="Only you get the reminder: a notification, and this chat comes back to the top of your list."
+      onPick={(at) => remind(remindOf, at)} onClear={() => unremind(remindOf)} onClose={() => setRemindOf(null)} all /> : null}
+    {later ? <WhenDialog title="Send later" kind="send" note={`It goes as you to ${channel.kind === "direct" ? first(channel.name) : channel.name} at that time. Until then you can change it, send it now or cancel it.`}
+      onPick={(at) => scheduleMessage(later.text, later.attachments, later.quote, at)} onClose={() => setLater(null)} all /> : null}
+    {infoOf ? <MessageInfo m={infoOf} readers={thread?.readers ?? []} members={members} onClose={() => setInfoOf(null)} /> : null}
+    {sheet ? <Sheet m={sheet} actions={actions(sheet)} reacts={!channel.browsing} onReact={(e) => { void react(sheet, e); setSheet(null); }} onMore={() => { setReactOf(sheet); setSheet(null); }} onClose={() => setSheet(null)} /> : null}
+    {reactOf ? <><div className={v6.reactBackdrop} aria-hidden="true" /><EmojiPicker className={v6.reactPicker} keepOpen={false} note={false} label="React with an emoji" onPick={(e) => { void react(reactOf, e); }} onClose={() => setReactOf(null)} /></> : null}
+    {confirm ? <Confirm title={confirm.authorId === viewer ? "Delete this message for everyone?" : "Remove this message?"} text={confirm.authorId === viewer ? "Everyone in the chat will see “This message was deleted”." : "Members will see “This message was deleted”. The removal stays in the audit trail."}
+      action={confirm.authorId === viewer ? "Delete" : "Remove"} onCancel={() => setConfirm(null)} onConfirm={() => void remove(confirm)} /> : null}
+  </div>;
+}
+
+function EventLine({ m, viewer, cards, channel, onJump }: { m: ChatMessage; viewer: string; cards: ReturnType<typeof useTaskCards>; channel: Channel; onJump: (id: string) => void }) {
+  // WA-NATIVE: a WhatsApp group notice ("… added …", "… changed the subject …") is one quiet line; its words name who.
+  if (m.imported) return <div className={`${css.event} ${nat.importedEvent}`} id={`m-${m.id}`} data-imported-event=""><span>{m.body} · {clock(m.createdAt)}</span></div>;
+  const task = m.attachments.find((a) => a.task), call = callOf(m.attachments);
+  // CHAT-V3: "pinned a message", "asked for approval", "approved": a tap shows the message it is about.
+  const about = m.attachments.find((a) => a.pinned || a.approval || a.poll);
+  if (about) return <div className={css.event} id={`m-${m.id}`}><button type="button" className={v3.eventBtn} onClick={() => onJump((about.pinned ?? about.approval ?? about.poll)!)} data-event-about="" title="Show the message"><b>{m.authorId === viewer ? "You" : m.name}</b> {m.body} · {clock(m.createdAt)}</button></div>;
+  // J6: a Flow step's line links to the step.
+  const step = !task ? m.attachments.find((a) => a.url?.startsWith("/runs/")) : undefined;
+  if (call) return <div className={css.event} id={`m-${m.id}`}><CallLine a={call} mine={m.authorId === viewer} author={first(m.name)} channelId={channel.id} at={m.createdAt} /></div>;
+  // CALLS-V2: a call's recording, its transcript and notes.
+  const rec = recordingOf(m.attachments);
+  if (rec) return <div className={css.event} id={`m-${m.id}`}><RecordingLine a={rec} channelId={channel.id} at={m.createdAt} /></div>;
+  return <div className={css.event} id={`m-${m.id}`}><span><b>{m.authorId === viewer ? "You" : m.name}</b> {m.body} · {clock(m.createdAt)}</span>
+    {task ? <TaskCard task={cards.get(task.task!)} fallback={task.name} channelId={channel.id} compact /> : null}
+    {step?.url ? <Link href={step.url} className={wk.stepLink} data-step-link=""><ListChecks size={13} aria-hidden="true" />{step.name}</Link> : null}</div>;
+}
+
+type Action = { key: string; label: string; icon: ReactNode; run: () => void; danger?: boolean };
+/** CHAT-V3: what a bubble can do, one stable handle (see `live` in Conversation). */
+type BubbleApi = { actions: (m: ChatMessage) => Action[]; react: (m: ChatMessage, emoji: string) => void; vote: (m: ChatMessage, choices: number[]) => void; closePoll: (m: ChatMessage) => void; sheet: (m: ChatMessage) => void; retry: (m: ChatMessage) => void; discard: (m: ChatMessage) => void;
+  reply: (m: ChatMessage) => void; thread: (id: string) => void; edits: (m: ChatMessage) => void; reactAny: (m: ChatMessage) => void; image: (m: ChatMessage, fileId: string) => void; quote: (id: string) => void; error: (e: string) => void; voice: ReturnType<typeof useVoiceState> };
+type BubbleProps = { m: ChatMessage; mine: boolean; group: boolean; run: boolean; usernames: (string | null)[]; viewer: string; myName: string | null; tick: string | null; cards: ReturnType<typeof useTaskCards>;
+  note: ReturnType<typeof useVoiceState>["notes"][string] | undefined; transcripts: boolean; channel: Channel; flash: boolean; api: BubbleApi; media?: WaMedia };
+const SWIPE = 56;
+// CHAT-V3 (speed): a bubble is drawn again only when what it shows changed (its message, ticks, cards, voice state).
+const Bubble = memo(function Bubble({ m, mine, group, run, usernames, viewer, myName, tick, cards, note, transcripts, channel, flash, api, media }: BubbleProps) {
+  const [tools, setTools] = useState<null | "react" | "menu">(null);
+  const toolsRef = useRef<HTMLDivElement>(null), menuRef = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => {
+    if (tools !== "menu") return;
+    const anchor = toolsRef.current, menu = menuRef.current, log = anchor?.closest('[role="log"]');
+    if (!anchor || !menu || !log) return;
+    // Keep the menu within the scrollport: earlier messages need it below, latest messages above.
+    const a = anchor.getBoundingClientRect(), bounds = log.getBoundingClientRect();
+    const above = a.top - Math.max(0, bounds.top) - 4, below = Math.min(window.innerHeight, bounds.bottom) - a.bottom - 4;
+    const down = menu.scrollHeight > above && below > above;
+    menu.style.maxHeight = `${Math.max(0, down ? below : above)}px`;
+    menu.style.top = down ? "calc(100% + 4px)" : "auto";
+    menu.style.bottom = down ? "auto" : "calc(100% + 4px)";
+    const width = menu.getBoundingClientRect().width;
+    const left = Math.max(Math.max(0, bounds.left), Math.min(mine ? a.right - width : a.left, Math.min(window.innerWidth, bounds.right) - width));
+    menu.style.left = `${left - a.left}px`;
+    menu.style.right = "auto";
+    const outside = (e: globalThis.MouseEvent) => { if (!anchor.contains(e.target as Node)) setTools(null); };
+    const key = (e: globalThis.KeyboardEvent) => { if (e.key === "Escape") setTools(null); };
+    const close = () => setTools(null);
+    document.addEventListener("mousedown", outside);
+    document.addEventListener("keydown", key);
+    log.addEventListener("scroll", close);
+    window.addEventListener("resize", close);
+    return () => {
+      document.removeEventListener("mousedown", outside);
+      document.removeEventListener("keydown", key);
+      log.removeEventListener("scroll", close);
+      window.removeEventListener("resize", close);
+    };
+  }, [tools, mine]);
+  const press = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // CHAT-V3 (phone): swipe a message to the right to reply to it, as in WhatsApp.
+  const swipe = useRef<{ x: number; y: number; on: boolean; dx: number } | null>(null), [dx, setDx] = useState(0);
+  const images = m.attachments.filter(isImage), notes = m.attachments.filter(isVoice), videos = m.attachments.filter(isVideo), gone = m.attachments.filter((a) => a.omitted),
+    others = m.attachments.filter((a) => !isImage(a) && !isVoice(a) && !isVideo(a) && !a.omitted);
+  const link = m.body && !m.removed ? previewLink(m.body) : null;
+  const touchStart = (e: TouchEvent) => { const t = e.touches[0]; swipe.current = { x: t.clientX, y: t.clientY, on: false, dx: 0 }; press.current = setTimeout(() => { press.current = null; swipe.current = null; navigator.vibrate?.(12); api.sheet(m); }, 450); };
+  const cancelPress = () => { if (press.current) { clearTimeout(press.current); press.current = null; } };
+  const touchMove = (e: TouchEvent) => {
+    const s = swipe.current, t = e.touches[0]; if (!s) { cancelPress(); return; }
+    const x = t.clientX - s.x, y = t.clientY - s.y;
+    if (Math.abs(x) > 6 || Math.abs(y) > 6) cancelPress();
+    if (!s.on && Math.abs(y) > 10 && Math.abs(y) > Math.abs(x)) { swipe.current = null; setDx(0); return; }
+    if (x > 10) { s.on = true; s.dx = Math.min(80, x * 0.8); setDx(s.dx); }
+  };
+  const touchEnd = () => { cancelPress(); if (swipe.current?.on && swipe.current.dx >= SWIPE) { navigator.vibrate?.(10); api.reply(m); } swipe.current = null; setDx(0); };
+  const actions = tools === "menu" ? api.actions(m) : [];
+  const open = (a: Attachment) => (e: ReactMouseEvent) => { if (e.metaKey || e.ctrlKey || e.shiftKey) return; e.preventDefault(); api.image(m, a.id!); };
+  const profile = m.guest ? null : `/people/${m.byAgent ? "ai/" : ""}${encodeURIComponent(m.authorId)}`;
+  const avatar = <Avatar ai={m.byAgent} name={m.name} id={m.authorId} photoAt={m.photoAt} size={30} />;
+  return <article id={`m-${m.id}`} className={css.msg} data-mine={mine || undefined} data-run={run || undefined} data-flash={flash || undefined} data-pending={m.pending || undefined} data-queued={m.queued || undefined}
+    style={dx ? { transform: `translateX(${dx}px)` } : undefined}
+    onTouchStart={m.removed || m.pending ? undefined : touchStart} onTouchEnd={touchEnd} onTouchMove={touchMove} onTouchCancel={touchEnd} onContextMenu={(e) => { if (coarse() && !m.removed) { e.preventDefault(); api.sheet(m); } }}
+    onMouseLeave={() => { if (tools !== "menu") setTools(null); }}>
+    {dx ? <span className={v3.swipeReply} style={{ opacity: Math.min(1, dx / SWIPE) }} aria-hidden="true"><Reply size={15} /></span> : null}
+    {(group || m.byAgent) && !mine ? (run ? <span className={css.avatarGap} /> : profile ? <Link href={profile} prefetch={false} className={css.avatarLink} aria-label={`Open ${m.name}’s profile`}>{avatar}</Link> : avatar) : null}
+    <div className={css.bubbleCol}>
+      <div className={css.bubble} data-agent={m.agentRun || m.agentAsk || m.handoff ? "" : undefined} data-media={images.length && !m.body ? "" : undefined} data-edited={m.editedAt && !m.removed ? "" : undefined}>
+        {(group || m.byAgent) && !mine && !run ? <b className={css.author} style={{ "--hue": hue(m.authorId) } as CSSProperties}>{profile ? <Link href={profile} prefetch={false}>{m.name}</Link> : m.name}{m.byAgent ? <AiBadge employeeId={m.employeeId} /> : null}{m.former ? <small className={css.former}> · former member</small> : null}</b> : null}
+        {m.forwarded && !m.removed ? <span className={v3.flags}><Forward size={12} aria-hidden="true" />Forwarded</span> : null}
+        {m.removed ? <p className={css.removed}><CircleAlert size={14} aria-hidden="true" />This message was deleted</p> : <>
+          {m.quote ? <button type="button" className={css.quote} onClick={() => api.quote(m.quote!.id)} style={{ "--hue": hue(m.quote.authorId) } as CSSProperties}>
+            <b>{m.quote.authorId === viewer ? "You" : m.quote.name}</b><span>{m.quote.removed ? "This message was deleted" : m.quote.body || (m.quote.attachments ? "📎 Attachment" : "")}</span></button> : null}
+          {images.length ? <div className={css.images} data-n={Math.min(images.length, 4)}>{images.map((a) => <a key={a.id} className={v3.imgWrap} href={fileUrl(a, true)} target="_blank" rel="noreferrer" onClick={open(a)} aria-label={`Open ${a.name}${a.version ? `, version ${a.version}` : ""}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- member-only file served by the API */}
+            <img src={fileUrl(a, true)} alt={(images.length === 1 && media?.alt) || a.name} loading="lazy" />{a.version ? <span className={v3.version}>v{a.version}</span> : null}</a>)}</div> : null}
+          {m.pending ? notes.map((a) => <VoiceNote key={a.id} messageId={m.id} a={a} mine={mine} transcripts={false} onPlayed={() => {}} onTranscribe={() => {}} />)
+            : notes.map((a) => <VoiceNote key={a.id} messageId={m.id} a={a} mine={mine} state={note} transcripts={transcripts} onPlayed={() => api.voice.played(m.id)} onTranscribe={() => api.voice.transcribe(m.id)} />)}
+          {videos.map((a) => <video key={a.id} className={nat.video} controls preload="none" playsInline poster={a.poster ? waUrl(a.poster) : undefined} src={a.playable ? waUrl(a.playable) : fileUrl(a, true)}
+            aria-label={a.name} style={a.w && a.h ? { aspectRatio: `${a.w} / ${a.h}` } : undefined} data-wa-video="" />)}
+          {gone.map((a, i) => <OmittedFile key={`gone-${i}`} kind={a.omitted!} name={a.name} />)}
+          {others.map((a, i) => a.task ? <TaskCard key={a.task} task={cards.get(a.task)} fallback={a.name} channelId={channel.id} />
+            : a.id ? <a key={a.id} className={css.file} href={fileUrl(a)} target="_blank" rel="noreferrer"
+                onClick={(e) => { if (!a.id || !PANEL_DOCS.test(a.mime ?? "") || e.metaKey || e.ctrlKey || e.shiftKey) return; if (openInPanel({ href: `file:${a.id}`, title: a.name })) e.preventDefault(); }}>
+                <FileIcon size={18} aria-hidden="true" /><span>{a.name}{a.version ? ` · v${a.version}` : ""}<small>{PANEL_DOCS.test(a.mime ?? "") ? "Open" : "Download"}</small></span></a>
+            : <a key={a.url ?? i} className={css.file} href={a.url} target="_blank" rel="noreferrer" onClick={(e) => { if (!a.url || e.metaKey || e.ctrlKey || e.shiftKey) return; if (openInPanel({ href: a.url, title: a.name })) e.preventDefault(); }}><Link2 size={18} aria-hidden="true" /><span>{a.name}<small>{a.url ? linkDomain(a.url) : ""}</small></span></a>)}
+          {media && !m.removed ? <WaMediaLine media={media} /> : null}
+          {!m.removed && !m.pending && !m.failed && (images.length > 0 || others.some((a) => !a.task)) ? <button type="button" className={wk.fileTask} data-file-task="" onClick={() => api.actions(m).find((a) => a.key === "task")?.run()}><ListChecks size={13} aria-hidden="true" />Make it a task</button> : null}
+          {m.poll ? <PollCard m={m} viewer={viewer} canVote={!channel.moderationOnly && !m.pending} onVote={(c) => api.vote(m, c)} onClose={() => api.closePoll(m)} /> : null}
+          {m.body && !m.poll ? <p className={css.text} data-find-text="">{segments(m.body, usernames, m.mentioned).map((s, i) => s.type === "link" ? <span key={i}><a href={s.value} target="_blank" rel="noreferrer" title={s.value}>{s.label}</a>{s.rest}</span> : s.type === "mention" ? <mark key={i}>{s.value}</mark> : <span key={i}>{s.value}</span>)}<span className={css.spacer} aria-hidden="true" /></p> : null}
+          {link && !m.pending && !others.some((a) => a.url === link) ? <LinkPreview url={link} /> : null}
+        </>}
+        {m.removed ? null : <AgentParts m={m} channel={channel} />}
+        {m.approval && !m.removed ? <ApprovalCard m={m} viewer={viewer} channelId={channel.id} onError={api.error} /> : null}
+        <span className={css.meta}>{m.reminder ? <AlarmClock size={11} aria-label={`Reminder ${whenWords(m.reminder.at)}`} data-reminder="" /> : null}{m.pinnedAt ? <Pin size={11} aria-label="Pinned" /> : null}{m.starred ? <Star size={11} aria-label="Saved" /> : null}{m.editedAt && !m.removed ? <button type="button" className={css.editedBtn} onClick={() => api.edits(m)} title="See the earlier words" data-edited-open="">edited</button> : null}<time dateTime={m.createdAt} title={fullTime(m.createdAt)}>{clock(m.createdAt)}</time>
+          {tick ? <i className={css.tick} data-tick={tick} aria-label={m.queued ? "Waiting for the connection" : tick === "read" ? "Read" : tick === "delivered" ? "Delivered" : tick === "sent" ? "Sent" : tick === "pending" ? "Sending" : "Not sent"}>
+            {tick === "pending" ? <Clock3 size={13} /> : tick === "failed" ? <CircleAlert size={13} /> : tick === "sent" ? <Check size={14} /> : <CheckCheck size={15} />}</i> : null}</span>
+      </div>
+      {m.queued && !m.failed ? <p className={css.failed} role="status" data-outbox="">Waiting for the connection · it sends by itself</p> : null}
+      {m.failed ? <p className={css.failed} role="alert">Not sent: {m.failed} <button type="button" onClick={() => api.retry(m)}>Try again</button><button type="button" onClick={() => api.discard(m)}>Delete</button></p> : null}
+      {m.replies > 0 && !m.removed ? <button type="button" className={v3.threadChip} onClick={() => api.thread(m.id)} data-thread-chip=""><MessageSquareText size={14} aria-hidden="true" />{m.replies} repl{m.replies === 1 ? "y" : "ies"}{m.lastReplyAt ? <small>· {dayChip(m.lastReplyAt) === "Today" ? clock(m.lastReplyAt) : dayChip(m.lastReplyAt)}</small> : null}</button> : null}
+      {mine || m.removed || m.imported ? null : <IntentChips m={m} channel={channel} viewer={viewer} username={myName} said={note?.transcript ?? null} />}
+      {m.reactions.length ? <div className={css.reactions}>{m.reactions.map((r) => <button key={r.emoji} type="button" aria-pressed={r.mine} onClick={() => api.react(m, r.emoji)} aria-label={`${r.emoji} ${r.count}${r.mine ? ", including you" : ""}`}>{r.emoji}{r.count > 1 ? <span>{r.count}</span> : null}</button>)}</div> : null}
+    </div>
+    {!m.removed && !m.pending && !m.failed ? <div ref={toolsRef} className={css.tools} data-open={tools ? "" : undefined}>
+      {!channel.browsing ? <><button type="button" aria-label="React" aria-expanded={tools === "react"} onClick={() => setTools(tools === "react" ? null : "react")}><Smile size={16} aria-hidden="true" /></button>
+      <button type="button" aria-label="Reply" onClick={() => api.reply(m)}><Reply size={16} aria-hidden="true" /></button></> : null}
+      {!channel.moderationOnly ? <button type="button" aria-label={m.replies ? "Open the thread" : "Start a thread"} title={m.replies ? "Open the thread" : "Start a thread"} onClick={() => api.thread(m.id)}><MessageSquareText size={16} aria-hidden="true" /></button> : null}
+      <button type="button" aria-label="More actions" aria-expanded={tools === "menu"} onClick={() => setTools(tools === "menu" ? null : "menu")}><ChevronDown size={16} aria-hidden="true" /></button>
+      {tools === "react" ? <span className={css.reactPick} role="group" aria-label="Choose a reaction">{[...new Set([...quickReactions(QUICK), ...QUICK, ...MORE_REACTIONS])].slice(0, 11).map((e) => <button key={e} type="button" aria-label={`React ${e}`} onClick={() => { setTools(null); api.react(m, e); }}>{e}</button>)}
+        <button type="button" aria-label="More emoji" title="More emoji" data-react-more="" onClick={() => { setTools(null); api.reactAny(m); }}><Plus size={16} aria-hidden="true" /></button></span> : null}
+      {tools === "menu" ? <span ref={menuRef} className={css.menu} role="menu">{actions.map((a) => <button key={a.key} type="button" role="menuitem" data-danger={a.danger || undefined} onClick={() => { setTools(null); a.run(); }}>{a.icon}{a.label}</button>)}</span> : null}
+    </div> : null}
+  </article>;
+}, (a, b) => a.m === b.m && a.mine === b.mine && a.group === b.group && a.run === b.run && a.usernames === b.usernames && a.tick === b.tick && a.cards === b.cards && a.note === b.note
+  && a.transcripts === b.transcripts && a.media === b.media && a.channel.id === b.channel.id && a.channel.moderationOnly === b.channel.moderationOnly && a.flash === b.flash && a.myName === b.myName && a.viewer === b.viewer && a.api === b.api);
+
+/** CHAT-V4: "154 tokens", "12.3k tokens"; "0.2 s", "48 s", "2 min 5 s". */
+function tokenWords(n: number) { return n < 1000 ? `${n} token${n === 1 ? "" : "s"}` : `${(n / 1000).toFixed(n < 10000 ? 1 : 0).replace(/\.0$/, "")}k tokens`; }
+function secondsWords(s: number) { if (!Number.isFinite(s) || s < 0) return null; if (s < 10) return `${Math.round(s * 10) / 10} s`; if (s < 60) return `${Math.round(s)} s`; const m = Math.floor(s / 60), r = Math.round(s % 60); return r ? `${m} min ${r} s` : `${m} min`; }
+
+/** EST-1035: why a question went unanswered or a hand-off was not filed, from the fixed codes Pulse records. */
+const AGENT_REASON: Record<string, string> = {
+  message_gone: "the message is gone", not_leader: "the person who asked is no longer a leader here", agent_left: "it is no longer in this conversation",
+  asker_left: "the person who asked left this conversation", budget_spent: "today's token budget is spent", not_chats: "it answers in Chats only",
+  expired: "the question waited more than a day", gave_up: "it could not start after five tries", stuck: "it got stuck", model_error: "something went wrong while answering",
+  no_answer: "it had no answer",
+};
+const HANDOFF_REASON: Record<string, string> = {
+  agent_left: "the co-worker left this conversation", decider_not_leader: "the leader who handed it over is no longer a leader",
+  decider_left: "the leader who handed it over left this conversation",
+};
+
+/** EST-1035: what an AI co-worker's answer cost (as the model reported it, or unknown), where a leader's question to
+ *  it stands, and a hand-off it proposed, which a leader hands over or declines (only then is it filed as work). */
+/** AI-EMPLOYEES v2: what an AI employee would post, asked of its approver: Send it / Edit / Don't (or a reply such as
+ *  "fine, send it"); once decided, who decided and how. On the posted message: who approved it. */
+function ProposalCard({ m, channel }: { m: ChatMessage; channel: Channel }) {
+  const p = m.proposal!;
+  const [busy, setBusy] = useState(false), [error, setError] = useState(""), [editing, setEditing] = useState(false), [text, setText] = useState(p.body);
+  // SIM-CLIENTS R133: on a phone the keyboard and the composer covered Send edited: while editing, its buttons are kept in
+  // view (after the keyboard opens, and whenever the visible area changes size).
+  const actions = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (!editing) return;
+    const show = () => actions.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    const t = window.setTimeout(show, 350), vv = window.visualViewport;
+    vv?.addEventListener("resize", show);
+    return () => { window.clearTimeout(t); vv?.removeEventListener("resize", show); };
+  }, [editing]);
+  const decide = async (action: "send" | "dismiss", body?: string) => {
+    setBusy(true); setError("");
+    try { await send(`chats/proposals/${p.id}/decide`, { action, body }); setEditing(false); await syncThread(channel.id); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  };
+  const decided = p.decidedBy ? `${p.decidedBy}${p.via === "reply" ? " (by reply)" : ""}${p.decidedAt ? ` · ${new Date(p.decidedAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })}` : ""}` : "";
+  // EA-AI: a proposed task is created (as the person who says Create it), not posted; its card follows in the chat.
+  const task = p.kind === "task", where = p.channelName ? ` in ${p.channelName}` : "";
+  // AI-AUTONOMY (1351): many task changes in one card: Apply all (each as the person who decides), or Don't.
+  // AI-AUTONOMY (1410): a new colleague (profile and join link) and a file for HR documents decide the same way.
+  if (p.kind === "batch" || p.kind === "person" || p.kind === "document") return <div className={css.aiProposal} data-state={p.state} data-proposal={p.id} data-kind={p.kind}>
+    <b>{p.state === "pending" ? (p.kind === "person" ? "Proposed new colleague" : p.kind === "document" ? "Proposed HR document" : "Proposed task changes") : p.state === "sent" ? "Applied" : "Not applied"}</b>
+    <blockquote>{p.state === "sent" && p.sentBody ? `${p.sentBody}\n\n${p.body}` : p.body}</blockquote>
+    {p.why && p.state === "pending" ? <small>Why: {p.why}</small> : null}
+    {p.state === "pending" ? (p.mine ? <span className={css.aiActions}>
+      <button type="button" className={css.primary} disabled={busy} onClick={() => void decide("send")}>{p.kind === "batch" ? "Apply all" : "Apply"}</button>
+      <button type="button" className={css.secondary} disabled={busy} onClick={() => void decide("dismiss")}>Don&apos;t</button>
+    </span> : <small>Waiting for {p.approver ?? "its approver"}</small>) : <small>{p.state === "sent" ? `Approved by ${decided}` : p.state === "dismissed" ? `Not applied: ${decided}` : "Expired"}</small>}
+    {error ? <small role="alert">{error}</small> : null}
+  </div>;
+  if (p.on === "sent") return <small className={css.aiStatus} data-state="approved" data-proposal-sent={p.id}><Check size={12} aria-hidden="true" />{task ? "Task created, approved by " : "Approved by "}{decided}{p.sentBody && p.sentBody !== p.body ? ", edited" : ""}</small>;
+  return <div className={css.aiProposal} data-state={p.state} data-proposal={p.id} data-kind={p.kind ?? "reply"}>
+    <b>{p.urgent && p.state === "pending" ? <span className={css.aiUrgent}>Urgent</span> : null}{p.state === "pending" ? (task ? "Proposed task" : `Proposed reply${where}`) : p.state === "sent" ? (task ? "Task created" : `Sent${where}`) : task ? "Not created" : "Not sent"}</b>
+    {editing ? <textarea aria-label={task ? "Edit the task (first line is its title)" : "Edit the reply"} value={text} onChange={(e) => setText(e.target.value)} rows={4} maxLength={4000} autoFocus />
+      : <blockquote>{p.state === "sent" && p.sentBody ? p.sentBody : p.body}</blockquote>}
+    {p.why && p.state === "pending" ? <small>Why: {p.why}</small> : null}
+    {p.state === "pending" && p.escalatedTo && !p.askedOfMe ? <small>Also asked {p.escalatedTo} to decide</small> : null}
+    {p.state === "pending" ? (p.mine ? <span className={css.aiActions} ref={actions}>
+      {editing ? <><button type="button" className={css.primary} disabled={busy || !text.trim()} onClick={() => void decide("send", text.trim())}>{task ? "Create edited" : "Send edited"}</button>
+        <button type="button" className={css.secondary} disabled={busy} onClick={() => { setEditing(false); setText(p.body); }}>Cancel</button></>
+        : <><button type="button" className={css.primary} disabled={busy} onClick={() => void decide("send")}>{task ? "Create it" : "Send it"}</button>
+        <button type="button" className={css.secondary} disabled={busy} onClick={() => setEditing(true)}>Edit</button>
+        <button type="button" className={css.secondary} disabled={busy} onClick={() => void decide("dismiss")}>Don&apos;t</button></>}
+    </span> : <small>Waiting for {p.approver ?? "its approver"}</small>)
+      : <small>{p.state === "sent" ? (task && p.taskId ? <>Approved by {decided}. <a href={`/tasks/${p.taskId}`}>Open the task</a></>
+        : <>Approved by {decided}. <a href={`/chats?channel=${p.channelId}${p.postedMessageId ? `&message=${p.postedMessageId}` : ""}`}>See it in {p.channelName ?? "the group"}</a></>) : p.state === "dismissed" ? `${task ? "Not created" : "Not sent"}: ${decided}` : "Expired"}</small>}
+    {error ? <small role="alert">{error}</small> : null}
+  </div>;
+}
+
+function AgentParts({ m, channel }: { m: ChatMessage; channel: Channel }) {
+  const [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const run = m.agentRun, ask = m.agentAsk, h = m.handoff, update = m.handoffUpdate;
+  if (m.proposal) return <ProposalCard m={m} channel={channel} />;
+  if (!run && !ask && !h && !update) return null;
+  const lead = !!cachedList()?.canLead, board = cachedList()?.boardUrl;
+  const decide = async (accept: boolean) => {
+    setBusy(true); setError("");
+    try { await send(`chats/handoffs/${h!.id}/decide`, { accept }); await syncThread(channel.id); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  };
+  // CHAT-V4: the run in people's words: the model's name (never its raw id), tokens when reported, how long it took.
+  const meter = run ? [run.model ? modelName(run.model) : null, run.tokens === null ? null : tokenWords(run.tokens), run.seconds === null ? null : secondsWords(Number(run.seconds)),
+    run.state === "uncertain" ? "stuck" : run.state === "error" ? "error" : run.state === "dispatching" ? "answering" : null].filter(Boolean).join(" · ") : "";
+  const meterTitle = run ? `Answered by ${run.model ? modelName(run.model) : "its runtime’s default model"}${run.lane ? ` (${run.lane})` : ""}. ${run.tokens === null ? "The model did not report its tokens." : `${run.tokens.toLocaleString("en-IN")} tokens, as the model reported them.`}` : "";
+  const who = ask?.agent ?? "The co-worker";
+  return <>
+    {update ? <div className={css.aiUpdate}><AiBadge employeeId={m.employeeId} /><span>{m.name}&apos;s update</span>
+      <b>{({ started: "Started", progress: "Progress", in_review: "For your review", blocked: "Blocked", cancelled: "Cancelled" })[update.state]}</b>
+      {board ? <a href={`${board}/${encodeURIComponent(update.boardRef.split("-")[0])}/issues/${encodeURIComponent(update.boardRef)}`} target="_blank" rel="noreferrer">{update.boardRef}</a> : <span>{update.boardRef}</span>}<span className={css.spacer} aria-hidden="true" /></div> : null}
+    {meter ? <small className={css.aiMeter} title={meterTitle} data-ai-meter=""><Sparkles size={11} aria-hidden="true" />{meter}</small> : null}
+    {ask && ["queued", "leased", "dispatching"].includes(ask.state) ? <small className={css.aiStatus} data-state="thinking">{ask.reason === "paused" ? `${who} is paused until an admin switches it back on` : ask.reason === "out_of_quota" || ask.runtimeState === "out_of_quota" ? `${who} is out of quota${ask.runtimeUntil ? ` until ${new Date(ask.runtimeUntil).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}` : ""}; it answers then` : `${who} is thinking…`}</small>
+      : ask?.state === "failed" ? <small className={css.aiStatus} data-state="failed">{who} couldn&apos;t answer{ask.reason && AGENT_REASON[ask.reason] ? `: ${AGENT_REASON[ask.reason]}` : ""}</small>
+      : ask?.state === "uncertain" ? <small className={css.aiStatus} data-state="failed">{who} got stuck and didn&apos;t answer</small> : null}
+    {h ? <div className={css.aiHandoff} data-state={h.state}><b>Hand-off: {h.title}</b>{h.details ? <span>{h.details}</span> : null}
+      {h.state === "proposed" ? (lead ? <span className={css.aiActions}><button type="button" className={css.primary} disabled={busy} onClick={() => void decide(true)}>Hand it over</button>
+        <button type="button" className={css.secondary} disabled={busy} onClick={() => void decide(false)}>Not now</button></span> : <small>A leader can hand it over</small>)
+        : <small>{h.state === "declined" ? "Not taken on" : h.state === "filed" ? `Handed over as ${h.boardRef}. The result comes back here for review.`
+          : h.state === "uncertain" ? "Not confirmed as filed. Check the board before handing it over again."
+          : h.state === "closed" ? `Not filed: ${HANDOFF_REASON[h.reason ?? ""] ?? "it can no longer be handed over"}` : "Handed over · being filed"}</small>}
+      {error ? <small role="alert">{error}</small> : null}</div> : null}
+  </>;
+}
+
+function Sheet({ m, actions, reacts = true, onReact, onMore, onClose }: { m: ChatMessage; actions: Action[]; reacts?: boolean; onReact: (e: string) => void; onMore: () => void; onClose: () => void }) {
+  // CHAT-V5 (touch test): lifting the finger after press and hold is not a tap on what opened under it.
+  const born = useRef(0);
+  useEffect(() => { born.current = Date.now(); }, []);
+  return <div className={css.sheetBackdrop} onClick={onClose} onClickCapture={(e) => { if (Date.now() - born.current < 450) { e.preventDefault(); e.stopPropagation(); } }}><div className={css.sheet} role="dialog" aria-modal="true" aria-label="Message actions" onClick={(e) => e.stopPropagation()}>
+    {reacts ? <div className={css.sheetReact} role="group" aria-label="React">{[...new Set([...quickReactions(QUICK), ...QUICK, ...MORE_REACTIONS])].slice(0, 8).map((e) => <button key={e} type="button" aria-label={`React ${e}`} aria-pressed={m.reactions.some((r) => r.emoji === e && r.mine)} onClick={() => onReact(e)}>{e}</button>)}
+      <button type="button" aria-label="More emoji" data-react-more="" onClick={onMore}><Plus size={20} aria-hidden="true" /></button></div> : null}
+    {actions.map((a) => <button key={a.key} type="button" className={css.sheetItem} data-danger={a.danger || undefined} onClick={() => { onClose(); a.run(); }}>{a.icon}{a.label}</button>)}
+    <button type="button" className={css.sheetItem} onClick={onClose}><X size={16} aria-hidden="true" />Cancel</button>
+  </div></div>;
+}
+
+export function Confirm({ title, text, action, onCancel, onConfirm, tone = "danger" }: { title: string; text: string; action: string; onCancel: () => void; onConfirm: () => void; tone?: "danger" | "primary" }) {
+  useEffect(() => { const k = (e: globalThis.KeyboardEvent) => { if (e.key === "Escape") onCancel(); }; document.addEventListener("keydown", k); return () => document.removeEventListener("keydown", k); }, [onCancel]);
+  return <div className={css.backdrop} onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}><div className={css.dialog} role="alertdialog" aria-modal="true" aria-label={title}>
+    <h2>{title}</h2><p className={css.hint}>{text}</p>
+    <footer><button type="button" className={css.secondary} onClick={onCancel} autoFocus>Cancel</button><button type="button" className={tone === "primary" ? css.primary : css.danger} onClick={onConfirm}>{action}</button></footer>
+  </div></div>;
+}
+
+type Suggest = { kind: "mention"; items: Member[] } | { kind: "task"; items: { id: string; title: string; statusLabel: string; assigneeName: string | null }[] } | { kind: "command"; items: ChatCommand[] } | null;
+let projectCache: { id: string; name: string }[] | null = null, projectLoad: Promise<void> | null = null;
+function Composer({ channel, members, viewer, reply, editing, onCancel, onSend, onSendTask, onSaveEdit, onTask, onWork, apiRef, onLater, onEditLast }: { channel: Channel; members: Member[]; viewer: string; reply: ChatMessage | null; editing: ChatMessage | null;
+  onCancel: () => void; onSend: (text: string, attachments: Attachment[]) => void; onLater?: (text: string, attachments: Attachment[]) => void; onEditLast?: () => boolean; onSendTask: (text: string, offer: TaskIntent<Member>) => void; onSaveEdit: (text: string) => void; onTask: (title: string) => void; onWork: (kind: WorkKind) => void; apiRef?: RefObject<ComposerApi | null> }) {
+  const [text, setText] = useState(() => editing ? editing.body : ""), [files, setFiles] = useState<(Attachment & { preview?: string; uploading?: boolean; link?: boolean; progress?: number; problem?: string; file?: File })[]>([]);
+  const [emoji, setEmoji] = useState(false), [error, setError] = useState(""), [suggest, setSuggest] = useState<Suggest>(null), [active, setActive] = useState(0);
+  // QA-1024: Pip steps aside while the @ / slash / task list is open (it sat over the list's options at 768 and 1440 px).
+  const suggesting = !!suggest;
+  useEffect(() => { window.dispatchEvent(new Event("pulse:float-changed")); }, [suggesting]);
+  const input = useRef<HTMLTextAreaElement>(null), picker = useRef<HTMLInputElement>(null);
+  // QA-BULK (P1): the saved draft is read after mount. Read during the first render it gave the browser a composer the
+  // server never drew (data-typing, "Send later"), and the hydration error showed "Something glitched" on a reload.
+  // Until the restored words are in the box, nothing is written back (an empty first render, or a quick remount, must
+  // not erase the saved draft).
+  const restored = useRef(false), pending = useRef<string | null>(null);
+  useEffect(() => {
+    if (restored.current || editing) return; restored.current = true;
+    const saved = drafts.get(channel.id);
+    if (saved) { pending.current = saved; setText(saved); }
+  }, [channel.id, editing]);
+  useEffect(() => {
+    if (editing || !restored.current) return;
+    if (pending.current !== null) { if (text !== pending.current) return; pending.current = null; }
+    drafts.set(channel.id, text);
+  }, [channel.id, text, editing]);
+  useEffect(() => { if (reply || editing) input.current?.focus(); }, [reply, editing]);
+  useEffect(() => { const el = input.current; if (!el) return; el.style.height = "auto"; el.style.height = `${Math.min(el.scrollHeight, 148)}px`; }, [text]);
+  // POLISH-2 (QA-E2E P1-11): a finished @name that is nobody in this conversation is not told anything; say so here.
+  const outside = useMemo(() => {
+    const known = new Set(members.map((p) => p.username?.toLowerCase()).filter(Boolean));
+    // The name still being typed (the people list is open for it) is not finished yet.
+    const typing = suggest?.kind === "mention" ? text.match(/@([\w.-]*)$/)?.[1] : undefined;
+    return [...new Set([...text.matchAll(/(?:^|\s)@([\w.-]+)(?=[\s,!?:;]|$)/g)].map((m) => m[1].replace(/[.-]+$/, ""))
+      .filter((u) => u && u !== typing && !known.has(u.toLowerCase()) && !(channel.kind !== "direct" && /^(everyone|here)$/i.test(u))))].slice(0, 3);
+  }, [text, members, suggest, channel.kind]);
+  // What the caret is typing: @someone, #a task, or /task.
+  const token = useMemo(() => { const m = text.match(/(^|\s)([@#])([^\s@#]*)$/); return m ? { sign: m[2], q: m[3] } : text.startsWith("/") && !text.includes("\n") ? { sign: "/", q: text.slice(1) } : null; }, [text]);
+  useEffect(() => {
+    if (!token) { queueMicrotask(() => setSuggest(null)); return; }
+    if (token.sign === "@") {
+      const q = token.q.toLowerCase();
+      // CHAT-V5: @everyone and @here in a group, offered first when the letters fit.
+      const all = channel.kind === "direct" ? [] : BROADCASTS(channel.members).filter((b) => b.username!.startsWith(q));
+      const items = [...all, ...rankMentions(members, q, viewer)].slice(0, 8);
+      queueMicrotask(() => { setSuggest(items.length ? { kind: "mention", items } : null); setActive(0); }); return;
+    }
+    if (token.sign === "/") { const items = token.q.includes(" ") ? [] : byGroup(chatCommands(token.q, channel)); queueMicrotask(() => { setSuggest(items.length ? { kind: "command", items } : null); setActive(0); }); return; }
+    const t = setTimeout(() => { void get<{ tasks: { id: string; title: string; statusLabel: string; assigneeName: string | null }[] }>(`chats/tasks?q=${encodeURIComponent(token.q)}`).then((d) => { setSuggest(d.tasks.length ? { kind: "task", items: d.tasks } : null); setActive(0); }).catch(() => setSuggest(null)); }, 180);
+    return () => clearTimeout(t);
+  }, [token, members, viewer, channel]);
+  const ready = !files.some((f) => f.uploading || f.problem) && (!!text.trim() || files.length > 0);
+  // J2: a line that gives someone in this chat work is offered as a task (who, what, when, which project).
+  const zone = useOrgZone();
+  const [projects, setProjects] = useState(projectCache), [notTask, setNotTask] = useState("");
+  const offer = useMemo(() => editing || files.length ? null : taskIntent(text, { members, viewer, projects: projects ?? [], today: zoneDay(zone) }), [text, members, viewer, projects, zone, editing, files.length]);
+  useEffect(() => {
+    if (!offer || projects) return;
+    projectLoad ??= get<{ projects: { id: string; name: string }[] }>("work/options").then((d) => { projectCache = d.projects.map((p) => ({ id: p.id, name: p.name })); }).catch(() => { projectCache = []; });
+    void projectLoad.then(() => setProjects(projectCache));
+  }, [offer, projects]);
+  const offered = offer && notTask !== text ? offer : null;
+  // UX-SIMPLE: a command's card (nothing changes until Confirm), the palette, and a plain request offered as a task.
+  const [card, setCard] = useState<CommandCard | null>(null), [palette, setPalette] = useState(false);
+  const ctx = (args: string): ChatCommandContext => ({ channel, args, makeTask: onTask, showWork: onWork, send: (t) => onSend(t, []), attach: (t, a) => onSend(t, a), members, viewer, today: zoneDay(zone), zone, preview: setCard });
+  const asked = useMemo(() => editing || files.length || offer || text.trim().startsWith("/") ? null : requestIntent(text, zoneDay(zone)), [text, editing, files.length, offer, zone]);
+  const [notAsk, setNotAsk] = useState("");
+  // A message's "Add to a project" (and anything else outside the box) shows its card here.
+  useEffect(() => { const on = (e: Event) => setCard((e as CustomEvent<CommandCard>).detail); window.addEventListener(CARD_EVENT, on); return () => window.removeEventListener(CARD_EVENT, on); }, []);
+  const offeredAsk = asked && notAsk !== text && !card ? asked : null;
+  function runByName(name: string, args: string) { const c = chatCommands(name, channel).find((x) => x.name === name); if (c) { setSuggest(null); c.run(ctx(args)); } }
+  function sendTask() { if (!offered || !ready) return; onSendTask(text, offered); setText(""); setSuggest(null); input.current?.focus(); }
+  // CHAT-V5: a message with @everyone / @here that would tell more than 10 people asks first.
+  const [askAll, setAskAll] = useState<null | "everyone" | "here">(null);
+  function submit(confirmed = false) {
+    if (editing) { if (text.trim()) onSaveEdit(text); setText(""); return; }
+    if (!ready) return;
+    const all = channel.kind === "direct" ? null : broadcastOf(text);
+    if (all && !confirmed && channel.members > 11) { setAskAll(all); return; }
+    // CHAT-VOICE: /call and /video start a call here.
+    const call = text.match(/^\/(call|video)\s*$/i);
+    if (call) { startCall(channel.id, call[1].toLowerCase() === "video"); setText(""); return; }
+    const found = findChatCommand(text, channel);
+    if (found) { found.command.run(ctx(found.args)); setText(""); setSuggest(null); return; }
+    onSend(text, files.map((f) => f.task ? { task: f.task, name: f.name } : f.link ? { name: f.name, url: f.url } : { id: f.id, name: f.name, mime: f.mime })); setText(""); files.forEach((f) => f.preview && URL.revokeObjectURL(f.preview)); setFiles([]); setEmoji(false);
+    input.current?.focus();
+  }
+  function pick(i: number) {
+    if (!suggest) return;
+    if (suggest.kind === "mention") { const p = suggest.items[i]; setText((t) => t.replace(/@[^\s@#]*$/, `@${p.username} `)); }
+    else if (suggest.kind === "task") { const t = suggest.items[i]; setText((x) => x.replace(/#[^\s@#]*$/, `#${t.title} `)); if (!files.some((f) => f.task === t.id) && files.length < 5) setFiles((f) => [...f, { task: t.id, name: t.title.slice(0, 300) }]); }
+    else { const c = suggest.items[i]; if (c.takesText) setText(`/${c.name} `); else { c.run(ctx("")); setText(""); } }
+    setSuggest(null); input.current?.focus();
+  }
+  function onKey(e: KeyboardEvent<HTMLTextAreaElement>) {
+    // CHAT-V5: Up in an empty box edits my last message (as in Slack and Teams).
+    if (e.key === "ArrowUp" && !text && !editing && !suggest && !e.shiftKey && !e.altKey && onEditLast?.()) { e.preventDefault(); return; }
+    if (suggest && ["ArrowDown", "ArrowUp", "Tab"].includes(e.key)) { e.preventDefault(); const n = suggest.items.length; setActive((a) => (a + (e.key === "ArrowUp" ? n - 1 : 1)) % n); return; }
+    if (e.key === "/" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); setPalette(true); return; }
+    if (e.key === "Escape") { if (suggest) setSuggest(null); else if (card) setCard(null); else if (reply || editing) { onCancel(); if (editing) setText(""); } return; }
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && offered) { e.preventDefault(); sendTask(); return; }
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && !coarse()) {
+      e.preventDefault();
+      // A command typed in full ("/tasks") runs; a part of one ("/ta") picks the highlighted one.
+      if (suggest && !(suggest.kind === "command" && findChatCommand(text, channel))) { pick(active); return; }
+      submit();
+    }
+  }
+  // CHAT-V5: each file shows how far its upload is; one that fails stays with Try again (nothing else is lost).
+  async function uploadOne(f: File, key: string, preview?: string) {
+    setFiles((x) => x.map((y) => y.url === key ? { ...y, uploading: true, problem: undefined, progress: 0 } : y));
+    try {
+      const a = await uploadWithProgress<Attachment>(`chats/${channel.id}/files`, { name: f.name, mime: f.type || "application/octet-stream", bytes: await readBase64(f) },
+        (progress) => setFiles((x) => x.map((y) => y.url === key ? { ...y, progress } : y)));
+      setFiles((x) => x.map((y) => y.url === key ? { id: a.id, name: a.name, mime: a.mime, preview } : y));
+    } catch (e) { setFiles((x) => x.map((y) => y.url === key ? { ...y, uploading: false, problem: (e as Error).message } : y)); }
+  }
+  async function upload(list: File[]) {
+    setError("");
+    for (const f of list.slice(0, 5 - files.length)) {
+      if (f.size > 5 * 1024 * 1024) { setError(`${f.name} is over 5 MB. Share a Drive link instead.`); continue; }
+      const key = crypto.randomUUID(), preview = f.type.startsWith("image/") ? URL.createObjectURL(f) : undefined;
+      setFiles((x) => [...x, { name: f.name, mime: f.type, preview, uploading: true, url: key, progress: 0, file: f }]);
+      await uploadOne(f, key, preview);
+    }
+  }
+  // Dropped on the conversation: files upload as if picked, links attach as links (up to five things in all).
+  useEffect(() => {
+    if (!apiRef) return;
+    apiRef.current = { files: (list) => void upload(list), link: (ref) => setFiles((x) => x.length >= 5 || x.some((f) => f.link && f.url === ref.url) ? x : [...x, { name: ref.name, url: ref.url, link: true }]) };
+    return () => { apiRef.current = null; };
+  });
+  function onPaste(e: ClipboardEvent<HTMLTextAreaElement>) { const list = [...e.clipboardData.files]; if (list.length) { e.preventDefault(); void upload(list); } }
+  // CHAT-V6: emoji go where the caret was, one after another, without focusing the box on a phone (no keyboard popping up).
+  const caret = useRef<number | null>(null);
+  function insert(s: string, focus = true) {
+    const el = input.current; const at = Math.min(caret.current ?? el?.selectionStart ?? text.length, text.length); caret.current = focus ? null : at + s.length;
+    setText((t) => t.slice(0, at) + s + t.slice(at)); if (focus) requestAnimationFrame(() => { el?.focus(); el?.setSelectionRange(at + s.length, at + s.length); });
+  }
+  const closeEmoji = useCallback(() => { setEmoji(false); caret.current = null; }, []);
+  // FLOAT-2: floating things (Pip) keep off the composer, so Send can always be tapped on a phone. READY (owner, 23 Oct):
+  // on a computer too: Pip beside the mic and Send crowded them, so it rests above the composer at every width.
+  return <div className={css.composer} data-chat-composer="" data-float-avoid="">
+    {reply || editing ? <div className={css.replying}><span style={{ "--hue": hue((editing ?? reply)!.authorId) } as CSSProperties}><b>{editing ? "Editing" : `Replying to ${(reply!.authorId === viewer ? "yourself" : reply!.name)}`}</b><small>{(editing ?? reply)!.body || "📎 Attachment"}</small></span>
+      <button type="button" className={css.iconBtn} onClick={() => { onCancel(); if (editing) setText(""); }} aria-label={editing ? "Stop editing" : "Cancel reply"}><X size={16} aria-hidden="true" /></button></div> : null}
+    {files.length ? <div className={css.pending}>{files.map((f, i) => <span key={f.id ?? f.task ?? f.url ?? i} data-uploading={f.uploading || undefined} data-problem={f.problem ? "" : undefined} title={f.problem}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- a local preview of the file being sent */}
+      {f.preview ? <img src={f.preview} alt="" /> : f.task ? <ListChecks size={16} aria-hidden="true" /> : f.link ? <Link2 size={16} aria-hidden="true" /> : f.mime?.startsWith("image/") ? <ImageIcon size={16} aria-hidden="true" /> : <FileIcon size={16} aria-hidden="true" />}
+      <em>{f.task ? `Task: ${f.name}` : f.name}</em>
+      {f.uploading ? <span className={v5.progress} role="progressbar" aria-label={`Uploading ${f.name}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((f.progress ?? 0) * 100)}><i style={{ width: `${Math.round((f.progress ?? 0) * 100)}%` }} /></span> : null}
+      {f.problem && f.file ? <button type="button" className={v5.retryUpload} onClick={() => void uploadOne(f.file!, f.url!, f.preview)} aria-label={`Try uploading ${f.name} again`} data-upload-retry="">Try again</button> : null}
+      <button type="button" onClick={() => setFiles((x) => x.filter((_, j) => j !== i))} aria-label={`Remove ${f.name}`}><X size={13} aria-hidden="true" /></button></span>)}</div> : null}
+    {files.some((f) => f.problem) ? <p className={css.composeError} role="alert">{files.find((f) => f.problem)!.problem}</p> : null}
+    {suggest ? <div className={css.suggest} data-float-avoid="" role="listbox" aria-label={suggest.kind === "mention" ? "People" : suggest.kind === "task" ? "Tasks" : "Commands"}>
+      {suggest.kind === "command" ? <>{suggest.items.map((c, i) => <div key={c.name} role="presentation">
+        {i === 0 || cmdGroup(suggest.items[i - 1].name) !== cmdGroup(c.name) ? <p className={css.cmdGroup}>{cmdGroup(c.name)}</p> : null}
+        <button type="button" role="option" aria-selected={i === active} data-command={c.name} className={css.cmdRow} onMouseEnter={() => setActive(i)} onMouseDown={(e) => { e.preventDefault(); pick(i); }}>
+          <span className={css.cmdIcon} aria-hidden="true"><c.icon size={16} /></span><span><b>/{c.name}</b><small>{c.hint}{c.detail ? ` · ${c.detail}` : ""}</small></span>{i === active ? <kbd aria-hidden="true">{c.takesText ? "Tab" : "↵"}</kbd> : null}</button></div>)}
+        <p className={css.cmdFoot} aria-hidden="true"><span><kbd>↑</kbd><kbd>↓</kbd> choose</span><span><kbd>↵</kbd> run</span><span><kbd>Esc</kbd> close</span></p></>
+        : suggest.kind === "mention" ? suggest.items.map((p, i) => <button key={p.id} type="button" role="option" aria-selected={i === active} onMouseDown={(e) => { e.preventDefault(); pick(i); }} data-broadcast={p.id.startsWith("@") ? p.username ?? "" : undefined}>{p.id.startsWith("@") ? <span className={v5.allIcon} aria-hidden="true"><Megaphone size={14} /></span> : <Avatar ai={p.agent} name={p.name} id={p.id} photoAt={p.photoAt} size={26} status />}<span><b>{p.name}{p.agent ? <AiBadge employeeId={p.employeeId} /> : null}</b><small>@{p.username}{p.team ? ` · ${p.team}` : ""}</small></span></button>)
+        : suggest.items.map((t, i) => <button key={t.id} type="button" role="option" aria-selected={i === active} onMouseDown={(e) => { e.preventDefault(); pick(i); }}><ListChecks size={16} aria-hidden="true" /><span><b>{t.title}</b><small>{t.statusLabel}{t.assigneeName ? ` · ${t.assigneeName}` : ""}</small></span></button>)}
+    </div> : null}
+    {card ? <CommandCardView card={card} onClose={() => { setCard(null); input.current?.focus(); }} onShare={(t) => onSend(t, [])} /> : null}
+    {palette ? <CommandPalette commands={byGroup(allChatCommands(channel))} groupOf={cmdGroup} onClose={() => { setPalette(false); input.current?.focus(); }}
+      onPick={(c) => { setPalette(false); if (c.takesText) { setText(`/${c.name} `); requestAnimationFrame(() => input.current?.focus()); } else { setText(""); c.run(ctx("")); } }} /> : null}
+    {offeredAsk && !suggest ? <div className={wk.offer} data-ask-offer="" role="group" aria-label="Make this a task?">
+      <ListChecks size={15} aria-hidden="true" />
+      <span>Make this a task? <b>{offeredAsk.title}</b>{offeredAsk.dueOn ? <em> · {dueLabel(offeredAsk.dueOn, zone)}</em> : null}</span>
+      <button type="button" data-primary="" onClick={() => runByName("task", text)}>Make a task</button>
+      <button type="button" className={wk.offerClose} onClick={() => setNotAsk(text)} aria-label="Not a task"><X size={14} aria-hidden="true" /></button>
+    </div> : null}
+    {offered && !suggest ? <div className={wk.offer} data-task-offer="" role="group" aria-label="Send as a task">
+      <ListChecks size={15} aria-hidden="true" />
+      <span>Task for <b>{offered.assignee.name.split(" ")[0]}</b>: {offered.title}{offered.dueOn ? <em> · {dueLabel(offered.dueOn, zone)}</em> : null}{offered.project ? <em> · {offered.project.name}</em> : null}</span>
+      <button type="button" data-primary="" onClick={sendTask} disabled={!ready} title="Ctrl+Enter">Send as task</button>
+      <button type="button" className={wk.offerClose} onClick={() => setNotTask(text)} aria-label="Not a task, send it as a message"><X size={14} aria-hidden="true" /></button>
+    </div> : null}
+    {/* CHAT-V6: search, categories (Recent first), arrows and Enter; on a phone it sits over the messages and keeps the keyboard down. */}
+    {emoji ? <EmojiPicker onPick={(e) => insert(e, !coarse())} onClose={closeEmoji} /> : null}
+    <div className={css.bar} data-float-avoid="" data-typing={text.trim() ? "" : undefined}>
+      <button type="button" className={css.iconBtn} onClick={() => setEmoji(!emoji)} aria-label="Emoji" aria-expanded={emoji} data-emoji-toggle=""><Smile size={21} aria-hidden="true" /></button>
+      {/* UX-SIMPLE: on a phone the hint row is hidden, so the commands have their own button beside the emoji. */}
+      {!editing ? <button type="button" className={`${css.iconBtn} ${cc.slashBtn}`} onClick={() => setPalette(true)} aria-label="Commands" data-open-palette-phone=""><SquareSlash size={20} aria-hidden="true" /></button> : null}
+      <button type="button" className={css.iconBtn} onClick={() => picker.current?.click()} aria-label="Attach a file" title="Photos and files up to 5 MB" disabled={files.length >= 5 || !!editing}><Paperclip size={20} aria-hidden="true" /></button>
+      <input ref={picker} type="file" multiple hidden onChange={(e) => { void upload([...(e.target.files ?? [])]); e.target.value = ""; }} />
+      <textarea ref={input} rows={1} value={text} onChange={(e) => { setText(e.target.value); const t = e.target.value.trim(); if (!editing) iAmTyping(channel.id, !!t && !t.startsWith("/")); }} onKeyDown={onKey} onPaste={onPaste} onFocus={() => { caret.current = null; }} maxLength={12000} enterKeyHint="send"
+        placeholder={editing ? "Edit your message" : "Message"} aria-label={editing ? "Edit your message" : `Message ${channel.name}`} />
+      {/* CHAT-VOICE: with nothing typed or attached, Send is the mic (hold to record, tap for hands free). */}
+      {/* CHAT-V5: send later (a time from quick choices or picked); the words stay in the box until it is scheduled. */}
+      {onLater && !editing && ready && !text.trim().startsWith("/") ? <button type="button" className={`${css.iconBtn} ${v5.later}`} onClick={() => onLater(text, files.map((f) => f.task ? { task: f.task, name: f.name } : f.link ? { name: f.name, url: f.url } : { id: f.id, name: f.name, mime: f.mime }))} aria-label="Send later" title="Send later" data-send-later=""><Clock3 size={19} aria-hidden="true" /></button> : null}
+      {!editing && !text.trim() && !files.length ? <VoiceRecorder channelId={channel.id} onSend={(a) => { setError(""); onSend("", [a]); }} onError={setError} />
+        : <button type="button" className={css.send} onClick={() => submit()} disabled={editing ? !text.trim() : !ready} aria-label={editing ? "Save the edit" : "Send"}>{editing ? <Check size={20} aria-hidden="true" /> : <SendHorizontal size={20} aria-hidden="true" />}</button>}
+    </div>
+    {error ? <p className={css.composeError} role="alert">{error}</p> : null}
+    {askAll ? <Confirm title={askAll === "everyone" ? `Notify all ${channel.members - 1} people?` : "Notify everyone active now?"}
+      text={askAll === "everyone" ? `@everyone tells every member of ${channel.name} with a bell and a push, except those who muted it.` : `@here tells the members of ${channel.name} active in Pulse in the last 10 minutes, except those who muted it. The rest see it as a normal message.`}
+      action="Send and notify" tone="primary" onCancel={() => setAskAll(null)} onConfirm={() => { setAskAll(null); submit(true); }} /> : null}
+    {outside.length ? <p className={css.mentionOut}>{outside.map((u) => `@${u}`).join(", ")} {outside.length === 1 ? "isn’t" : "aren’t"} in this conversation: they won’t be told or see it.</p> : null}
+    {/* CHAT-SHELL: the hints are quick actions: each puts its sign in the box (or opens the side panel). */}
+    <div className={css.composeHint}>
+      <button type="button" onClick={() => insert(text && !/\s$/.test(text) ? " @" : "@")}><kbd>@</kbd> mention</button>
+      <button type="button" onClick={() => insert(text && !/\s$/.test(text) ? " #" : "#")}><kbd>#</kbd> a task</button>
+      {/* UX-SIMPLE: the hint opens the palette (every command, grouped and searchable); typing "/" still lists them inline. */}
+      <button type="button" onClick={() => setPalette(true)} data-open-palette="" title="Every command (Ctrl+/)"><kbd>/</kbd> commands</button>
+      {/* E2E-4P (owner check): three quick actions and one keyboard hint; the row was cramped with five. */}
+      <span title="Drop files or links into the box to attach them"><kbd>Shift</kbd><kbd>Enter</kbd> new line</span>
+    </div>
+  </div>;
+}

@@ -1,0 +1,12 @@
+export const OAUTH_SCOPES: string[];
+export function publicOrigin(headers: Headers): string;
+export function protectedResource(origin: string): Record<string, unknown>;
+export function authorizationServer(origin: string): Record<string, unknown>;
+export function discovery(body: unknown): Response;
+export function preflight(): Response;
+export function challenge(origin: string, invalid?: boolean): string;
+export function forwardOAuth(request: Request, action: string, fetchImpl?: typeof fetch): Promise<Response>;
+export function html(title: string, inner: string, status?: number): Response;
+export type ConsentInfo = { app: { name: string; verified: boolean }; returnsTo: string; person: string; company: string; scopes: { key: string; label: string }[] };
+export function consentPage(info: ConsentInfo, query: URLSearchParams): Response;
+export function returnPage(target: string): Response;
