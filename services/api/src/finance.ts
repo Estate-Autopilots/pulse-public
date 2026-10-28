@@ -1,0 +1,33 @@
+// Finance views use one canonical ledger. Other sources remain supporting observations.
+export type MoneyRow = {id:string;dataset:string;approved:boolean;data:Record<string,unknown>;projectId?:string;projectName?:string;clientId?:string;clientName?:string};
+const str=(x:unknown)=>String(x??'');
+const amount=(x:unknown):number|null=>x===null||x===undefined||x===''?null:Number.isFinite(Number(x))?Number(x):null;
+export function financeWorkspace(rows:MoneyRow[],today=new Date().toISOString().slice(0,10),balances:{currency:string;amount:number;as_of:string;history_reconciled:boolean}[]=[]) {
+ const ledger=rows.filter(r=>r.dataset==='money_sheet_transactions');
+ const confirmed=ledger.filter(r=>r.approved&&amount(r.data.amount)!==null&&['inflow','outflow'].includes(str(r.data.direction)));
+ const sum=(rs:MoneyRow[])=>rs.reduce((n,r)=>n+(amount(r.data.amount)??0),0);
+ const group=(rs:MoneyRow[],key:(r:MoneyRow)=>string)=>{const groups:Record<string,MoneyRow[]>={};for(const r of rs)(groups[key(r)]??=[]).push(r);return Object.entries(groups).map(([key,items])=>({key,amount:sum(items),count:items.length})).sort((a,b)=>b.amount-a.amount);};
+ const currencies=[...new Set(confirmed.map(r=>str(r.data.currency)))].sort();
+ const trends=currencies.map(currency=>{const items=confirmed.filter(r=>r.data.currency===currency);return {currency,months:group(items,r=>str(r.data.date).slice(0,7)).sort((a,b)=>a.key.localeCompare(b.key)).map(m=>{const rs=items.filter(r=>str(r.data.date).startsWith(m.key));return {month:m.key,inflow:sum(rs.filter(r=>r.data.direction==='inflow')),outflow:sum(rs.filter(r=>r.data.direction==='outflow')),count:rs.length};})};});
+ const spend=currencies.map(currency=>{const items=confirmed.filter(r=>r.data.currency===currency&&r.data.direction==='outflow');return {currency,categories:group(items,r=>str(r.data.category)||'Uncategorised'),vendors:group(items,r=>str(r.data.vendor)||'Unknown vendor')};});
+ const subscriptions=rows.filter(r=>['subscriptions','recurring'].includes(r.dataset)).map(r=>{const d=r.data;const plannedMonthlyCost=amount(d.planned_monthly_cost);const observedAmount=[d.last_charge_amount,d.last_amount,d.amount].map(amount).find(v=>v!==null)??null;const value=observedAmount??plannedMonthlyCost;const seats=amount(d.seats??d.seat_count);const usage=amount(d.used_seats??d.active_seats);const date=str(d.renewal_date??d.next_renewal);let renewal=date,inferred=false;const last=str(d.last_charge_date??d.last_observed_date??d.date);const cycle=str(d.cycle).toLowerCase();
+  if(!renewal&&/^\d{4}-\d{2}-\d{2}$/.test(last)&&/month|year|annual/.test(cycle)&&d.cycle_basis!=='planned monthly cost'){const base=new Date(last+'T00:00:00Z');if(/month/.test(cycle))base.setUTCMonth(base.getUTCMonth()+1);else base.setUTCFullYear(base.getUTCFullYear()+1);renewal=base.toISOString().slice(0,10);inferred=true;}
+  return {...r,amount:value,observedAmount,plannedMonthlyCost,renewal:renewal||null,inferred,seats,costPerSeat:seats&&(plannedMonthlyCost??value)!==null?(plannedMonthlyCost??value)!/seats:null,unused:usage===null?null:usage===0,usage};}).sort((a,b)=>(a.renewal??'9999').localeCompare(b.renewal??'9999'));
+ // A proposal averages the last three complete calendar months, including months with zero reconciled spend.
+ const date=new Date(today+'T00:00:00Z');const next=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)).toISOString().slice(0,10);
+ const history=[1,2,3].map(i=>new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()-i,1)).toISOString().slice(0,7));
+ const proposals=spend.flatMap(s=>s.categories.map(c=>{const items=confirmed.filter(r=>r.data.currency===s.currency&&r.data.direction==='outflow'&&(str(r.data.category)||'Uncategorised')===c.key&&history.includes(str(r.data.date).slice(0,7)));return {category:c.key,currency:s.currency,amount:Math.round(sum(items)/3*100)/100,basis:`Average reconciled spend across ${[...history].reverse().join(', ')}`,source:'history'};})).filter(p=>p.amount>0);
+ const knownRenewals:Record<string,{category:string;currency:string;amount:number;dates:string[]}>={};
+ for(const r of subscriptions.filter(r=>!['false','no','inactive'].includes(str(r.data.active_now).toLowerCase()))){
+  const monthly=r.plannedMonthlyCost!==null&&r.data.planned_cadence==='monthly';
+  const known=r.renewal?.startsWith(next.slice(0,7))&&!r.inferred&&r.observedAmount!==null;
+  if(!monthly&&!known)continue;
+  const category=str(r.data.category)||(r.dataset==='recurring'?'Office':'Subscriptions'),currency=str(monthly?r.data.planned_currency:r.data.currency)||'INR',key=category+'|'+currency;
+  const group=knownRenewals[key]??={category,currency,amount:0,dates:[]};group.amount+=monthly?r.plannedMonthlyCost!:r.observedAmount!;
+  group.dates.push(monthly?`Monthly plan (${str(r.data.planned_source)||'reported cost'}); contract date ${r.renewal&&!r.inferred?r.renewal:'unconfirmed'}`:r.renewal!);
+ }
+ for(const renewal of Object.values(knownRenewals)){const existing=proposals.find(p=>p.category===renewal.category&&p.currency===renewal.currency);if(existing){existing.amount=Math.max(existing.amount,renewal.amount);existing.basis+='; checked against planned monthly costs and known renewals';}else proposals.push({...renewal,basis:`Planned costs and known renewals: ${renewal.dates.join(', ')}; review contracts before approval`,source:'renewal'});}
+ const runways=balances.map(b=>{const flow=trends.find(t=>t.currency===b.currency);const months=flow?.months.filter(m=>history.includes(m.month))??[];const burn=months.reduce((n,m)=>n+m.outflow-m.inflow,0)/3;return {currency:b.currency,balance:Number(b.amount),asOf:b.as_of,burn,months:b.history_reconciled&&b.as_of>=history[0]+'-01'&&months.length===3&&burn>0?Math.round(Number(b.amount)/burn*10)/10:null,complete:b.history_reconciled};});
+ const clients=currencies.flatMap(currency=>{const items=confirmed.filter(r=>r.data.direction==='inflow'&&r.data.currency===currency&&r.clientId);return group(items,r=>r.clientId!).map(g=>{const rs=items.filter(r=>r.clientId===g.key);const projects=[...new Set(rs.map(r=>r.projectId).filter(Boolean))];return {...g,currency,name:rs[0].clientName,projects:projects.length,repeat:projects.length>1,firstDate:rs.map(r=>str(r.data.date)).sort()[0],lastDate:rs.map(r=>str(r.data.date)).sort().at(-1)};});});
+ return {trends,spend,subscriptions,clients,runways,nextMonth:next,proposals,counts:{observations:rows.length,ledger:ledger.length,confirmed:confirmed.length,pending:ledger.length-confirmed.length,unknownDirection:ledger.filter(r=>!['inflow','outflow'].includes(str(r.data.direction))).length},runway:null,runwayReason:'A verified opening cash balance and complete reconciled months are needed to estimate runway.'};
+}
