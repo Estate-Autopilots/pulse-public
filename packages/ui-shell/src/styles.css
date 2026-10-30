@@ -1,0 +1,145 @@
+/* Semantic aliases preserve Sales Xray shell geometry while letting Pulse own its tokens and accent. */
+:root {
+  --lx-ink: var(--theme-text);
+  --lx-ink-2: var(--theme-text);
+  --lx-ink-3: var(--theme-text-muted);
+  --lx-muted: var(--theme-text-muted);
+  --lx-muted-2: var(--theme-text-muted);
+  --lx-line: var(--theme-border);
+  --lx-line-soft: var(--theme-border);
+  --lx-line-strong: var(--theme-border-strong);
+  --lx-paper: var(--theme-canvas);
+  --lx-paper-2: var(--theme-surface-subtle);
+  --lx-surface: var(--theme-surface);
+  --lx-sunken: var(--theme-surface-subtle);
+  --lx-film: #101827;
+  --lx-film-2: #1b2b45;
+  --lx-film-text: #ffffff;
+  --lx-glow: var(--theme-action);
+  --lx-teal: var(--theme-action);
+  --lx-teal-hover: var(--theme-action-hover);
+  --lx-teal-2: var(--theme-action);
+  --lx-teal-soft: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface));
+  --lx-on-teal: var(--theme-action-text);
+  --lx-strength: var(--theme-action);
+  --lx-strength-ink: var(--theme-action-hover);
+  --lx-strength-soft: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface));
+  --lx-strength-edge: var(--theme-border-strong);
+  --lx-info: var(--theme-info);
+  --lx-success: var(--theme-success);
+  --lx-warning: var(--theme-warning);
+  --lx-danger: var(--theme-danger);
+  --lx-danger-soft: color-mix(in srgb, var(--theme-danger) 12%, var(--theme-surface));
+  --lx-font-ui: var(--font-inter, Inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --lx-text-body: 400 14px/1.55 var(--lx-font-ui);
+  --lx-text-ui: 500 14px/1.4 var(--lx-font-ui);
+  --lx-text-meta: 500 12px/1.4 var(--lx-font-ui);
+  --lx-space-2: 8px;
+  --lx-space-3: 12px;
+  --lx-space-4: 16px;
+  --lx-radius-sm: 10px;
+  --lx-radius-pill: 999px;
+  --lx-ring-focus: 0 0 0 2px var(--theme-surface), 0 0 0 4px var(--theme-focus);
+  --lx-shadow-1: 0 1px 2px rgb(15 27 51 / 5%);
+  --lx-shadow-2: var(--theme-shadow);
+  --lx-shadow-cta: 0 8px 20px color-mix(in srgb, var(--theme-action) 24%, transparent);
+  --lx-dur-move: var(--theme-transition-duration);
+  --lx-ease-move: cubic-bezier(0.16, 1, 0.3, 1);
+  --lx-ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --lx-gradient-primary: linear-gradient(135deg, var(--theme-action), var(--theme-action-hover));
+}
+
+.sidebar-tooltip-wrapper { display: inline-flex; }
+.sidebar-tooltip-panel {
+  width: max-content;
+  max-width: 240px;
+  padding: 7px 10px;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  background: var(--theme-text);
+  color: var(--theme-surface);
+  box-shadow: var(--theme-shadow);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.sidebar-tooltip-content { font-weight: 600; }
+.sidebar-tooltip-reason { margin-top: 3px; opacity: 0.8; }
+
+/* Scrollbars: thin, no arrows, no track; the thumb shows while the pointer is over the scrolling region. */
+@supports not selector(::-webkit-scrollbar) {
+  * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--theme-text-muted) 38%, transparent) transparent; }
+}
+::-webkit-scrollbar { width: 10px; height: 10px; background: transparent; }
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { border: 3px solid transparent; border-radius: 999px; background: transparent; background-clip: content-box; }
+:hover::-webkit-scrollbar-thumb, :focus-within::-webkit-scrollbar-thumb { background-color: color-mix(in srgb, var(--theme-text-muted) 34%, transparent); }
+::-webkit-scrollbar-thumb:hover, ::-webkit-scrollbar-thumb:active { background-color: color-mix(in srgb, var(--theme-text-muted) 62%, transparent); }
+/* On a desktop the shell is the viewport: the document itself never scrolls, so there is never a second scrollbar. */
+@media (min-width: 900px) {
+  html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+}
+/* STAFF-UX (owner, 28 Oct 2026: "sign-in and the onboarding can't scroll on phones"): a bare page (sign-in, password,
+   invitation, team setup, /welcome) has no shell scroller, so the document scrolls at every width: a phone on its side
+   or in "desktop site" (900 px and up) was locked by the rule above. Natural scroll, small-viewport units, and room so a
+   focused field scrolls clear of the on-screen keyboard. */
+html:has(main[data-bare-page]), html:has(main[data-bare-page]) body { height: auto; min-height: 100dvh; overflow: visible; overflow-x: clip; overscroll-behavior-y: auto; }
+main[data-bare-page] { min-height: 100dvh; }
+html:has(main[data-bare-page]) { scroll-padding-bottom: calc(96px + var(--keyboard-h, 0px)); }
+main[data-bare-page] :is(input, textarea, select) { scroll-margin-block: 72px calc(96px + var(--keyboard-h, 0px)); }
+/* App feel (round 5A2): no scrollbar is ever drawn on a desktop. What does not fit is paged, tabbed or opened in a drawer. */
+@media (min-width: 900px) {
+  * { scrollbar-width: none; }
+  ::-webkit-scrollbar { display: none; width: 0; height: 0; }
+}
+
+/* OWNER-HOME Focus mode (html[data-pulse-focus], set by the calm home): the top bar stops being a bar. No background,
+   line, title or Pip; New, Check in, the bell and the account float top-right as one small glass capsule. */
+html[data-pulse-focus] [data-shell-topbar] { background: transparent !important; border: 0 !important; border-image-source: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html[data-pulse-focus] [data-shell-topbar]::before, html[data-pulse-focus] [data-shell-topbar]::after { display: none !important; }
+/* FLOAT: only Pip's placeholder goes; Pip itself (put in the top bar) joins the capsule (it carries data-home too, and
+   vanished from the calm home, with no way to bring it back there). */
+html[data-pulse-focus] [data-shell-topbar] nav[aria-label="Breadcrumb"], html[data-pulse-focus] [data-shell-actions] > [data-home]:not([data-island]) { display: none !important; }
+/* Pip joins the capsule as itself: no dark bubble, sitting between Check in and the bell. */
+html[data-pulse-focus] [data-shell-actions] > [data-island] { position: static !important; inset: auto !important; transform: none !important; margin: 0 !important; width: auto !important; }
+/* FLOAT: the pill only; its menu and summary keep their glass card (they turned see-through over the page). */
+html[data-pulse-focus] [data-shell-actions] > [data-island] > [data-island-pill] { background: transparent !important; box-shadow: none !important; border: 0 !important; padding: 0 2px !important; }
+html[data-pulse-focus] [data-shell-actions] > [data-island] .pip { width: 34px !important; height: 34px !important; }
+html[data-pulse-focus] [data-shell-actions] {
+  gap: 2px !important; margin-top: 12px; padding: 4px; border-radius: 18px;
+  background: color-mix(in srgb, var(--theme-surface, #fff) 66%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5); backdrop-filter: blur(24px) saturate(1.5);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 0 0 1px rgb(0 0 0 / 0.07), 0 10px 30px rgb(0 0 0 / 0.08);
+  animation: pulse-focus-capsule 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+html[data-theme="dark"][data-pulse-focus] [data-shell-actions] { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 1px rgb(255 255 255 / 0.08), 0 10px 30px rgb(0 0 0 / 0.4); }
+@keyframes pulse-focus-capsule { from { opacity: 0; transform: translateY(-6px) scale(0.98); } }
+/* New: icon only, a round button. */
+html[data-pulse-focus] [data-shell-actions] button[aria-label^="Create"] { width: 36px; min-width: 36px; height: 36px; padding: 0 !important; justify-content: center; border: 0 !important; border-radius: 50% !important; background: transparent !important; }
+html[data-pulse-focus] [data-shell-actions] button[aria-label^="Create"] > span, html[data-pulse-focus] [data-shell-actions] button[aria-label^="Create"] > kbd { display: none !important; }
+/* Check in: one quiet pill, the options caret folded away. */
+html[data-pulse-focus] [data-shell-actions] button[aria-label="Check-in options"] { display: none !important; }
+html[data-pulse-focus] [data-shell-actions] button[aria-label^="Check in"], html[data-pulse-focus] [data-shell-actions] button[aria-label^="Checked in"] { height: 36px; border: 0 !important; border-radius: 13px !important; box-shadow: none !important; }
+html[data-pulse-focus] [data-shell-actions] button[aria-label^="Notifications"] { width: 36px; height: 36px; border: 0 !important; border-radius: 50% !important; background: transparent !important; }
+html[data-pulse-focus] [data-shell-actions] button { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s; }
+html[data-pulse-focus] [data-shell-actions] button:active { transform: scale(0.9); }
+@media (prefers-reduced-transparency: reduce) { html[data-pulse-focus] [data-shell-actions] { background: var(--theme-surface, #fff); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+@media (prefers-reduced-motion: reduce) { html[data-pulse-focus] [data-shell-actions] { animation: none; } }
+/* On a computer the quiet top bar floats over the page, so the calm home's background runs to the top edge (no seam). */
+@media (min-width: 761px) {
+  html[data-pulse-focus] *:has(> [data-shell-topbar]) { position: relative; }
+  html[data-pulse-focus] [data-shell-topbar] { position: absolute !important; inset: 0 0 auto 0; z-index: 40; pointer-events: none; }
+  html[data-pulse-focus] [data-shell-topbar] [data-shell-actions] { pointer-events: auto; }
+}
+
+/* OWNER-HOME (owner, 20 Oct 2026): no line and no fill under the top bar on any page; the page runs to the top edge.
+   Phones keep a light blur while content scrolls under the pinned bar, still with no line. */
+html [data-shell-topbar][data-shell-topbar] { background: transparent !important; border-bottom-width: 0 !important; border-bottom-color: transparent !important; border-image-source: none !important; border-image-width: 0 !important; box-shadow: none !important; }
+[data-shell-topbar]::before, [data-shell-topbar]::after { display: none !important; }
+@media (max-width: 760px) {
+  html:not([data-pulse-focus]) [data-shell-topbar] { background: color-mix(in srgb, var(--theme-canvas, #f6f6fa) 72%, transparent) !important; -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); }
+}
+/* FLOAT-2 (device audit): the calm home's capsule stays at the right on a phone, where the same controls sit on every
+   other page (with the title hidden it slid to the left, and jumped when switching tabs). */
+html[data-pulse-focus] [data-shell-actions] { margin-left: auto !important; }
+@media (max-width: 899.98px) { html[data-pulse-focus] [data-shell-actions] { gap: 8px !important; } }

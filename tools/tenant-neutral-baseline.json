@@ -1,0 +1,467 @@
+{
+ "note": "DE-EA: per-file counts of company-specific literals outside comments; only ever shrinks (tools/check-tenant-neutral.mjs).",
+ "files": {
+  "apps/desktop/src/demo-comms.js": {
+   "domain": 0,
+   "ea": 2,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/mobile/scripts/configure-origin.mjs": {
+   "domain": 1,
+   "ea": 0,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/acquisition/fixture.ts": {
+   "domain": 0,
+   "ea": 13,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/acquisition/types.ts": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/acquisition/workspace.tsx": {
+   "domain": 0,
+   "ea": 13,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/chats/app.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/chats/groups/detail.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 5
+  },
+  "apps/web/app/chats/groups/guide.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/chats/groups/hub.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 7
+  },
+  "apps/web/app/chats/groups/model.ts": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 2
+  },
+  "apps/web/app/chats/import/import.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/companies/checklist.tsx": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/companies/steps.ts": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/companies/wizard.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 4
+  },
+  "apps/web/app/create.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/dashboard/leadership.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/destinations/registry.mjs": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 2
+  },
+  "apps/web/app/finance/desk/page.tsx": {
+   "domain": 0,
+   "ea": 3,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/finance/live.tsx": {
+   "domain": 0,
+   "ea": 3,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/finance/views.tsx": {
+   "domain": 0,
+   "ea": 7,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/hr/flow-actions.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/hr/help/page.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/hr/moves/checklist.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 2
+  },
+  "apps/web/app/hr/moves/types.ts": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 2
+  },
+  "apps/web/app/hr/page.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/insights.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/insights/reports/page.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/kit/gallery.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/leadership/view.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/lib/app-updates.ts": {
+   "domain": 1,
+   "ea": 0,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/lib/chat-format.mjs": {
+   "domain": 1,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/lib/notices.mjs": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/lib/weekly-data.mjs": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 2
+  },
+  "apps/web/app/me/work/workspace.tsx": {
+   "domain": 0,
+   "ea": 2,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/orgs/licences/page.tsx": {
+   "domain": 1,
+   "ea": 0,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/people/[id]/page.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/people/directory.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/people/lifecycle.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/projects/[id]/page.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 2
+  },
+  "apps/web/app/projects/parts.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/records.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/settings/company-setup.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/settings/connectors.tsx": {
+   "domain": 0,
+   "ea": 3,
+   "name": 0,
+   "pod": 0
+  },
+  "apps/web/app/settings/page.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/settings/roles.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/settings/work-rules.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/tasks/dashboard.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/tasks/review-settings.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "apps/web/app/tasks/work-two.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 2
+  },
+  "apps/web/app/ui.tsx": {
+   "domain": 0,
+   "ea": 0,
+   "name": 0,
+   "pod": 1
+  },
+  "packages/companion/src/client.js": {
+   "domain": 1,
+   "ea": 0,
+   "name": 0,
+   "pod": 0
+  },
+  "packages/companion/src/updates.js": {
+   "domain": 1,
+   "ea": 0,
+   "name": 0,
+   "pod": 0
+  },
+  "packages/invoice-doc/src/sample.js": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 0
+  },
+  "packages/sdk-py/src/pulse_sdk/connector.py": {
+   "domain": 0,
+   "ea": 2,
+   "name": 0,
+   "pod": 0
+  },
+  "services/api/src/connectors.ts": {
+   "domain": 0,
+   "ea": 3,
+   "name": 0,
+   "pod": 0
+  },
+  "services/api/src/erp-seams.ts": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 0
+  },
+  "services/api/src/finance-desk-routes.ts": {
+   "domain": 1,
+   "ea": 0,
+   "name": 1,
+   "pod": 0
+  },
+  "services/api/src/flow/seed.ts": {
+   "domain": 1,
+   "ea": 3,
+   "name": 0,
+   "pod": 0
+  },
+  "services/api/src/flow/templates/ea-creative.ts": {
+   "domain": 0,
+   "ea": 43,
+   "name": 0,
+   "pod": 0
+  },
+  "services/api/src/flow/templates/index.ts": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 0
+  },
+  "services/api/src/licences.ts": {
+   "domain": 1,
+   "ea": 0,
+   "name": 0,
+   "pod": 0
+  },
+  "services/api/src/native-validation.ts": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/erp_catalog_seed.py": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_desk.py": {
+   "domain": 4,
+   "ea": 0,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_live/__main__.py": {
+   "domain": 0,
+   "ea": 2,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_live/bank.py": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_live/drive.py": {
+   "domain": 0,
+   "ea": 2,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_live/mail.py": {
+   "domain": 7,
+   "ea": 2,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_live/model.py": {
+   "domain": 0,
+   "ea": 2,
+   "name": 6,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_live/sheets.py": {
+   "domain": 0,
+   "ea": 2,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_live/sync.py": {
+   "domain": 0,
+   "ea": 12,
+   "name": 2,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_live/wa_screens.py": {
+   "domain": 1,
+   "ea": 0,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/finance_providers.py": {
+   "domain": 5,
+   "ea": 0,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/lifecycle_scan.py": {
+   "domain": 1,
+   "ea": 2,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/place_index.py": {
+   "domain": 0,
+   "ea": 1,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/talent_index.py": {
+   "domain": 2,
+   "ea": 5,
+   "name": 0,
+   "pod": 0
+  },
+  "services/workers/src/pulse_workers/tools_import.py": {
+   "domain": 0,
+   "ea": 0,
+   "name": 2,
+   "pod": 0
+  }
+ }
+}

@@ -1,0 +1,125 @@
+/* WORK-TAB (27 Oct 2026): Work → People, performance and quality per person. Calm: one row of numbers, one table,
+   colour only where something needs a look (late, low quality). */
+.view { --good: #1f7a4d; --watch: #9a5b00; --low: #b42318; --mark: #5b45d6; --track: color-mix(in srgb, #5b45d6 12%, var(--theme-surface));
+  display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+:global(:root[data-theme="dark"]) .view, :global(:root[data-theme="dark"]) .card { --good: #4cc38a; --watch: #f0b44c; --low: #ff7a6e; --mark: #8d7cf2; --track: color-mix(in srgb, #8d7cf2 18%, var(--theme-surface)); }
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"])) .view, :global(:root:not([data-theme="light"])) .card { --good: #4cc38a; --watch: #f0b44c; --low: #ff7a6e; --mark: #8d7cf2; --track: color-mix(in srgb, #8d7cf2 18%, var(--theme-surface)); }
+}
+.scope { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+.tile { display: grid; gap: 2px; padding: 12px 14px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); min-width: 0; }
+.tile span { color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+.tile b { font-size: 24px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tile small { color: var(--theme-text-muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tile[data-tone="low"] b { color: var(--low); }
+.tile[data-tone="watch"] b { color: var(--watch); }
+.tile[data-tone="good"] b { color: var(--good); }
+
+.fix { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px 14px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); }
+.fixLabel { color: var(--theme-text-muted); font-size: 12px; font-weight: 650; letter-spacing: .03em; text-transform: uppercase; }
+.fix a { display: inline-flex; align-items: baseline; gap: 4px; height: 28px; align-items: center; padding: 0 10px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text); font-size: 13px; text-decoration: none; }
+.fix a:hover { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action); }
+.fix a[data-tone="low"] b { color: var(--low); }
+.fix small { color: var(--theme-text-muted); font-size: 12px; }
+.panel { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); overflow: hidden; }
+.head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; padding: 14px 16px 10px; }
+.head h3 { margin: 0; font-size: 15px; font-weight: 650; }
+.head small { color: var(--theme-text-muted); font-size: 12.5px; }
+.scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.table th { padding: 8px 10px; border-block: 1px solid var(--theme-border); color: var(--theme-text-muted); font-size: 11.5px; font-weight: 650; letter-spacing: .03em;
+  text-align: left; text-transform: uppercase; white-space: nowrap; background: color-mix(in srgb, var(--theme-surface-subtle) 50%, var(--theme-surface)); }
+.table td { padding: 10px 10px; border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); vertical-align: middle; }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr:hover td { background: color-mix(in srgb, var(--theme-action) 4%, var(--theme-surface)); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+th.num { text-align: right; }
+.table td[data-tone="low"] { color: var(--low); font-weight: 650; }
+.who { display: flex; align-items: center; gap: 10px; min-width: 170px; color: inherit; text-decoration: none; }
+.who span { display: grid; min-width: 0; }
+.who b { font-weight: 600; }
+.who small { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--theme-text-muted); font-size: 12px; }
+.coach { display: inline-flex; align-items: center; gap: 3px; height: 18px; padding: 0 6px; border-radius: 999px; background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface));
+  color: var(--theme-action); font-size: 11px; font-weight: 600; }
+.now { max-width: 200px; }
+.now a { display: block; overflow: hidden; color: var(--theme-text); text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.now a:hover { color: var(--theme-action); }
+.none { color: var(--theme-text-muted); }
+.share { display: inline-grid; gap: 0; }
+.share b { font-weight: 650; font-variant-numeric: tabular-nums; }
+.share small { color: var(--theme-text-muted); font-size: 11.5px; }
+.share[data-tone="good"] b { color: var(--good); }
+.share[data-tone="watch"] b { color: var(--watch); }
+.share[data-tone="low"] b { color: var(--low); }
+.output { display: grid; gap: 4px; min-width: 96px; }
+.outputLine { display: flex; align-items: baseline; gap: 6px; }
+.outputLine b { font-weight: 650; font-variant-numeric: tabular-nums; }
+.outputLine small { color: var(--theme-text-muted); font-size: 11.5px; }
+.bar { position: relative; display: block; height: 6px; border-radius: 999px; background: var(--track); }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--mark); }
+.bar em { position: absolute; top: -2px; width: 2px; height: 10px; border-radius: 1px; background: var(--theme-text-muted); }
+.go { width: 28px; }
+.go a { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; color: var(--theme-text-muted); }
+.go a:hover { background: var(--theme-surface-subtle); color: var(--theme-action); }
+.empty { display: grid; gap: 4px; padding: 28px 16px; color: var(--theme-text-muted); text-align: center; }
+.empty b { color: var(--theme-text); }
+.targets { border-top: 1px solid var(--theme-border); padding: 10px 16px; }
+.targets summary { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.targets summary small { color: var(--theme-text-muted); font-weight: 400; }
+.targetList { display: grid; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
+.targetList li { display: grid; grid-template-columns: minmax(140px, 220px) 90px minmax(0, 220px) auto; align-items: center; gap: 8px; }
+.targetRole { font-size: 13px; font-weight: 600; }
+.targetError { margin: 6px 0 0; color: var(--low); font-size: 12.5px; }
+@media (max-width: 700px) { .targetList li { grid-template-columns: 1fr 80px; } }
+.foot { margin: 0; padding: 10px 16px 14px; border-top: 1px solid var(--theme-border); color: var(--theme-text-muted); font-size: 12px; }
+
+/* Rail cards beside a person's own tasks. */
+.card { --good: #1f7a4d; --watch: #9a5b00; --low: #b42318;
+  display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); }
+.cardHead { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.cardHead h3 { margin: 0; font-size: 14px; font-weight: 650; }
+.cardHead a { color: var(--theme-action); font-size: 12.5px; font-weight: 600; text-decoration: none; }
+.cardLine { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.cardList { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.cardList a { display: flex; align-items: center; gap: 8px; padding: 6px; margin: 0 -6px; border-radius: 10px; color: inherit; text-decoration: none; }
+.cardList a:hover { background: var(--theme-surface-subtle); }
+.cardList span { display: grid; min-width: 0; }
+.cardList b { font-size: 13px; font-weight: 600; }
+.cardList small { color: var(--low); font-size: 12px; }
+.mini { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.mini > div { display: grid; gap: 1px; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, var(--theme-surface-subtle) 60%, var(--theme-surface)); min-width: 0; }
+.mini dt { color: var(--theme-text-muted); font-size: 11px; font-weight: 650; }
+.mini dd { margin: 0; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.mini dd[data-tone="good"] { color: var(--good); }
+.mini dd[data-tone="watch"] { color: var(--watch); }
+.mini dd[data-tone="low"] { color: var(--low); }
+.mini small { color: var(--theme-text-muted); font-size: 11.5px; }
+
+@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .table thead { display: none; }
+  .table, .table tbody, .table tr, .table td { display: block; width: 100%; }
+  .table tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; padding: 12px 14px; border-bottom: 1px solid var(--theme-border); }
+  .table td { padding: 0; border: 0; text-align: left; }
+  .table td[data-label="Person"], .table td[data-label="On now"] { grid-column: 1 / -1; }
+  .table td[data-label]:not([data-label="Person"])::before { content: attr(data-label); display: block; color: var(--theme-text-muted); font-size: 11px; font-weight: 650; }
+  .go { display: none !important; }
+  .now { max-width: none; }
+}
+/* WORK-UX (29 Oct 2026): the six numbers are one joined strip, as on Work → Projects (six boxes read as clutter). */
+.tiles { gap: 0; overflow: hidden; border: 1px solid color-mix(in srgb, var(--theme-border) 75%, transparent); border-radius: 14px; background: var(--theme-surface); }
+.tile { gap: 1px; padding: 10px 14px; border: 0; border-left: 1px solid color-mix(in srgb, var(--theme-border) 65%, transparent); border-radius: 0; background: none; }
+.tile:first-child { border-left: 0; }
+.tile b { font-size: 22px; line-height: 1.15; }
+@media (max-width: 1100px) {
+  .tile:nth-child(3n + 1) { border-left: 0; }
+  .tile:nth-child(n + 4) { border-top: 1px solid color-mix(in srgb, var(--theme-border) 65%, transparent); }
+}
+@media (max-width: 700px) {
+  .tile:nth-child(3n + 1) { border-left: 1px solid color-mix(in srgb, var(--theme-border) 65%, transparent); }
+  .tile:nth-child(odd) { border-left: 0; }
+  .tile:nth-child(n + 3) { border-top: 1px solid color-mix(in srgb, var(--theme-border) 65%, transparent); }
+}

@@ -1,0 +1,37 @@
+.list { margin: 0; padding: 0; list-style: none; }
+.item { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 16px; border-top: 1px solid var(--theme-border); }
+.item:first-child { border-top: 0; }
+.item[data-unread] { background: color-mix(in srgb, var(--theme-action) 4%, var(--theme-surface)); }
+.icon { display: inline-grid; flex: none; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.item[data-unread] .icon { background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); }
+.text { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.title { color: var(--theme-text); font-weight: 600; text-decoration: none; }
+.title:hover { text-decoration: underline; }
+.item:not([data-unread]) .title { font-weight: 500; }
+.text small { color: var(--theme-text-muted); font-size: 12px; }
+.foot { flex: none; margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.preferences { flex: none; max-height: 45vh; overflow: auto; }
+.status { flex: none; padding: 10px 16px; }
+.preferences summary { padding: 12px 16px; cursor: pointer; font-weight: 600; }
+.preferencesForm { display: grid; gap: 12px; padding: 4px 16px 16px; }
+.preferencesForm fieldset { display: grid; gap: 8px; border: 1px solid var(--theme-border); border-radius: 8px; }
+.preferencesForm label { display: flex; align-items: center; gap: 8px; }
+.preferencesForm p { margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.preferencesForm input:not([type=checkbox]),.preferencesForm select { padding: 6px; min-width: 0; background: var(--theme-surface); color: var(--theme-text); border: 1px solid var(--theme-border); border-radius: 6px; font: inherit; font-size: 13px; }
+.hours { display: flex; flex-wrap: wrap; gap: 12px; }
+.hours label { flex-wrap: wrap; }
+.itemActions { display: flex; flex: none; flex-wrap: wrap; gap: 6px; }
+@media(max-width:600px) { .item { flex-wrap: wrap; } .itemActions { width: 100%; padding-left: 44px; } .preferencesForm label { flex-wrap: wrap; } }
+/* ATT: what may ping you, kind by kind. */
+.mute { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; border: 0; }
+.mute legend { margin-bottom: 4px; font-weight: 650; }
+.mute ul { display: grid; margin: 0; padding: 0; list-style: none; }
+.mute li { padding: 9px 0; }
+.mute li + li { border-top: 1px solid var(--soft, var(--theme-border)); }
+/* FLOAT-2 (device audit): a long link in a notification wraps inside its row. */
+.text, .title, .text small { overflow-wrap: anywhere; }
+
+/* UX-SIMPLE: three groups, each a switch with its kinds on demand. */
+.muteGroup { display: grid; gap: 6px; padding: 10px 0; border-top: 1px solid var(--theme-border); }
+.muteGroup details > summary { width: fit-content; color: var(--theme-action); font-size: 13px; cursor: pointer; }
+.muteGroup details ul { margin-top: 8px; padding-left: 12px; }

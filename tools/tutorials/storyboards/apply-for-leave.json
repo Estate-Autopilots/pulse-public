@@ -1,0 +1,291 @@
+{
+ "id": "apply-for-leave",
+ "title": {
+  "en": "Apply for leave",
+  "hi": "Leave ke liye apply kijiye"
+ },
+ "persona": "Meera Shah (founder of Brightside Studio); all fictional",
+ "takes": [
+  {
+   "id": "l1",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/me"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "appear",
+     "mark": "timeoff",
+     "zoom": 1.25,
+     "role": "button",
+     "name": "/^Time off/",
+     "sfx": "none"
+    },
+    {
+     "do": "wait",
+     "ms": 1200
+    },
+    {
+     "do": "tap",
+     "mark": "apply",
+     "zoom": 1.3,
+     "role": "button",
+     "name": "Apply for leave"
+    },
+    {
+     "do": "appear",
+     "mark": "form",
+     "zoom": 0,
+     "role": "heading",
+     "name": "Apply for leave",
+     "sfx": "none"
+    },
+    {
+     "do": "tap",
+     "mark": "kind",
+     "zoom": 1.3,
+     "text": "Sick leave"
+    },
+    {
+     "do": "mark",
+     "mark": "dates"
+    },
+    {
+     "do": "fill",
+     "label": "From",
+     "exact": true,
+     "value": "2026-10-30"
+    },
+    {
+     "do": "fill",
+     "label": "To",
+     "exact": true,
+     "value": "2026-10-30"
+    },
+    {
+     "do": "wait",
+     "ms": 600
+    },
+    {
+     "do": "type",
+     "mark": "reason",
+     "value": "Feeling unwell, back on Monday.",
+     "zoom": 1.3,
+     "delay": 35,
+     "label": "Reason"
+    },
+    {
+     "do": "tap",
+     "mark": "send",
+     "zoom": 1.35,
+     "role": "button",
+     "name": "Send request"
+    },
+    {
+     "do": "wait",
+     "ms": 2200
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "l1",
+   "from": "send",
+   "to": "end",
+   "hook": {
+    "en": "Leave in a minute",
+    "hi": "Leave, ek minute mein"
+   },
+   "chapter": {
+    "en": "In short",
+    "hi": "Short mein"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] Need a day off? Ask in a minute!",
+     "cap": "Need a day *off?* Ask in a *minute!*"
+    },
+    "hi": {
+     "say": "[excited] छुट्टी चाहिए? एक minute में apply कीजिए!",
+     "cap": "Chhutti *chahiye?* Ek minute mein *apply* kijiye!"
+    }
+   }
+  },
+  {
+   "id": "desk",
+   "take": "l1",
+   "from": "start",
+   "to": "apply",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Leave left",
+    "hi": "Bachi leave"
+   },
+   "line": {
+    "en": {
+     "say": "My desk shows the leave you have left.",
+     "cap": "*My* *desk* shows the leave you have left."
+    },
+    "hi": {
+     "say": "My desk पर बची हुई leave दिखती है।",
+     "cap": "*My* *desk* par bachi hui leave dikhti hai."
+    }
+   }
+  },
+  {
+   "id": "form",
+   "take": "l1",
+   "from": "apply",
+   "to": "reason",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Kind and dates",
+    "hi": "Type aur dates"
+   },
+   "line": {
+    "en": {
+     "say": "Tap Apply for leave, pick the kind and the dates.",
+     "cap": "Tap *Apply* *for* *leave,* pick the kind and the dates."
+    },
+    "hi": {
+     "say": "Apply for leave दबाइए, leave का type और dates चुनिए।",
+     "cap": "*Apply* *for* *leave* dabaiye, leave ka type aur dates chuniye."
+    }
+   }
+  },
+  {
+   "id": "send",
+   "take": "l1",
+   "from": "reason",
+   "to": "end",
+   "payoff": true,
+   "chapter": {
+    "en": "Send",
+    "hi": "Bhejiye"
+   },
+   "line": {
+    "en": {
+     "say": "[happy] Add a reason, and send. You'll hear back soon.",
+     "cap": "Add a *reason,* and send. You'll hear back soon."
+    },
+    "hi": {
+     "say": "[happy] वजह लिखिए, और भेजिए। जवाब जल्दी आएगा।",
+     "cap": "*Wajah* likhiye, aur bhejiye. Jawaab jaldi aayega."
+    }
+   }
+  }
+ ],
+ "end": {
+  "frames": 30,
+  "text": {
+   "en": "More tutorials: Pulse, Learn",
+   "hi": "Aur tutorials: Pulse, Learn"
+  }
+ },
+ "screens": {
+  "setup": [
+   {
+    "do": "login",
+    "user": "meera.shah"
+   },
+   {
+    "do": "goto",
+    "url": "/me"
+   }
+  ],
+  "steps": [
+   {
+    "do": "appear",
+    "role": "button",
+    "name": "/^Time off/"
+   },
+   {
+    "shot": "01",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "/^Time off/"
+    }
+   },
+   {
+    "do": "tap",
+    "role": "button",
+    "name": "Apply for leave"
+   },
+   {
+    "do": "appear",
+    "role": "heading",
+    "name": "Apply for leave",
+    "timeout": 60000
+   },
+   {
+    "shot": "02",
+    "settle": 1200,
+    "focus": {
+     "text": "Sick leave"
+    }
+   },
+   {
+    "shot": "03",
+    "settle": 1200,
+    "focus": {
+     "label": "How much of the day"
+    }
+   },
+   {
+    "do": "type",
+    "value": "Family function in Pune.",
+    "delay": 20,
+    "label": "Reason"
+   },
+   {
+    "shot": "04",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "Send request"
+    }
+   },
+   {
+    "do": "press",
+    "key": "Escape"
+   },
+   {
+    "do": "goto",
+    "url": "/hr"
+   },
+   {
+    "do": "appear",
+    "text": "Approvals"
+   },
+   {
+    "shot": "05",
+    "settle": 1200,
+    "focus": {
+     "role": "link",
+     "name": "Approvals"
+    }
+   }
+  ]
+ }
+}

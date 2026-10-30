@@ -1,0 +1,89 @@
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0;overflow:auto;padding-bottom:12px}.card{padding:16px;border:1px solid var(--theme-border);border-radius:12px;background:var(--theme-panel);min-width:0}.title{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap}.title h3,.card>h3{font-size:15px;margin:0 0 6px}.meta{font-size:12px;color:var(--theme-text-muted);margin:6px 0;overflow-wrap:anywhere}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{min-height:42px}.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.form input,.form select,.form textarea{max-width:100%;min-width:0}.days{display:flex;flex-wrap:wrap;gap:8px}.days button{min-width:42px;min-height:42px}.days button[aria-pressed=true]{border-color:color-mix(in srgb,var(--theme-action) 45%,var(--theme-border));background:var(--accent-soft);color:var(--theme-action)}.members{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.members label{display:flex;align-items:center;gap:6px;min-height:40px}.trail{padding-left:20px;font-size:13px}.trail li{margin:12px 0;overflow-wrap:anywhere}.wide{grid-column:1/-1}.status{color:var(--theme-danger);font-size:13px}.tabs{display:flex;flex-wrap:wrap;gap:8px}.filter{align-self:flex-start;flex:none}.note{width:100%;min-height:70px}.scroll{overflow:auto;min-height:0;flex:1}.card summary{cursor:pointer;min-height:36px;align-content:center}@media(max-width:600px){.form{grid-template-columns:minmax(0,1fr)}.members{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:12px}.title{gap:6px}}
+
+/* Shared requests (HR-POLISH): one calm card per request in a panel that pages on a desktop HR desk. */
+.queueFit{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+.cards{display:grid;min-width:0}
+.flow{display:grid;grid-template-columns:32px minmax(0,1fr);gap:6px 12px;padding:14px 16px;border-top:1px solid var(--soft);min-width:0}
+.flow[data-done] .flowWho b{font-weight:550}
+.flowTop{grid-column:1/-1;display:flex;align-items:center;gap:12px;min-width:0}
+.flowWho{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;min-width:0;flex:1 1 auto}
+.flowWho b{overflow:hidden;font-size:14px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.flowWho span{color:var(--theme-text-muted);font-size:13px}
+.flowState{display:flex;flex:none;flex-wrap:wrap;justify-content:flex-end;gap:6px}
+.flowBody{grid-column:2;display:grid;gap:6px;min-width:0;font-size:13px;line-height:1.45}
+.flowMeta{display:flex;flex-wrap:wrap;gap:2px 0;margin:0;color:var(--theme-text-muted);font-variant-numeric:tabular-nums}
+.flowMeta>span+span::before{content:"·";margin:0 7px;color:var(--theme-border-strong)}
+.flowMeta b{color:var(--theme-text);font-weight:600}
+.flowFlags{display:flex;flex-wrap:wrap;gap:6px;margin:0}
+.flowDecision{display:flex;flex-wrap:wrap;gap:2px 8px;margin:0;color:var(--theme-text-muted)}
+.flowDecision span{color:var(--theme-text);font-weight:550}
+.flowMore{grid-column:2;min-width:0}
+.flowMore>summary{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 10px 0 8px;border:1px solid var(--theme-border);border-radius:8px;background:var(--theme-surface);color:var(--theme-text);font-size:13px;font-weight:550;list-style:none;cursor:pointer;transition:border-color 120ms ease,background-color 120ms ease}
+.flowMore>summary::-webkit-details-marker{display:none}
+.flowMore>summary:hover{border-color:var(--theme-border-strong);background:var(--hover)}
+.flowMore>summary svg{color:var(--theme-text-muted);transform:rotate(-90deg);transition:transform 160ms ease}
+.flowMore[open]>summary svg{transform:none}
+.flowMore>summary small{display:inline-grid;min-width:18px;height:18px;padding:0 5px;place-items:center;border-radius:999px;background:var(--theme-surface-subtle);color:var(--theme-text-muted);font-size:12px;font-weight:600}
+.flowOpen{display:grid;gap:12px;margin-top:10px;padding:12px 14px;border-radius:10px;background:color-mix(in srgb,var(--theme-surface-subtle) 60%,var(--theme-surface))}
+.flowOpen .trail{display:grid;gap:10px;margin:0;padding:0 0 0 16px;list-style:none;border-left:2px solid var(--soft)}
+.flowOpen .trail li{position:relative;display:grid;gap:1px;margin:0;font-size:13px}
+.flowOpen .trail li::before{content:"";position:absolute;top:6px;left:-21px;width:8px;height:8px;border-radius:50%;background:var(--theme-border-strong);box-shadow:0 0 0 2px var(--theme-surface)}
+.flowOpen .trail li:last-child::before{background:var(--theme-action)}
+.flowOpen .trail span{color:var(--theme-text-muted);font-size:12px}
+.flowOpen .trail p{margin:2px 0 0;color:var(--theme-text);overflow-wrap:anywhere}
+.decide{display:grid;gap:6px;min-width:0}
+.decide .actions{margin-top:4px}
+.decide .status{min-height:1.3em;margin:0}
+.decide .actions button{min-height:36px}
+.hint{margin:0;color:var(--theme-text-muted);font-size:12px}
+.queue .filter{margin-right:4px}
+@media(max-width:1179.98px),(max-height:599.98px){.queueFit section[class]{max-height:none}}
+.flowOpen{max-width:760px}
+.flowNote{max-width:96ch}
+@media(max-width:899.98px){.queue>div:first-child>span{min-width:0}.queue .filter{flex:1 1 0;min-width:0}}
+/* Phones: avatar beside the name, the chips under it; the facts stack without leading dots. */
+@media(max-width:600px){.flow{grid-template-columns:28px minmax(0,1fr);gap:6px 10px;padding:12px}.flowTop{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 10px}.flowTop>:first-child{grid-row:span 2;align-self:start}.flowState{justify-content:flex-start}.flowBody,.flowMore{grid-column:2}.flowMeta{column-gap:12px}.flowMeta>span+span::before{content:none}}
+@media(prefers-reduced-motion:reduce){.flowMore>summary,.flowMore>summary svg{transition:none}}
+
+/* Pod heads → co-founders (HR-POLISH): the person and both actions on one row, who holds the role as chips. */
+.cofounders{display:grid;gap:12px}
+.cofounders h3{margin:0 0 2px;font-size:15px}
+.cofounders .meta{margin:0}
+.coRow{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 12px}
+.coRow>label{flex:0 1 340px;min-width:200px}
+.coRow .actions{margin:0}
+.coNow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;color:var(--theme-text-muted);font-size:13px}
+.coNow>span{font-weight:550}
+.coNow ul{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.coNow li{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:3px 10px 3px 4px;border:1px solid color-mix(in srgb,var(--theme-border) 70%,transparent);border-radius:999px;color:var(--theme-text)}
+.coNow em{font-style:normal}
+.cofounders .status:empty{display:none}
+
+/* Policies → Approvals & comp-off: two labelled groups of fields that wrap to the width, not two half-page columns. */
+.policyForm{display:grid;gap:16px;max-width:1080px}
+.group{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:12px 14px;min-width:0;margin:0;padding:0;border:0}
+.group legend{grid-column:1/-1;margin-bottom:4px;padding:0;color:var(--theme-text);font-size:13px;font-weight:600}
+.policyForm .actions{margin-top:0}
+/* UI-POLISH-3: the approval policy: a hint under each field, a figure with its unit inside the box. */
+.policyCard{display:grid;gap:4px}
+.policyCard .group>label{align-content:start}
+.policyCard>.meta{max-width:760px;margin:0 0 10px}
+.hint{color:var(--theme-text-muted);font-size:12px;font-weight:400;line-height:1.4}
+.unitInput{position:relative;display:flex;align-items:center}
+.unitInput input{padding-right:52px!important}
+.unitInput em{position:absolute;right:10px;color:var(--theme-text-muted);font-size:12px;font-style:normal;pointer-events:none}
+.form{align-items:start}
+.form>button{align-self:end}
+.short{display:none}
+@media(max-width:899.98px){.queue .filter .full{display:none}.queue .filter .short{display:inline}}
+
+/* UX-5A: working on a day off, in a small drawer (WorkDays). */
+.dayOff { display: contents; }
+.credits { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 13px; }
+.credits li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.credits small { color: var(--theme-text-muted); }
+.note { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; resize: vertical; }
+
+/* UX-5A: an error line is always there, so one appearing never pushes the page down; a save says so in Pip's island. */
+.status{min-height:1.3em;margin:4px 0 0}
+.status[data-tone="done"]{color:var(--theme-success)}
