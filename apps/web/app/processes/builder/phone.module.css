@@ -1,0 +1,24 @@
+/* FLOW-B: a process's stages and steps as a list (phones, and narrow windows). */
+.list { --k0: #9aa3b2; --k1: #2a78d6; --k2: #e8662f; --k3: #17a673; --k4: #d18c00; --k5: #df558f; --k6: #5a49c2; --k7: #0e98a8; --k8: #8f6f3a; --k9: #a03dbd;
+  display: flex; flex-direction: column; gap: 14px; padding-bottom: 28px; }
+:global(:root[data-theme="dark"]) .list { --k0: #6b7383; --k1: #4b95ec; --k2: #ef7a45; --k3: #2bbd86; --k4: #e2a52a; --k5: #ec6ea3; --k6: #9a8cf0; --k7: #2fbccc; --k8: #c39d60; --k9: #c672e4; }
+.list [data-k="0"] { --kc: var(--k0); } .list [data-k="1"] { --kc: var(--k1); } .list [data-k="2"] { --kc: var(--k2); } .list [data-k="3"] { --kc: var(--k3); } .list [data-k="4"] { --kc: var(--k4); }
+.list [data-k="5"] { --kc: var(--k5); } .list [data-k="6"] { --kc: var(--k6); } .list [data-k="7"] { --kc: var(--k7); } .list [data-k="8"] { --kc: var(--k8); } .list [data-k="9"] { --kc: var(--k9); }
+.note { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 13px; }
+.empty { color: var(--theme-text-muted); }
+.stage { border-radius: 18px; background: var(--theme-surface); box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-border) 70%, transparent); }
+.stage h3 { display: flex; align-items: center; gap: 10px; margin: 0; padding: 14px 16px 6px; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.stage h3 > span { display: grid; flex: none; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 12px; }
+.stage h3 small { margin-left: auto; color: var(--theme-text-muted); font-size: 12.5px; font-weight: 600; }
+.stage ol { margin: 0; padding: 4px 0 8px; list-style: none; }
+.stage li { display: flex; align-items: flex-start; gap: 12px; padding: 10px 16px; }
+.stage li + li { border-top: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); }
+.icon { display: grid; flex: none; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: color-mix(in srgb, var(--kc) 14%, var(--theme-surface)); color: color-mix(in srgb, var(--kc) 85%, var(--theme-text)); }
+.text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.text b { font-size: 14px; font-weight: 650; line-height: 1.3; }
+.text small { color: var(--theme-text-muted); font-size: 12.5px; }
+.ports { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 2px; }
+.ports i { display: inline-flex; align-items: center; gap: 4px; padding: 0 7px; border-radius: 999px; background: color-mix(in srgb, var(--kc) 12%, var(--theme-surface)); color: color-mix(in srgb, var(--kc) 75%, var(--theme-text));
+  font-size: 11.5px; font-style: normal; font-weight: 600; line-height: 20px; }
+.ports em { color: var(--theme-text-muted); font-style: normal; }
+.only { color: color-mix(in srgb, var(--theme-action) 80%, var(--theme-text)) !important; font-weight: 600; }

@@ -1,0 +1,6 @@
+/* Pull to refresh in the Pulse phone app: a small round indicator under the header. */
+.pull { position: fixed; z-index: 40; top: calc(52px + var(--pulse-safe-top, 0px) - 40px); left: 50%; display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid var(--theme-border); border-radius: 50%;
+  background: var(--theme-surface); color: var(--theme-action); box-shadow: 0 6px 18px rgb(15 27 51 / 14%); pointer-events: none; }
+.spin { animation: pulse-ptr-spin 700ms linear infinite; }
+@keyframes pulse-ptr-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }

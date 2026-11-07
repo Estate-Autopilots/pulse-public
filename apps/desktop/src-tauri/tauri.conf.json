@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Pulse",
+  "version": "1.0.2",
+  "identifier": "com.pulse.work",
+  "build": {
+    "beforeBuildCommand": "pnpm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "Estate Autopilots",
+    "copyright": "\u00a9 2026 Estate Autopilots",
+    "category": "Productivity",
+    "shortDescription": "Pulse: your workday, inbox and chats, with one-click check-in",
+    "longDescription": "The full Pulse in its own window, plus a quick panel in your tray or menu bar: check in, take a break and check out in one click with the same rules as My desk, see your inbox and chats, and get pings that never show message text on your lock screen. Pip, the Pulse bot, keeps you company.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      },
+      "webviewInstallMode": {
+        "type": "embedBootstrapper"
+      }
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEU3QjdERDVEMThFMEIwNDcKUldSSHNPQVlYZDIzNTEzRTlINzE5ZmZYNWJYUDJFeTZscWJkcHVlQit1L2JuU2JrUTMzS3Zrc0UK",
+      "endpoints": [
+        "https://pulse.estateautopilots.com/api/app-updates/test/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      },
+      "requireSignedVersion": true
+    },
+    "deep-link": {
+      "desktop": {
+        "schemes": [
+          "pulse"
+        ]
+      }
+    }
+  }
+}

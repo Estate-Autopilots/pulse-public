@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pulse</string>
+    <string name="title_activity_main">Pulse</string>
+    <string name="package_name">com.pulse.work.mobile</string>
+    <string name="custom_url_scheme">com.pulse.work.mobile</string>
+    <string name="attendance_widget_description">Today: status, time worked, the next shift and one action, confirmed in Pulse</string>
+    <string name="attendance_widget_small_description">Status, time worked and one action, confirmed in Pulse</string>
+</resources>

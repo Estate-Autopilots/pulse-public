@@ -1,0 +1,38 @@
+openapi: 3.1.0
+info:
+  title: Synthetic My Tasks acceptance harness (not the install API)
+  version: 0.1.0
+  description: >-
+    Scratch PostgreSQL only. A server-provisioned random bearer credential resolves one synthetic principal.
+    Its server-owned active memberships select org-local people. Every org read rechecks membership and
+    active person/org, uses a read-only pulse_api transaction and existing task RLS. No query selectors,
+    writes, account linking, imports or production registration. Revocation discards pending results.
+security: [{ syntheticCredential: [] }]
+paths:
+  /synthetic/my-tasks:
+    get:
+      summary: Read this synthetic principal's own tasks across explicit memberships
+      responses:
+        '200':
+          description: Four-field allowlist only; private, no-store
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SyntheticMyTask' }
+        '400': { description: Request selectors are forbidden }
+        '401': { description: Missing, invalid or revoked server credential }
+        '403': { description: No active membership, denied tenant binding or non-scratch database }
+components:
+  securitySchemes:
+    syntheticCredential: { type: http, scheme: bearer }
+  schemas:
+    SyntheticMyTask:
+      type: object
+      additionalProperties: false
+      required: [organization, title, status, dueAt]
+      properties:
+        organization: { type: string }
+        title: { type: string }
+        status: { type: string }
+        dueAt: { type: [string, 'null'], format: date-time }

@@ -1,0 +1,116 @@
+/* AC design system, tier 0: the scales every component reads (owner workbench, 21 Oct 2026).
+   Colour lives in tokens.css (--theme-*) and follows the organisation's theme; these are the shared sizes, type,
+   radii, elevation and motion, so a component never invents its own. */
+:root {
+  /* Type: one scale, Inter / the system UI face. */
+  --ds-font: var(--font-inter, Inter), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --ds-text-xs: 11.5px;
+  --ds-text-sm: 12.5px;
+  --ds-text-md: 13.5px;
+  --ds-text-lg: 15px;
+  --ds-text-xl: 18px;
+  --ds-text-2xl: 22px;
+  --ds-text-3xl: 26px;
+  --ds-text-display: 34px;
+  --ds-weight-regular: 450;
+  --ds-weight-medium: 550;
+  --ds-weight-strong: 650;
+  --ds-weight-heavy: 700;
+  --ds-tracking-tight: -0.02em;
+
+  /* Space: a 4 px grid. */
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 20px;
+  --ds-space-6: 24px;
+  --ds-space-8: 32px;
+
+  /* Radius: one family, scaled by the theme's roundness (1 = default, 0.5 = sharper, 1.4 = softer). */
+  --ds-roundness: 1;
+  --ds-radius-sm: calc(8px * var(--ds-roundness));
+  --ds-radius-md: calc(12px * var(--ds-roundness));
+  --ds-radius-lg: calc(16px * var(--ds-roundness));
+  --ds-radius-xl: calc(20px * var(--ds-roundness));
+  --ds-radius-pill: 999px;
+
+  /* Density: control heights (the theme's density scales them). */
+  --ds-density: 1;
+  --ds-control-sm: calc(30px * var(--ds-density));
+  --ds-control-md: calc(36px * var(--ds-density));
+  --ds-control-lg: calc(44px * var(--ds-density));
+
+  /* Lines and elevation. */
+  --ds-line: color-mix(in srgb, var(--theme-border) 75%, transparent);
+  --ds-ring: inset 0 0 0 1px var(--ds-line);
+  --ds-elev-1: var(--ds-ring), 0 1px 2px rgb(0 0 0 / 0.03);
+  --ds-elev-2: var(--ds-ring), 0 10px 24px rgb(0 0 0 / 0.06);
+  --ds-elev-3: var(--ds-ring), 0 18px 44px rgb(0 0 0 / 0.12);
+
+  /* Tints: a soft fill of any hue (used by icon tiles, tags, selected rows). */
+  --ds-tint: 13%;
+  --ds-hover: color-mix(in srgb, var(--theme-text) 6%, transparent);
+  --ds-press: color-mix(in srgb, var(--theme-text) 10%, transparent);
+
+  /* Motion. */
+  --ds-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ds-fast: 140ms;
+  --ds-base: 220ms;
+
+  /* What floats over a page (FLOAT, 21 Oct 2026): one order, one glass, one motion. Liquid glass is for floating
+     controls only (Pip, its menu and messages, chip menus, the companion tab); pages and cards stay solid.
+     Order, low to high: the page's own sticky bars, then the top bar and the phone's tab bar, then floating controls,
+     then side sheets (insights, a record), then popovers that open over them (the notifications panel, a coach mark),
+     then dialogs, then the command palette. */
+  --ds-z-sticky: 20;
+  --ds-z-bar: 30;
+  --ds-z-tabs: 35;
+  --ds-z-float: 60;
+  --ds-z-sheet: 80;
+  --ds-z-popover: 90;
+  --ds-z-dialog: 95;
+  --ds-z-palette: 10000;
+  --ds-glass: color-mix(in srgb, var(--theme-surface) 78%, transparent);
+  --ds-glass-strong: color-mix(in srgb, var(--theme-surface) 92%, transparent);
+  --ds-glass-blur: blur(24px) saturate(1.7);
+  --ds-glass-edge: inset 0 0 0 1px color-mix(in srgb, var(--theme-border) 65%, transparent), inset 0 1px 0 rgb(255 255 255 / 0.55);
+  --ds-glass-shadow: 0 16px 40px rgb(20 18 50 / 0.16), 0 2px 8px rgb(20 18 50 / 0.06);
+  /* A floating control keeps this far from the window's edges and from what it must not cover. */
+  --ds-float-edge: 16px;
+  --ds-spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 19.4%, 1.077, 1.121 24.3%, 1.149 26.3%, 1.159 28.3%, 1.155, 1.143 32.5%, 1.083 39.1%, 1.017 46.6%, 0.995 51.3%, 0.985 56.9%, 0.996 70.7%, 1.001 82.7%, 1);
+  --ds-float-in: 280ms;
+
+  /* The category hues (icon tiles, charts, tags): fixed so a category keeps its colour in every app. */
+  --ds-hue-indigo: var(--theme-action);
+  --ds-hue-green: #16a34a;
+  --ds-hue-sky: #0ea5e9;
+  --ds-hue-amber: #f59e0b;
+  --ds-hue-pink: #ec4899;
+  --ds-hue-teal: #0d9488;
+  --ds-hue-orange: #ea580c;
+  --ds-hue-slate: #64748b;
+}
+:root[data-theme="dark"] {
+  --ds-elev-1: var(--ds-ring);
+  --ds-elev-2: var(--ds-ring), 0 12px 28px rgb(0 0 0 / 0.35);
+  --ds-elev-3: var(--ds-ring), 0 20px 48px rgb(0 0 0 / 0.5);
+  --ds-tint: 20%;
+  --ds-glass: color-mix(in srgb, var(--theme-surface) 72%, transparent);
+  --ds-glass-edge: inset 0 0 0 1px rgb(255 255 255 / 0.09), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  --ds-glass-shadow: 0 18px 44px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.3);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ds-elev-1: var(--ds-ring);
+    --ds-elev-2: var(--ds-ring), 0 12px 28px rgb(0 0 0 / 0.35);
+    --ds-elev-3: var(--ds-ring), 0 20px 48px rgb(0 0 0 / 0.5);
+    --ds-tint: 20%;
+    --ds-glass: color-mix(in srgb, var(--theme-surface) 72%, transparent);
+    --ds-glass-edge: inset 0 0 0 1px rgb(255 255 255 / 0.09), inset 0 1px 0 rgb(255 255 255 / 0.08);
+    --ds-glass-shadow: 0 18px 44px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.3);
+  }
+}
+@media (prefers-reduced-motion: reduce) { :root { --ds-fast: 0ms; --ds-base: 0ms; --ds-float-in: 0ms; } }
+/* Without blur (or asked for less transparency) the glass is solid. */
+@media (prefers-reduced-transparency: reduce) { :root { --ds-glass: var(--theme-surface); --ds-glass-strong: var(--theme-surface); } }

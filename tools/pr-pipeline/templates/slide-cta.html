@@ -1,0 +1,10 @@
+{{> top}}
+<main class="main">
+  {{#label}}<div class="lbl">{{label}}</div>{{/label}}
+  <h2 class="h2" data-key>{{title}}</h2>
+  {{#body}}<p class="p">{{body}}</p>{{/body}}
+  {{#question}}<div class="box"><p class="p">{{question}}</p></div>{{/question}}
+  {{#actions_any}}<div class="chips">{{#actions}}<span class="chip">{{.}}</span>{{/actions}}</div>{{/actions_any}}
+  <div class="sig"><div class="logo">{{{logo}}}</div><div><div class="an">{{sign_name}}</div><div class="ar">{{sign_role}}</div></div></div>
+</main>
+{{> foot}}

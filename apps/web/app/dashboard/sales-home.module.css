@@ -1,0 +1,26 @@
+/* EST-1241: the sales home. Theme tokens only, so light and dark follow; one column on a phone. */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 12px; align-items: start; min-width: 0; }
+.wide { grid-column: 1 / -1; }
+.rows { list-style: none; margin: 0; padding: 4px 14px 10px; display: grid; gap: 0; }
+.rows > li + li { border-top: 1px solid var(--theme-border); }
+.row { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 44px; padding: 8px 0; color: inherit; text-decoration: none; }
+a.row:hover b { text-decoration: underline; }
+.row:focus-visible { outline: 2px solid var(--theme-accent); outline-offset: 2px; border-radius: 6px; }
+.row[data-state="overdue"] > svg { color: var(--theme-danger); }
+.row[data-state="today"] > svg { color: var(--theme-warning); }
+.row[data-state="upcoming"] > svg { color: var(--theme-text-muted); }
+.main { display: grid; gap: 2px; min-width: 0; }
+.main b { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.main small { color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.skeleton { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; }
+.failed { display: grid; gap: 10px; justify-items: start; padding: 12px 14px 14px; }
+.failed p { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.more { margin: 0; padding: 0 14px 12px; font-size: 12px; }
+.more a { color: var(--theme-accent); }
+.modules { list-style: none; margin: 0; padding: 8px 14px 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.module { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--theme-border); border-radius: 10px; color: inherit; text-decoration: none; font-size: 13px; font-weight: 500; }
+.module:hover { border-color: var(--theme-accent); }
+.module:focus-visible { outline: 2px solid var(--theme-accent); outline-offset: 2px; }
+.module > svg { color: var(--theme-text-muted); flex: none; }
+.module > span { overflow-wrap: anywhere; min-width: 0; }
+@media (max-width: 640px) { .modules { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

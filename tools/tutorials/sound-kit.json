@@ -1,0 +1,12 @@
+{
+  "about": "The reel SFX kit and music bed, made once with ElevenLabs and cached by prompt. Placed automatically on logged capture actions (tap) and edit events (whoosh on scene cuts, pop on cards, chime on the payoff).",
+  "sfx": {
+    "tap":    {"prompt": "Single soft clean UI tap click on a glass phone screen, short, crisp, no reverb, no music", "seconds": 0.5, "gain_db": -9},
+    "whoosh": {"prompt": "Fast short airy whoosh swipe transition for a social media video, clean, modern, no music", "seconds": 0.7, "gain_db": -13},
+    "pop":    {"prompt": "Cute short bubbly pop for a text bubble appearing in an app, clean, bright, no music", "seconds": 0.5, "gain_db": -11},
+    "chime":  {"prompt": "Bright short success chime notification, two rising notes, modern app, clean, no music", "seconds": 1.2, "gain_db": -10}
+  },
+  "music": {
+    "reel": {"prompt": "Upbeat modern lo-fi pop instrumental bed for a fast tech app explainer reel, 118 bpm, punchy drums, bright plucks, warm bass, optimistic, no vocals, steady energy, loops cleanly", "seconds": 32}
+  }
+}

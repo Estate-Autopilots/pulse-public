@@ -1,0 +1,32 @@
+/* BUGKIT-TELEMETRY: the element picker over the page (picker.tsx) and the picked elements' threads in the reporter. */
+.layer { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; }
+:global(html[data-picking]) *, :global(html[data-picking]) { cursor: crosshair !important; }
+.hover { position: fixed; border: 2px solid var(--theme-action, #3e63dd); background: color-mix(in srgb, var(--theme-action, #3e63dd) 10%, transparent); border-radius: 4px; pointer-events: none; transition: all 60ms linear; }
+.tag { position: absolute; left: -2px; top: -24px; max-width: 320px; overflow: hidden; padding: 2px 8px; border-radius: 4px; background: var(--theme-action, #3e63dd); color: #fff; font-size: 12px; line-height: 18px; white-space: nowrap; text-overflow: ellipsis; }
+.picked { position: fixed; border: 2px solid var(--theme-danger, #e5484d); background: color-mix(in srgb, var(--theme-danger, #e5484d) 10%, transparent); border-radius: 4px; pointer-events: none; }
+.badge { position: absolute; top: -11px; left: -11px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--theme-danger, #e5484d); color: #fff; font-size: 12px; font-weight: 700; box-shadow: 0 0 0 2px var(--theme-surface, #fff); }
+.bar { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; width: max-content; max-width: calc(100vw - 32px); padding: 8px 8px 8px 14px; border: 1px solid var(--theme-border-strong, #bbb); border-radius: 12px; background: var(--theme-surface, #fff); color: var(--theme-text, #111); box-shadow: 0 8px 30px rgb(0 0 0 / 0.22); font-size: 13px; pointer-events: auto; cursor: default; }
+.hint { min-width: 0; }
+.hint b { margin-left: 4px; font-weight: 650; }
+.cancel, .done { display: inline-flex; align-items: center; gap: 5px; height: 32px; padding: 0 12px; border: 1px solid var(--theme-border, #ddd); border-radius: 8px; background: var(--theme-surface, #fff); color: var(--theme-text, #111); font: inherit; cursor: pointer; white-space: nowrap; }
+.done { border-color: var(--theme-action, #3e63dd); background: var(--theme-action, #3e63dd); color: #fff; font-weight: 600; }
+.cancel:focus-visible, .done:focus-visible { outline: 2px solid var(--theme-action, #3e63dd); outline-offset: 2px; }
+@media (max-width: 560px) { .bar { flex-wrap: wrap; left: 16px; right: 16px; transform: none; width: auto; } .hint { flex: 1 1 100%; } .cancel, .done { flex: 1; justify-content: center; } }
+
+/* The picked elements in the reporter, each with its own comment thread. */
+.pins { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pin { display: grid; gap: 6px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); }
+.pinHead { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.pinNo { display: grid; place-items: center; flex: 0 0 22px; height: 22px; border-radius: 50%; background: var(--theme-danger, #e5484d); color: #fff; font-size: 12px; font-weight: 700; }
+.pinText { display: grid; min-width: 0; flex: 1; }
+.pinText b { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.pinText code { overflow: hidden; color: var(--theme-text-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.thread { display: grid; gap: 4px; margin: 0 0 0 30px; padding: 0; list-style: none; font-size: 13px; }
+.thread li { padding: 6px 10px; border-radius: 8px; background: var(--theme-surface-subtle, var(--theme-canvas)); }
+.thread small { display: block; color: var(--theme-text-muted); font-size: 11px; }
+.reply { display: flex; gap: 6px; margin-left: 30px; }
+.reply input { flex: 1; min-width: 0; height: 32px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.iconButton { display: inline-grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.iconButton:hover { background: var(--theme-surface-subtle, var(--theme-canvas)); color: var(--theme-text); }
+.pickRow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pickRow small { color: var(--theme-text-muted); font-size: 12px; }

@@ -1,0 +1,9 @@
+{{> top}}
+<main class="main">
+  {{#label}}<div class="lbl">{{label}}</div>{{/label}}
+  <div class="big {{number_style}}" data-fit data-key>{{number}}</div>
+  {{#unit}}<div class="unit">{{unit}}</div>{{/unit}}
+  {{#sub}}<p class="p">{{sub}}</p>{{/sub}}
+  {{#chips_any}}<div class="chips">{{#chips}}<span class="chip">{{.}}</span>{{/chips}}</div>{{/chips_any}}
+</main>
+{{> foot}}

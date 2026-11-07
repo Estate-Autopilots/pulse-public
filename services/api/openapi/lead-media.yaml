@@ -1,0 +1,78 @@
+openapi: 3.1.0
+info:
+  title: Pulse private lead photos
+  version: 1.0.0
+  description: Sign-in and HR-only refusal precede parameter/body schema validation and lead lookup. Request parsing and the upload body limit still apply first.
+security: [{ session: [] }]
+paths:
+  /api/v0/acquisition/leads/{lead}/photos:
+    parameters: [{ name: lead, in: path, required: true, schema: { type: string, format: uuid } }]
+    get:
+      summary: List safe photo metadata for a currently permitted acquisition lead
+      responses:
+        '200':
+          description: No private bytes, storage keys, public links or location
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: false, required: [photos], properties: { photos: { type: array, maxItems: 10, items: { $ref: '#/components/schemas/LeadPhoto' } } } }
+        '400': { description: Invalid lead UUID }
+        '401': { description: Sign-in required before parameter validation }
+        '403': { description: HR-only and service-key access refused }
+        '404': { description: Lead unavailable or acquisition disabled }
+    post:
+      summary: Attach one normalized encrypted photo, idempotent per lead and requestKey
+      description: Current lead owner or scoped manager only. JPEG/PNG/WebP, at most 5000000 decoded input bytes and 16 megapixels, one frame. Server re-encodes to WebP without EXIF/XMP/ICC/location. At most ten photos per lead. Replay returns the same media ID; changed content/provenance for a token returns 409. Failed validation commits nothing. source and takenAt are unverified caller claims, never proof of a site visit. Future explicit opt-in GPS references this media ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [requestKey, mime, data]
+              properties:
+                requestKey: { type: string, format: uuid }
+                mime: { enum: [image/jpeg, image/png, image/webp] }
+                data: { type: string, contentEncoding: base64, minLength: 4, maxLength: 6666668 }
+                source: { enum: [upload, camera], default: upload }
+                takenAt: { type: string, format: date-time }
+      responses:
+        '200': { description: New or previously attached photo, content: { application/json: { schema: { $ref: '#/components/schemas/LeadPhoto' } } } }
+        '400': { description: Invalid image or metadata, including unknown fields }
+        '401': { description: Sign-in required before parameter/body schema validation }
+        '403': { description: HR-only and service-key access refused }
+        '404': { description: Lead unavailable or acquisition disabled }
+        '409': { description: Changed retry or ten-photo limit }
+        '413': { description: Request exceeds the bounded body size }
+        '503': { description: Private encryption keyring unavailable; nothing saved }
+  /api/v0/acquisition/leads/{lead}/photos/{media}:
+    parameters:
+      - { name: lead, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: media, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      summary: Recheck current lead permission and decrypt one private photo
+      responses:
+        '200': { description: Normalized photo; Cache-Control private/no-store and nosniff, content: { image/webp: { schema: { type: string, format: binary } } } }
+        '400': { description: Invalid lead or media UUID }
+        '401': { description: Sign-in required before parameter validation }
+        '403': { description: HR-only and service-key access refused }
+        '404': { description: Lead/media unavailable, wrong relation or acquisition disabled }
+components:
+  securitySchemes:
+    session: { type: apiKey, in: header, name: x-pulse-session, description: Authenticated install session or trusted Cloudflare Access identity. Service keys cannot read or upload media. }
+  schemas:
+    LeadPhoto:
+      type: object
+      additionalProperties: false
+      required: [id, leadId, uploader, uploadedAt, takenAt, source, mime, size, width, height]
+      properties:
+        id: { type: string, format: uuid }
+        leadId: { type: string, format: uuid }
+        uploader: { type: string, format: uuid }
+        uploadedAt: { type: string, format: date-time }
+        takenAt: { type: [string, 'null'], format: date-time, description: Unverified caller-supplied time }
+        source: { enum: [upload, camera], description: Unverified caller-supplied provenance }
+        mime: { const: image/webp }
+        size: { type: integer, minimum: 1, maximum: 5000000 }
+        width: { type: integer, minimum: 1 }
+        height: { type: integer, minimum: 1 }

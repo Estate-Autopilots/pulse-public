@@ -1,0 +1,70 @@
+openapi: 3.1.0
+info: { title: Install-local Pulse catalogue, version: 1.0.0 }
+paths:
+  /api/v1/catalog/items:
+    get:
+      summary: Active catalogue entries from the issuing installation only
+      description: No query parameters or org selectors. Service credentials never authorize staff endpoints or writes. Public links are relative to this installation, null until explicitly shared. Budget is 120 catalogue requests per minute per API process, including invalid credentials and public pages.
+      security: [{ catalogKey: [] }]
+      responses:
+        '200':
+          description: Active entries; integer INR paise before GST, taxRate in percentage points
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items]
+                properties: { items: { type: array, items: { $ref: '#/components/schemas/Item' } } }
+        '400': { description: Query parameters are not supported }
+        '401': { description: Missing, invalid, rotated or revoked credential }
+        '403': { description: Another company host or endpoint outside catalog.read }
+        '429': { description: Rate limited; Retry-After 60 seconds }
+  /api/v1/catalog/offers/{token}:
+    get:
+      summary: Customer page for one explicitly shared active offer
+      description: Independent unguessable revocable token; no API authorization, staff session or access to other offers. Price displayed in INR rupees. No-store, no-referrer, escaped text, no scripts or external resources.
+      parameters: [{ name: token, in: path, required: true, schema: { type: string, pattern: '^[A-Za-z0-9_-]{43}$' } }]
+      responses:
+        '200': { description: Only the Item fields, rendered as HTML, content: { text/html: { schema: { type: string } } } }
+        '404': { description: Invalid, revoked, inactive or other-install offer }
+        '429': { description: Rate limited }
+  /api/v1/operator/catalog:
+    post:
+      summary: Server operator issues/revokes keys and shares/unshares offers
+      security: [{ operatorKey: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [action, id]
+              properties:
+                action: { type: string, enum: [issue, revoke, share, unshare] }
+                id: { type: string, format: uuid, description: New credential UUID for issue; existing key UUID for revoke; item UUID for share/unshare }
+                hash: { type: string, pattern: '^[a-f0-9]{64}$', description: Required only for issue; SHA-256 of the 32-byte random secret encoded as base64url }
+      responses:
+        '200': { description: Credential/item id only; share also returns a relative publicLink. Raw service secrets are never accepted or returned. }
+        '400': { description: Invalid or extra fields, scope or digest }
+        '401': { description: Operator credential required }
+        '404': { description: Disabled operator API, web-proxied call or inactive offer }
+components:
+  securitySchemes:
+    catalogKey: { type: http, scheme: bearer, description: 'pcat_<credential-UUID>_<43-character base64url secret>; exactly catalog.read, bound to pulse.install, hash only at rest' }
+    operatorKey: { type: http, scheme: bearer, description: Existing installation operator secret, server-local only }
+  schemas:
+    Item:
+      type: object
+      additionalProperties: false
+      required: [id, kind, name, description, price, currency, taxRate, publicLink]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [service, product, consumable, package] }
+        name: { type: string }
+        description: { type: string }
+        price: { type: integer, minimum: 0, maximum: 1000000000000, description: INR paise before GST; 100 paise = INR 1 }
+        currency: { type: string, const: INR }
+        taxRate: { type: number, description: GST percentage points; 18 means 18 percent }
+        publicLink: { type: [string, 'null'], description: Same-install relative customer page, null until shared }

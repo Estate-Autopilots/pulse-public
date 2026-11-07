@@ -1,0 +1,9 @@
+[Unit]
+Description=Pulse PR pipeline (%i) every six hours
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:25:00 UTC
+RandomizedDelaySec=300
+Persistent=true
+Unit=pulse-pr-pipeline@%i.service
+[Install]
+WantedBy=timers.target

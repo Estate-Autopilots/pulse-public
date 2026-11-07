@@ -1,0 +1,308 @@
+{
+ "id": "add-an-expense",
+ "title": {
+  "en": "Record an expense",
+  "hi": "Expense record kijiye"
+ },
+ "persona": "Meera Shah (founder of Brightside Studio); all fictional",
+ "takes": [
+  {
+   "id": "e1",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/finance"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "tap",
+     "mark": "add",
+     "zoom": 1.3,
+     "role": "button",
+     "name": "Add entry"
+    },
+    {
+     "do": "appear",
+     "mark": "form",
+     "zoom": 0,
+     "sel": "#fin-entry-form",
+     "timeout": 60000,
+     "sfx": "none"
+    },
+    {
+     "do": "tap",
+     "mark": "kind",
+     "zoom": 1.3,
+     "role": "button",
+     "name": "Expense",
+     "exact": true
+    },
+    {
+     "do": "type",
+     "mark": "amount",
+     "value": "4720",
+     "zoom": 1.3,
+     "delay": 60,
+     "label": "/^Amount/"
+    },
+    {
+     "do": "tap",
+     "mark": "gst",
+     "zoom": 1.35,
+     "role": "button",
+     "name": "18%"
+    },
+    {
+     "do": "type",
+     "mark": "category",
+     "value": "Props",
+     "zoom": 1.3,
+     "delay": 35,
+     "label": "Category"
+    },
+    {
+     "do": "type",
+     "mark": "vendor",
+     "value": "Decor Mart",
+     "zoom": 1.3,
+     "delay": 35,
+     "label": "/^Vendor/"
+    },
+    {
+     "do": "tap",
+     "mark": "save",
+     "zoom": 1.35,
+     "role": "button",
+     "name": "Save entry"
+    },
+    {
+     "do": "wait",
+     "ms": 2500
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "e1",
+   "from": "save",
+   "to": "end",
+   "hook": {
+    "en": "Expenses in a minute",
+    "hi": "Expense, ek minute mein"
+   },
+   "chapter": {
+    "en": "In short",
+    "hi": "Short mein"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] Every expense, with its receipt, in a minute!",
+     "cap": "Every *expense,* with its *receipt,* in a minute!"
+    },
+    "hi": {
+     "say": "[excited] हर expense, receipt के साथ, एक minute में!",
+     "cap": "Har *expense,* *receipt* ke saath, ek minute mein!"
+    }
+   }
+  },
+  {
+   "id": "add",
+   "take": "e1",
+   "from": "add",
+   "to": "amount",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Add entry",
+    "hi": "Add entry"
+   },
+   "line": {
+    "en": {
+     "say": "In Finance, tap Add entry, and pick Expense.",
+     "cap": "In *Finance,* tap *Add* *entry,* and pick *Expense.*"
+    },
+    "hi": {
+     "say": "Finance में Add entry दबाइए, और Expense चुनिए।",
+     "cap": "*Finance* mein *Add* *entry* dabaiye, aur *Expense* chuniye."
+    }
+   }
+  },
+  {
+   "id": "amount",
+   "take": "e1",
+   "from": "amount",
+   "to": "vendor",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Amount and GST",
+    "hi": "Amount aur GST"
+   },
+   "line": {
+    "en": {
+     "say": "Type the amount. Eighteen percent fills the GST.",
+     "cap": "Type the *amount.* Eighteen percent fills the *GST.*"
+    },
+    "hi": {
+     "say": "Amount लिखिए, eighteen percent से GST भर जाता है।",
+     "cap": "*Amount* likhiye, eighteen percent se *GST* bhar jaata hai."
+    }
+   }
+  },
+  {
+   "id": "save",
+   "take": "e1",
+   "from": "vendor",
+   "to": "end",
+   "payoff": true,
+   "chapter": {
+    "en": "Save",
+    "hi": "Save"
+   },
+   "line": {
+    "en": {
+     "say": "[happy] Who you paid, then Save entry. Done!",
+     "cap": "Who you paid, then *Save* *entry.* Done!"
+    },
+    "hi": {
+     "say": "[happy] किसे दिया, फिर Save entry। हो गया!",
+     "cap": "Kise diya, phir *Save* *entry.* Ho gaya!"
+    }
+   }
+  }
+ ],
+ "end": {
+  "frames": 30,
+  "text": {
+   "en": "More tutorials: Pulse, Learn",
+   "hi": "Aur tutorials: Pulse, Learn"
+  }
+ },
+ "screens": {
+  "setup": [
+   {
+    "do": "login",
+    "user": "meera.shah"
+   },
+   {
+    "do": "goto",
+    "url": "/finance"
+   }
+  ],
+  "steps": [
+   {
+    "do": "appear",
+    "role": "button",
+    "name": "Add entry"
+   },
+   {
+    "shot": "01",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "Add entry"
+    }
+   },
+   {
+    "do": "tap",
+    "role": "button",
+    "name": "Add entry"
+   },
+   {
+    "do": "appear",
+    "sel": "#fin-entry-form",
+    "timeout": 60000
+   },
+   {
+    "shot": "02",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "Expense",
+     "exact": true
+    }
+   },
+   {
+    "do": "type",
+    "value": "4,720",
+    "delay": 20,
+    "label": "/^Amount/"
+   },
+   {
+    "do": "tap",
+    "role": "button",
+    "name": "18%"
+   },
+   {
+    "do": "type",
+    "value": "Props",
+    "delay": 20,
+    "label": "Category"
+   },
+   {
+    "shot": "03",
+    "settle": 1200,
+    "focus": {
+     "label": "/^Amount/"
+    }
+   },
+   {
+    "do": "type",
+    "value": "Decor Mart",
+    "delay": 20,
+    "label": "/^Vendor/"
+   },
+   {
+    "do": "type",
+    "value": "Props for the Greenleaf menu shoot",
+    "delay": 20,
+    "label": "Note"
+   },
+   {
+    "shot": "04",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "Save entry"
+    }
+   },
+   {
+    "do": "press",
+    "key": "Escape"
+   },
+   {
+    "do": "goto",
+    "url": "/finance?tab=entries"
+   },
+   {
+    "do": "wait",
+    "ms": 3000
+   },
+   {
+    "shot": "05",
+    "settle": 1200,
+    "focus": {
+     "role": "link",
+     "name": "Entries"
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,10 @@
+[Unit]
+Description=Pulse PR pipeline (%i): work signals from repositories, releases, deploys and lane reports, the pipeline tick, creative renders (PR-PIPELINE; never posts or sends)
+[Service]
+Type=oneshot
+Environment=PATH=/home/eadev/.local/opt/node/bin:/home/eadev/.local/bin:/usr/local/bin:/usr/bin:/bin
+# The launcher picks the checkout (the shipped release's when it has the tool, else dev/live) and its Python.
+ExecStart=/usr/local/bin/ea-heavy /bin/bash %h/.local/lib/pulse-pr-pipeline/run.sh %i
+Nice=19
+CPUWeight=20
+TimeoutStartSec=1h

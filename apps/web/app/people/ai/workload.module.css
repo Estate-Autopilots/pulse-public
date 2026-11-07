@@ -1,0 +1,48 @@
+/* AI-EMP-2: the AI workload page. Tiles for the day, then one card per AI employee: what it did, what waits on people,
+   what people caught. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile { display: grid; gap: 4px; padding: 14px 16px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); min-width: 0; }
+.tile b { font-size: 24px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile small { color: var(--theme-text-muted); }
+.tile[data-tone="wait"] { border-color: color-mix(in srgb, var(--theme-warning, #d39a0b) 45%, var(--theme-border)); }
+.tile[data-tone="bad"] { border-color: color-mix(in srgb, var(--theme-danger) 40%, var(--theme-border)); }
+.tileLabel { display: inline-flex; align-items: center; gap: 6px; color: var(--theme-text-muted); font-size: 13px; }
+.list { display: grid; gap: 16px; }
+.agent { display: grid; gap: 12px; padding: 16px 18px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); min-width: 0; }
+.agentHead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.agentName { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.agentName > span { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-weight: 650; }
+.agentName a { color: inherit; }
+.agentName small { color: var(--theme-text-muted); overflow-wrap: anywhere; }
+.did { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 8px 16px; margin: 0; }
+.did > div { min-width: 0; }
+.did dt { color: var(--theme-text-muted); font-size: 12.5px; }
+.did dd { margin: 0; font-weight: 650; font-variant-numeric: tabular-nums; }
+.did dd small { color: var(--theme-text-muted); font-weight: 400; }
+.part { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--theme-border); min-width: 0; }
+.part h3 { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 14px; }
+.part h3 small { padding: 0 7px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-weight: 600; }
+.part summary { cursor: pointer; list-style: none; }
+.part summary::-webkit-details-marker { display: none; }
+.part ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.part li { display: grid; gap: 4px; min-width: 0; }
+.part li[data-urgent] { padding-left: 10px; border-left: 3px solid var(--theme-danger); }
+.part li > small { color: var(--theme-text-muted); overflow-wrap: anywhere; }
+.part li a { color: var(--theme-action); }
+.rowHead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.rowHead b { overflow-wrap: anywhere; }
+.rowHead small { color: var(--theme-text-muted); }
+.quote { margin: 0; padding: 6px 10px; border-left: 3px solid var(--theme-border); border-radius: 4px; background: var(--theme-canvas); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13.5px; }
+.quote[data-struck] { color: var(--theme-text-muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--theme-danger) 60%, transparent); }
+.quote[data-sent] { border-left-color: color-mix(in srgb, var(--theme-success, #23a55a) 60%, var(--theme-border)); }
+.timeline { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.timeline li { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 8px; font-size: 13.5px; }
+.timeline time { color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.timeline b { display: inline-flex; align-items: center; gap: 4px; }
+.timeline q { overflow-wrap: anywhere; }
+.timeline small { display: block; color: var(--theme-text-muted); }
+.quiet { margin: 0; color: var(--theme-text-muted); font-size: 13.5px; }
+@media (max-width: 560px) {
+  .agent { padding: 14px; }
+  .timeline li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}

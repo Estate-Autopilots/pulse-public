@@ -1,0 +1,37 @@
+/* SELF-SERVE (owner, 4 Nov 2026): appointments and adding a client, in My day's language (stat tiles, cards with a left
+ * colour stripe, a quiet right rail on a computer, one obvious next step). */
+.wrap { --stripe: hsl(262 52% 48%); display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 1100px; margin: 0 auto; padding-bottom: 32px; color: var(--theme-text); }
+:global(html[data-theme="dark"]) .wrap { --stripe: hsl(262 58% 66%); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.stats div { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; background: var(--theme-surface); border: 1px solid var(--theme-border); min-width: 0; }
+.stats dt { font-size: 12px; color: var(--theme-text-muted); }
+.stats dd { margin: 0; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.section { display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border); min-width: 0; }
+.sectionHead { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 650; min-height: 28px; }
+.sectionHead small { margin-left: auto; font-weight: 500; color: var(--theme-text-muted); font-size: 12px; }
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.item { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 10px 12px 10px 16px; border-radius: 12px; border: 1px solid var(--theme-border); }
+.item::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 2px; background: var(--stripe); }
+.item[data-status="cancelled"] { opacity: 0.65; }
+.item[data-status="cancelled"]::before { background: var(--theme-border-strong); }
+.itemMain { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.itemMain b { font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.itemMain small { color: var(--theme-text-muted); font-size: 12.5px; overflow-wrap: anywhere; }
+.quiet { min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--theme-border); background: transparent; color: var(--theme-text); font: inherit; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.primary { min-height: 46px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--theme-action); color: var(--theme-action-text); font: inherit; font-size: 15px; font-weight: 650; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.primary:disabled, .quiet:disabled { opacity: 0.6; cursor: not-allowed; }
+.primary:focus-visible, .quiet:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+.book { display: grid; gap: 12px; }
+.when { display: grid; grid-template-columns: 1.4fr 1fr 0.8fr; gap: 10px; }
+.problem { margin: 0; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--theme-danger) 8%, var(--theme-surface)); color: var(--theme-danger); font-size: 13px; }
+.ok { margin: 0; overflow-wrap: anywhere; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--theme-success) 9%, var(--theme-surface)); color: var(--theme-text); font-size: 14px; line-height: 1.45; }
+.empty { margin: 0; color: var(--theme-text-muted); font-size: 14px; line-height: 1.5; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: start; font-size: 14px; line-height: 1.4; }
+.no { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--stripe); box-shadow: inset 0 0 0 1.5px var(--stripe); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+.link { overflow-wrap: anywhere; font-size: 12.5px; color: var(--theme-text-muted); }
+@media (min-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr) 320px; } }
+@media (max-width: 480px) { .when { grid-template-columns: 1fr 1fr; } .when label:first-child { grid-column: 1 / -1; } .stats dd { font-size: 15px; } }

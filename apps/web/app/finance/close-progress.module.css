@@ -1,0 +1,70 @@
+/* UX-POLISH-2: the month close as a short path to done: a ring, a checklist, a few earned badges and a streak.
+   Playful touches, professional surface: one card, theme tokens, motion once on open and never under reduced motion. */
+.srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: start; padding: 18px 20px; border: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); border-radius: 16px; background: linear-gradient(135deg, color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)), var(--theme-surface) 55%); }
+.ringBox { position: relative; width: 96px; height: 96px; }
+.ring { width: 96px; height: 96px; transform: rotate(-90deg); }
+.track { fill: none; stroke: var(--theme-surface-subtle); stroke-width: 8; }
+.fill { fill: none; stroke: var(--theme-action); stroke-width: 8; stroke-linecap: round; animation: ring-fill 900ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fill[data-done] { stroke: var(--theme-success); }
+@keyframes ring-fill { from { stroke-dashoffset: var(--c); } to { stroke-dashoffset: var(--to); } }
+.ringText { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.1; }
+.ringText b { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.ringText small { color: var(--theme-text-muted); font-size: 11px; }
+.body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.head h2 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -0.01em; }
+.streak { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 999px; background: color-mix(in srgb, var(--theme-warning) 12%, var(--theme-surface)); color: var(--theme-warning); font-size: 12px; font-weight: 600; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.badges li { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--theme-success) 10%, var(--theme-surface)); color: var(--theme-success); font-size: 12px; font-weight: 600; animation: pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both; animation-delay: calc(300ms + var(--i) * 70ms); }
+.steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px 20px; margin: 0; padding: 0; list-style: none; }
+.steps li { display: flex; align-items: flex-start; gap: 8px; min-width: 0; font-size: 13px; }
+.steps li svg { flex: none; margin-top: 1px; }
+.tick { color: var(--theme-success); animation: pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both; animation-delay: calc(200ms + var(--i) * 60ms); }
+.todo { color: var(--theme-text-muted); }
+.stepText { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.steps li[data-done] .stepText > span { color: var(--theme-text-muted); }
+.stepText a { color: var(--theme-text) !important; font-weight: 550; }
+.stepText a:hover { color: var(--theme-action) !important; text-decoration: underline; }
+.stepText small { color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.next { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action) !important; font-size: 13px; font-weight: 600; text-decoration: none !important; transition: background-color 140ms ease; }
+.next:hover { background: color-mix(in srgb, var(--theme-action) 16%, var(--theme-surface)); }
+.next:focus-visible, .stepText a:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+@keyframes pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+@media (max-width: 599.98px) { .card { grid-template-columns: minmax(0, 1fr); justify-items: start; } .steps { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .fill, .tick, .badges li { animation: none; } }
+
+/* The header's meter: a small ring and the count, on every Finance tab. */
+.meter { order: 9; margin-left: auto; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px 0 6px; border: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); border-radius: 999px; background: var(--theme-surface); color: var(--theme-text-muted) !important; font-size: 12.5px; font-weight: 550; white-space: nowrap; text-decoration: none !important; transition: border-color 120ms ease, background-color 120ms ease; }
+.meter b { color: var(--theme-text); font-variant-numeric: tabular-nums; }
+.meter:hover { border-color: var(--theme-border-strong); background: var(--theme-surface-subtle); }
+.meter:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.meter[data-done] b { color: var(--theme-success); }
+.meterRing { width: 22px; height: 22px; transform: rotate(-90deg); }
+.meterRing .track, .meterRing .fill { stroke-width: 3.5; }
+.meter[data-done] .fill { stroke: var(--theme-success); }
+@media (max-width: 599.98px) { .meter { padding: 0 6px; } .meter span { display: none; } }
+
+/* UX-POLISH-4: the month-close hero (Overview). */
+.hero { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 28px; align-items: center; padding: 22px 26px; border: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); border-radius: 20px; background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)), var(--theme-surface) 55%); }
+.heroRing { position: relative; width: 160px; height: 160px; }
+.heroRing svg { width: 160px; height: 160px; transform: rotate(-90deg); }
+.heroRing .track, .heroRing .fill { stroke-width: 14; }
+.heroRingText { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.15; }
+.heroRingText b { font-size: 38px; font-weight: 750; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.heroRingText small { max-width: 90px; color: var(--theme-text-muted); font-size: 12px; }
+.heroBody { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.heroTop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.eyebrow { padding: 3px 10px; border-radius: 6px; background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.heroTitle { margin: 2px 0 0; font-size: 28px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.15; }
+.heroLede { margin: 0 0 6px; color: var(--theme-text-muted); font-size: 14px; }
+.chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.chips li { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 12px; border: 1.5px solid color-mix(in srgb, var(--theme-warning) 35%, var(--theme-border)); border-radius: 12px; background: color-mix(in srgb, var(--theme-warning) 5%, var(--theme-surface)); font-size: 13.5px; font-weight: 550; line-height: 1.3; }
+.chips li[data-done] { border-color: color-mix(in srgb, var(--theme-success) 30%, transparent); background: color-mix(in srgb, var(--theme-success) 9%, var(--theme-surface)); }
+.chips li svg { flex: none; }
+.chips li .todo { color: var(--theme-warning); }
+.chips a { color: var(--theme-text) !important; text-decoration: none !important; }
+.chips a:hover { color: var(--theme-action) !important; text-decoration: underline !important; }
+.chips a:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 4px; }
+@media (max-width: 1279.98px) { .chips { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 759.98px) { .hero { grid-template-columns: minmax(0, 1fr); justify-items: start; padding: 18px; } .heroRing, .heroRing svg { width: 128px; height: 128px; } .heroRingText b { font-size: 30px; } .chips { grid-template-columns: minmax(0, 1fr); } .heroTitle { font-size: 22px; } }

@@ -1,0 +1,6 @@
+[Unit]
+Description=Restart the Pulse dev server once a night (OPS-2)
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/pulse-dev-recycle --nightly
+Nice=10

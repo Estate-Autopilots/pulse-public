@@ -1,0 +1,602 @@
+# =====================================================================================================================
+# Event type registry v1. Source of truth in the repo (spec appendix D documents it). pulse-migrate syncs it into
+# pulse.event_type after every migration run, where a trigger enforces it on every insert into the log; the ingest
+# service and the collector runtime check it first (pulse_sdk.validate) so a rejection comes back with a reason.
+# For each type: default purposes, sensitivity floor (0 org, 1 personal, 2 sensitive), visibility floor
+# (person < team < org; an event may be stricter, never looser), retention class, allowed emitters (source prefixes),
+# subject format, and the required data fields (full JSON Schemas live next to this file in the repo).
+# Every data field must be declared here (required, or optional with "?"): undeclared fields such as title,
+# window_title, url or key codes are rejected (ADR-0025), by the validator and by the database trigger.
+# Ingest rejects: unknown types; purposes not in `purposes`; sensitivity below the floor; visibility looser than the
+# floor; sources not in `emitters`; subjects not matching `subject`.
+# Phase-1 types are complete; later types are listed with their phase.
+# Canonical purposes (privacy.purpose): delivery quality coaching voice workload outcomes activity_context after_hours
+#   work_delta command_counts wellbeing presence office security privacy billing
+# Canonical references: <kind>:<namespace>:<key>, e.g. person:pulse:<uuid>, device:pulse:<uuid>,
+#   account:google:<email>, file:gdrive:<id>, file:local:<basename>, version:pulse:<uuid>, task:pulse:<uuid>,
+#   project:pulse:<uuid>, system:pulse:<component>
+# =====================================================================================================================
+version: 1
+types:
+
+  # ---------------------------------------------------------------------------------------------- Drive (phase 1)
+  drive.file.created:   &drive
+    purposes: [delivery]
+    sensitivity: 1
+    visibility: team
+    retention: work_record
+    emitters: [/collectors/gdrive_changes, /collectors/gdrive_audit, /collectors/gdrive_activity, /collectors/connector]   # R52 company plugins
+    subject: file:gdrive:<file_id>
+    data: [name, mime, parents, "size?", "md5?", "sha256?", "duration_ms?", "width?", "height?", "owner?", "last_modifying_user?", "audit_event_id?"]
+  drive.file.uploaded:  *drive
+  drive.file.updated:   *drive
+  drive.file.moved:     *drive
+  drive.file.renamed:   *drive
+  drive.file.trashed:   *drive
+  drive.file.shared:                       # permission change; data.grantee_domains drives version.shared detection
+    <<: *drive
+    data: [name, grantee_domains, role, "link_sharing?"]
+  drive.file.observed:                     # snapshot from files.list when a project root is bound (backfill, phase 1)
+    <<: *drive
+    emitters: [/collectors/gdrive_snapshot]
+    data: [name, mime, parents, "size?", "owner?", "last_modifying_user?", "index_path?", "index_created_at?", "index_modified_at?"]
+  drive.folder.created: *drive
+  drive.comment.created:
+    <<: *drive
+    data: [file_id, author_ref, created_at]        # no comment text
+
+  # ----------------------------------------------------------------------------------- mail / calendar (phase 1)
+  mail.message.sent: &mail
+    purposes: [delivery, workload]
+    sensitivity: 1
+    visibility: team
+    retention: work_metadata
+    emitters: [/collectors/gmail_meta]
+    subject: message:gmail:<message_id>
+    data: [thread_id, from_domain, to_domains, "subject_if_project?", sent_at]   # headers only; never body
+  mail.message.received: *mail
+  calendar.event.created: &cal
+    purposes: [delivery, workload]
+    sensitivity: 1
+    visibility: person
+    retention: work_metadata
+    emitters: [/collectors/gcal]
+    subject: calendar_event:google:<event_id>
+    data: [start, end, organiser_ref, attendee_domains, "title_if_project?", "tags?"]   # tags: shoot, client_call, leave, focus
+  calendar.event.updated: *cal
+  calendar.event.held: *cal
+
+  # ------------------------------------------------------------------------------------ desktop agent (phase 1)
+  agent.device.enrolled: &agentdev
+    purposes: [security]
+    sensitivity: 1
+    visibility: team
+    retention: security_log
+    emitters: [/api]
+    subject: device:pulse:<device_id>
+    data: [platform, agent_version, person_ref]
+  agent.device.revoked: *agentdev
+  agent.device.assigned:                   # shared-station switcher
+    <<: *agentdev
+    purposes: [delivery]
+    emitters: [/agent]
+    data: [person_ref, valid_from]
+  agent.usage.hourly:
+    purposes: [activity_context]
+    sensitivity: 1
+    visibility: person
+    retention: activity_raw
+    emitters: [/agent]
+    subject: device:pulse:<device_id>
+    data: [hour_start, active_s, idle_s, categories, "after_hours?"]   # categories keys from the fixed enum (appendix B)
+  agent.cid_time.hourly:                   # active minutes per CID (S6 + S8); person-only (06 §5)
+    purposes: [activity_context]
+    sensitivity: 1
+    visibility: person
+    retention: activity_raw
+    emitters: [/agent]
+    subject: device:pulse:<device_id>
+    data: [hour_start, minutes_by_cid]
+  agent.render.detected:
+    purposes: [delivery]
+    sensitivity: 1
+    visibility: team
+    retention: work_record
+    emitters: [/agent]
+    subject: file:local:<basename>
+    data: [name, size, md5, sha256, "duration_ms?", "width?", "height?", "cid?", "app?"]
+
+  # --------------------------------------------------------------------------------- creative apps (phase 1–2)
+  app.project.opened: &appctx
+    purposes: [activity_context]
+    sensitivity: 1
+    visibility: person
+    retention: activity_raw
+    emitters: [/agent]
+    subject: device:pulse:<device_id>
+    data: [app, project_name_hash, project_display_name, "cid?"]
+  app.project.activated: *appctx
+  app.project.dirty: *appctx
+  app.project.closed: *appctx
+  app.work.delta:                          # v0.3 · S24: counts of changes between saves; person-first (03 S24, 04 M9)
+    purposes: [work_delta]
+    sensitivity: 1
+    visibility: person
+    retention: activity_raw
+    emitters: [/agent]
+    subject: device:pulse:<device_id>
+    data: [app, project_name_hash, "cid?", from_save, to_save, "baseline?", counts, "timeline_ms?", net_ewu, gross_ewu]
+  agent.commands.hourly:                   # v0.3 · S25: opt-in; category totals only (03 S25); not offered to EU tenants
+    purposes: [command_counts]
+    sensitivity: 1
+    visibility: person
+    retention: activity_raw
+    emitters: [/agent]
+    subject: device:pulse:<device_id>
+    data: [hour_start, app, source, counts]
+  app.export.completed:
+    purposes: [delivery]
+    sensitivity: 1
+    visibility: team
+    retention: work_record
+    emitters: [/agent]
+    subject: file:local:<basename>
+    data: [app, output_name, "cid?", "sequence_name?"]
+  app.render.completed:
+    purposes: [delivery]
+    sensitivity: 1
+    visibility: team
+    retention: work_record
+    emitters: [/agent]
+    subject: file:local:<basename>
+    data: [app, output_name, "cid?"]
+
+  # ------------------------------------------------------------------------------- work objects (phase 1, declared)
+  project.bound: &decl
+    purposes: [delivery]
+    sensitivity: 0
+    visibility: team
+    retention: work_record
+    emitters: [/api]
+    subject: project:pulse:<project_id>
+    data: [registry_no, storage_root]
+  task.created: &task
+    <<: *decl
+    subject: task:pulse:<task_id>
+    field_types:
+      status: {type: string, enum: [open, in_progress, blocked, in_review, done, cancelled]}
+    data: [project_ref, title, "assignee_ref?", "deliverable_type?", "due_at?", "planned_units?", "status?"]
+  task.assigned: *task
+  task.status_changed: *task
+  task.due_changed: *task
+  asset.issued:                            # CID allocated (POST /v1/assets) or created on detection
+    <<: *decl
+    subject: asset:pulse:<asset_id>
+    data: [cid, deliverable_type, project_ref, "task_ref?", issued_by]
+  input.received:
+    <<: *decl
+    subject: input:pulse:<input_id>
+    data: [kind, project_ref, "asset_ref?", file_refs, paired_by]    # kind: raw_footage, approved_script, blueprint …
+  input.expected:
+    <<: *decl
+    subject: input:pulse:<input_id>
+    data: [kind, project_ref, expected_at]
+  version.ready_for_review:                # creator marks ready
+    <<: *decl
+    sensitivity: 1
+    subject: version:pulse:<version_id>
+    emitters: [/api, /agent]
+    data: [actor_ref]
+  version.shared:                          # PGS tap or derived from drive.file.shared to a client domain
+    <<: *decl
+    sensitivity: 1
+    subject: version:pulse:<version_id>
+    data: [method]                          # declared | drive_share
+  approval.recorded:
+    <<: *decl
+    sensitivity: 1
+    subject: version:pulse:<version_id>
+    data: [by_ref, method]                  # bot tap, web, voice item
+  feedback.received:                       # declared by the PGS (bot, web, confirmed voice item); never from email bodies
+    <<: *decl
+    sensitivity: 1
+    subject: version:pulse:<version_id>
+    data: [items, source]                  # items: [{text, "where?", category?}]
+
+  # -------------------------------------------------------------------------------------- Ads (phase 2, S14)
+  ads.metrics.daily:
+    purposes: [outcomes]
+    sensitivity: 0
+    visibility: org
+    retention: outcome
+    emitters: [/collectors/meta_ads]
+    subject: ad:meta:<platform_ad_id>
+    data: [ad_account, platform_campaign_id, campaign_name, platform_ad_set_id, "ad_set_name?", platform_ad_id,
+           ad_name, day, placement, spend, currency, impressions, "reach?", "video_3s_plays?", "thruplays?",
+           "link_clicks?", "link_ctr?", "leads?", leads_reported, attribution_setting, "cid?", "cid_version?",
+           "cid_variant?"]
+
+  # -------------------------------------------------------------------------------------- people (declared, phase 1)
+  attribution.confirmed: &people
+    purposes: [delivery]
+    sensitivity: 1
+    visibility: team
+    retention: work_record
+    emitters: [/api]
+    subject: event:pulse:<seq>
+    data: [person_ref]
+  attribution.rejected: *people
+  blocker.declared:
+    <<: *people
+    subject: task:pulse:<task_id>
+    data: [blocker_key, owner_side, "note?"]
+  blocker.resolved:
+    <<: *people
+    subject: blocker:pulse:<blocker_id>
+    data: ["note?"]
+  blocker.disputed:
+    <<: *people
+    subject: blocker:pulse:<blocker_id>
+    data: [note]
+  correction.submitted:
+    <<: *people
+    subject: correction:pulse:<correction_id>
+    data: [target_type, target_ref, claim]
+  correction.resolved:
+    <<: *people
+    subject: correction:pulse:<correction_id>
+    data: [status, "note?"]
+    field_types:
+      status: {type: string, enum: [accepted, rejected, auto_applied]}
+  groundtruth.answered:                    # daily check (08 §5)
+    <<: *people
+    subject: version:pulse:<version_id>
+    data: [answer]                         # correct | not_mine | not_deliverable | wrong_asset
+  groundtruth.followups:                   # v0.3 · pilot: project lead's evening tally of status chases (08 §6)
+    <<: *people
+    subject: person:pulse:<person_id>
+    data: [day, bucket]                    # bucket: 0 | 1-2 | 3-5 | 6+
+  groundtruth.missing:
+    <<: *people
+    subject: person:pulse:<person_id>
+    data: [text, "file_ref?", "cid?"]
+  leave.declared:
+    <<: *people
+    purposes: [workload]
+    visibility: person
+    subject: person:pulse:<person_id>
+    data: [from, to]
+  experiment.logged:                       # phase 2
+    <<: *people
+    purposes: [quality]
+    visibility: person
+    subject: version:pulse:<version_id>
+    data: [technique, why, where, intended_effect]
+
+  # ----------------------------------------------------------------------------------------- review (phase 1)
+  review.requested: &rev
+    purposes: [quality]
+    sensitivity: 1
+    visibility: person
+    retention: work_record
+    emitters: [/api, /agent, /system]
+    subject: version:pulse:<version_id>
+    data: ["requested_by_ref?"]
+  review.completed:
+    <<: *rev
+    emitters: [/system]
+    data: [review_id, verdict, model, rubric_version]
+  review.note.responded:
+    <<: *rev
+    emitters: [/api, /agent]
+    subject: review_note:pulse:<note_id>
+    data: [response, "reason?"]
+
+  # ----------------------------------------------------------------------------- identity, config, models, messaging
+  identity.merged: &sys
+    purposes: [delivery]
+    sensitivity: 1
+    visibility: org
+    retention: work_record
+    emitters: [/api, /system]
+    subject: identity:pulse:<entity_type>:<entity_id>
+    data: [into_ref, method, confidence]
+  identity.split: *sys
+  config.changed:
+    <<: *sys
+    sensitivity: 0
+    subject: config:pulse:<doc_kind>/<doc_key>
+    data: [version, changed_by_ref]
+  model.promoted:
+    <<: *sys
+    sensitivity: 0
+    subject: model:pulse:<name>
+    data: [version, eval_report_ref]
+  model.rolled_back: *sys
+  ui.screen.opened_day:                    # v0.3 · one yes per person, surface and day (pilot measure "opens My week 4+ days")
+    purposes: [coaching]
+    sensitivity: 1
+    visibility: person
+    retention: activity_raw
+    emitters: [/api]
+    subject: person:pulse:<person_id>
+    data: [day, screen, surface]           # screen: my_week | review | …; surface: web | desktop | mobile | bot_link
+  nudge.sent:
+    purposes: [coaching]
+    sensitivity: 1
+    visibility: person
+    retention: work_metadata
+    emitters: [/system]
+    subject: person:pulse:<person_id>
+    data: [kind, channel]                  # no message text stored
+
+  # ------------------------------------------------------------------------------------------ privacy (phase 1)
+  notice.acknowledged: &priv
+    purposes: [privacy]
+    sensitivity: 1
+    visibility: person
+    retention: legal
+    emitters: [/api]
+    subject: person:pulse:<person_id>
+    data: [notice_id, language, channel]
+  consent.granted:
+    <<: *priv
+    data: [purpose, "scope?", notice_id, channel]
+  consent.withdrawn:
+    <<: *priv
+    data: [purpose, channel]
+  privacy.request.opened: *priv
+  privacy.request.closed: *priv
+  privacy.event.redacted:
+    <<: *priv
+    emitters: [/system]
+    subject: event:pulse:<seq>
+    data: [reason, type, "class?", "count?", "before?"]   # class/count/before: the daily retention summary
+
+  # ----------------------------------------------------------------------------- the app's own changes (UX-5B)
+  # Emitted by the database itself (0400_task_companion.sql) when something people can be sent to changes, whichever
+  # screen, phone or import made it. Each is a destination's "this was changed" event (apps/web/app/destinations/
+  # registry.ts); open tasks' completion signals match them exactly. Ids and counts only: no names, no addresses.
+  office.added: &app
+    purposes: [delivery]
+    sensitivity: 0
+    visibility: org
+    retention: work_record
+    emitters: [/system/pulse-db]
+    subject: office:pulse:<office_id>
+    data: [wifi_count, ip_count]           # how many Wi-Fi networks and public IP ranges the office has now
+  office.network.saved: *app
+  checkin.arrival.saved:
+    <<: *app
+    subject: setting:pulse:<key>
+    data: [value]                          # ask | auto | off
+  checkin.reminders.saved:
+    <<: *app
+    subject: setting:pulse:<key>
+    data: [value]
+  payroll.cutoff.saved:
+    <<: *app
+    subject: setting:pulse:<key>
+    data: [value]
+  presence.auto.saved:
+    <<: *app
+    subject: setting:pulse:<key>
+    data: [value]
+  policy.published:
+    <<: *app
+    subject: policy:pulse:<policy_id>
+    data: [kind, version]
+  holiday.added:
+    <<: *app
+    subject: holiday:pulse:<holiday_id>
+    data: [day]
+  project.added:
+    <<: *app
+    subject: project:pulse:<project_id>
+    data: [kind]
+  client.added:
+    <<: *app
+    subject: client:pulse:<client_id>
+    data: []
+  attendance.checked_in: &arrival
+    purposes: [presence]
+    sensitivity: 1
+    visibility: person
+    retention: work_metadata
+    emitters: [/system/pulse-db]
+    subject: person:pulse:<person_id>
+    data: [mode, work_date]
+  attendance.office.arrived:               # a check-in a phone made or offered on recognising an office
+    <<: *arrival
+    data: [via, work_date, "office_ref?"]
+  leave.decided:
+    <<: *arrival
+    subject: leave:pulse:<leave_id>
+    data: [status]
+  # COMP-A (0440_comp_pay.sql): a founder sent an offer; the person answered it. The offer's id only, never pay. A task
+  # linked to the offer ("Issue … offer letter") finishes on comp.offer.sent through its confirmed completion signal.
+  comp.offer.sent: &pay
+    purposes: [billing]
+    sensitivity: 2
+    visibility: person
+    retention: work_record
+    emitters: [/system/pulse-db]
+    subject: offer:pulse:<offer_id>
+    data: [offer_id]
+  comp.offer.answered:
+    <<: *pay
+    data: [offer_id, reply]
+
+
+# ------------------------------------------------------------------------------------------------- field types
+# JSON Schema for every data field named in `types` (the loader refuses a field without one). A type may override
+# a field with `field_types`. The validator checks each event's data against required + optional fields typed
+# here, with additionalProperties false; the four types with full schemas in envelope.schema.json are checked by
+# both. Generated TypeScript and Pydantic types come from the same definitions (pulse-codegen).
+fields:
+  name:              &filename {type: string, minLength: 1, maxLength: 255}
+  output_name:       *filename
+  sequence_name:     {type: string, maxLength: 255}
+  mime:              {type: string, maxLength: 255, pattern: '^[\w.+-]+/[\w.+-]+$'}
+  parents:           {type: array, maxItems: 10, items: {type: string, pattern: '^(gdrive:)?[A-Za-z0-9_-]{1,128}$'}}
+  size:              &count {type: integer, minimum: 0}
+  md5:               {type: string, pattern: '^[0-9a-fA-F]{32}$'}
+  sha256:            {type: string, pattern: '^[0-9a-fA-F]{64}$'}
+  duration_ms:       *count
+  width:             &pixels {type: integer, minimum: 0, maximum: 100000}
+  height:            *pixels
+  owner:             &ref {type: string, maxLength: 320, pattern: '^[a-z_]+:[a-z0-9_]+:\S+$'}
+  last_modifying_user: *ref
+  audit_event_id:    &token {type: string, maxLength: 128, pattern: '^[\w.:-]+$'}
+  grantee_domains:   &domains {type: array, maxItems: 100, items: {type: string, maxLength: 253, pattern: '^[a-z0-9.-]+$'}}
+  role:              {type: string, enum: [reader, commenter, writer, fileOrganizer, organizer, owner]}
+  link_sharing:      &slug {type: string, pattern: '^[a-z0-9_]{1,64}$'}
+  file_id:           {type: string, pattern: '^[A-Za-z0-9_-]{1,128}$'}
+  platform_id:       &platform_id {type: string, minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9_:-]+$'}
+  ad_account:        *platform_id
+  platform_campaign_id: *platform_id
+  platform_ad_set_id: *platform_id
+  platform_ad_id:    *platform_id
+  campaign_name:     {type: string, maxLength: 300}
+  ad_set_name:       {type: string, maxLength: 300}
+  ad_name:           {type: string, maxLength: 300}
+  placement:         {type: string, maxLength: 64, pattern: '^[a-z_]{1,32}(:[a-z_]{1,32})?$'}
+  spend:             {type: number, minimum: 0, maximum: 10000000000}
+  currency:          {type: string, pattern: '^[A-Z]{3}$'}
+  impressions:       *count
+  reach:             *count
+  video_3s_plays:    *count
+  thruplays:         *count
+  link_clicks:       *count
+  link_ctr:          {type: number, minimum: 0, maximum: 100}
+  leads:             *count
+  leads_reported:    {type: boolean}
+  attribution_setting: {type: string, maxLength: 64}
+  cid_version:       {type: integer, minimum: 1, maximum: 99}
+  cid_variant:       *slug
+  author_ref:        *ref
+  created_at:        &ts {type: string, format: date-time}
+  thread_id:         *token
+  from_domain:       {type: string, maxLength: 253, pattern: '^[a-z0-9.-]+$'}
+  to_domains:        *domains
+  subject_if_project: &short_text {type: string, maxLength: 300}
+  sent_at:           *ts
+  start:             *ts
+  end:               *ts
+  organiser_ref:     *ref
+  attendee_domains:  *domains
+  title_if_project:  *short_text
+  tags:              {type: array, maxItems: 10, items: {type: string, enum: [shoot, client_call, leave, focus]}}
+  platform:          {type: string, enum: [windows, macos, linux, ios, android]}
+  agent_version:     {type: string, pattern: '^[0-9A-Za-z.+-]{1,32}$'}
+  person_ref:        &person {type: string, pattern: '^person:pulse:[0-9a-f-]{36}$'}
+  valid_from:        *ts
+  hour_start:        *ts
+  active_s:          &seconds_in_hour {type: integer, minimum: 0, maximum: 3600}
+  idle_s:            *seconds_in_hour
+  after_hours:       &flag {type: boolean}
+  categories:        &object {type: object, maxProperties: 64}      # exact keys: envelope.schema.json
+  minutes_by_cid:    *object
+  counts:            *object
+  cid:               {type: string, pattern: '^[A-Z]{2,4}\d{4,6}-[A-Z]{2}\d{2,3}(-v\d{1,2})?(-[a-z0-9x]{1,8})?$'}
+  app:               {type: string, pattern: '^[a-z0-9_]{1,32}$'}
+  project_name_hash: {type: string, pattern: '^[0-9a-f]{64}$'}
+  project_display_name: {type: string, maxLength: 200}
+  from_save:         *ts
+  to_save:           *ts
+  baseline:          *flag
+  timeline_ms:       *count
+  net_ewu:           &units {type: number, minimum: 0, maximum: 1000000}
+  gross_ewu:         *units
+  source:            *slug
+  registry_no:       {type: integer, minimum: 1, maximum: 999999}
+  storage_root:      {type: string, pattern: '^gdrive:[A-Za-z0-9_-]{1,128}$'}
+  project_ref:       {type: string, pattern: '^project:pulse:[0-9a-f-]{36}$'}
+  title:             {type: string, minLength: 1, maxLength: 300}
+  assignee_ref:      *person
+  deliverable_type:  {type: string, pattern: '^([A-Z]{2}|unknown)$'}
+  due_at:            *ts
+  planned_units:     {type: number, minimum: 0, maximum: 1000}
+  status:            *slug
+  task_ref:          {type: string, pattern: '^task:pulse:[0-9a-f-]{36}$'}
+  asset_ref:         {type: string, pattern: '^asset:pulse:[0-9a-f-]{36}$'}
+  issued_by:         {type: string, enum: [api, detection, import]}
+  kind:              *slug
+  file_refs:         {type: array, maxItems: 500, items: *ref}
+  paired_by:         {type: string, enum: [rule, declared]}
+  expected_at:       *ts
+  actor_ref:         *ref
+  method:            *slug
+  by_ref:            *ref
+  items:
+    type: array
+    maxItems: 50
+    items:
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties:
+        text: {type: string, minLength: 1, maxLength: 2000}
+        where: {type: string, maxLength: 200}
+        category: {type: string, maxLength: 64}
+  blocker_key:       *slug
+  owner_side:        {type: string, enum: [client, internal, external, person, unknown]}
+  note:              &text {type: string, maxLength: 2000}
+  target_type:       *slug
+  target_ref:        *short_text
+  claim:             *text
+  answer:            {type: string, enum: [correct, not_mine, not_deliverable, wrong_asset]}
+  day:               &date {type: string, format: date}
+  bucket:            {type: string, enum: ['0', '1-2', '3-5', '6+']}
+  text:              *text
+  file_ref:          *short_text
+  from:              *date
+  to:                *date
+  technique:         &medium_text {type: string, maxLength: 1000}
+  why:               *medium_text
+  where:             *medium_text
+  intended_effect:   *medium_text
+  requested_by_ref:  *ref
+  review_id:         *token
+  verdict:           {type: string, enum: [approved, revision_required, review_blocked]}
+  model:             {type: string, maxLength: 100}
+  rubric_version:    *count
+  response:          {type: string, enum: [done, accepted, rejected, not_applicable]}
+  reason:            *text
+  into_ref:          *ref
+  confidence:        {type: number, minimum: 0, maximum: 1}
+  version:           {anyOf: [{type: integer, minimum: 0}, {type: string, pattern: '^\d+\.\d+\.\d+([-+][\w.]+)?$'}]}
+  changed_by_ref:    *ref
+  eval_report_ref:   *short_text
+  screen:            *slug
+  surface:           {type: string, enum: [web, desktop, mobile, bot_link]}
+  channel:           *slug
+  notice_id:         *token
+  language:          {type: string, pattern: '^[a-z]{2,3}(-[A-Za-z]{2,4})?$'}
+  purpose:           {type: string, enum: [delivery, quality, coaching, voice, workload, outcomes, activity_context, after_hours, work_delta, command_counts, wellbeing, presence, office, security, privacy, billing]}
+  scope:             *object
+  type:              {type: string, pattern: '^([a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*){1,3}|\*)$'}
+  class:             *slug
+  count:             *count
+  before:            *ts
+  index_path:        {type: string, maxLength: 8192}
+  index_created_at:  *ts
+  index_modified_at: *ts
+  wifi_count:        *count
+  ip_count:          *count
+  value:             {type: string, maxLength: 64}
+  mode:              {type: string, enum: [office, wfh, field]}
+  work_date:         *date
+  via:               {type: string, enum: [auto, asked]}
+  office_ref:        {type: string, pattern: '^office:pulse:[0-9a-f-]{36}$'}
+  offer_id:          {type: string, pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'}
+  reply:             {type: string, enum: [accepted, declined]}
+
+later:                                     # registered in their phase with full definitions
+  # phases per the v0.3 roadmap (07)
+  phase_2: [design.file.version_created, design.file.updated, design.comment.created, voice.note.received, transcript.created,
+            ads.ad.created, ads.ad.status_changed, ads.ad.creative_changed, ads.change.logged, lead.created,
+            shoot.started, shoot.wrapped, footage.handoff.declared, mobile.device.enrolled]
+  phase_3: [presence.day, office.zone.occupancy, office.env.reading, focus.block.requested, workload.checkin.answered]
+  phase_4: [project.created, task.board.moved, tenant.signed_up, billing.invoice.issued]
+  later:   [meeting.recorded, lead.touch.logged, visit.scheduled, visit.done, booking.made]

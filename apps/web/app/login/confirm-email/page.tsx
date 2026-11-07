@@ -1,0 +1,6 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import {usePathname} from 'next/navigation';
+import {post} from '../../records';
+import css from '../login.module.css';
+export default function ConfirmEmail(){const token=useRef(''),path=usePathname(),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);useEffect(()=>{const capture=()=>{if(!window.location.hash)return;token.current=window.location.hash.slice(1);window.history.replaceState(null,'',window.location.pathname);setMessage('');};capture();window.addEventListener('hashchange',capture);return()=>window.removeEventListener('hashchange',capture);},[]);return <div className={css.framed}><div className={css.form}><h1>Confirm delivery email</h1><p>Use this private link to confirm your new address. HR can see the change. This link works once and expires in 60 minutes.</p><button className={css.primary} disabled={busy} onClick={async()=>{setBusy(true);try{await post((path.startsWith('/portal')?'portal/':'')+'auth/confirm-email',{token:token.current});token.current='';setMessage('Your delivery email is confirmed.');}catch(e){setMessage((e as Error).message);}finally{setBusy(false);}}}>Confirm email</button><p role="status">{message}</p><a href={path.startsWith('/portal')?'/portal/login':'/login'}>Sign in</a></div></div>;}

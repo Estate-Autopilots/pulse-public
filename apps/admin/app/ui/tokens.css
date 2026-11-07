@@ -1,0 +1,123 @@
+/*
+ * Admin console palette: the Sales Xray "Lightbox" values (apps/sales-xray-web/
+ * app/lightbox/tokens.css), copied because the two apps never import each
+ * other. This is the only admin file with raw colour values; everything else
+ * uses these --lx-* tokens or the --sx-* semantic layer (sx-tokens.css) and
+ * tints with color-mix(). One accent: Pulse iris (the brand masters in packages/design-system/src/brand.js). Light and dark both resolve here.
+ */
+:root {
+  color-scheme: light;
+
+  /* ---------- Neutrals ---------- */
+  --lx-ink: #0b1424;
+  --lx-ink-2: #1c2940;
+  --lx-ink-3: #33415a;
+  --lx-muted: #56637a;
+  --lx-muted-2: #646d7f;
+  --lx-line: #e2e7f0;
+  --lx-line-soft: #eaeef5;
+  --lx-line-strong: #cbd3e1;
+  --lx-paper: #f4f6fb;
+  --lx-paper-2: #f9fafd;
+  --lx-surface: #ffffff;
+  --lx-sunken: #edf1f7;
+
+  /* ---------- Film (the dark band behind the call player) ---------- */
+  --lx-film: #0a1220;
+  --lx-film-2: #16233a;
+  --lx-film-text: #ffffff;
+  --lx-film-text-2: #c9d4e3;
+  --lx-film-text-3: #9fb0c8;
+  --lx-film-wave: #3a4c66;
+
+  /* ---------- Brand ---------- */
+  --lx-teal: #5b45d6;
+  --lx-teal-hover: #4f37d0;
+  --lx-teal-soft: #ece8ff;
+  --lx-on-teal: #ffffff;
+  --lx-glow: #7c5cff;
+
+  /* ---------- Moment kinds (meaning, never performance) ---------- */
+  --lx-strength: #097870;
+  --lx-focus: #b45309;
+  --lx-focus-ink: #92400e;
+  --lx-missed: #6341e0;
+  --lx-missed-ink: #4c2fc0;
+  --lx-objection: #c81d55;
+  --lx-objection-ink: #b31749;
+  --lx-closing: #2459e0;
+  --lx-closing-ink: #1d4cc4;
+
+  /* ---------- Status ---------- */
+  --lx-success: #0f8a5f;
+  --lx-info: #2459e0;
+  --lx-warning: #b45309;
+  --lx-danger: #c0261b;
+
+  /* ---------- Type: Latin and Devanagari in one stack ---------- */
+  --lx-font-ui:
+    var(--font-ui, "Plus Jakarta Sans"),
+    var(--font-deva, "Noto Sans Devanagari"), system-ui, sans-serif;
+  --lx-font-mono: var(--font-mono, ui-monospace), ui-monospace, monospace;
+  --lx-leading-devanagari: 1.65;
+
+  /* ---------- Shape, elevation, motion ---------- */
+  --lx-radius-xs: 6px;
+  --lx-radius-sm: 8px;
+  --lx-radius-md: 12px;
+  --lx-radius-pill: 999px;
+  --lx-shadow-1: 0 1px 2px rgba(11, 20, 36, 0.06);
+  --lx-shadow-2: 0 12px 32px -16px rgba(11, 20, 36, 0.35);
+  --lx-ring-focus: 0 0 0 2px var(--lx-surface), 0 0 0 4px var(--lx-teal);
+  --lx-dur-quick: 120ms;
+  --lx-bottom-nav-h: 56px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --lx-ink: #e8edf5;
+  --lx-ink-2: #d6deea;
+  --lx-ink-3: #b7c2d3;
+  --lx-muted: #93a0b5;
+  --lx-muted-2: #8390a6;
+  --lx-line: #1e2a42;
+  --lx-line-soft: #18223a;
+  --lx-line-strong: #2b3a59;
+  --lx-paper: #060a14;
+  --lx-paper-2: #0b1222;
+  --lx-surface: #0f1829;
+  --lx-sunken: #0a1120;
+  --lx-teal: #9a8cff;
+  --lx-teal-hover: #b9adff;
+  --lx-teal-soft: rgba(124, 92, 255, 0.16);
+  --lx-on-teal: #0a1220;
+  --lx-strength: #2dd4bf;
+  --lx-focus: #f59e0b;
+  --lx-focus-ink: #fbbf24;
+  --lx-missed: #a78bfa;
+  --lx-missed-ink: #c4b8ff;
+  --lx-objection: #fb7185;
+  --lx-objection-ink: #ff8cae;
+  --lx-closing: #7aa7ff;
+  --lx-closing-ink: #bfd0ff;
+  --lx-info: #7aa7ff;
+  --lx-warning: #f59e0b;
+  --lx-danger: #f97066;
+  --lx-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --lx-shadow-2: 0 12px 32px -16px rgba(0, 0, 0, 0.8);
+}
+
+/* Devanagari: never synthesise italics, always give it more leading. */
+:lang(hi),
+:lang(mr),
+[data-script="deva"] {
+  font-style: normal;
+  line-height: var(--lx-leading-devanagari);
+  letter-spacing: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --lx-dur-quick: 0ms;
+  }
+}

@@ -1,0 +1,27 @@
+/* PROFILE-UNIFY: the resume page (screen preview, print to PDF, public link). */
+.doc { background: #fff; color: #1b1f24; border: 1px solid var(--lx-line, #e3e6ea); border-radius: 12px; padding: 32px 36px; width: min(820px, 100%); margin: 0 auto; font-size: 13.5px; line-height: 1.5; }
+.head { display: flex; gap: 18px; align-items: center; border-bottom: 2px solid #1b1f24; padding-bottom: 14px; margin-bottom: 8px; }
+.head h1 { margin: 0; font-size: 26px; font-weight: 720; letter-spacing: -0.01em; }
+.photo { width: 84px; height: 84px; border-radius: 50%; background: center / cover no-repeat; flex: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.headline { margin: 2px 0 0; font-size: 15px; font-weight: 600; }
+.meta { margin: 2px 0 0; color: #59616b; font-size: 12.5px; }
+.doc section { margin-top: 14px; break-inside: avoid; }
+.doc h2 { margin: 0 0 6px; font-size: 12px; font-weight: 720; text-transform: uppercase; letter-spacing: 0.08em; color: #0f766e; }
+.prose { margin: 0; white-space: pre-line; }
+.item { margin: 0 0 8px; break-inside: avoid; }
+.itemHead { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.itemHead span { color: #59616b; font-size: 12.5px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0; }
+.tags li { padding: 2px 9px; border: 1px solid #d5dae0; border-radius: 999px; font-size: 12.5px; }
+.tags small, .list small { color: #59616b; }
+.list { margin: 0; padding-left: 18px; }
+.builder { display: grid; gap: 16px; width: min(1040px, 100%); margin: 0 auto; padding: 8px 0 48px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.public { min-height: 100vh; background: #f4f5f7; padding: 24px 16px; }
+@media (max-width: 600px) { .doc { padding: 20px 16px; } .head { flex-direction: column; align-items: flex-start; } }
+/* Printed on its own (the builder prints it in a hidden frame; the public link has nothing else on the page). */
+@media print {
+  .doc { border: 0; border-radius: 0; padding: 0; width: 100%; }
+  .public { padding: 0; background: #fff; }
+  @page { margin: 16mm; }
+}

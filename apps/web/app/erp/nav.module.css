@@ -1,0 +1,18 @@
+/* BILLING (18 Oct 2026): the Billing sections row. Tabs underlined in the action colour on a computer; on a phone,
+   pills that scroll sideways (the chosen one filled and brought into view), 40 px tall, with a fade at the edge. */
+.sections { display: flex; flex-wrap: wrap; gap: 2px; min-width: 0; border-bottom: 1px solid var(--theme-border); }
+.section { position: relative; padding: 7px 10px 9px; color: var(--theme-text-muted); font-size: 14px; font-weight: 500; text-decoration: none; white-space: nowrap; }
+.section:hover { color: var(--theme-text); }
+.section[aria-current="page"] { color: var(--theme-text); font-weight: 600; }
+.section[aria-current="page"]::after { content: ""; position: absolute; right: 8px; bottom: -1px; left: 8px; height: 2px; border-radius: 2px; background: var(--theme-action); }
+@media (max-width: 760px) {
+  .sections { flex-wrap: nowrap; gap: 6px; margin: 0 -14px; padding: 2px 14px 4px; border-bottom: 0; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
+  .sections::-webkit-scrollbar { display: none; }
+  .section { display: inline-flex; flex: none; align-items: center; min-height: 40px; padding: 0 14px; border: 1px solid var(--theme-border); border-radius: 999px;
+    background: var(--theme-surface); font-size: 13.5px; scroll-snap-align: start; -webkit-tap-highlight-color: transparent; }
+  .section[aria-current="page"] { border-color: var(--theme-action); background: var(--theme-action); color: var(--theme-action-text, #fff); }
+  .section[aria-current="page"]::after { display: none; }
+  .section:active { transform: scale(0.97); }
+}
+@media (prefers-reduced-motion: reduce) { .section:active { transform: none; } }

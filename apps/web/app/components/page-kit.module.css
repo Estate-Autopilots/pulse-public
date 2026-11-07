@@ -1,0 +1,128 @@
+/* UX-SETTINGS-CHAT (owner, 5 Nov 2026: "make every screen as good as My day"): the shared calm kit. The same header,
+   stat tiles, numbered picks, stripe cards, chips, empty states and quiet rail as Work → My day, so a page builds from
+   these instead of its own styles. Phone first (390 wide, 16px gutters from the frame); 44px presses on a phone and on
+   any coarse pointer; the theme's tokens only, so light and dark both read. A stripe's colour is --stripe-hue (a number)
+   or --stripe-color (a colour). */
+.page { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 1240px; margin: 0 auto; padding-bottom: 32px; color: var(--theme-text); min-width: 0; }
+/* The stripe's shade is worked out on each coloured part, so the kit colours the same inside any page. */
+.picks > li[style*="--stripe-hue"], .stripe[style*="--stripe-hue"], .chip[style*="--stripe-hue"] { --stripe: var(--stripe-color, hsl(var(--stripe-hue) 52% 42%)); }
+:global(:root[data-theme="dark"]) .picks > li[style*="--stripe-hue"], :global(:root[data-theme="dark"]) .stripe[style*="--stripe-hue"], :global(:root[data-theme="dark"]) .chip[style*="--stripe-hue"] { --stripe: var(--stripe-color, hsl(var(--stripe-hue) 58% 62%)); }
+
+/* Header: eyebrow, title, a line of plain English; stat tiles on the right from 640px. */
+.head { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.headText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.back { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; min-height: 32px; margin: 0 0 2px -4px; padding: 0 6px; border-radius: 8px; color: var(--theme-text-muted); font-size: 13px; font-weight: 550; text-decoration: none; }
+.back:hover { color: var(--theme-text); background: var(--theme-surface-subtle); }
+.eyebrow { margin: 0; font-size: 13px; color: var(--theme-text-muted); overflow-wrap: anywhere; }
+.title { margin: 0; font-size: 26px; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.lede { margin: 2px 0 0; max-width: 70ch; font-size: 14px; line-height: 1.5; color: var(--theme-text-muted); }
+.headActions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.stats { display: grid; grid-template-columns: repeat(var(--stat-count, 4), minmax(0, 1fr)); gap: 8px; margin: 0; min-width: 0; }
+.stat { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; background: var(--theme-surface); border: 1px solid var(--theme-border); min-width: 0; color: inherit; text-decoration: none; }
+.stat[data-link] { position: relative; }
+.stat[data-link]:hover { border-color: var(--theme-border-strong, var(--theme-text-muted)); }
+.statLink { color: inherit; text-decoration: none; }
+.statLink::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.stat:has(.statLink:focus-visible) { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+.statLink:focus-visible { outline: none; }
+.stat dt, .stat .statLabel { font-size: 12px; color: var(--theme-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat dd, .stat .statValue { margin: 0; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat[data-tone="bad"] dd { color: var(--theme-danger); }
+.stat[data-tone="warn"] dd { color: var(--theme-warning); }
+.stat[data-tone="good"] dd { color: var(--theme-success); }
+
+/* Chips: one row that scrolls sideways on a phone inside its own box (pages have 14 or 16px gutters, so it never bleeds
+   past them and never makes the page scroll); wraps from 640px. */
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: -4px; padding: 4px; min-width: 0; max-width: calc(100% + 8px); }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--theme-border);
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 550; cursor: pointer; white-space: nowrap; text-decoration: none;
+}
+.chip[aria-pressed="true"], .chip[aria-current="page"] { border-color: var(--theme-text); background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1px var(--theme-text); }
+.chipCount { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--theme-surface-subtle); font-size: 12px; display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+.chip[data-tone="bad"] .chipCount { background: var(--theme-danger); color: #fff; }
+.dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--stripe, var(--theme-text-muted)); display: inline-block; }
+
+/* Two columns from 1024px: the work on the left, a quiet rail on the right. */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+.main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.rail { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.card { display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border); min-width: 0; }
+.sectionHead { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; font-weight: 650; color: var(--theme-text); min-height: 28px; }
+.sectionHead > svg { flex: none; color: var(--theme-text-muted); }
+.sectionHead small { margin-left: auto; font-weight: 500; color: var(--theme-text-muted); font-size: 12px; }
+.sectionHead[data-tone="bad"] { color: var(--theme-danger); }
+.sectionHead[data-tone="bad"] > svg { color: var(--theme-danger); }
+
+/* "Start with": numbered picks, each a whole-row link. */
+.picks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.picks li { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 8px; }
+.pickNo { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--theme-surface-subtle); color: var(--stripe, var(--theme-text)); box-shadow: inset 0 0 0 1.5px var(--stripe, var(--theme-border)); }
+.pickOpen { display: flex; flex-direction: column; gap: 2px; min-height: 44px; justify-content: center; min-width: 0; border-radius: 8px; color: inherit; text-decoration: none; background: none; border: 0; padding: 0; font: inherit; text-align: left; cursor: pointer; }
+.pickOpen b { font-weight: 600; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pickOpen small { display: block; color: var(--theme-text-muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (hover: hover) { .pickOpen:hover b { color: var(--theme-action); } }
+
+/* Stripe cards: a list of places or things, each with its colour on the left. */
+.stripeList { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.stripe {
+  position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 56px; padding: 10px 12px 10px 16px;
+  border-radius: 14px; background: var(--theme-surface); border: 1px solid var(--theme-border); box-shadow: inset 4px 0 0 var(--stripe, var(--theme-border)); color: inherit; text-decoration: none; min-width: 0;
+}
+a.stripe:hover, button.stripe:hover { border-color: var(--theme-border-strong, var(--theme-text-muted)); background: var(--theme-surface-subtle); }
+button.stripe { width: 100%; font: inherit; text-align: left; cursor: pointer; }
+.stripeIcon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; flex: none; color: var(--stripe, var(--theme-text-muted)); background: color-mix(in srgb, var(--stripe, var(--theme-text-muted)) 12%, transparent); }
+.stripeText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stripeText b { font-size: 15px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.stripeText small { font-size: 13px; line-height: 1.4; color: var(--theme-text-muted); }
+.stripeEnd { display: inline-flex; align-items: center; gap: 6px; color: var(--theme-text-muted); font-size: 12.5px; white-space: nowrap; }
+.stripeText .badge { align-self: flex-start; margin-top: 4px; }
+.badge { display: inline-flex; align-items: center; min-height: 22px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--theme-surface-subtle); border: 1px solid var(--theme-border); color: var(--theme-text); }
+.badge[data-tone="bad"] { background: color-mix(in srgb, var(--theme-danger) 12%, transparent); border-color: color-mix(in srgb, var(--theme-danger) 35%, transparent); color: var(--theme-danger); }
+.badge[data-tone="warn"] { background: color-mix(in srgb, var(--theme-warning) 12%, transparent); border-color: color-mix(in srgb, var(--theme-warning) 35%, transparent); color: var(--theme-text); }
+.badge[data-tone="good"] { background: color-mix(in srgb, var(--theme-success) 12%, transparent); border-color: color-mix(in srgb, var(--theme-success) 35%, transparent); color: var(--theme-text); }
+
+/* Facts in a rail card: label left, value right. */
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 13.5px; }
+.facts dt { color: var(--theme-text-muted); }
+.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; text-align: right; }
+.quiet { margin: 0; font-size: 13px; line-height: 1.5; color: var(--theme-text-muted); }
+.railLinks { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 4px 0 0; padding: 0; list-style: none; font-size: 13.5px; }
+.railLinks a { display: inline-flex; align-items: center; min-height: 32px; color: var(--theme-action); font-weight: 550; text-decoration: none; }
+.railLinks a:hover { text-decoration: underline; }
+
+.empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 32px 16px; text-align: center; border-radius: 16px; border: 1px dashed var(--theme-border-strong, var(--theme-border)); color: var(--theme-text-muted); }
+.empty b { color: var(--theme-text); font-size: 16px; }
+.empty > svg { color: var(--theme-text-muted); }
+.empty[data-tone="good"] > svg { color: var(--theme-success); }
+.empty span { max-width: 52ch; font-size: 14px; line-height: 1.5; }
+
+.btn, .btnPrimary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); text-decoration: none; white-space: nowrap;
+}
+.btnPrimary { background: var(--theme-action); border-color: var(--theme-action); color: var(--theme-action-text, #fff); }
+.btn:disabled, .btnPrimary:disabled { opacity: 0.6; cursor: default; }
+
+.chip:focus-visible, .pickOpen:focus-visible, .stripe:focus-visible, .back:focus-visible, .btn:focus-visible, .btnPrimary:focus-visible, .railLinks a:focus-visible {
+  outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px;
+}
+
+@media (max-width: 380px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .title { font-size: 24px; } }
+@media (max-width: 639.98px) { .stats[data-count="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); } .stats:not([data-count="3"]) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 640px) {
+  .head[data-stats] { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+  .head[data-stats] .stats { min-width: 420px; }
+  .chips { flex-wrap: wrap; }
+  .stripeList[data-columns="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .grid[data-rail] { grid-template-columns: minmax(0, 1fr) 340px; column-gap: 20px; }
+  .grid[data-rail] > .rail { position: sticky; top: 12px; }
+  .chip, .btn, .btnPrimary, .pickOpen { min-height: 36px; }
+}
+@media (min-width: 1024px) and (pointer: coarse) { .chip, .btn, .btnPrimary, .pickOpen { min-height: 44px; } }
+.chips[data-wrap] { margin: 0; padding: 0; flex-wrap: wrap; overflow: visible; }

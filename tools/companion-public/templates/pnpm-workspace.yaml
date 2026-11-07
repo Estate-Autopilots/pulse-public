@@ -1,0 +1,6 @@
+packages:
+  - apps/desktop
+  - apps/mobile
+  - apps/chrome-extension
+  - packages/companion
+  - packages/design-system

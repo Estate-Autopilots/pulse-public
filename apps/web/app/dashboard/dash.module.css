@@ -1,0 +1,101 @@
+/* Dashboard, Leadership and My week: a few large panels that share the whole window. Shared pieces stay in ui.module.css. */
+
+/* Key numbers: four across; six only where a window is wide enough to read their notes. */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; min-width: 0; }
+.kpis[data-n="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kpis[data-n="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (min-width: 1500px) { .kpis[data-n="6"] { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+@media (min-width: 1180px) and (max-width: 1499.98px) { .kpis[data-n="6"] { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+@media (max-width: 1179.98px) { .kpis, .kpis[data-n="3"], .kpis[data-n="5"] { grid-template-columns: repeat(3, minmax(0, 1fr)); } .kpis[data-n="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .kpis, .kpis[data-n="3"], .kpis[data-n="4"], .kpis[data-n="5"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } }
+@media (min-width: 1180px) and (min-height: 860px) { .kpis > * { padding: 16px 18px 14px; } }
+
+/* Sub-tabs with one quiet line of context beside them. */
+.sub { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 8px 16px; min-width: 0; }
+.subNote { min-width: 0; overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 760px) { .subNote { display: none; } }
+
+/* Layouts. Every track is minmax(0, fr) so panels take the height they are given and page inside it. */
+.lead { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr); grid-template-rows: minmax(0, 1.25fr) minmax(0, 1fr); }
+.lead > .span { grid-column: span 2; }
+.lead > .tall { grid-column: 3; grid-row: 1 / span 2; }
+.pair { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.pairEven { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.quad { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+.quad > .tallLeft { grid-column: 1; grid-row: 1 / span 2; }
+.quad > .tallRight { grid-column: 2; grid-row: 1 / span 2; }
+.quad > .across { grid-column: 1 / -1; }
+.trio { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+@media (max-width: 1179.98px), (max-height: 599.98px) {
+  .lead, .pair, .pairEven, .quad, .trio { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; }
+  .lead > .span, .lead > .tall, .quad > .tallLeft, .quad > .tallRight, .quad > .across { grid-column: auto; grid-row: auto; }
+  .lead > .span, .quad > .across { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .lead, .pair, .pairEven, .quad, .trio { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Charts grow with their panel: columns stay slim, the plot takes the height. */
+.colBar.colBar { width: min(36px, 58%); }
+.bars { container-type: inline-size; }
+@media (min-width: 1180px) and (min-height: 860px) {
+  .bars > li > * { min-height: 40px; }
+  .bars .track { height: 10px; }
+  .rows > li > *, .rows > li[class] { min-height: 46px; }
+}
+.rows { container-type: inline-size; }
+@container (max-width: 330px) { .meter { display: none; } }
+
+/* Check-ins per day: one column a day, weekends and holidays hatched, today written out. */
+.days { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 4px; padding: 12px 14px; border-top: 1px solid var(--soft); }
+.day { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.day i { position: relative; display: block; width: 100%; max-width: 44px; height: 56px; border-radius: 4px; background: color-mix(in srgb, var(--theme-surface-subtle) 70%, var(--theme-surface)); overflow: hidden; }
+.day u { position: absolute; right: 0; bottom: 0; left: 0; min-height: 0; border-radius: 4px 4px 0 0; background: var(--mark-quiet); }
+.day[data-today] u { background: var(--theme-action); }
+.day[data-off] i { background: repeating-linear-gradient(135deg, var(--theme-surface-subtle) 0 3px, transparent 3px 6px); }
+.day b { height: 14px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; line-height: 14px; font-variant-numeric: tabular-nums; }
+.day[data-today] b { color: var(--theme-text); }
+.day small { color: var(--theme-text-muted); font-size: 12px; line-height: 13px; }
+.day[data-today] small { color: var(--theme-text); font-weight: 700; }
+@media (min-width: 1180px) and (min-height: 600px) {
+  .days.days { flex: 1 1 auto; min-height: 0; }
+  .day i { flex: 1 1 auto; height: auto; min-height: 20px; }
+}
+
+/* Pods as cards: roomier where the window is. */
+/* Pod cards: wide enough to read every fact at body size; the team list wraps instead of being cut. */
+.podCards.podCards { grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; align-content: start; padding: 4px 14px 14px; }
+.podCards > * { gap: 10px; padding: 16px 18px; border-radius: 12px; }
+.podCards [class*="__podName"] { font-size: 15px; }
+.podCards [class*="__podFigure"] b { font-size: 26px; }
+.podCards [class*="__podFacts"] { gap: 6px; font-size: 13px; }
+.podCards [class*="__podTeams"] { white-space: normal; overflow: visible; text-overflow: clip; }
+
+/* Split bars read as one calm block with air between them. */
+.block { display: grid; gap: 2px; padding: 4px 0 8px; }
+.blockLabel { padding: 8px 14px 0; color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+
+/* Money: nothing is connected, so the page says so and shows no figure. */
+.calm { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 0; padding: 32px 24px; text-align: center; }
+.calmIcon { display: grid; width: 44px; height: 44px; margin-bottom: 8px; place-items: center; border-radius: 12px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.calm h3 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -0.015em; }
+.calm p { max-width: 46ch; margin: 0; color: var(--theme-text-muted); line-height: 1.55; }
+.calm small { margin-top: 10px; color: var(--theme-text-muted); font-size: 12px; }
+.pending { color: var(--theme-text-muted); font-size: 12px; }
+
+/* Loading: the same frame as the page that is coming, so nothing jumps when it arrives. */
+.skTabs { display: flex; flex: none; align-items: center; gap: 18px; height: 35px; border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); }
+.skPanel { display: flex; flex-direction: column; gap: 14px; min-width: 0; min-height: 0; padding: 14px; overflow: hidden; }
+.skPanel > :last-child { flex: 1 1 auto; min-height: 60px; }
+@media (max-width: 1179.98px) { .skPanel { height: 220px; } }
+
+/* Pipeline stages: four readable rows (figure, meaning, link) instead of three small stats. */
+.stages { display: grid; margin: 0; padding: 0 6px 8px; list-style: none; }
+.stage { display: grid; grid-template-columns: auto minmax(0, 1fr) auto 16px; align-items: center; gap: 12px; min-height: 56px; padding: 8px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, var(--theme-surface)); border-radius: 8px; color: inherit; }
+.stages > li:first-child .stage { border-top: 0; }
+a.stage:hover { background: color-mix(in srgb, var(--theme-surface-subtle) 55%, var(--theme-surface)); }
+.stage > svg { color: var(--theme-text-muted); }
+.stageText { display: grid; gap: 1px; min-width: 0; }
+.stageText b { font-weight: 600; }
+.stageText small { color: var(--theme-text-muted); font-size: 13px; }
+.stageValue { font-size: 22px; font-weight: 650; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }

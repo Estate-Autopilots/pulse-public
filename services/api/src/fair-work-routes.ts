@@ -1,0 +1,22 @@
+import type {FastifyInstance} from 'fastify';
+import {type Tx,fail} from './routes.js';
+import {workMeasures,MODEL_CARDS} from './fair-work-model.js';
+type Obj=Record<string,unknown>;
+const body={type:'object',additionalProperties:true,maxProperties:40} as const;
+const id=(v:unknown)=>/^[0-9a-f-]{36}$/.test(String(v))?String(v):fail(400,'Choose a valid work receipt');
+export function registerFairWorkRoutes(app:FastifyInstance,{tx}:{tx:Tx}){
+ app.get<{Querystring:{person?:string}}>('/api/v0/fair-work',req=>tx(req,async c=>{const d=(await c.query('select pulse.fair_state($1) d',[req.query.person?id(req.query.person):null])).rows[0].d;const opportunities=(d.reviewRecords??[]).filter((r:Obj)=>{const p=r.policy as Obj;return p?.startAt&&p?.dueAt&&Array.isArray(p?.intervals)&&p.intervals.length;});const rework:Record<string,number>={};for(const n of d.notes??[])if(n.reworkReason)rework[n.reworkReason]=(rework[n.reworkReason]??0)+1;const nativeReceipts=d.self?(await c.query('select id,kind,purpose,at,state from pulse.native_event order by at desc limit 100')).rows:[];return {...d,nativeReceipts,reports:{review:{opportunities:opportunities.length,responses:opportunities.filter((r:Obj)=>r.reply&&Date.parse(String(r.reply))<=Date.parse(String((r.policy as Obj).dueAt))).length},rework},synthetic:false,measures:workMeasures(d),collection:{state:'Not collecting',policy:'Optional sensing requires a separate approved notice and device receipt',items:['Native task baseline','Independent exact-version acceptance','Employee-selected experiment','Voluntary private kudos'],excluded:['Private chat and message bodies','Screenshots, keys, clipboard and credentials','Excluded app time and idle penalties','Salary schemas','CCTV person attribution']}};}));
+ for(const [route,fn] of Object.entries({baseline:'fair_baseline_save',credit:'fair_credit_save',coverage:'fair_coverage_save',note:'fair_note_save','experiment-review':'fair_experiment_review',preferences:'fair_preference_set','notice-approve':'fair_notice_approve'}))app.post<{Body:Obj}>('/api/v0/fair-work/'+route,{schema:{body}},req=>tx(req,async c=>(await c.query(`select pulse.${fn}($1) id`,[JSON.stringify(req.body)])).rows[0]));
+ app.post<{Body:Obj}>('/api/v0/fair-work/publication',{schema:{body}},req=>tx(req,async c=>(await c.query('select pulse.fair_publish($1,$2) id',[id(req.body.personId),req.body.action])).rows[0]));
+ app.post<{Body:Obj}>('/api/v0/fair-work/correction',{schema:{body}},req=>tx(req,async c=>(await c.query('select pulse.fair_dispute_save($1,$2) id',[req.body.dimension,req.body.reason])).rows[0]));
+ app.post<{Body:Obj}>('/api/v0/fair-work/resolve',{schema:{body}},req=>tx(req,async c=>{await c.query('select pulse.fair_resolve($1,$2)',[id(req.body.id),req.body.reason]);return {ok:true};}));
+ app.post<{Body:Obj}>('/api/v0/fair-work/access',{schema:{body}},req=>tx(req,async c=>{if(typeof req.body.grant!=='boolean')fail(400,'Choose grant or revoke');await c.query('select pulse.fair_access_set($1,$2)',[id(req.body.managerId),req.body.grant]);return {ok:true};}));
+ app.post<{Body:Obj}>('/api/v0/fair-work/feedback',{schema:{body}},req=>tx(req,async c=>{await c.query('select pulse.fair_note_feedback($1,$2)',[id(req.body.id),req.body.feedback]);return {ok:true};}));
+ app.post<{Body:Obj}>('/api/v0/fair-work/experiment',{schema:{body}},req=>tx(req,async c=>(await c.query('select pulse.fair_experiment_choose($1,$2) id',[id(req.body.noteId),req.body.choice])).rows[0]));
+ app.post<{Body:Obj}>('/api/v0/fair-work/kudos',{schema:{body}},req=>tx(req,async c=>(await c.query('select pulse.fair_kudos_send($1,$2) id',[id(req.body.recipient),req.body.message])).rows[0]));
+ app.get('/api/v0/fair-work/review-options',req=>tx(req,async c=>(await c.query('select pulse.fair_review_options() d')).rows[0].d));
+ app.get('/api/v0/fair-work/collection',req=>tx(req,async c=>(await c.query('select pulse.fair_collection() d')).rows[0].d));
+ app.post<{Body:Obj}>('/api/v0/fair-work/consent',{schema:{body}},req=>tx(req,async c=>(await c.query('select pulse.fair_consent_set($1,$2,$3) id',[id(req.body.notice),id(req.body.device),req.body.kind])).rows[0]));
+ app.post<{Body:Obj}>('/api/v0/fair-work/break',{schema:{body}},req=>tx(req,async c=>{if(typeof req.body.paused!=='boolean')fail(400,'Choose pause or resume');await c.query('select pulse.fair_break_set($1)',[req.body.paused]);return {ok:true,sensingEnabled:false};}));
+ app.get('/api/v0/fair-work/model-cards',req=>tx(req,async c=>{await c.query('select pulse.fair_state(null)');return MODEL_CARDS;}));
+}

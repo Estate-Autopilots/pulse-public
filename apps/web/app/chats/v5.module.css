@@ -1,0 +1,111 @@
+/* CHAT-V5: the Threads inbox, reminders, scheduled messages, polls, the emoji picker's recent row, the in-chat search bar. */
+.threads { display: flex; flex-direction: column; }
+.thread { align-items: flex-start; padding-top: 10px; padding-bottom: 10px; }
+.thread .threadRoot { display: block; overflow: hidden; margin: 2px 0 3px; color: var(--theme-text); font-size: 13px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.thread[data-unread] .threadRoot b, .thread[data-unread] .replies { color: var(--theme-action); }
+.replies { font-weight: 600; }
+.threadIcon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+
+/* Remind me / send later */
+.current { display: flex; align-items: center; gap: 8px; margin: 0; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); color: var(--theme-text); font-size: 13.5px; }
+.choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr)); gap: 8px; min-width: 0; }
+.choices button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 52px; padding: 8px 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; }
+.choices button:hover:not(:disabled) { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.choices small { color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+.pick { display: flex; flex-direction: column; gap: 6px; color: var(--theme-text-muted); font-size: 12.5px; font-weight: 600; }
+.pick > span { display: flex; gap: 8px; min-width: 0; }
+.pick button { flex: none; }
+.pick input { flex: 1 1 0; width: 0; min-width: 0; min-height: 38px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-canvas); color: var(--theme-text); font: inherit; font-size: 14px; color-scheme: light dark; }
+
+/* My messages waiting to be sent, above the composer */
+.scheduled { flex: none; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); }
+.scheduledHead { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 38px; padding: 0 16px; border: 0; background: none; color: var(--theme-text); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.scheduledHead b { font-weight: 600; }
+.scheduledHead small { color: var(--theme-text-muted); }
+.scheduledHead em { color: var(--theme-danger); font-style: normal; font-weight: 600; }
+.scheduledHead svg:last-child { margin-left: auto; transition: transform 160ms ease; }
+.scheduledHead svg[data-open] { transform: rotate(180deg); }
+.scheduled ul { display: flex; flex-direction: column; gap: 8px; max-height: 40vh; margin: 0; padding: 0 12px 10px; overflow-y: auto; list-style: none; }
+.scheduled li { display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.scheduled li[data-failed] { border-color: color-mix(in srgb, var(--theme-danger) 50%, var(--theme-border)); }
+.scheduled li p { margin: 0; color: var(--theme-text); font-size: 14px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.when { display: inline-flex; align-items: center; gap: 6px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+.scheduled li[data-failed] .when { color: var(--theme-danger); }
+.actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.actions button { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--theme-action); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.actions button:hover { background: var(--theme-surface-subtle); }
+.actions button[data-danger] { color: var(--theme-danger); }
+.editRow { display: flex; flex-wrap: wrap; gap: 6px; }
+.editRow textarea { flex: 1 1 100%; padding: 8px 10px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-canvas); color: var(--theme-text); font: inherit; font-size: 14px; resize: vertical; }
+.editRow button { min-height: 32px; }
+.reminderChip { display: inline-flex; align-items: center; gap: 4px; margin-right: 4px; color: var(--theme-action); font-weight: 600; }
+.later { flex: none; }
+
+/* Polls */
+.poll { display: flex; flex-direction: column; gap: 6px; min-width: min(300px, 62vw); margin: 2px 0 4px; }
+.pollQ { display: flex; align-items: flex-start; gap: 7px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+.pollQ svg { flex: none; margin-top: 2px; color: var(--theme-action); }
+.pollHint { color: var(--theme-text-muted); font-size: 12px; }
+.poll [role="group"] { display: flex; flex-direction: column; gap: 6px; }
+.pollOpt { position: relative; display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 10px; overflow: hidden; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.pollOpt:disabled { cursor: default; }
+.pollOpt:hover:not(:disabled) { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); }
+.pollOpt[aria-checked="true"] { border-color: var(--theme-action); }
+.pollOpt[data-lead] { font-weight: 700; }
+.pollBar { position: absolute; inset: 0 auto 0 0; background: color-mix(in srgb, var(--theme-action) 14%, transparent); transition: width 260ms var(--ds-ease, ease); pointer-events: none; }
+.pollMark { position: relative; flex: none; display: grid; place-items: center; width: 18px; height: 18px; border: 1.5px solid var(--theme-border-strong, var(--theme-border)); border-radius: 50%; color: var(--theme-action-text); }
+.pollOpt[role="checkbox"] .pollMark { border-radius: 5px; }
+.pollOpt[aria-checked="true"] .pollMark { border-color: var(--theme-action); background: var(--theme-action); }
+.pollLabel { position: relative; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.pollCount { position: relative; flex: none; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pollCount small { color: var(--theme-text-muted); font-weight: 500; }
+.pollWho { color: var(--theme-text-muted); font-size: 11.5px; line-height: 1.4; }
+.pollClose { align-self: flex-start; padding: 4px 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.field { display: flex; flex-direction: column; gap: 6px; color: var(--theme-text-muted); font-size: 12.5px; font-weight: 600; }
+.field input { min-height: 38px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-canvas); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 400; }
+.field input:focus { outline: none; border-color: color-mix(in srgb, var(--theme-action) 60%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 14%, transparent); }
+.optRow { display: flex; align-items: center; gap: 4px; }
+.optRow input { flex: 1; min-width: 0; }
+.check { display: flex; align-items: center; gap: 8px; color: var(--theme-text); font-size: 14px; }
+.check input { width: 18px; height: 18px; accent-color: var(--theme-action); }
+
+/* @everyone / @here in the people list */
+.allIcon { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: color-mix(in srgb, var(--theme-action) 14%, var(--theme-surface)); color: var(--theme-action); }
+.emojiHead { grid-column: 1 / -1; margin: 4px 6px 2px; color: var(--theme-text-muted); font-size: 11.5px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+
+/* UX sweep: offline, failed sends, upload progress */
+.offline { display: flex; align-items: center; gap: 8px; flex: none; margin: 0; padding: 8px 16px; border-top: 1px solid color-mix(in srgb, var(--theme-warning, #b45309) 35%, transparent); background: color-mix(in srgb, var(--theme-warning, #b45309) 12%, var(--theme-surface)); color: var(--theme-text); font-size: 13px; }
+.failedAll { display: flex; align-items: center; gap: 10px; flex: none; margin: 0; padding: 6px 16px; background: color-mix(in srgb, var(--theme-danger) 9%, var(--theme-surface)); color: var(--theme-danger); font-size: 13px; font-weight: 600; }
+.failedAll button { margin-left: auto; padding: 4px 10px; border: 1px solid currentColor; border-radius: 8px; background: none; color: inherit; font: inherit; font-size: 12.5px; cursor: pointer; }
+.progress { position: relative; flex: none; width: 46px; height: 4px; overflow: hidden; border-radius: 2px; background: var(--theme-surface-subtle); }
+.progress i { position: absolute; inset: 0 auto 0 0; background: var(--theme-action); transition: width 160ms linear; }
+.retryUpload { width: auto !important; height: 24px !important; padding: 0 8px !important; border-radius: 6px !important; color: var(--theme-danger) !important; font: inherit; font-size: 12px; font-weight: 600; }
+
+/* Jump to a chat, shortcuts */
+.jump { gap: 8px; padding: 12px; }
+.jumpBox { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 12px; color: var(--theme-text-muted); }
+.jumpBox:focus-within { border-color: color-mix(in srgb, var(--theme-action) 60%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 14%, transparent); }
+.jumpBox input { flex: 1; min-width: 0; border: 0; background: none; color: var(--theme-text); font: inherit; font-size: 15px; outline: none; }
+.jumpList { display: flex; flex-direction: column; max-height: min(420px, 55vh); overflow-y: auto; }
+.jumpList button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border: 0; border-radius: 10px; background: none; color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+.jumpList button[aria-selected="true"] { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); }
+.jumpList button > span:last-child { display: flex; flex-direction: column; min-width: 0; }
+.jumpList b { overflow: hidden; font-size: 14px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.jumpList small { color: var(--theme-text-muted); font-size: 12px; }
+.jumpFoot { display: flex; gap: 14px; margin: 2px 4px 0; color: var(--theme-text-muted); font-size: 11.5px; }
+.jump kbd, .keys kbd, .jumpBox kbd { display: inline-block; min-width: 18px; margin-right: 3px; padding: 1px 5px; border: 1px solid var(--theme-border); border-bottom-width: 2px; border-radius: 5px; background: var(--theme-surface); color: var(--theme-text-muted); font: inherit; font-size: 11px; text-align: center; }
+.keys { display: flex; flex-direction: column; gap: 2px; margin: 0; }
+.keys > div { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 50%, transparent); }
+.keys dt { white-space: nowrap; }
+.keys dd { margin: 0; color: var(--theme-text); font-size: 13.5px; }
+
+/* Find in this chat */
+.findCount { flex: none; min-width: 52px; height: 26px; padding: 0 8px; border: 0; border-radius: 13px; background: var(--theme-surface); color: var(--theme-text-muted); font: inherit; font-size: 12px; font-variant-numeric: tabular-nums; cursor: pointer; }
+.findMiss { position: absolute; top: calc(100% + 6px); left: 12px; padding: 4px 10px; border-radius: 8px; background: var(--theme-surface); color: var(--theme-text-muted); font-size: 12px; box-shadow: 0 6px 18px rgb(0 0 0 / 14%); }
+.findOn ::highlight(chat-find) { background-color: color-mix(in srgb, #f5c400 45%, transparent); color: inherit; }
+.findOn ::highlight(chat-find-now) { background-color: #f5a400; color: #111; }
+
+/* CHAT-V6: the way to all my reminders and scheduled messages (time dialog, scheduled bar). */
+.whenFoot { flex-wrap: wrap; justify-content: space-between !important; align-items: center; gap: 8px; }
+.allLater { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 13px; font-weight: 600; text-align: left; cursor: pointer; }
+.allLater:hover { text-decoration: underline; }

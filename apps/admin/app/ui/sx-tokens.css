@@ -1,0 +1,53 @@
+/*
+ * The semantic layer every admin screen uses (same names as Sales Xray's
+ * app/ui/sx-tokens.css): colours alias tokens.css, tints are color-mix().
+ * Text 12/13/14, panel titles 15, page titles 20, figures 24.
+ */
+:root {
+  --sx-paper: var(--lx-paper);
+  --sx-surface: var(--lx-surface);
+  --sx-sunken: var(--lx-sunken);
+  --sx-ink: var(--lx-ink);
+  --sx-ink-2: var(--lx-ink-2);
+  --sx-muted: var(--lx-muted);
+  --sx-line: var(--lx-line);
+  --sx-line-strong: var(--lx-line-strong);
+  --sx-accent: var(--lx-teal);
+  --sx-accent-ink: var(--lx-on-teal);
+  --sx-accent-soft: color-mix(in oklab, var(--lx-teal) 12%, transparent);
+  --sx-good: var(--lx-success);
+  --sx-warn: var(--lx-warning);
+  --sx-bad: var(--lx-danger);
+  --sx-bad-soft: color-mix(in oklab, var(--lx-danger) 10%, transparent);
+  --sx-info: var(--lx-info);
+  --sx-focus-ring: var(--lx-ring-focus);
+
+  --sx-text-xs: 12px;
+  --sx-text-sm: 13px;
+  --sx-text-md: 14px;
+  --sx-text-panel: 600 15px / 1.35 var(--lx-font-ui);
+  --sx-text-title: 650 20px / 1.25 var(--lx-font-ui);
+  --sx-text-kpi: 650 24px / 1.1 var(--lx-font-ui);
+
+  --sx-control-h: 32px;
+  --sx-row-h: 40px;
+  --sx-table-head-h: 32px;
+  --sx-panel-head-h: 42px;
+  --sx-badge-h: 20px;
+  --sx-tile-min-h: 96px;
+  --sx-bottom-nav-h: var(--lx-bottom-nav-h);
+  --sx-topbar-h: 48px;
+  --sx-rail-w: 232px;
+  --sx-rail-w-collapsed: 60px;
+
+  --sx-radius-sm: var(--lx-radius-sm);
+  --sx-radius-md: var(--lx-radius-md);
+  --sx-gap: 16px;
+  --sx-gutter: 16px;
+}
+
+@media (pointer: coarse), (max-width: 760px) {
+  :root {
+    --sx-control-h: 44px;
+  }
+}

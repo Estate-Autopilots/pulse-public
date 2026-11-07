@@ -1,0 +1,194 @@
+/* TASKS-P0: the board. Columns scroll on their own (long ones are windowed), empty ones fold into a thin drop rail,
+   cards say what, by when and for how much at a glance. Phones pick one column at a time. */
+.whose { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; min-width: 0; }
+.who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.who h3 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.who p { margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.switch { height: 32px; max-width: 220px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+
+.board { display: flex; gap: 10px; min-width: 0; overflow-x: auto; padding-bottom: 2px; }
+@media (min-width: 1180px) and (min-height: 600px) { .board { flex: 1 1 0; min-height: 0; } }
+.column { display: flex; flex: 1 1 0; flex-direction: column; min-width: 196px; min-height: 0; border: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-surface-subtle) 70%, var(--theme-canvas)); transition: border-color 120ms ease, background-color 120ms ease; }
+.column[data-over] { border-color: var(--theme-action); background: color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface)); }
+.column[data-tone="late"] .head b { color: var(--theme-danger); }
+.column[data-tone="now"] .head b { color: var(--theme-warning); }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 0; padding: 10px 12px 6px; font-size: 13px; font-weight: 700; }
+.head span { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: var(--theme-surface); color: var(--theme-text-muted); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: center; }
+.scroll { flex: 1 1 auto; min-height: 0; padding: 2px 8px 10px; }
+@media (min-width: 1180px) and (min-height: 600px) { .scroll { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; } }
+.cards { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.empty { margin: 4px 4px 0; color: var(--theme-text-muted); font-size: 12px; }
+/* An empty column: a thin rail that still takes a drop. */
+.rail { flex: 0 0 46px; min-width: 46px; align-items: center; cursor: default; }
+.rail .head { flex-direction: column; gap: 8px; padding: 12px 0; }
+.rail .head b { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 12px; letter-spacing: 0.02em; white-space: nowrap; }
+.railOpen { margin-top: auto; margin-bottom: 8px; padding: 2px 4px; border: 0; background: none; color: var(--theme-text-muted); font: inherit; font-size: 11px; writing-mode: vertical-rl; transform: rotate(180deg); cursor: pointer; }
+
+/* The card */
+.card { position: relative; display: flex; flex-direction: column; gap: 7px; padding: 10px 10px 9px 13px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); border-radius: 10px;
+  background: var(--theme-surface); box-shadow: 0 1px 2px rgb(15 27 51 / 5%); cursor: grab; touch-action: manipulation; transition: box-shadow 140ms ease, transform 140ms ease; }
+.card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--edge, transparent); }
+.card[data-priority="urgent"] { --edge: var(--theme-danger); } .card[data-priority="high"] { --edge: var(--theme-warning); } .card[data-priority="normal"] { --edge: color-mix(in srgb, var(--theme-action) 55%, transparent); } .card[data-priority="low"] { --edge: var(--theme-border-strong); }
+.card:hover { box-shadow: 0 4px 14px rgb(15 27 51 / 10%); }
+.card:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.card[data-dragging] { opacity: 0.35; border-style: dashed; box-shadow: none; }
+/* TASKS-3: the lifted card follows the pointer; columns that take it are outlined, the one under it lights up. */
+.ghost { position: fixed; z-index: 80; top: 0; left: 0; pointer-events: none; will-change: transform; filter: drop-shadow(0 18px 30px rgb(15 27 51 / 22%)); }
+.ghost .card { cursor: grabbing; border-color: var(--theme-action); }
+.board[data-dragging] .column[data-target] { border-style: dashed; }
+.board[data-dragging] .column[data-over] { border-style: solid; box-shadow: inset 0 0 0 1px var(--theme-action); }
+.draggingPage, .draggingPage * { cursor: grabbing !important; user-select: none !important; }
+.card[data-landed] { animation: land 900ms ease; }
+@keyframes land { 0% { transform: scale(.97); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 35%, transparent); } 60% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 20%, transparent); } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .card[data-landed] { animation: none; } }
+.card[data-busy] { opacity: 0.6; }
+.card[data-unlocked] { border-color: color-mix(in srgb, var(--theme-success) 55%, var(--theme-border)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-success) 16%, transparent), 0 4px 16px color-mix(in srgb, var(--theme-success) 18%, transparent); }
+.card[data-leaving] { animation: leave 520ms ease forwards; }
+@keyframes leave { 60% { background: color-mix(in srgb, var(--theme-success) 10%, var(--theme-surface)); } 100% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .card[data-leaving] { animation: none; } }
+.top { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
+.title { flex: 1 1 auto; min-width: 0; overflow: hidden; color: var(--theme-text); font-size: 14px; font-weight: 600; line-height: 1.35; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.title:hover { color: var(--theme-action); }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; min-width: 0; color: var(--theme-text-muted); font-size: 12px; }
+.meta > span { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.due { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px; border-radius: 6px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.due[data-tone="late"] { background: color-mix(in srgb, var(--theme-danger) 12%, var(--theme-surface)); color: var(--theme-danger); }
+.due[data-tone="now"] { background: color-mix(in srgb, var(--theme-warning) 15%, var(--theme-surface)); color: var(--theme-warning); }
+.due[data-tone="soon"] { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action); }
+.status { height: 20px; padding: 0 7px; border-radius: 6px; background: var(--theme-surface-subtle); font-size: 11px; font-weight: 650; line-height: 20px; }
+.status[data-tone="accent"] { background: color-mix(in srgb, var(--theme-action) 11%, var(--theme-surface)); color: var(--theme-action); }
+.status[data-tone="danger"] { background: color-mix(in srgb, var(--theme-danger) 11%, var(--theme-surface)); color: var(--theme-danger); }
+.status[data-tone="success"] { background: color-mix(in srgb, var(--theme-success) 11%, var(--theme-surface)); color: var(--theme-success); }
+.foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
+.badges { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; }
+.badge { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.badge[data-kind="waiting"] { background: color-mix(in srgb, var(--theme-brand-2) 14%, var(--theme-surface)); color: color-mix(in srgb, var(--theme-brand-2) 80%, var(--theme-text)); }
+.badge[data-kind="unlocked"] { background: color-mix(in srgb, var(--theme-success) 14%, var(--theme-surface)); color: var(--theme-success); }
+.badge[data-kind="same"] { background: color-mix(in srgb, var(--theme-warning) 14%, var(--theme-surface)); color: var(--theme-warning); }
+.badge[data-kind="blocked"] { background: color-mix(in srgb, var(--theme-danger) 11%, var(--theme-surface)); color: var(--theme-danger); }
+.end { display: flex; flex: none; align-items: center; gap: 4px; }
+/* The quiet tick */
+.tick { position: relative; display: inline-grid; flex: none; width: 20px; height: 20px; margin-top: 1px; place-items: center; padding: 0; border: 1.5px solid var(--theme-border-strong); border-radius: 50%;
+  background: var(--theme-surface); color: transparent; cursor: pointer; transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease; }
+.tick:hover { border-color: var(--theme-success); color: color-mix(in srgb, var(--theme-success) 60%, transparent); }
+.tick[data-done] { border-color: var(--theme-success); background: var(--theme-success); color: #fff; }
+.tick:disabled { cursor: default; opacity: 0.55; }
+/* Move: an icon on desktop hover, the native picker on a phone. */
+.move { position: relative; display: inline-grid; width: 26px; height: 26px; place-items: center; border-radius: 6px; color: var(--theme-text-muted); }
+.move select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font: inherit; font-size: 16px; }
+.move:hover, .move:focus-within { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.move:focus-within { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+@media (hover: hover) and (min-width: 900px) { .card .move { opacity: 0; } .card:hover .move, .card:focus-within .move { opacity: 1; } }
+
+/* Phones: one column at a time */
+.pick { display: none !important; }
+@media (max-width: 899px) {
+  .pick { display: inline-flex !important; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .pick > button { flex: none; }
+  .board { flex-direction: column; overflow: visible; }
+  .column { display: none; flex: none; min-width: 0; }
+  .column[data-picked] { display: flex; }
+  .rail { display: none !important; }
+}
+
+/* Today's focus and the progress rings */
+.focus { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; min-width: 0; }
+@media (min-width: 900px) { .focus { grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; } }
+/* Phones swipe through the three; wider screens show them side by side. */
+.focusList { display: grid; grid-auto-columns: 82%; grid-auto-flow: column; gap: 8px; margin: 0; padding: 0 0 2px; overflow-x: auto; list-style: none; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.focusList > li { scroll-snap-align: start; }
+@media (min-width: 700px) { .focusList { grid-auto-columns: auto; grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; } }
+.focusHead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0 0 6px; font-size: 13px; font-weight: 700; }
+.focusHead small { color: var(--theme-text-muted); font-weight: 500; }
+@media (max-width: 699px) { .focusHead small { display: none; } .rings { padding: 6px 10px; } }
+.focusCard { position: relative; display: flex; flex-direction: column; gap: 6px; min-height: 86px; padding: 10px 12px 10px 14px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent);
+  border-radius: 12px; background: var(--theme-surface); text-decoration: none; }
+.focusCard::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--edge, var(--theme-action)); }
+.focusCard[data-priority="urgent"] { --edge: var(--theme-danger); } .focusCard[data-priority="high"] { --edge: var(--theme-warning); }
+.focusCard:hover { border-color: var(--theme-action); }
+.focusCard b { color: var(--theme-text); font-size: 14px; font-weight: 650; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.focusN { color: var(--theme-text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.rings { display: flex; gap: 12px; align-items: center; padding: 8px 14px; border: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); border-radius: 12px; background: var(--theme-surface); }
+.ring { display: flex; align-items: center; gap: 8px; }
+.ring svg { flex: none; }
+.ring circle { fill: none; stroke-width: 6; }
+.ring .track { stroke: var(--theme-surface-subtle); }
+.ring .fill { stroke: var(--theme-success); stroke-linecap: round; transition: stroke-dashoffset 400ms ease; }
+.ring b { display: block; font-size: 15px; font-variant-numeric: tabular-nums; }
+.ring small { color: var(--theme-text-muted); font-size: 12px; }
+/* EST-1199: on a phone Today's focus is one row of cards; the two progress rings wait for a wider screen (they were a
+   row of their own above the first task). */
+@media (max-width: 899.98px) { .focus .rings { display: none; } }
+
+/* Owner workbench (21 Oct 2026): "Up next" is one calm banner: the first task large, the next two beside it. */
+@media (min-width: 900px) {
+  .focus { padding: 14px 16px; border-radius: var(--ds-radius-xl); background: radial-gradient(120% 160% at 0% 0%, color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)) 0%, var(--theme-surface) 65%); box-shadow: var(--ds-elev-1); }
+  .focusHead { margin: 0 0 10px; font-size: var(--ds-text-md); }
+  .focusHead svg { color: var(--theme-action); }
+  .focusList { grid-auto-flow: row; grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(0, 1fr)); grid-auto-columns: unset; overflow: visible; }
+  .focusCard { min-height: 72px; border: 0; border-radius: var(--ds-radius-lg); background: var(--theme-surface); box-shadow: var(--ds-ring); transition: box-shadow var(--ds-fast) ease, transform var(--ds-base) var(--ds-ease); }
+  .focusCard:hover { box-shadow: var(--ds-elev-2); transform: translateY(-1px); border-color: transparent; }
+  .focusList > li:first-child .focusCard b { font-size: var(--ds-text-lg); }
+}
+/* Owner workbench (21 Oct 2026, take 2): Up next is one slim line, so the views below get the room. The heading, then
+   the next tasks as compact chips in a row; urgency stays on each chip's left edge. */
+@media (min-width: 900px) {
+  .focus { display: flex; align-items: center; gap: 14px; padding: 8px 10px 8px 14px; border-radius: var(--ds-radius-lg); }
+  .focus > div { display: flex; flex: 1 1 auto; align-items: center; gap: 14px; min-width: 0; }
+  .focusHead { flex: none; margin: 0; white-space: nowrap; }
+  .focusHead small { display: none; }
+  .focusList { display: flex; flex: 1 1 auto; gap: 8px; min-width: 0; grid-template-columns: none; overflow: hidden; }
+  .focusList > li { flex: 0 1 auto; min-width: 0; max-width: 44%; }
+  .focusCard { flex-direction: row; align-items: center; gap: 8px; min-height: 0; padding: 7px 12px 7px 14px; border-radius: var(--ds-radius-md); }
+  .focusCard b, .focusList > li:first-child .focusCard b { overflow: hidden; font-size: var(--ds-text-md); text-overflow: ellipsis; white-space: nowrap; -webkit-line-clamp: unset; display: block; }
+  .focusN { flex: none; }
+  /* The two rings keep their size and one line each ("this week" wrapped and its figure spilled out of the box). */
+  .focus .rings { flex: none; padding: 6px 12px; }
+  .focus .ring small { white-space: nowrap; }
+  /* READY (Datup, 21 Oct): the due badge never gets clipped; the title gives way first. */
+  .focusCard b { flex: 1 1 auto; min-width: 5em; }
+  .focusCard .meta { flex: none; flex-wrap: nowrap; }
+  /* The slim strip has room for the title and the due badge only; "N waiting" shows on the task itself. */
+  .focusCard .meta > span:not(.due) { display: none; }
+}
+/* Below 1600 px the strip shows two chips, so each keeps a readable title beside its due badge. */
+@media (min-width: 900px) and (max-width: 1599px) {
+  .focusList > li:nth-child(n + 3) { display: none; }
+  .focusList > li { max-width: 50%; }
+}
+/* STAFF-UX (owner, 28 Oct 2026: "ribbons under ribbons" on a phone): Up next is one slim line on a phone too, the most
+   urgent task beside the heading (the full three stay on wider screens), so My work starts in the first screen. */
+@media (max-width: 899.98px) {
+  .focus { display: flex; align-items: center; gap: 10px; padding: 0; }
+  .focus > div { display: flex; flex: 1 1 auto; align-items: center; gap: 10px; min-width: 0; }
+  .focusHead { flex: none; margin: 0; white-space: nowrap; }
+  .focusList { display: flex; flex: 1 1 auto; min-width: 0; overflow: hidden; scroll-snap-type: none; }
+  .focusList > li { flex: 1 1 auto; min-width: 0; }
+  .focusList > li:nth-child(n + 2) { display: none; }
+  .focusCard { flex-direction: row; align-items: center; gap: 8px; min-height: 40px; padding: 6px 10px 6px 12px; }
+  .focusN { display: none; }
+  .focusCard b { display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; font-size: 13.5px; text-overflow: ellipsis; white-space: nowrap; -webkit-line-clamp: unset; }
+  .focusCard .meta { flex: none; flex-wrap: nowrap; }
+  .focusCard .meta > span:not(.due) { display: none; }
+}
+
+/* WORK-UX (owner, 29 Oct 2026: "ribbons under ribbons, up next also under it, my work is so down"): on My work, Up next is
+   the first card of the right rail, so the list starts right under the tabs. One numbered line per task, its due badge
+   at the end; the urgency edge stays. */
+.focus[data-rail] { display: block; padding: 12px 12px 10px; border: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); border-radius: 14px;
+  background: radial-gradient(130% 120% at 0% 0%, color-mix(in srgb, var(--theme-action) 8%, var(--theme-surface)) 0%, var(--theme-surface) 70%); box-shadow: none; }
+.focus[data-rail] > div { display: block; }
+.focus[data-rail] .focusHead { display: flex; margin: 0 4px 8px; font-size: 14px; white-space: normal; }
+.focus[data-rail] .focusHead small { display: inline; margin-left: auto; font-size: 12px; }
+.focus[data-rail] .focusList { display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-flow: row; gap: 6px; overflow: visible; }
+.focus[data-rail] .focusList > li { max-width: none; }
+.focus[data-rail] .focusCard { flex-direction: row; align-items: center; gap: 8px; min-height: 0; padding: 8px 10px 8px 13px; border: 0; border-radius: 10px; background: var(--theme-surface);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-border) 75%, transparent); transform: none; }
+.focus[data-rail] .focusCard:hover { box-shadow: 0 0 0 1px var(--theme-action); }
+.focus[data-rail] .focusN { display: none; }
+.focus[data-rail] .focusCard b, .focus[data-rail] .focusList > li:first-child .focusCard b { display: -webkit-box; flex: 1 1 auto; min-width: 0; overflow: hidden; font-size: 13.5px; font-weight: 600;
+  line-height: 1.35; white-space: normal; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.focus[data-rail] .focusCard .meta { flex: none; flex-wrap: nowrap; }
+.focus[data-rail] .focusCard .meta > span:not(.due) { display: none; }

@@ -1,0 +1,23 @@
+/* BILLING-KIT: "More details" (Disclosure) and "+ Add …" (AddField). Theme tokens only. */
+.disclosure { min-width: 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); }
+.summary { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 2px; color: var(--theme-action); font-size: 13.5px; font-weight: 600; list-style: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.summary::-webkit-details-marker { display: none; }
+.summary:hover .summaryText { text-decoration: underline; }
+.summary:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 6px; }
+.chevron { flex: none; transition: transform 160ms ease; }
+.disclosure[open] > .summary .chevron { transform: rotate(90deg); }
+.summaryText { flex: none; }
+.hint { min-width: 0; overflow: hidden; color: var(--theme-text-muted); font-size: 12.5px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.disclosure[open] > .summary .hint { visibility: hidden; }
+.content { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 4px 0 12px; }
+
+.group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; min-width: 0; }
+.group > .added { flex: 1 1 100%; }
+.add { display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 0 2px; border: 0; background: transparent; color: var(--theme-action); font: inherit;
+  font-size: 13px; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.add:hover { text-decoration: underline; }
+.add:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 6px; }
+.added { min-width: 0; }
+
+@media (max-width: 899.98px) { .summary, .add { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) { .chevron { transition: none; } }

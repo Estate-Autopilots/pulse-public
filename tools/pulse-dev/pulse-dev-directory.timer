@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh Pulse dev Workspace directory every 15 minutes
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=15min
+Persistent=true
+[Install]
+WantedBy=timers.target

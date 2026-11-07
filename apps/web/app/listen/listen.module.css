@@ -1,0 +1,49 @@
+/* AGENT-CHANNELS: the listening room. Phone first: one column, controls at least 44 px tall, nothing wider than the screen;
+   two columns (transcript | the AI employee) from 900 px. Theme tokens only, so dark mode follows. */
+.room { display: grid; gap: 14px; min-width: 0; }
+.card { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--theme-border, rgba(127,127,127,.25)); border-radius: 12px;
+  background: var(--theme-surface, transparent); min-width: 0; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; min-width: 0; }
+.muted { color: var(--theme-text-muted, inherit); line-height: 1.45; overflow-wrap: anywhere; margin: 0; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field > span:first-child { font-weight: 600; }
+.field input, .field select { min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--theme-border, rgba(127,127,127,.35));
+  background: var(--theme-surface, transparent); color: inherit; font: inherit; max-width: 100%; min-width: 0; }
+.inline { display: flex; gap: 8px; flex-wrap: wrap; }
+.inline input { width: 110px; }
+.check { display: flex; gap: 10px; align-items: flex-start; line-height: 1.45; min-height: 44px; }
+.check input { width: 22px; height: 22px; flex: none; margin-top: 1px; }
+.notice { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; line-height: 1.45;
+  background: var(--theme-warning-surface, rgba(214,158,46,.14)); }
+.primary, .quiet, .stop { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px;
+  border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer; max-width: 100%; }
+.primary { border: 0; color: #fff; background: var(--theme-action, #5b45d6); }
+.quiet { min-height: 44px; border: 1px solid var(--theme-border, rgba(127,127,127,.35)); color: inherit; background: transparent; }
+.stop { border: 0; color: #fff; background: var(--theme-danger, #c53030); }
+.primary:disabled, .quiet:disabled, .stop:disabled { opacity: .55; cursor: default; }
+.live { display: grid; gap: 10px; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--theme-danger, #c53030);
+  background: var(--theme-danger-surface, rgba(197,48,48,.08)); }
+.banner { display: flex; gap: 10px; align-items: center; font-size: 1.1rem; }
+.banner span:last-child { font-variant-numeric: tabular-nums; margin-left: auto; }
+.dot { width: 14px; height: 14px; border-radius: 50%; background: var(--theme-danger, #c53030); animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; transform: scale(.85); } }
+@media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+.consent { margin: 0; font-weight: 600; line-height: 1.45; }
+.note { margin: 0; color: var(--theme-text-muted, inherit); }
+.split { display: grid; gap: 14px; min-width: 0; }
+@media (min-width: 900px) { .split { grid-template-columns: 3fr 2fr; align-items: start; } }
+.transcript { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; max-height: 60vh; overflow-y: auto; }
+.transcript li { display: grid; grid-template-columns: 56px 1fr; gap: 8px; line-height: 1.5; min-width: 0; }
+.transcript time { color: var(--theme-text-muted, inherit); font-variant-numeric: tabular-nums; }
+.transcript span { overflow-wrap: anywhere; }
+.replies { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.replies p { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
+.replies time { color: var(--theme-text-muted, inherit); font-size: .85em; }
+.sessions { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.sessions li { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; min-width: 0; padding: 6px 0;
+  border-top: 1px solid var(--theme-border, rgba(127,127,127,.18)); }
+.sessions li small { grid-column: 1; }
+.sessions li .icon { grid-column: 2; grid-row: 1 / span 2; }
+.link { justify-self: start; min-height: 32px; padding: 0; border: 0; background: none; color: var(--theme-link, inherit); font: inherit; font-weight: 600;
+  text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.icon { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 10px; background: transparent; color: inherit; cursor: pointer; }

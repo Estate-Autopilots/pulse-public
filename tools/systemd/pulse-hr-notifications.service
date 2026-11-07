@@ -1,0 +1,11 @@
+[Unit]
+Description=Pulse production personal HR notifications and pending reminders
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/estate-autopilots/db/pulse.env
+EnvironmentFile=-/etc/estate-autopilots/secrets/telegram.env
+Environment=PULSE_PUBLIC_URL=https://pulse.estateautopilots.com
+ExecStart=/usr/bin/python3 /home/eadev/.local/lib/pulse-release/hr-notifications-run.py
+Nice=19
+CPUWeight=20
+TimeoutStartSec=900

@@ -1,0 +1,8 @@
+[Unit]
+Description=Check every 10 minutes whether Pulse has a green main or an approved workbench to release (OPS-2)
+[Timer]
+OnCalendar=*-*-* *:00/10:00 UTC
+Persistent=true
+AccuracySec=1m
+[Install]
+WantedBy=timers.target

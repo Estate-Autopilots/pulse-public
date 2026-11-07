@@ -1,0 +1,27 @@
+-- migrate:up
+-- Commercial outcome units are required; SQL NULL must not bypass validation.
+create or replace function pulse.acq_stage_add(p jsonb) returns uuid language plpgsql security definer set search_path=pulse,pg_temp as $$
+declare l pulse_priv.acq_enquiry%rowtype;s pulse_priv.acq_stage%rowtype;sid uuid;st text:=p->>'stage';v text:=p->>'verification';b jsonb;prev jsonb;src pulse_priv.acq_source%rowtype;
+begin
+ select * into l from pulse_priv.acq_enquiry where org_id=current_org() and id=(p->>'enquiryId')::uuid for update;
+ if not acq_can(l.project_id) or not(l.owner_id=current_viewer() or acq_can(l.project_id,true)) or l.withdrawn then raise exception 'Assigned staff or scoped reviewer required' using errcode='42501';end if;
+ if coalesce(st,'') not in('attempt','connected','visit_planned','visit_completed','booking','sale','opportunity','contract','callback','cancelled','outcome_coverage') or coalesce(v,'') not in('reported','verified') or length(coalesce(p->>'evidence','')) not between 3 and 1000 or length(coalesce(p->>'requestKey','')) not between 1 and 160 or length(coalesce(p->>'confidence','')) not between 1 and 240 or p->>'effective' is null or (p->>'effective')::timestamptz>now()+interval '366 days' then raise exception 'Stage date evidence confidence and request identity required' using errcode='22023';end if;
+ if (l.path='buyer' and st in('opportunity','contract')) or(l.path='agency' and st in('visit_planned','visit_completed','booking','sale')) then raise exception 'Stage belongs to a different revenue path' using errcode='22023';end if;
+ if coalesce(st,'') not in('visit_planned','callback') and (p->>'effective')::timestamptz>now() then raise exception 'Actual outcome cannot be future dated' using errcode='22023';end if;
+ if v='verified' and st in('visit_completed','booking','sale','contract','cancelled','outcome_coverage') then
+ if not acq_can(l.project_id,true) or coalesce(p->>'evidenceClass','') not in('approved_crm','approved_register','signed_contract') then raise exception 'Approved register CRM or contract and scoped reviewer required' using errcode='42501';end if;end if;
+ if st='connected' and coalesce(p->>'callOutcome','') not in('consultation','callback_requested','no_interest','wrong_number','other_logged') then raise exception 'Explicit logged call outcome required' using errcode='22023';end if;
+ if st='cancelled' then select * into s from pulse_priv.acq_stage where id=nullif(p->>'reverses','')::uuid and org_id=current_org() and enquiry_id=l.id;
+ if s.id is null or s.stage not in('booking','sale','contract') or (s.verification='verified' and v<>'verified') or exists(select 1 from pulse_priv.acq_stage where org_id=current_org() and enquiry_id=l.id and reverses=s.id and request_key<>p->>'requestKey') then raise exception 'Cancellation must reverse one unreversed stage with adequate verification' using errcode='22023';end if;
+ elsif nullif(p->>'reverses','') is not null then raise exception 'Only explicit cancellation reverses history' using errcode='22023';end if;
+ if p ? 'minor' and (jsonb_typeof(p->'minor') is distinct from 'number' or coalesce(p->>'currency','') !~ '^[A-Z]{3}$' or jsonb_typeof(p->'scale') is distinct from 'number' or (p->>'scale')::numeric<>trunc((p->>'scale')::numeric) or (p->>'scale')::int not between 0 and 4 or st not in('booking','sale','contract') or (p->>'minor')::numeric<0 or (p->>'minor')::numeric>9e12 or (p->>'minor')::numeric<>trunc((p->>'minor')::numeric) or p->>'currency' !~ '^[A-Z]{3}$') then raise exception 'Valid scoped commercial value required' using errcode='22023';end if;
+ if st='callback' and(not coalesce((l.body->>'consent')::boolean,false) or coalesce((l.body->>'optOut')::boolean,false) or not coalesce((l.body->>'phoneAvailable')::boolean,false)) then raise exception 'Contact authority and phone required for callback' using errcode='22023';end if;
+ b:=jsonb_build_object('evidenceClass',p->>'evidenceClass','callOutcome',p->>'callOutcome','minor',p->'minor','currency',p->>'currency','scale',p->'scale');
+ select id,to_jsonb(x) into sid,prev from pulse_priv.acq_stage x where org_id=current_org() and enquiry_id=l.id and request_key=p->>'requestKey';
+ if sid is not null then if prev->>'stage'<>st or prev->>'verification'<>v or prev->>'evidence'<>p->>'evidence' or (prev->>'effective')::timestamptz<>(p->>'effective')::timestamptz or prev->'body'<>b or prev->>'confidence'<>p->>'confidence' or (prev->>'reverses') is distinct from nullif(p->>'reverses','') then raise exception 'Stage receipt replay changed' using errcode='40001';end if;return sid;end if;
+ insert into pulse_priv.acq_stage(org_id,enquiry_id,request_key,stage,effective,actor,verification,evidence,confidence,body,reverses) values(current_org(),l.id,p->>'requestKey',st,(p->>'effective')::timestamptz,current_viewer(),v,p->>'evidence',p->>'confidence',b,nullif(p->>'reverses','')::uuid) returning id into sid;
+ update pulse_priv.acq_enquiry set revision=revision+1,body=body||case when st='callback' then jsonb_build_object('callback',p->>'effective') when st='outcome_coverage' then jsonb_build_object('coverage',true) else '{}'::jsonb end where id=l.id;
+ if st='callback' and l.body->>'taskId' is not null then update task set due_label=(p->>'effective')::timestamptz::date::text,locked=array(select distinct x from unnest(locked||array['due_label']) x) where id=(l.body->>'taskId')::uuid;end if;
+ select * into src from pulse_priv.acq_source where id=l.source_id;
+ perform audit_write('acquisition.stage',sid::text);return sid;
+end $$;

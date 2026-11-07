@@ -1,0 +1,22 @@
+.page { display: grid; gap: 32px; max-width: 880px; margin: 0 auto; padding: 48px 24px 64px; }
+.hero { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
+.hero > div { flex: 1; min-width: 280px; }
+.pip { flex: none; }
+.eyebrow { margin: 0; color: var(--theme-action); font-size: 13px; font-weight: 650; }
+.hero h1 { margin: 4px 0 8px; font-size: 34px; font-weight: 720; letter-spacing: -.02em; }
+.lead { margin: 0; color: var(--theme-text-muted); font-size: 16px; line-height: 1.55; }
+.downloads { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 24px; }
+.button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: var(--theme-text); font-weight: 600; text-decoration: none; }
+.primary { border-color: transparent; background: var(--theme-action); color: var(--theme-action-text); }
+.pending { padding: 6px 12px; border-radius: 999px; background: color-mix(in srgb, var(--theme-warning) 14%, transparent); color: var(--theme-warning); font-size: 13px; font-weight: 600; }
+.hint { padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--theme-warning) 35%, var(--theme-border)); border-radius: 12px; background: color-mix(in srgb, var(--theme-warning) 7%, var(--theme-surface)); font-size: 14px; line-height: 1.5; }
+.steps { padding: 24px 32px; border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-surface); }
+.steps h2 { margin: 0 0 12px; font-size: 18px; }
+.steps ol { display: grid; gap: 12px; margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.6; }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.shots figure { margin: 0; }
+.shots img { display: block; width: 100%; height: auto; border: 1px solid var(--theme-border); border-radius: 14px; }
+.shots figcaption { margin-top: 8px; color: var(--theme-text-muted); font-size: 13px; }
+.foot { margin: 0; color: var(--theme-text-muted); font-size: 14px; }
+.others { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
+.others a { color: var(--theme-action); font-weight: 600; text-decoration: none; }

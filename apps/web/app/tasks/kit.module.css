@@ -1,0 +1,12 @@
+/* TASKS-4B: the review rating's frame (the shared kit draws the choices) and a yes/no switch the kit does not have yet. */
+.rating { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
+.ratingLabel { color: var(--theme-text-muted); font-size: 12px; font-weight: 650; }
+.toggle { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 32px; color: var(--theme-text); font-size: 13px; cursor: pointer; user-select: none; }
+.toggle input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.track { position: relative; flex: none; width: 34px; height: 20px; border-radius: 10px; background: var(--theme-border-strong); transition: background-color 140ms ease; }
+.track i { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 25%); transition: transform 140ms ease; }
+.toggle input:checked + .track { background: var(--theme-action); }
+.toggle input:checked + .track i { transform: translateX(14px); }
+.toggle input:focus-visible + .track { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+.toggle input:disabled + .track { opacity: 0.5; }
+@media (prefers-reduced-motion: reduce) { .track, .track i { transition: none; } }

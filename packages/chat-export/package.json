@@ -1,0 +1,18 @@
+{
+  "name": "@pulse/chat-export",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "R47: the WhatsApp text-export reader shared by the preview in the browser (the file never leaves the device) and the API's approved import.",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=2 test/*.test.js",
+    "lint": "node --check src/index.js"
+  },
+  "sideEffects": false
+}

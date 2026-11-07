@@ -1,0 +1,101 @@
+/* UX-5A kit: the one Drawer (drawer.tsx). A panel floating at the right edge on a computer, a sheet from the bottom on a
+   phone (below 600 px). Header, scrolling body and sticky footer; theme tokens only; motion is transform/opacity and
+   off under prefers-reduced-motion. */
+.backdrop { position: fixed; z-index: var(--ds-z-sheet, 80); inset: 0; display: flex; justify-content: flex-end; align-items: flex-start; padding: 8px; background: rgb(8 12 22 / 28%);
+  animation: fadeIn 160ms ease-out both;
+  /* The words ui.module.css's form controls read inside a drawer. */
+  --soft: color-mix(in srgb, var(--theme-border) 60%, var(--theme-surface)); --hover: color-mix(in srgb, var(--theme-surface-subtle) 55%, var(--theme-surface));
+  --accent-soft: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); }
+/* As tall as its content (up to the window); a long form scrolls inside, a short one ends at its footer. */
+.drawer { position: relative; display: flex; flex-direction: column; width: min(var(--drawer-w, 480px), 100%); max-height: 100%; min-height: 0; margin-left: auto;
+  overflow: hidden; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); color: var(--theme-text); font-size: 14px; line-height: 1.45;
+  box-shadow: -18px 0 48px rgb(8 12 22 / 16%), 0 2px 8px rgb(8 12 22 / 8%); animation: slideIn 240ms cubic-bezier(.16, 1, .3, 1) both; transition: transform 200ms ease; }
+:global(html[data-theme="dark"]) .drawer { box-shadow: -18px 0 48px rgb(0 0 0 / 45%), 0 0 0 1px rgb(255 255 255 / 4%); }
+.drawer a { color: inherit; }
+.drawer :focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; border-radius: 6px; }
+
+/* ---- header: what this is, and its context in one line */
+.head { position: relative; flex: none; display: flex; align-items: flex-start; gap: 10px; padding: 14px 10px 12px 18px; border-bottom: 1px solid var(--soft); touch-action: none; }
+.grip { display: none; }
+.icon { display: grid; place-items: center; flex: none; width: 30px; height: 30px; margin-top: 1px; border-radius: 9px; background: var(--accent-soft); color: var(--theme-action); }
+.headMain { flex: 1 1 auto; min-width: 0; }
+.title { display: flex; align-items: center; gap: 7px; margin: 0; min-height: 30px; font-size: 15.5px; font-weight: 650; line-height: 1.3; letter-spacing: -0.005em; }
+.title > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.context { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; min-width: 0; color: var(--theme-text-muted); font-size: 12.5px; }
+.context > :not(.chip, [class]) { min-width: 0; }
+.chip { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; height: 24px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 999px;
+  background: var(--theme-surface); color: var(--theme-text); font-size: 12.5px; font-weight: 550; text-decoration: none; white-space: nowrap; }
+.chip span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.chip svg { flex: none; color: var(--theme-text-muted); }
+a.chip:hover { border-color: var(--theme-border-strong); }
+.close { display: grid; place-items: center; flex: none; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.close:hover { background: var(--hover); color: var(--theme-text); }
+
+/* ---- body: grouped sections, scrolling on its own */
+.body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 18px; padding: 16px 18px 22px; scrollbar-gutter: stable; }
+.body > * { flex: none; }
+.section { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.section + .section { padding-top: 16px; border-top: 1px solid var(--soft); }
+.sectionHead { display: flex; align-items: center; gap: 6px; min-height: 18px; }
+.sectionHead h3 { margin: 0; color: var(--theme-text-muted); font-size: 11.5px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; }
+.sectionAside { margin-left: auto; color: var(--theme-text-muted); font-size: 12px; }
+
+/* ---- section tabs (BILLING-KIT): one row under the header; the chosen one underlined in the action colour */
+.tabs { flex: none; display: flex; gap: 2px; padding: 0 10px; border-bottom: 1px solid var(--soft); overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { position: relative; display: inline-flex; flex: none; align-items: center; gap: 6px; min-height: 40px; padding: 0 10px; border: 0; background: transparent;
+  color: var(--theme-text-muted); font: inherit; font-size: 13.5px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.tab:hover { color: var(--theme-text); }
+.tab[aria-selected="true"] { color: var(--theme-text); }
+.tab[aria-selected="true"]::after { content: ""; position: absolute; right: 8px; bottom: -1px; left: 8px; height: 2px; border-radius: 2px; background: var(--theme-action); }
+.tabCount { min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 11.5px; line-height: 18px; text-align: center; }
+.drawer[data-bare] .body { padding: 0; gap: 0; }
+.body[role="tabpanel"] { touch-action: pan-y; }
+
+/* ---- footer: a reserved status line, then the actions; the primary one last */
+.foot { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 12px 18px; border-top: 1px solid var(--soft);
+  background: color-mix(in srgb, var(--theme-surface-subtle) 45%, var(--theme-surface)); }
+.status { flex: 1 1 140px; min-width: 0; min-height: 1.4em; margin: 0; color: var(--theme-danger); font-size: 12.5px; line-height: 1.4; }
+.status[data-tone="info"] { color: var(--theme-text-muted); }
+.actions { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 8px; margin-left: auto; }
+
+/* ---- leaving: a still copy slides away after its owner unmounted the drawer */
+.backdrop[data-leaving] { pointer-events: none; animation: fadeOut 180ms ease-in forwards; }
+.backdrop[data-leaving] .drawer { animation: slideOut 180ms ease-in forwards; }
+
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes fadeOut { to { opacity: 0; } }
+@keyframes slideIn { from { transform: translateX(32px); opacity: 0; } }
+@keyframes slideOut { to { transform: translateX(32px); opacity: 0; } }
+@keyframes riseIn { from { transform: translateY(48px); opacity: 0; } }
+@keyframes riseOut { to { transform: translateY(48px); opacity: 0; } }
+
+/* ---- a phone: a sheet from the bottom with a grip; 44 px targets; clear of the home indicator */
+@media (max-width: 599.98px) {
+  .backdrop { align-items: flex-end; padding: 0; }
+  .drawer { width: 100%; max-height: 92dvh; min-height: 0; margin: 0; border-width: 1px 0 0; border-radius: 18px 18px 0 0; animation-name: riseIn; }
+  .backdrop[data-leaving] .drawer { animation-name: riseOut; }
+  .head { padding: 18px 8px 10px 16px; }
+  .grip { display: block; position: absolute; top: 6px; left: 50%; width: 38px; height: 4px; border-radius: 4px; background: var(--theme-border-strong); transform: translateX(-50%); }
+  .close { width: 44px; height: 44px; }
+  .body { padding: 14px 16px 18px; }
+  .foot { flex-wrap: wrap; padding: 10px 16px calc(10px + var(--pulse-safe-bottom, 0px)); }
+  .status:empty { display: none; }
+  .actions { flex: 1 1 auto; }
+  .actions > * { min-height: 44px; }
+  .actions > :last-child { flex: 1 1 auto; justify-content: center; }
+}
+/* ---- a phone sheet with snap heights (BILLING-KIT): peek = header and footer only; half; full. A persistent sheet at
+   peek lets the page behind be used: no dimming, presses go through around it. */
+@media (max-width: 599.98px) {
+  .drawer[data-snap] { transition: height 280ms cubic-bezier(.2, .8, .2, 1), transform 200ms ease; }
+  .drawer[data-snap="half"] { height: 55dvh; }
+  .drawer[data-snap="full"] { height: 92dvh; }
+  .drawer[data-snap="peek"] .tabs, .drawer[data-snap="peek"] .body { display: none; }
+  .drawer[data-snap] .head { cursor: grab; }
+  .tab { min-height: 44px; }
+  .backdrop[data-peek] { bottom: calc(58px + var(--pulse-safe-bottom, 0px)); background: transparent; pointer-events: none; animation: none; }
+  .backdrop[data-peek] .foot { padding-bottom: 10px; }
+  .backdrop[data-peek] .drawer { pointer-events: auto; box-shadow: 0 -8px 28px rgb(8 12 22 / 16%); }
+}
+@media (prefers-reduced-motion: reduce) { .backdrop, .drawer, .drawer[data-snap], .backdrop[data-leaving], .backdrop[data-leaving] .drawer { animation: none; transition: none; } }

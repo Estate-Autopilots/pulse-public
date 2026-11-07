@@ -1,0 +1,79 @@
+/* FOUNDATIONS: goals. Phone first, one column; cards in two columns from 900. Theme tokens only (light and dark);
+   every control a finger presses is at least 44px. */
+/* UX-POLISH-2: the goals use the page's width, aligned with its title (was a 1100 px column centred under a left title). */
+.wrap { display: flex; flex-direction: column; gap: 20px; width: 100%; padding-bottom: 32px; color: var(--theme-text); }
+.section { display: flex; flex-direction: column; gap: 10px; }
+.sectionHead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.sectionHead h2 { margin: 0; font-size: 16px; font-weight: 650; }
+.sectionHead span { font-size: 13px; color: var(--theme-text-muted); }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@media (min-width: 900px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1600px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.card {
+  display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--theme-border);
+  background: var(--theme-surface); color: inherit; text-decoration: none; min-width: 0;
+}
+a.card:hover, a.card:focus-visible { border-color: var(--theme-text-muted); }
+.cardTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.cardTitle { margin: 0; font-size: 15px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+.level { font-size: 12px; color: var(--theme-text-muted); white-space: nowrap; }
+.pct { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; color: var(--theme-text-muted); }
+.meta [data-tone="late"] { color: var(--theme-danger); }
+
+.bar { position: relative; height: 8px; border-radius: 999px; background: var(--theme-surface-subtle); overflow: hidden; }
+.bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--theme-text); }
+.bar[data-tone="done"] i { background: var(--theme-success); }
+.bar[data-tone="late"] i { background: var(--theme-danger); }
+.bar[data-tone="muted"] i { background: var(--theme-text-muted); }
+.big .bar { height: 12px; }
+
+/* UX-POLISH: an empty section is a calm card: a soft mark, what goes here, and a quiet way to start. */
+.empty { display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-radius: 14px; border: 1px dashed var(--theme-border); background: color-mix(in srgb, var(--theme-surface) 55%, transparent); font-size: 14px; color: var(--theme-text-muted); }
+.emptyMark { display: grid; flex: none; width: 40px; height: 40px; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action); }
+.emptyWords { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; line-height: 1.45; }
+.emptyWords b { color: var(--theme-text); font-weight: 600; }
+@media (max-width: 599.98px) { .empty { flex-wrap: wrap; } .empty > button { width: 100%; } }
+
+/* UX-POLISH: the new-goal form lives in the kit's Drawer: fields stack with even spacing, the number row in three. */
+.form { display: flex; flex-direction: column; gap: 18px; }
+.form .hint { font-weight: 400; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 520px) { .row { grid-template-columns: 1.4fr 1fr 1fr; } }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 550; min-width: 0; }
+.field input, .field select, .field textarea {
+  min-height: 40px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text);
+  font: inherit; font-size: 15px; font-weight: 400; width: 100%; box-sizing: border-box;
+}
+.field textarea { min-height: 72px; resize: vertical; }
+.hint { font-size: 12px; font-weight: 400; color: var(--theme-text-muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--theme-border);
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none;
+}
+.btn:hover:not(:disabled) { border-color: var(--theme-border-strong); }
+.btn:focus-visible, .field :is(input, textarea):focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.btn:disabled { opacity: 0.6; cursor: default; }
+/* UX-POLISH: the one primary action uses Pulse's action colour, as everywhere else (it was solid black). */
+.primary { background: var(--theme-action); color: var(--theme-action-text); border-color: var(--theme-action); }
+.primary:hover:not(:disabled) { background: var(--theme-action-hover); border-color: var(--theme-action-hover); }
+.quiet { border-color: transparent; background: transparent; color: var(--theme-text-muted); }
+.quiet:hover:not(:disabled) { border-color: transparent; background: var(--theme-surface-subtle); color: var(--theme-text); }
+@media (max-width: 899.98px) { .btn, .field input, .field select { min-height: 44px; } }
+.error { margin: 0; font-size: 13px; color: var(--theme-danger); }
+
+.hero { display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 16px; border: 1px solid var(--theme-border); background: var(--theme-surface); }
+.heroTop { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.heroPct { font-size: 34px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1; }
+.why { margin: 0; font-size: 14px; color: var(--theme-text-muted); white-space: pre-wrap; }
+.list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; border: 1px solid var(--theme-border); border-radius: 14px; overflow: hidden; background: var(--theme-surface); }
+.list li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; min-height: 44px; border-top: 1px solid var(--theme-border); }
+.list li:first-child { border-top: 0; }
+.itemText { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.itemText a { color: inherit; font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+.itemText span { font-size: 12px; color: var(--theme-text-muted); }
+.picks { display: flex; flex-direction: column; gap: 4px; }
+.pick { justify-content: flex-start; text-align: left; width: 100%; }
+.strip { display: flex; flex-direction: column; gap: 10px; }

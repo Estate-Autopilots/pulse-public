@@ -1,0 +1,33 @@
+/* EST-1542: the WhatsApp names screen. Theme tokens only, so light and dark follow. */
+.stack { display: grid; gap: 12px; min-width: 0; }
+.bars { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; padding: 12px 14px 4px; }
+.bar { display: grid; gap: 6px; }
+.barHead { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.barHead b { font-weight: 600; white-space: nowrap; }
+.track { height: 8px; border-radius: 999px; background: var(--theme-border); overflow: hidden; }
+.track i { display: block; height: 100%; border-radius: inherit; background: var(--theme-accent); transition: width 200ms ease; }
+.note { margin: 0; padding: 8px 14px 12px; color: var(--theme-text-muted); font-size: 12px; }
+.rows { list-style: none; margin: 0; padding: 4px 14px 10px; display: grid; }
+.row { display: grid; grid-template-columns: minmax(180px, 1fr) auto; gap: 10px 16px; align-items: center; padding: 10px 0; border-top: 1px solid var(--theme-border); }
+.row:first-child { border-top: 0; }
+.name { display: grid; gap: 2px; min-width: 0; }
+.name b { font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.name small { color: var(--theme-text-muted); font-size: 12px; }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.answer { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--theme-success); justify-content: flex-end; }
+.answer span { color: var(--theme-text); }
+.answer small { color: var(--theme-text-muted); }
+/* EST-1542 B: loading names from WhatsApp exports on this computer. */
+.load { display: grid; gap: 10px; padding: 12px 14px 14px; }
+.loadActions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.loadResult { display: grid; gap: 10px; }
+.loadResult p { margin: 0; font-size: 13px; }
+.pick { position: relative; cursor: pointer; }
+.pick:focus-within { outline: 2px solid var(--theme-accent); outline-offset: 2px; }
+.pick[aria-disabled="true"] { opacity: .6; cursor: progress; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+@media (max-width: 640px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .actions, .answer { justify-content: flex-start; }
+  .actions button { min-height: 36px; }
+}

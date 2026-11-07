@@ -1,0 +1,59 @@
+/* PEOPLE-CONTACTS: the profile header (people and contacts). A phone gets a soft cover and a large photo; a computer a
+   compact band (the record below keeps the window, LAYOUT-SWEEP). Chips are facts, not buttons, unless they link. */
+.header { position: relative; flex: none; overflow: hidden; border: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); border-radius: 16px; background: var(--theme-surface);
+  animation: ph-in 360ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes ph-in { from { opacity: 0; transform: translateY(4px); } }
+.cover { height: 76px; background:
+  radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, hsl(var(--hue, 225) 72% 58%) 30%, transparent), transparent 62%),
+  radial-gradient(90% 120% at 100% 0%, color-mix(in srgb, var(--theme-action) 16%, transparent), transparent 70%),
+  linear-gradient(180deg, var(--theme-surface-subtle), var(--theme-surface)); }
+.back { position: absolute; top: 10px; left: 14px; display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--theme-surface) 80%, transparent);
+  color: var(--theme-text-muted); font-size: 12px; font-weight: 550; text-decoration: none; backdrop-filter: blur(6px); }
+.back::before { content: "‹"; font-size: 15px; line-height: 1; }
+.back:hover { color: var(--theme-text); }
+.body { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 18px; padding: 0 20px 16px; }
+.photo { position: relative; display: inline-flex; flex: none; margin-top: -46px; }
+.photo [aria-hidden="true"][style] { box-shadow: 0 0 0 4px var(--theme-surface), 0 6px 18px rgb(15 27 51 / 14%); }
+.avatar { font-size: 28px; }
+.text { display: grid; flex: 1 1 280px; gap: 5px; min-width: min(260px, 100%); padding-top: 10px; }
+.name { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 9px; margin: 0; font-size: 22px; font-weight: 680; letter-spacing: -0.02em; line-height: 1.2; overflow-wrap: anywhere; }
+.subtitle { margin: 0; color: var(--theme-text-muted); font-size: 14px; }
+/* UI-UPGRADE (owner, 24 Oct 2026): the facts read as one clean meta line (pod · reports to · joined · place · @handle),
+   not a row of bordered chips; a fact that links underlines on hover. */
+/* Every fact starts with a dot; the list is shifted left by one dot's width and clipped there, so a wrapped line never
+   starts with a stray dot. */
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 0; margin: 2px 0 0 -23px; padding: 0; list-style: none; clip-path: inset(-4px -4px -4px 23px); }
+.chips > li { display: inline-flex; align-items: center; min-width: 0; max-width: 100%; }
+.chips > li::before { content: ""; flex: none; width: 3px; height: 3px; margin: 0 10px; border-radius: 50%; background: color-mix(in srgb, var(--theme-text-muted) 70%, transparent); }
+.chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-height: 26px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--theme-text-muted); font-size: 13px; text-decoration: none; white-space: nowrap; }
+.chip svg { flex: none; opacity: 0.7; }
+.chip b { overflow: hidden; color: var(--theme-text); font-weight: 560; text-overflow: ellipsis; }
+/* A value with its own control (the employee ID's copy button) is never cut. */
+.chip b:has(button) { display: inline-flex; align-items: center; overflow: visible; }
+.chipLabel { color: var(--theme-text-muted); }
+a.chip:hover b { color: var(--theme-action); text-decoration: underline; text-underline-offset: 3px; }
+a.chip:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; padding-top: 12px; }
+
+@media (max-width: 640px) {
+  .header { border-radius: 14px; }
+  .body { flex-direction: column; align-items: center; padding: 0 14px 16px; text-align: center; }
+  .text { flex: none; justify-items: center; width: 100%; min-width: 0; padding-top: 2px; }
+  .name { justify-content: center; font-size: 21px; }
+  .chips { justify-content: center; gap: 2px 14px; margin-left: 0; clip-path: none; }
+  .chips > li::before { display: none; }
+  .actions { justify-content: center; margin: 0; padding-top: 4px; }
+}
+/* A computer: one compact band, the photo still a real photo (LAYOUT-SWEEP keeps the record in the window). */
+@media (min-width: 1180px) and (min-height: 600px) {
+  .header { border: 0; border-radius: 0; background: transparent; overflow: visible; }
+  .cover, .back { display: none; }
+  .body { align-items: center; padding: 2px 0 10px; }
+  .photo { margin-top: 0; }
+  .photo [aria-hidden="true"][style] { --size: 64px !important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--theme-border) 70%, transparent); }
+  .avatar { font-size: 22px; }
+  .text { padding-top: 0; gap: 3px; }
+  .name { font-size: 20px; }
+  .actions { padding-top: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .header { animation: none; } }

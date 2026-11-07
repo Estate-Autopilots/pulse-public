@@ -1,0 +1,15 @@
+/* PULSE-ADMIN (1140): platform announcements, a calm card at the bottom corner. */
+.stack { position: fixed; left: 16px; bottom: 16px; z-index: 60; display: grid; gap: 8px; width: min(380px, calc(100vw - 32px)); pointer-events: none; }
+.card { pointer-events: auto; display: grid; grid-template-columns: 18px minmax(0, 1fr) 24px; gap: 10px; align-items: start; padding: 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); box-shadow: var(--theme-shadow, 0 8px 24px rgba(0, 0, 0, .12)); font-size: 13px; }
+.card[data-tone="warning"] { border-color: color-mix(in oklab, var(--theme-warning) 45%, var(--theme-border)); }
+.card[data-tone="success"] { border-color: color-mix(in oklab, var(--theme-success) 45%, var(--theme-border)); }
+.icon { margin-top: 1px; color: var(--theme-action); }
+.card[data-tone="warning"] .icon { color: var(--theme-warning); }
+.card[data-tone="success"] .icon { color: var(--theme-success); }
+.text { min-width: 0; color: var(--theme-text); }
+.text b { display: block; font-weight: 600; }
+.text p { margin: 4px 0 0; color: var(--theme-text-muted); }
+.text a { display: inline-block; margin-top: 6px; color: var(--theme-action); font-weight: 550; }
+.close { display: grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 6px; background: none; color: var(--theme-text-muted); cursor: pointer; }
+.close:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+@media (max-width: 640px) { .stack { bottom: calc(72px + env(safe-area-inset-bottom, 0px)); } }

@@ -1,0 +1,10 @@
+[Unit]
+Description=Publish the newest verified Pulse Windows installer to the local downloads directory
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/opt/node/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PULSE_DESKTOP_DOWNLOADS_DIR=%h/pulse-downloads/desktop
+ExecStart=/usr/bin/env node %h/pulse-downloads/bin/publish.mjs
+TimeoutStartSec=900
+Nice=10

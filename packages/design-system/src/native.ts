@@ -1,0 +1,2 @@
+// Native equivalents of tokens.css. Keep the semantic names across every Pulse client.
+export const nativeTokens={light:{canvas:'#f6f6fa',surface:'#ffffff',text:'#191a2e',muted:'#66687e',border:'#dbdce8',action:'#5b45d6',actionText:'#ffffff',selected:'#efeff6'},dark:{canvas:'#121219',surface:'#1a1a24',text:'#eeeef6',muted:'#a7a8bb',border:'#31313f',action:'#a99cff',actionText:'#17123a',selected:'#23232f'}} as const;

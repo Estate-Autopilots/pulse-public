@@ -1,0 +1,16 @@
+.note { flex: none; margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.pods { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; padding: 12px 16px; }
+.pod { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.pod h4 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; }
+.pod h4 svg { color: var(--theme-action); }
+.pod dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.pod dt { color: var(--theme-text-muted); font-size: 12px; }
+.pod dd { margin: 2px 0 0; font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.pod dd small { margin-left: 6px; color: var(--theme-text-muted); font-size: 12px; font-weight: 400; }
+.muted { color: var(--theme-text-muted); font-size: 12px; }
+.spark { display: inline-flex; align-items: center; gap: 10px; }
+.icon { flex: none; margin-right: 10px; color: var(--theme-action); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 0; padding: 14px 16px; }
+.facts dt { color: var(--theme-text-muted); font-size: 12px; }
+.facts dd { margin: 4px 0 0; font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.facts dd small { display: block; color: var(--theme-text-muted); font-size: 12px; font-weight: 400; }

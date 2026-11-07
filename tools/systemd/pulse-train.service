@@ -1,0 +1,8 @@
+[Unit]
+Description=Pulse committed workbench release train
+[Service]
+Type=oneshot
+Environment=PATH=/home/eadev/.cargo/bin:/home/eadev/.local/opt/node/bin:/home/eadev/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 /home/eadev/.local/lib/pulse-release/pulse-train.py
+TimeoutStartSec=10800
+Nice=10

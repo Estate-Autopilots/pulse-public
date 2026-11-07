@@ -1,0 +1,27 @@
+{
+  "name": "@pulse/companion",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pulse Companion core shared by the web widget, desktop panel, Chrome popup and phone app: check-in view model, reminders, presence decisions, offline queue, gateway client and the Pip mascot.",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./panel": {
+      "types": "./src/panel.d.ts",
+      "default": "./src/panel.js"
+    },
+    "./panel.css": "./src/panel.css",
+    "./pip.css": "./src/pip.css",
+    "./communications": {
+      "types": "./src/communications.d.ts",
+      "default": "./src/communications.js"
+    }
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=2 test/*.test.js",
+    "lint": "node --check src/index.js && node --check src/panel.js"
+  }
+}

@@ -1,0 +1,44 @@
+[project]
+name = "pulse-gdrive-extract"
+version = "0.1.0"
+description = "Useful text and lossless compressed facts from approved Drive roots (off by default)"
+requires-python = ">=3.12"
+dependencies = [
+    "google-api-python-client>=2.0",
+    "google-auth-httplib2>=0.2",
+    "pulse-gdrive-changes",
+    "pulse-gdrive-snapshot",
+    "pulse-sdk",
+    "pypdf>=6.0",
+]
+
+[project.scripts]
+pulse-drive-extract = "pulse_gdrive_extract.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.8"]
+
+[tool.uv.sources]
+pulse-gdrive-changes = { workspace = true }
+pulse-gdrive-snapshot = { workspace = true }
+pulse-sdk = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pulse_gdrive_extract"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pulse_sdk", "pulse_gdrive_snapshot", "pulse_gdrive_changes", "pulse_gdrive_extract"]

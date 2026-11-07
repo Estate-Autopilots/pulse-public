@@ -1,0 +1,20 @@
+/* UX-DELIGHT (6 Nov 2026): Finance's collections ring and streak. Quiet colours from the theme; the ring fills once on
+   arrival and not at all under reduced motion. */
+.body { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px 20px; padding: 4px 2px; }
+.ring { width: 96px; height: 96px; }
+.track { fill: none; stroke: var(--theme-surface-subtle); stroke-width: 9; }
+.fill { fill: none; stroke: var(--theme-action); stroke-width: 9; stroke-linecap: round; transition: stroke-dashoffset 900ms cubic-bezier(.2, .8, .2, 1); }
+.fill[data-full] { stroke: var(--theme-success); }
+.ringText { fill: var(--theme-text); font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin: 0; }
+.facts div { min-width: 0; }
+.facts dt { color: var(--theme-text-muted); font-size: 12px; }
+.facts dd { margin: 2px 0 0; color: var(--theme-text); font-size: 16px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.facts dd[data-tone="warn"] { color: var(--theme-warning); }
+.next { grid-column: 1 / -1; }
+.next dd { font-size: 13px; font-weight: 550; color: var(--theme-text-muted); }
+.streak { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin: 0; padding: 8px 10px; border-radius: 10px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 13px; }
+.streak[data-on] { background: color-mix(in srgb, var(--theme-warning) 12%, var(--theme-surface)); color: var(--theme-text); }
+.streak[data-on] svg { color: var(--theme-warning); }
+@media (max-width: 520px) { .body { grid-template-columns: 1fr; justify-items: center; } .facts { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .fill { transition: none; } }

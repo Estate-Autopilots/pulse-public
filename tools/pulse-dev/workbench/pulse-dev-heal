@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# pulse-dev-heal: restart the dev web server only when it is really broken. Runs from pulse-dev-heal.timer every
+# three minutes. A restart costs a cold compile of every route (minutes on this box), so a compile error that the
+# developer has already fixed, or a hydration warning from one page, must not trigger one.
+#
+# Restart when either
+#   1. the journal shows a build/hydration failure in the last four minutes AND a live probe of /dashboard still
+#      answers with a broken build (non-200, or the Next error overlay markers in the body), or
+#   2. the server does not answer /healthz within 90 s (hung dev server), or is not running at all, or
+#   3. /api/v0/me answers 404 on two consecutive checks (the app's routes are missing after a start).
+# After a restart the pulse-dev-warm unit (PartOf pulse-dev-web.service) compiles the common routes again.
+set -u
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+PORT=${PULSE_DEV_PORT:-3200}
+UNIT=pulse-dev-web
+LOG=$HOME/ea-intel/logs/pulse-dev-heal.log
+mkdir -p "$(dirname "$LOG")"
+note() { printf '%s %s\n' "$(date -u +%FT%TZ)" "$*" >> "$LOG"; }
+restart() { note "restarted $UNIT: $1"; systemctl --user restart "$UNIT"; }
+
+# pulse-dev-recycle holds this lock while it restarts the server; the nightly one stops it to work on its cache, and a
+# start in between would open the cache mid-copy. This check holds it for its whole run (creating it on the first
+# run), so the nightly waits for a check that is already probing; a check that finds it taken leaves the server alone,
+# and the next one runs three minutes later.
+RECYCLE_STATE=${PULSE_DEV_RECYCLE_STATE:-$HOME/.local/state/pulse-dev-recycle}
+mkdir -p "$RECYCLE_STATE"
+exec 9>>"$RECYCLE_STATE/lock"
+flock -n 9 || exit 0
+
+if ! systemctl --user is-active --quiet "$UNIT"; then
+  restart "unit was not active"; exit 0
+fi
+
+# A fresh server compiles its proxy and first routes before it answers; when the host is starved (hypervisor steal
+# above 90 % has been seen) that takes several minutes. No verdict in the first 15 minutes after a start.
+started=$(systemctl --user show "$UNIT" -p ActiveEnterTimestampMonotonic --value 2>/dev/null || echo 0)
+up_s=$(( ($(cut -d. -f1 /proc/uptime) * 1000000 - ${started:-0}) / 1000000 ))
+
+# 3. Routes missing (READINESS, 23 Oct 2026): twice today, after pulse-dev-recycle restarted the server under a
+#    starved host, the new server answered 404 for every /api/v0 call (and nested pages such as /people/pay/<id>)
+#    while /dashboard and /healthz rendered, so neither check above noticed; the owner saw "Can't reach Pulse" until
+#    someone restarted it by hand, after which it came back whole. A healthy server answers /api/v0/me without an
+#    identity with 401 (sign in), never 404, as soon as it answers at all, so this needs no 15-minute grace: a 404 on
+#    two consecutive checks (3 minutes apart) restarts it. Any other status, or no answer, leaves the verdict to the
+#    other checks.
+ROUTES_MARK=$HOME/ea-intel/logs/pulse-dev-heal.routes404
+rcode=$(curl -s -o /dev/null -m 120 -w '%{http_code}' "http://127.0.0.1:$PORT/api/v0/me" 2>/dev/null || echo 000)
+if [[ $rcode == 404 ]]; then
+  if [[ -f $ROUTES_MARK ]]; then rm -f "$ROUTES_MARK"; restart "/api/v0/me answered 404 on two consecutive checks (routes missing after a start)"; exit 0; fi
+  touch "$ROUTES_MARK"; note "/api/v0/me answered 404; will restart if the next check also does"; exit 0
+fi
+rm -f "$ROUTES_MARK"
+
+if (( started > 0 && up_s < 900 )); then exit 0; fi
+
+# 2. Hung: no answer within 120 s, on two consecutive checks (the timer runs every 3 min). Any HTTP status counts
+#    as alive: /healthz answers 503 when the API is slow to reply, which is not the dev server's fault.
+MARK=$HOME/ea-intel/logs/pulse-dev-heal.noanswer
+code=$(curl -s -o /dev/null -m 120 -w '%{http_code}' "http://127.0.0.1:$PORT/healthz" 2>/dev/null || echo 000)
+if [[ $code == 000 ]]; then
+  if [[ -f $MARK ]]; then rm -f "$MARK"; restart "no answer from /healthz within 120 s on two consecutive checks"; exit 0; fi
+  touch "$MARK"; note "no answer from /healthz within 120 s; will restart if the next check also fails"; exit 0
+fi
+rm -f "$MARK"
+
+# 1. Broken build: a recent failure in the journal that a live probe confirms.
+if journalctl --user -u "$UNIT" --since "-4min" --no-pager -o cat 2>/dev/null | grep -qE "Hydration failed|Module build failed|Failed to compile|CssSyntaxError"; then
+  body=$(mktemp); code=$(curl -s -o "$body" -m 120 -w '%{http_code}' "http://127.0.0.1:$PORT/dashboard" 2>/dev/null || echo 000)
+  if [[ $code != 200 ]] || grep -qE "Module build failed|Failed to compile|CssSyntaxError|__next_error__" "$body"; then
+    rm -f "$body"; restart "journal failure confirmed by probe (HTTP $code)"; exit 0
+  fi
+  rm -f "$body"; note "journal failure not confirmed by probe (HTTP $code); no restart"
+fi

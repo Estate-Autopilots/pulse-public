@@ -1,0 +1,10 @@
+[Unit]
+Description=Check for a new successful Pulse Windows build every 10 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,46 @@
+{
+  "format": "pulse-update-draft/v1",
+  "slotKey": "2026-03-14-pm",
+  "status": "draft",
+  "edition": "night",
+  "org": "Example Studio",
+  "headline": "Release 2.4 is live. New Quotes and Timesheets are ready to try.",
+  "sender": "Pulse Chief of Staff (AI) for Asha",
+  "onBehalfOf": "Asha",
+  "audience": ["Ravi"],
+  "window": {"timezone": "Asia/Kolkata", "start": "2026-03-14T09:00:00+05:30", "end": "2026-03-14T21:00:00+05:30"},
+  "collectedThrough": "2026-03-14T15:25:00Z",
+  "sections": [
+    {"key": "live", "title": "Live for everyone", "items": [
+      {"title": "Release 2.4", "status": "live", "chip": "Live 14:02", "note": "Faster search, phone screens fixed, keys for agents"},
+      {"title": "Phone app 3.1 · PC app 2.0", "status": "live", "note": "Notifications for chats and alerts"}
+    ]},
+    {"key": "readyToTry", "title": "Ready to try on the test site", "items": [
+      {"title": "New Quotes", "status": "test_site", "note": "Packages fold open, quotes with a live preview, three templates"},
+      {"title": "Timesheets", "status": "test_site", "note": "Week view per person with hand-offs and a test mode"},
+      {"title": "Release 2.5", "status": "waiting", "chip": "Checks", "note": "Client follow-ups and phone updates. One test is being fixed."}
+    ]},
+    {"key": "workFinished", "title": "Work finished", "count": 24, "note": "Reviews and fixes finished today. Not every change is live yet.", "items": [
+      "Chat mentions checked",
+      "Workflow screen review completed",
+      "Search speed-up merged"
+    ]},
+    {"key": "requests", "title": "Your requests", "items": [
+      {"title": "Strategist playbook & workflow", "status": "in_progress", "progress": 35, "note": "Shared Mon 9 Mar. All playbooks read; the app is designed. The build has started."},
+      {"title": "Move projects out of the old tool", "status": "started", "progress": 5, "note": "Shared Thu 12 Mar. Trial run on the test site first."},
+      {"title": "Group chat history into Pulse", "status": "started", "progress": 5, "note": "Shared Thu 12 Mar. One group on the test site first."},
+      {"title": "Chat alerts", "status": "done", "progress": 100, "note": "Asked Tue 10 Mar. The phone app and the browser now send alerts."}
+    ]},
+    {"key": "ideas", "title": "Asha's ideas", "items": [
+      {"title": "Pulse as an OS", "status": "planned", "note": "App library, company structure, your own words, editable stages"}
+    ]},
+    {"key": "needs", "title": "Needs you, Ravi", "items": [
+      "A safe way to share the old tool's data. No passwords in chat.",
+      "Try the new Quotes on the test site and say what feels wrong.",
+      "Confirm the team role names."
+    ]},
+    {"key": "plan", "title": "Tomorrow", "items": [
+      {"title": "Strategist app: first screens on the test site", "chip": "Plan", "note": "Release 2.5 to the test site · old-tool trial run"}
+    ]}
+  ]
+}

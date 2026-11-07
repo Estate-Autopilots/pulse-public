@@ -1,0 +1,11 @@
+type Env = Record<string, string | undefined>;
+export const ROLES: ["app", "api", "mcp", "id"];
+export type HostRole = "app" | "api" | "mcp" | "id";
+export type Family = { name: string; listed: boolean; app: string; api: string | null; mcp: string | null; id: string | null };
+export type HostFamily = { name: string; listed: boolean; role: HostRole; host: string; self: string; app: string; issuer: string; mcp: string; signIn: string };
+export function hostFamilies(env?: Env): Family[];
+export function hostOrigin(host: string, port?: string | null): string;
+export function hostFamily(rawHost: string | null | undefined, env?: Env): HostFamily | null;
+export type HostRoute = { status: 302; location: string } | { status: 404; body: string };
+export function hostRoute(rawHost: string | null | undefined, path: string, search?: string, method?: string, env?: Env): HostRoute | null;
+export function sameOriginFor(rawHost: string | null | undefined, fallback: string, env?: Env): string;

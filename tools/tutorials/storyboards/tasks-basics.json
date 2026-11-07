@@ -1,0 +1,298 @@
+{
+ "id": "tasks-basics",
+ "title": {
+  "en": "Give and finish tasks",
+  "hi": "Tasks dijiye aur poore kijiye"
+ },
+ "persona": "Meera Shah (founder of Brightside Studio); all fictional",
+ "takes": [
+  {
+   "id": "t1",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/tasks"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "appear",
+     "mark": "upnext",
+     "zoom": 1.2,
+     "text": "Up next",
+     "sfx": "none"
+    },
+    {
+     "do": "wait",
+     "ms": 1400
+    },
+    {
+     "do": "tap",
+     "mark": "new",
+     "zoom": 1.3,
+     "role": "button",
+     "name": "New task"
+    },
+    {
+     "do": "appear",
+     "mark": "form",
+     "zoom": 0,
+     "label": "What needs doing",
+     "sfx": "none"
+    },
+    {
+     "do": "type",
+     "mark": "typing",
+     "value": "Share the Skyline Heights shoot plan tomorrow",
+     "zoom": 1.25,
+     "delay": 35,
+     "label": "What needs doing"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "tap",
+     "mark": "create",
+     "zoom": 1.3,
+     "role": "button",
+     "name": "/^(Create task|Assign to)/"
+    },
+    {
+     "do": "wait",
+     "ms": 2500
+    },
+    {
+     "do": "mark",
+     "mark": "created"
+    },
+    {
+     "do": "tap",
+     "mark": "tick",
+     "zoom": 1.35,
+     "role": "button",
+     "name": "/^Mark “Share the Skyline Heights shoot plan/"
+    },
+    {
+     "do": "wait",
+     "ms": 2200
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "t1",
+   "from": "tick",
+   "from_offset": -10,
+   "to": "end",
+   "hook": {
+    "en": "Tasks, done in seconds",
+    "hi": "Tasks, seconds mein done"
+   },
+   "chapter": {
+    "en": "In short",
+    "hi": "Short mein"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] Give a task, and tick it off... in seconds!",
+     "cap": "Give a *task,* and tick it off... in *seconds!*"
+    },
+    "hi": {
+     "say": "[excited] Task दीजिए, और seconds में पूरा कीजिए!",
+     "cap": "*Task* dijiye, aur *seconds* mein poora kijiye!"
+    }
+   }
+  },
+  {
+   "id": "upnext",
+   "take": "t1",
+   "from": "start",
+   "to": "new",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Up next",
+    "hi": "Up next"
+   },
+   "line": {
+    "en": {
+     "say": "Up next shows the one task to do first.",
+     "cap": "*Up* *next* shows the one task to do first."
+    },
+    "hi": {
+     "say": "Up next बताता है, पहले कौन सा task करना है।",
+     "cap": "*Up* *next* batata hai, pehle kaun sa task karna hai."
+    }
+   }
+  },
+  {
+   "id": "new",
+   "take": "t1",
+   "from": "new",
+   "to": "create",
+   "to_offset": -4,
+   "chapter": {
+    "en": "New task",
+    "hi": "New task"
+   },
+   "line": {
+    "en": {
+     "say": "Tap New task, and type it in one line.",
+     "cap": "Tap *New* *task,* and type it in one line."
+    },
+    "hi": {
+     "say": "New task दबाइए, और एक line में लिखिए।",
+     "cap": "*New* *task* dabaiye, aur ek line mein likhiye."
+    }
+   }
+  },
+  {
+   "id": "create",
+   "take": "t1",
+   "from": "create",
+   "to": "tick",
+   "to_offset": -4,
+   "chapter": {
+    "en": "Create",
+    "hi": "Create"
+   },
+   "line": {
+    "en": {
+     "say": "Create it. Add a name, and it's theirs.",
+     "cap": "*Create* it. Add a name, and it's theirs."
+    },
+    "hi": {
+     "say": "Create दबाइए। किसी का नाम लिखें, तो task उनका।",
+     "cap": "*Create* dabaiye. Kisi ka naam likhein, to task unka."
+    }
+   }
+  },
+  {
+   "id": "done",
+   "take": "t1",
+   "from": "tick",
+   "to": "end",
+   "payoff": true,
+   "chapter": {
+    "en": "Tick it off",
+    "hi": "Tick kijiye"
+   },
+   "line": {
+    "en": {
+     "say": "[happy] Done? Tick the circle. That's it!",
+     "cap": "Done? Tick the *circle.* That's it!"
+    },
+    "hi": {
+     "say": "[happy] हो गया? Circle पर tick कीजिए। बस!",
+     "cap": "Ho gaya? *Circle* par tick kijiye. Bas!"
+    }
+   }
+  }
+ ],
+ "end": {
+  "frames": 30,
+  "text": {
+   "en": "More tutorials: Pulse, Learn",
+   "hi": "Aur tutorials: Pulse, Learn"
+  }
+ },
+ "screens": {
+  "setup": [
+   {
+    "do": "login",
+    "user": "meera.shah"
+   },
+   {
+    "do": "goto",
+    "url": "/tasks"
+   }
+  ],
+  "steps": [
+   {
+    "do": "appear",
+    "text": "Up next"
+   },
+   {
+    "shot": "01",
+    "settle": 1200,
+    "focus": {
+     "text": "Up next"
+    }
+   },
+   {
+    "do": "tap",
+    "role": "button",
+    "name": "New task"
+   },
+   {
+    "do": "appear",
+    "label": "What needs doing",
+    "timeout": 60000
+   },
+   {
+    "do": "type",
+    "value": "Share the Skyline Heights shoot plan tomorrow",
+    "delay": 20,
+    "label": "What needs doing"
+   },
+   {
+    "shot": "02",
+    "settle": 1200,
+    "focus": {
+     "label": "What needs doing"
+    }
+   },
+   {
+    "shot": "03",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "/^(Create task|Assign to)/"
+    }
+   },
+   {
+    "do": "press",
+    "key": "Escape"
+   },
+   {
+    "do": "wait",
+    "ms": 800
+   },
+   {
+    "shot": "04",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "/^Mark .* done$/"
+    }
+   },
+   {
+    "shot": "05",
+    "settle": 1200,
+    "focus": {
+     "role": "tab",
+     "name": "/^Today/"
+    }
+   }
+  ]
+ }
+}

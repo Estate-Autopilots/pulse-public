@@ -1,0 +1,17 @@
+/* PULSE-ADMIN: the admin site's sign-in, on the console's tokens. */
+.page { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; background: var(--sx-paper); }
+.card { width: min(400px, 100%); display: grid; gap: 10px; padding: 28px 24px; border: 1px solid var(--sx-line); border-radius: 16px; background: var(--sx-surface); box-shadow: 0 12px 40px color-mix(in oklab, var(--sx-ink) 8%, transparent); }
+.mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--sx-accent); color: var(--sx-accent-ink); }
+.kicker { margin: 6px 0 0; color: var(--sx-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.title { margin: 0; font-size: 22px; line-height: 1.2; }
+.sub { margin: 0 0 6px; color: var(--sx-muted); font-size: 13px; }
+.form { display: grid; gap: 12px; }
+.field { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--sx-ink-2); }
+.field input { height: 38px; padding: 0 12px; border: 1px solid var(--sx-line-strong); border-radius: 9px; background: var(--sx-surface); font-weight: 400; }
+.field input:focus-visible { outline: 2px solid var(--sx-accent); outline-offset: 1px; }
+.primary { height: 40px; border: 0; border-radius: 10px; background: var(--sx-accent); color: var(--sx-accent-ink); font-weight: 650; cursor: pointer; }
+.primary:disabled { opacity: .6; cursor: progress; }
+.error { margin: 0; color: var(--sx-bad); font-size: 13px; }
+.note { margin: 4px 0 0; padding: 10px 12px; border-radius: 9px; background: var(--sx-sunken); color: var(--sx-ink-2); font-size: 13px; }
+.foot { margin: 8px 0 0; color: var(--sx-muted); font-size: 12px; }
+.foot a { color: var(--sx-accent); }

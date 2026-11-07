@@ -1,0 +1,592 @@
+openapi: 3.1.0
+info:
+  title: Install-local Pulse service API (scoped install key)
+  version: 1.2.0
+  description: >-
+    For a company's own agents and servers calling that company's own Pulse install. Every request carries
+    `Authorization: Bearer psvc_<key UUID>_<43-character base64url secret>`. The key is issued on that install with
+    explicit scopes, stored there as a SHA-256 digest only, and revoked per key. No cookies, staff sessions, Access
+    identity, device credentials or caller-chosen organisation: the organisation is always the install's own
+    (`pulse.install`), and a key works only on the install that issued it. A key authorizes exactly the operations
+    below for its scopes and nothing else, even alongside a staff session (403). Chat posting sends a message;
+    quote writes only create drafts and never issue, finalise, convert or delete documents. Every response is `Cache-Control: no-store`. Budget: 120 service requests per minute per
+    API process for authenticated keys; failed authentication has its own separate bucket and can never use up the valid keys' budget; 429 carries `Retry-After: 60`. Phone lookups have an extra budget of 30 per minute per key. Money is integer INR paise (12345 = INR 123.45);
+    `price`/`rate` are before GST; `gstRate`/`taxRate` are percentage points (18 = 18 %). Unknown query parameters or
+    body fields are refused (400). In-company AI co-worker keys (`pak_`, EST-1035/EST-1040) are a different mechanism.
+servers:
+  - url: https://{installHost}
+    description: Your own install's approved HTTPS origin, or loopback on the install's server. Never another company's install.
+    variables: { installHost: { default: pulse.example.com } }
+security: [{ serviceKey: [] }]
+paths:
+  /api/v1/catalog/items:
+    get:
+      summary: "Scope catalog.read: active catalogue entries (unchanged EST-1064 contract, see catalog.yaml)"
+      description: Accepts the existing `pcat_` catalogue key or a `psvc_` key holding `catalog.read`. No query parameters.
+      responses:
+        '200':
+          description: Active entries
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items]
+                properties: { items: { type: array, items: { $ref: '#/components/schemas/CatalogItem' } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/clients:
+    get:
+      summary: "Scope clients.read: this install's clients, minimal fields"
+      description: >-
+        Every client except the company's own internal record, ordered by id. Only the fields below: no contacts,
+        phone numbers, emails, addresses, billing, documents, payments, people, HR, attendance or finance detail.
+      parameters: [{ $ref: '#/components/parameters/Cursor' }, { $ref: '#/components/parameters/Limit' }, { $ref: '#/components/parameters/Phone' }]
+      responses:
+        '200':
+          description: One page, or with `phone` at most 5 exact matches and nextCursor null
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items, nextCursor]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/Client' } }
+                  nextCursor: { type: [string, 'null'], description: Pass back as `cursor` for the next page; null on the last page }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/leads:
+    get:
+      summary: "Scope leads.read: this install's open and closed leads (acquisition enquiries), minimal fields"
+      description: >-
+        Withdrawn and test enquiries are excluded; ordered by id. Only the fields below: no phone numbers, emails,
+        messages, source/ad/spend data, identity keys, people, HR, attendance or finance detail. 404 when the install
+        has the acquisition module switched off.
+      parameters: [{ $ref: '#/components/parameters/Cursor' }, { $ref: '#/components/parameters/Limit' }, { $ref: '#/components/parameters/Phone' }]
+      responses:
+        '200':
+          description: One page, or with `phone` at most 5 exact matches and nextCursor null
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items, nextCursor]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/Lead' } }
+                  nextCursor: { type: [string, 'null'] }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/quotes:
+    post:
+      summary: "Scope quotes.draft.create: create a DRAFT quotation from catalogue items"
+      description: >-
+        Always creates a draft quotation (no number, not issued, not sent) for one client or one lead of this install.
+        Every line is an active catalogue item; its name, SAC, unit and GST rate come from the catalogue. `rate` defaults
+        to the catalogue price; if any line's rate differs from the catalogue price the quotation carries
+        `ownerApprovalNeeded: true`, and Pulse refuses to issue it until someone with the leadership role issues it
+        (that is the approval, recorded in the ERP log). Staff edits to the draft recompute the flag. GST figures are
+        Pulse's own (same arithmetic as a staff draft). Created drafts are audited with the key id; the key cannot read,
+        edit, issue, send, convert or delete documents afterwards. 404 when the install has the money module off.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: A fresh UUID per intended quotation. Replaying the same key with the same body returns the same draft (200); with a different body, 409.
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QuoteDraftRequest' }
+      responses:
+        '201':
+          description: Draft created
+          content: { application/json: { schema: { $ref: '#/components/schemas/QuoteDraft' } } }
+        '200':
+          description: Idempotent replay of an earlier identical request
+          content: { application/json: { schema: { $ref: '#/components/schemas/QuoteDraft' } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: Idempotency-Key already used with a different body, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '422': { description: 'No salesperson (none given and the client/lead has none, or not an active staff member), or the ERP company state is not set', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/quotes/{id}/ready-notice:
+    post:
+      summary: "Scope notify.quote_ready: tell the quote's salesperson the draft is ready"
+      description: >-
+        Sends one fixed notice, only to the quotation's salesperson, never to anyone else and never with caller text:
+        "Quotation ready for <client or lead name>: <n> item(s), INR <total incl. GST>" plus " · owner approval needed"
+        when flagged, linking to `/quotes/{id}` on this install (sign-in required; the salesperson sees that one quotation
+        read-only). Delivered like other Pulse notices (inbox, plus the person's own push/email settings). Only for draft
+        quotations created through a service key on this install. One notice per quotation: a repeat call sends nothing
+        and returns the first `notifiedAt` with `repeat: true`. No request body. 404 when the install has the money
+        module off.
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200':
+          description: Notice sent now, or already sent earlier
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [id, notifiedAt, repeat]
+                properties:
+                  id: { type: string, format: uuid }
+                  notifiedAt: { type: string, format: date-time }
+                  repeat: { type: boolean }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: 'No such quotation on this install, not a service-created draft, or money module off', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/chats/{chatId}/messages:
+    post:
+      summary: "Scope chats.post: post as the key's bound AI member in a member chat"
+      description: >-
+        No read operation. An identical slot retry returns the original IDs without another file or notification;
+        changed text, image or chat returns 409. Membership and active AI identity are rechecked on every call.
+        Body cap 3 MiB; PNG/JPEG magic must match the declared MIME; decoded image cap 2 MiB (413).
+      parameters:
+        - { name: chatId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: Idempotency-Key, in: header, required: true, schema: { type: string, pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}-(am|pm)$' }, description: Real calendar date; slot unique per AI member across keys and chats }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [text]
+              properties:
+                text: { type: string, minLength: 1, maxLength: 12000 }
+                image:
+                  type: object
+                  additionalProperties: false
+                  required: [name, mime, bytes]
+                  properties:
+                    name: { type: string, minLength: 1, maxLength: 200 }
+                    mime: { type: string, enum: [image/png, image/jpeg] }
+                    bytes: { type: string, contentEncoding: base64, description: Canonical base64; at most 2097152 decoded bytes }
+      responses:
+        '201':
+          description: Posted; normal chat notifications queued
+          content:
+            application/json:
+              schema: &chatPostResult
+                type: object
+                additionalProperties: false
+                required: [messageId, chatId, replayed]
+                properties:
+                  messageId: { type: string, format: uuid }
+                  chatId: { type: string, format: uuid }
+                  replayed: { type: boolean }
+        '200': { description: Slot replay, content: { application/json: { schema: *chatPostResult } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { description: Slot already used for another message }
+        '413': { description: Image or request body exceeds its limit }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/updates:
+    post:
+      summary: 'Scope updates.post: deliver an install-local update on behalf of active staff'
+      description: >-
+        Slot is a real YYYY-MM-DD-am|pm date, unique per onBehalfOf across keys. Identical retries
+        (audience as a set) return 200; changed content returns 409. Audience and sender must be active
+        human staff of this install (422 otherwise). Sections are capped at 32 KiB. No staff read access.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [slot, headline, sections, audience, onBehalfOf]
+              properties:
+                slot: { type: string, pattern: '^\d{4}-\d{2}-\d{2}-(am|pm)$' }
+                headline: { type: string, minLength: 1, maxLength: 160 }
+                audience: { type: array, minItems: 1, maxItems: 50, items: { type: string, format: uuid }, description: Deduplicated at write }
+                onBehalfOf: { type: string, format: uuid }
+                sections:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    live: &updateCards
+                      type: array
+                      maxItems: 12
+                      items:
+                        type: object
+                        additionalProperties: false
+                        required: [title]
+                        properties:
+                          title: &updateTitle { type: string, minLength: 1, maxLength: 160 }
+                          note: &updateNote { type: string, minLength: 1, maxLength: 2000 }
+                          tag: { type: string, minLength: 1, maxLength: 40 }
+                    readyToTry: *updateCards
+                    ideas: *updateCards
+                    requests:
+                      type: array
+                      maxItems: 12
+                      items:
+                        type: object
+                        additionalProperties: false
+                        required: [title, status, progress]
+                        properties:
+                          title: *updateTitle
+                          status: { type: string, minLength: 1, maxLength: 60 }
+                          progress: { type: integer, minimum: 0, maximum: 100 }
+                          note: *updateNote
+                    needsYou: { type: array, maxItems: 12, items: { type: object, additionalProperties: false, required: [text], properties: { text: { type: string, minLength: 1, maxLength: 1000 } } } }
+                    plan:
+                      type: object
+                      additionalProperties: false
+                      required: [label, items]
+                      properties:
+                        label: { type: string, enum: [Today, Tomorrow] }
+                        items: { type: array, maxItems: 12, items: { type: object, additionalProperties: false, required: [title], properties: { title: *updateTitle, note: *updateNote } } }
+      responses:
+        '201':
+          description: Created; no content echoed
+          content: { application/json: { schema: &updateResult { type: object, additionalProperties: false, required: [updateId, replayed], properties: { updateId: { type: string, format: uuid }, replayed: { type: boolean } } } } }
+        '200': { description: Identical slot replay, content: { application/json: { schema: *updateResult } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { description: Slot already used for different content }
+        '422': { description: Audience or sender is not active install staff }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/tasks/mine:
+    get:
+      summary: "Scope tasks.read: the signed-in WAS person's own open tasks (EST-1392 §6)"
+      description: >-
+        Google ID token: JWKS, iss, aud, exp + 60 s, email_verified, allowed hd, active (iss, sub) link. Open/in-progress/blocked/in-review,
+        at most 200 tasks, earliest due first; no notes, value, timers, activity or cross-person counts. No query. Audit key id + person id; never token.
+      parameters: [{ name: Pulse-Person-Token, in: header, required: true, schema: { type: string, maxLength: 8192 } }]
+      responses:
+        '200': { description: The person's tasks, content: { application/json: { schema: { $ref: '#/components/schemas/MyTasks' } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { description: 'Invalid service credential, or `person_token_invalid` (bad or expired person token)', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '403': { description: '`person_not_linked` (no active linked staff person), or as Forbidden', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/people:
+    get:
+      summary: "Scope people.read: this install's staff directory, minimal fields"
+      description: Active/inactive staff only; current role keys and department/team/pod units. No personal, HR, activity or performance data.
+      parameters: [{ $ref: '#/components/parameters/Cursor' }, { $ref: '#/components/parameters/Limit' }]
+      responses:
+        '200': { description: One page; nextCursor is null on the last page, content: { application/json: { schema: { type: object, additionalProperties: false, required: [items, nextCursor], properties: {
+            items: { type: array, items: { $ref: '#/components/schemas/Person' } }, nextCursor: { type: [string, 'null'] } } } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/update-requests:
+    get:
+      summary: "Scope updates.requests.manage: list this install's request register"
+      description: Newest askedAt/id first. Includes staff replies. No staff viewer identity is assumed.
+      parameters:
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/RequestStatus' } }
+        - { name: onBehalfOf, in: query, schema: { type: string, format: uuid } }
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+      responses:
+        '200':
+          description: One page
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items, nextCursor]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/UpdateRequest' } }
+                  nextCursor: { type: [string, 'null'], format: uuid }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+    post:
+      summary: 'Scope updates.requests.manage: create a request for active install staff'
+      description: >-
+        ref is unique per install. Identical asker, on-behalf person, source, trimmed text and askedAt replay;
+        changed content returns 409. Omitted askedAt defaults to now on creation and preserves it on replay.
+        No delete operation exists. Unknown fields are rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [ref, askedBy, onBehalfOf, source, text]
+              properties:
+                ref: { type: string, pattern: '^[A-Za-z0-9._:-]{1,120}$' }
+                askedBy: { type: string, format: uuid }
+                onBehalfOf: { type: string, format: uuid }
+                source: { type: string, enum: [task, chat, manual] }
+                text: { type: string, minLength: 1, maxLength: 1000 }
+                askedAt: { type: string, format: date-time, description: Never in the future }
+      responses:
+        '201':
+          description: Created
+          content: { application/json: { schema: &requestResult { type: object, additionalProperties: false, required: [request], properties: { request: { $ref: '#/components/schemas/UpdateRequest' }, replayed: { const: true } } } } }
+        '200': { description: Identical ref replay with replayed true, content: { application/json: { schema: *requestResult } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { description: Reference already used for different content }
+        '422': { description: Asker or on-behalf person is not active install staff }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/service/update-requests/{id}/progress:
+    post:
+      summary: 'Scope updates.requests.manage: change status, progress or note'
+      description: At least one field required; unknown fields rejected. Updates updatedAt. No delete operation.
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              minProperties: 1
+              properties:
+                status: { $ref: '#/components/schemas/RequestStatus' }
+                progress: { type: integer, minimum: 0, maximum: 100 }
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200': { description: Updated request, content: { application/json: { schema: *requestResult } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/operator/service-keys:
+    get:
+      summary: Server operator lists keys (never secrets or digests)
+      security: [{ operatorKey: [] }]
+      responses:
+        '200':
+          description: All keys of this install, newest first
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [keys]
+                properties: { keys: { type: array, items: { $ref: '#/components/schemas/KeyInfo' } } }
+        '401': { description: Operator credential required }
+        '404': { description: Disabled operator API or web-proxied call }
+    post:
+      summary: Server operator issues or revokes a key (used by `node dist/service-key-admin.js` on the install)
+      security: [{ operatorKey: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [action, id]
+              properties:
+                action: { type: string, enum: [issue, revoke] }
+                id: { type: string, format: uuid, description: New key UUID for issue; existing key UUID for revoke }
+                hash: { type: string, pattern: '^[a-f0-9]{64}$', description: 'issue only: SHA-256 hex of the 43-character secret' }
+                scopes: { type: array, minItems: 1, uniqueItems: true, items: { $ref: '#/components/schemas/Scope' }, description: issue only }
+                agentId: { type: string, format: uuid, description: Required exactly when chats.post is included; active install-local AI member }
+                label: { type: string, minLength: 1, maxLength: 60, description: 'issue only: who holds it, e.g. "Quote agent"; no secrets' }
+      responses:
+        '200':
+          description: The key id only; raw secrets are never accepted or returned
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: false, required: [id], properties: { id: { type: string, format: uuid } } }
+        '400': { description: Invalid or extra fields, unknown scope, digest/scopes/label sent with revoke or missing on issue }
+        '401': { description: Operator credential required }
+        '404': { description: Disabled operator API or web-proxied call }
+components:
+  securitySchemes:
+    serviceKey:
+      type: http
+      scheme: bearer
+      description: '`psvc_<key UUID>_<43-character base64url secret>`; scopes fixed at issue; bound to the issuing install; digest only at rest; revocable per key'
+    operatorKey: { type: http, scheme: bearer, description: The install's existing operator secret, server-local only }
+  parameters:
+    Cursor: { name: cursor, in: query, required: false, schema: { type: string, maxLength: 200 }, description: Opaque; from the previous page's nextCursor }
+    Phone:
+      name: phone
+      in: query
+      required: false
+      description: >-
+        1.1. Exact lookup by phone number, E.164 (e.g. +919812345678; a 10-digit Indian number is read as +91). Not combinable
+        with cursor/limit. Matched server-side against the keyed digests Pulse already keeps (leads) or the stored client
+        number (clients); the number never appears in the response, logs or audit (audit holds key id + match count).
+        At most 5 rows; 30 lookups per minute per key (429).
+      schema: { type: string, pattern: '^\+?[0-9 ()-]{10,20}$' }
+    Limit: { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 200, default: 100 } }
+  responses:
+    BadRequest: { description: Unknown query parameter, invalid cursor/limit or invalid body, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Unauthorized: { description: Missing, malformed, unknown or revoked key, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Forbidden: { description: Key lacks this scope, another company's host on a multi-company server, or an endpoint outside the service API, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    NotFound: { description: Not found on this install or module switched off, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    RateLimited: { description: 'Rate limited; Retry-After: 60', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  schemas:
+    RequestStatus:
+      type: string
+      enum: [new, planned, started, in_progress, test_site, waiting, live, done]
+      description: 'Labels: New, Planned, Started, In progress, Test site, Waiting, Live, Done'
+    UpdateRequest:
+      type: object
+      additionalProperties: false
+      required: [id, text, askedAt, source, updateId, status, progress, note, updatedAt, askedBy, onBehalf]
+      properties:
+        id: { type: string, format: uuid }
+        text: { type: string, minLength: 1, maxLength: 1000 }
+        askedAt: { type: string, format: date-time }
+        source: { type: string, enum: [update_reply, task, chat, manual] }
+        updateId: { type: [string, 'null'], format: uuid }
+        status: { $ref: '#/components/schemas/RequestStatus' }
+        progress: { type: integer, minimum: 0, maximum: 100 }
+        note: { type: string, maxLength: 1000 }
+        updatedAt: { type: string, format: date-time }
+        askedBy: &requestPerson
+          type: object
+          additionalProperties: false
+          required: [id, name]
+          properties: { id: { type: string, format: uuid }, name: { type: string } }
+        onBehalf: *requestPerson
+    Error: { type: object, additionalProperties: false, required: [error], properties: { error: { type: string } } }
+    Scope: { type: string, enum: [catalog.read, clients.read, leads.read, quotes.draft.create, notify.quote_ready, chats.post, updates.post, tasks.read, people.read, updates.requests.manage] }
+    KeyInfo:
+      type: object
+      additionalProperties: false
+      required: [id, label, scopes, agentId, createdAt, revokedAt, lastUsedAt]
+      properties:
+        id: { type: string, format: uuid }
+        label: { type: string }
+        agentId: { type: [string, 'null'], format: uuid }
+        scopes: { type: array, items: { $ref: '#/components/schemas/Scope' } }
+        createdAt: { type: string, format: date-time }
+        revokedAt: { type: [string, 'null'], format: date-time }
+        lastUsedAt: { type: [string, 'null'], format: date-time, description: Minute precision }
+    Salesperson:
+      type: object
+      additionalProperties: false
+      required: [id, name]
+      description: An active staff member of this install; display name only
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+    Client:
+      type: object
+      additionalProperties: false
+      required: [id, name, status, salesperson]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        status: { type: [string, 'null'], enum: [prospect, active, paused, churned, null] }
+        salesperson: { oneOf: [{ $ref: '#/components/schemas/Salesperson' }, { type: 'null' }], description: The client's relationship owner while an active staff member }
+    Lead:
+      type: object
+      additionalProperties: false
+      required: [id, name, stage, receivedAt, salesperson]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: [string, 'null'], description: The enquirer's name as Pulse shows it; null when unknown }
+        stage: { type: string, description: 'Latest stage as Pulse shows it (e.g. new, contacted, visit_planned, booked, lost)' }
+        receivedAt: { type: string, format: date-time }
+        salesperson: { oneOf: [{ $ref: '#/components/schemas/Salesperson' }, { type: 'null' }], description: The enquiry's owner while an active staff member }
+    QuoteDraftRequest:
+      type: object
+      additionalProperties: false
+      required: [lines]
+      oneOf: [{ required: [clientId] }, { required: [leadId] }]
+      properties:
+        clientId: { type: string, format: uuid }
+        leadId: { type: string, format: uuid }
+        salespersonId: { type: string, format: uuid, description: 'Active staff member; default: the client''s or lead''s salesperson' }
+        lines:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            additionalProperties: false
+            required: [itemId, qty]
+            properties:
+              itemId: { type: string, format: uuid, description: An active catalogue entry from /api/v1/catalog/items }
+              qty: { type: number, exclusiveMinimum: 0, maximum: 100000, multipleOf: 0.001 }
+              rate: { type: integer, minimum: 0, maximum: 1000000000000, description: INR paise per unit before GST; default the catalogue price; any other value sets ownerApprovalNeeded }
+              details: { type: string, maxLength: 1000, description: Optional line note shown under the item name }
+        notes: { type: string, maxLength: 2000 }
+        sourceRef: { type: string, minLength: 1, maxLength: 100, description: '1.1. Caller''s source id (e.g. the Sales X-Ray analysis id), shown in the quotation''s ERP history; not printed on the quotation' }
+        validUntil: { type: string, format: date, description: 'Default: issue date + 30 days' }
+    QuoteLine:
+      type: object
+      additionalProperties: false
+      required: [itemId, name, qty, rate, catalogueRate, gstRate, taxable, tax, total]
+      properties:
+        itemId: { type: string, format: uuid }
+        name: { type: string }
+        qty: { type: number }
+        rate: { type: integer }
+        catalogueRate: { type: integer, description: The catalogue price when the draft was created }
+        gstRate: { type: number }
+        taxable: { type: integer }
+        tax: { type: integer, description: CGST+SGST or IGST for this line }
+        total: { type: integer }
+    QuoteDraft:
+      type: object
+      additionalProperties: false
+      required: [id, status, number, clientId, leadId, salesperson, ownerApprovalNeeded, currency, validUntil, lines, taxable, tax, total, link, sourceRef]
+      properties:
+        id: { type: string, format: uuid }
+        status: { const: draft }
+        number: { type: 'null', description: Drafts have no number; Pulse numbers a quotation when staff issue it }
+        clientId: { type: [string, 'null'], format: uuid }
+        leadId: { type: [string, 'null'], format: uuid }
+        salesperson: { $ref: '#/components/schemas/Salesperson' }
+        ownerApprovalNeeded: { type: boolean }
+        currency: { const: INR }
+        validUntil: { type: string, format: date }
+        lines: { type: array, items: { $ref: '#/components/schemas/QuoteLine' } }
+        taxable: { type: integer }
+        tax: { type: integer }
+        total: { type: integer, description: Including GST and rounding }
+        link: { type: string, description: 'Relative staff path on this install: /quotes/{id}' }
+        sourceRef: { type: [string, 'null'] }
+    MyTasks: { type: object, additionalProperties: false, required: [personId, items, generatedAt], properties: {
+      personId: { type: string, format: uuid }, generatedAt: { type: string, format: date-time }, items: { type: array, maxItems: 200, items: { type: object, additionalProperties: false, required: [id, title, status, dueAt, bucket, dueSoon, link], properties: {
+        id: { type: string, format: uuid }, title: { type: string }, status: { enum: [open, in_progress, blocked, in_review] }, dueAt: { type: [string, 'null'], format: date-time },
+        bucket: { enum: [overdue, due_today, upcoming, no_due_date], description: Install calendar day },
+        dueSoon: { type: boolean, description: Open/in-progress/blocked and due between now and 24 h from now }, link: { type: string, description: '/tasks/{id}' } } } } } }
+    Person: { type: object, additionalProperties: false, required: [id, name, workEmail, roles, teams, active, link], properties: {
+      id: { type: string, format: uuid }, name: { type: string }, workEmail: { type: [string, 'null'] },
+      roles: { type: array, items: { enum: [admin, hr, leadership, finance, manager, pgs, head_pgs] } },
+      teams: { type: array, items: { type: object, additionalProperties: false, required: [id, name], properties: { id: { type: string, format: uuid }, name: { type: string } } } },
+      active: { type: boolean }, link: { type: string, description: '/people/{id}' } } }
+    CatalogItem:
+      type: object
+      additionalProperties: false
+      required: [id, kind, name, description, price, currency, taxRate, publicLink]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [service, product, consumable, package] }
+        name: { type: string }
+        description: { type: string }
+        price: { type: integer, minimum: 0, maximum: 1000000000000 }
+        currency: { type: string, const: INR }
+        taxRate: { type: number }
+        publicLink: { type: [string, 'null'] }

@@ -1,0 +1,587 @@
+{
+ "id": "invite-a-client",
+ "title": {
+  "en": "Work with a client inside Pulse",
+  "hi": "Client ke saath Pulse mein kaam kijiye"
+ },
+ "persona": "Meera Shah (founder of Brightside Studio); all fictional",
+ "takes": [
+  {
+   "id": "r3a",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/connections"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 700
+    },
+    {
+     "do": "type",
+     "label": "Client company",
+     "value": "Greenleaf Cafe",
+     "mark": "company",
+     "zoom": 1.3,
+     "delay": 40
+    },
+    {
+     "do": "type",
+     "label": "Contact name",
+     "value": "Anaya Rao",
+     "mark": "contact",
+     "zoom": 1.3,
+     "delay": 40
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "Make the client link",
+     "mark": "make",
+     "zoom": 1.35
+    },
+    {
+     "do": "appear",
+     "sel": "[data-client-link]",
+     "mark": "link",
+     "zoom": 1.3
+    },
+    {
+     "do": "grab",
+     "sel": "[data-client-link]",
+     "var": "link",
+     "replaceOrigin": true
+    },
+    {
+     "do": "wait",
+     "ms": 1500
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ],
+   "blur": [
+    {
+     "mark": "link",
+     "box": [
+      20,
+      326,
+      370,
+      216
+     ],
+     "pad": 0,
+     "why": "the invite link and its QR code (a dev token)"
+    },
+    {
+     "mark": "link",
+     "box": [
+      20,
+      728,
+      370,
+      40
+     ],
+     "pad": 0,
+     "why": "the link again in the e-mail preview"
+    }
+   ]
+  },
+  {
+   "id": "r3b",
+   "setup": [],
+   "steps": [
+    {
+     "do": "goto",
+     "url": "${link}",
+     "mark": "open"
+    },
+    {
+     "do": "wait",
+     "ms": 1200
+    },
+    {
+     "do": "tap",
+     "text": "Just me",
+     "exact": true,
+     "mark": "justme",
+     "zoom": 1.3
+    },
+    {
+     "do": "type",
+     "label": "Your handle",
+     "value": "anaya.greenleaf",
+     "clear": true,
+     "mark": "handle",
+     "zoom": 1.3,
+     "delay": 30
+    },
+    {
+     "do": "fill",
+     "label": "/^Password/",
+     "secret": "anaya.greenleaf"
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "Create my account and accept",
+     "mark": "accept",
+     "zoom": 1.35
+    },
+    {
+     "do": "wait",
+     "ms": 3000
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  },
+  {
+   "id": "r3c",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/connections"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 1200
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "/New group with/",
+     "mark": "newgroup",
+     "zoom": 1.3
+    },
+    {
+     "do": "wait",
+     "ms": 800
+    },
+    {
+     "do": "type",
+     "label": "Group name",
+     "value": "Greenleaf launch",
+     "mark": "gname",
+     "zoom": 1.3,
+     "delay": 40,
+     "clear": true
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "Make the group",
+     "mark": "makegroup",
+     "zoom": 1.3
+    },
+    {
+     "do": "wait",
+     "ms": 1500
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  },
+  {
+   "id": "r3d",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/connections"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "/Give a task to/",
+     "mark": "give",
+     "zoom": 1.3
+    },
+    {
+     "do": "wait",
+     "ms": 800
+    },
+    {
+     "do": "type",
+     "label": "Task",
+     "exact": true,
+     "value": "Send us the new menu photos",
+     "mark": "task",
+     "zoom": 1.3,
+     "delay": 35,
+     "clear": true
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "Give the task",
+     "mark": "given",
+     "zoom": 1.3
+    },
+    {
+     "do": "wait",
+     "ms": 1800
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  },
+  {
+   "id": "r3e",
+   "setup": [
+    {
+     "do": "login",
+     "user": "anaya.greenleaf",
+     "as": "@anaya.greenleaf"
+    },
+    {
+     "do": "goto",
+     "url": "/chats"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "tap",
+     "text": "Greenleaf launch",
+     "exact": true,
+     "mark": "open",
+     "zoom": 1.25
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "type",
+     "placeholder": "Message",
+     "value": "Hi Meera! Excited to start",
+     "mark": "msg",
+     "zoom": 1.3,
+     "delay": 35,
+     "clear": true
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "Send",
+     "exact": true,
+     "mark": "send",
+     "zoom": 1.35
+    },
+    {
+     "do": "appear",
+     "text": "Hi Meera! Excited to start",
+     "exact": true,
+     "mark": "sentmsg",
+     "zoom": 1.3
+    },
+    {
+     "do": "wait",
+     "ms": 1200
+    },
+    {
+     "do": "back",
+     "mark": "back"
+    },
+    {
+     "do": "wait",
+     "ms": 600
+    },
+    {
+     "do": "tap",
+     "role": "link",
+     "name": "Work",
+     "exact": true,
+     "mark": "work",
+     "zoom": 1.2,
+     "sfx": "none"
+    },
+    {
+     "do": "appear",
+     "sel": "button[aria-label^=\"Mark\"]",
+     "mark": "tasklist",
+     "zoom": 1.3,
+     "sfx": "none"
+    },
+    {
+     "do": "wait",
+     "ms": 1200
+    },
+    {
+     "do": "tap",
+     "sel": "button[aria-label^=\"Mark\"]",
+     "mark": "done",
+     "zoom": 1.35
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "Mark done",
+     "exact": true,
+     "mark": "confirm",
+     "zoom": 1.3
+    },
+    {
+     "do": "wait",
+     "ms": 2400
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "r3e",
+   "from": "confirm",
+   "from_offset": 20,
+   "to": "end",
+   "camera": {
+    "cx": 585,
+    "cy": 700,
+    "z": 1.0
+   },
+   "hook": {
+    "en": "Clients, inside Pulse",
+    "hi": "Clients, Pulse ke andar"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] Your clients... working right inside Pulse!",
+     "cap": "Your *clients...* working right inside Pulse!"
+    },
+    "hi": {
+     "say": "[excited] आपके clients, सीधे Pulse के अंदर काम करते हैं!",
+     "cap": "Aapke *clients,* seedhe Pulse ke andar kaam karte hain!"
+    }
+   },
+   "chapter": {
+    "en": "In short",
+    "hi": "Short mein"
+   }
+  },
+  {
+   "id": "invite",
+   "take": "r3a",
+   "from": "company",
+   "to": "link",
+   "to_offset": 30,
+   "line": {
+    "en": {
+     "say": "Fill in the client, and make the client link.",
+     "cap": "Fill in the client, and make the *client* *link.*"
+    },
+    "hi": {
+     "say": "Client की details भरिए, और link बनाइए।",
+     "cap": "Client ki details bhariye, aur *link* banaiye."
+    }
+   },
+   "chapter": {
+    "en": "Make the link",
+    "hi": "Link banaiye"
+   }
+  },
+  {
+   "id": "join",
+   "take": "r3b",
+   "from": "justme",
+   "to": "end",
+   "line": {
+    "en": {
+     "say": "They open it, pick Just me, and they're in.",
+     "cap": "They open it, pick *Just* *me,* and they're in."
+    },
+    "hi": {
+     "say": "Client link खोलता है, Just me चुनता है, और अंदर!",
+     "cap": "Client link kholta hai, *Just* *me* chunta hai, aur andar!"
+    }
+   },
+   "chapter": {
+    "en": "The client joins",
+    "hi": "Client judta hai"
+   }
+  },
+  {
+   "id": "group",
+   "take": "r3c",
+   "from": "newgroup",
+   "to": "end",
+   "line": {
+    "en": {
+     "say": "Make a shared group, just for them.",
+     "cap": "Make a *shared* *group,* just for them."
+    },
+    "hi": {
+     "say": "उनके लिए एक shared group बनाइए।",
+     "cap": "Unke liye ek *shared* *group* banaiye."
+    }
+   },
+   "chapter": {
+    "en": "Shared group",
+    "hi": "Shared group"
+   }
+  },
+  {
+   "id": "task",
+   "take": "r3d",
+   "from": "give",
+   "to": "given",
+   "to_offset": 30,
+   "line": {
+    "en": {
+     "say": "Give them a task in one line.",
+     "cap": "Give them a *task* in one line."
+    },
+    "hi": {
+     "say": "एक line में task दीजिए।",
+     "cap": "Ek line mein *task* dijiye."
+    }
+   },
+   "chapter": {
+    "en": "Give a task",
+    "hi": "Task dijiye"
+   }
+  },
+  {
+   "id": "chat",
+   "take": "r3e",
+   "from": "msg",
+   "to": "sentmsg",
+   "to_offset": 24,
+   "line": {
+    "en": {
+     "say": "They chat with you, right there.",
+     "cap": "They *chat* with you, right there."
+    },
+    "hi": {
+     "say": "वो वहीं आपसे chat करते हैं।",
+     "cap": "Woh wahin aapse *chat* karte hain."
+    }
+   },
+   "chapter": {
+    "en": "Chat",
+    "hi": "Chat"
+   }
+  },
+  {
+   "id": "done",
+   "take": "r3e",
+   "from": "done",
+   "to": "end",
+   "payoff": true,
+   "line": {
+    "en": {
+     "say": "[happy] And when it's done, one tap. Work, together.",
+     "cap": "And when it's done, *one* *tap.* Work, together."
+    },
+    "hi": {
+     "say": "[happy] और काम होते ही, एक tap। साथ मिलकर काम!",
+     "cap": "Aur kaam hote hi, *ek* *tap.* Saath milkar kaam!"
+    }
+   },
+   "chapter": {
+    "en": "Done",
+    "hi": "Ho gaya"
+   }
+  }
+ ],
+ "end": {
+  "frames": 27,
+  "text": {
+   "en": "Work with clients, together",
+   "hi": "Clients ke saath, ek jagah"
+  }
+ },
+ "screens": {
+  "setup": [
+   {
+    "do": "login",
+    "user": "meera.shah"
+   },
+   {
+    "do": "goto",
+    "url": "/connections"
+   }
+  ],
+  "steps": [
+   {
+    "do": "appear",
+    "text": "Connected organisations"
+   },
+   {
+    "shot": "01",
+    "settle": 1200,
+    "focus": {
+     "text": "Connected organisations",
+     "exact": true
+    }
+   },
+   {
+    "shot": "02",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "/^New group with/"
+    }
+   },
+   {
+    "shot": "03",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "/^Give a task to/"
+    }
+   }
+  ]
+ },
+ "from_pilot": "takes and voice lines from the reels pilot 03-invite-client (23 Oct 2026); its captured takes are reused"
+}

@@ -1,0 +1,5 @@
+# Words the spelling check accepts beyond the dictionary (product and tech words). One or more per line.
+api apis mcp cli sdk sdks saas webhook webhooks onboarding workflow workflows dashboard dashboards login logins
+linkedin whatsapp telegram github gitlab ios android macos windows chrome postgres
+deploy deploys deployed rollback rollbacks timeline timelines carousel checklist inbox
+ai llm llms devops backend frontend fullstack runtime realtime offline online upload uploads

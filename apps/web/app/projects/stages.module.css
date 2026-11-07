@@ -1,0 +1,88 @@
+/* PROJECTS-STAGES (owner, 4 Nov 2026): starters, the journey by stage, late work and each person's load. Phone first:
+   every row stacks under 620 px, every control is a 36 px press or more. */
+.form { display: grid; gap: 12px; }
+.hint { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.problem { margin: 0; color: var(--theme-danger); font-size: 13px; }
+.rowEnd { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.tag { padding: 1px 6px; border-radius: 999px; background: var(--accent-soft); color: var(--theme-action); font-size: 11px; font-weight: 600; }
+
+/* Starters */
+.starters { display: grid; gap: 10px; min-width: 0; }
+.starterList { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+.starter { display: grid; gap: 4px; min-width: 0; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); text-align: left; cursor: pointer; font: inherit; }
+.starter:hover { border-color: color-mix(in srgb, var(--theme-action) 40%, var(--theme-border)); }
+.starter[aria-checked="true"] { border-color: var(--theme-action); box-shadow: 0 0 0 1px var(--theme-action); background: color-mix(in srgb, var(--accent-soft) 50%, var(--theme-surface)); }
+.starterHead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; }
+.starterSub { color: var(--theme-text-muted); font-size: 12px; }
+.starterStages { display: flex; flex-wrap: wrap; gap: 2px 4px; color: var(--theme-text-muted); font-size: 11.5px; }
+.starterStages i { margin-right: 4px; font-style: normal; opacity: .6; }
+.starterCallout { display: grid; gap: 10px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--theme-action) 25%, var(--theme-border)); border-radius: 12px; background: color-mix(in srgb, var(--accent-soft) 35%, var(--theme-surface)); }
+.starterCallout > div:first-child { display: grid; gap: 2px; font-size: 13px; }
+.starterCallout > div:first-child span { color: var(--theme-text-muted); }
+
+/* The journey: one row per stage, its owner, its work and its dates */
+.journey { display: grid; margin: 0; padding: 0 0 6px; list-style: none; }
+.jrow { display: grid; grid-template-columns: 30px minmax(0, 1fr) minmax(130px, auto) 128px 120px; gap: 10px; align-items: center; padding: 9px 16px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 50%, transparent); }
+.jrow:first-child { border-top: 0; }
+.jrow[data-state="now"] { background: color-mix(in srgb, var(--accent-soft) 40%, transparent); }
+.jNo { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--theme-border); font-size: 12px; font-weight: 700; }
+.jrow[data-state="done"] .jNo { background: var(--theme-action); color: var(--theme-on-action, #fff); }
+.jrow[data-state="now"] .jNo { box-shadow: 0 0 0 2px var(--theme-action); background: var(--theme-surface); }
+.jName { display: grid; gap: 1px; min-width: 0; }
+.jName b { font-weight: 600; }
+.jName small, .jDates, .jWork { color: var(--theme-text-muted); font-size: 12px; }
+.jWork b { color: var(--theme-text); }
+.jWork [data-late] { color: var(--theme-danger); }
+.ownerBtn { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; max-width: 100%; padding: 2px 8px; border: 1px solid var(--theme-border); border-radius: 8px; background: none; color: var(--theme-text); font: inherit; font-size: 12.5px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ownerBtn[data-none] { border-style: dashed; color: var(--theme-text-muted); }
+.ownerBtn:hover { border-color: var(--theme-action); color: var(--theme-action); }
+.ownerName { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; }
+@media (max-width: 760px) {
+  .jrow { grid-template-columns: 30px minmax(0, 1fr) auto; grid-template-areas: "no name owner" "no work work" "no dates dates"; gap: 3px 10px; align-items: start; padding: 10px 14px; }
+  .jNo { grid-area: no; } .jName { grid-area: name; } .jOwner { grid-area: owner; } .jWork { grid-area: work; } .jDates { grid-area: dates; }
+}
+
+.stageSelect { min-height: 30px; max-width: 170px; padding: 2px 6px; border: 1px dashed var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 12px; }
+
+/* Late work */
+/* UX-WORK: each late task is the Work kit's striped card (components/work-kit), with room between them. */
+.delays { display: grid; gap: 8px; margin: 0; padding: 4px 12px 12px; list-style: none; }
+.delay { display: grid; gap: 6px; }
+.delayHead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; }
+.delayHead a { color: var(--theme-text); font-weight: 600; }
+.delayHead a:hover { color: var(--theme-action); }
+.lateBy { color: var(--theme-danger); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.delayWhy { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; }
+.delayWhy b { color: var(--theme-text); font-weight: 550; }
+.delayWhy[data-none] { color: var(--theme-warning); }
+.acts { display: flex; flex-wrap: wrap; gap: 6px; }
+.acts > button { min-height: 34px; padding-inline: 10px; font-size: 12.5px; }
+.jDates:empty { display: none; }
+.jrow[data-state="passed"] .jNo { background: color-mix(in srgb, var(--theme-action) 25%, var(--theme-border)); }
+
+/* The doer's answer */
+.answer { display: grid; gap: 10px; }
+.reasons { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; border: 0; }
+.reasons legend { width: 100%; margin-bottom: 4px; font-weight: 600; font-size: 13px; }
+.reasons button { min-height: 34px; }
+.reasons button[aria-pressed="true"] { border-color: var(--theme-action); background: var(--accent-soft); color: var(--theme-action); }
+.answerRow { display: grid; grid-template-columns: minmax(0, 1fr) 180px; gap: 10px; }
+.answer[data-compact] .answerRow { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 620px) { .answerRow { grid-template-columns: minmax(0, 1fr); } }
+.lateBox { display: grid; gap: 10px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--theme-danger) 35%, var(--theme-border)); border-radius: 12px; background: color-mix(in srgb, var(--theme-danger) 5%, var(--theme-surface)); }
+.lateBox > p { margin: 0; font-size: 13px; }
+.lateBox > p b { font-weight: 650; }
+
+/* Load per person */
+.load { display: grid; margin: 0; padding: 0 0 6px; list-style: none; }
+.loadRow { display: grid; grid-template-columns: minmax(140px, 220px) minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 16px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 50%, transparent); }
+.loadRow:first-child { border-top: 0; }
+.loadWho { display: grid; gap: 1px; min-width: 0; }
+.loadWho a { color: var(--theme-text); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.loadWho small, .loadFacts { color: var(--theme-text-muted); font-size: 12px; }
+.loadFacts [data-late] { color: var(--theme-danger); font-weight: 600; }
+.loadBar { display: block; height: 6px; border-radius: 4px; background: var(--theme-border); overflow: hidden; }
+.loadBar i { display: block; height: 100%; border-radius: 4px; background: var(--theme-action); }
+.loadRow[data-state="late"] .loadBar i { background: var(--theme-danger); }
+.loadRow[data-state="full"] .loadBar i { background: var(--theme-warning); }
+@media (max-width: 620px) { .loadRow { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "who facts" "bar bar"; gap: 4px 10px; padding: 10px 14px; } .loadWho { grid-area: who; } .loadBar { grid-area: bar; } .loadFacts { grid-area: facts; text-align: right; } }

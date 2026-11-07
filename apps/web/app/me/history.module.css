@@ -1,0 +1,9 @@
+/* R43: My desk → History. Quiet notes under the tables, leave grouped by year. */
+.note { margin: 0; padding: 10px 14px 12px; color: var(--theme-text-muted); font-size: 12px; line-height: 1.5; }
+.subhead { margin: 0; padding: 12px 14px 2px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+.years { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.yearHead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin: 0; padding: 10px 14px 2px; }
+.yearHead span { color: var(--theme-text-muted); font-size: 12px; }
+.counts { display: grid; flex: none; justify-items: end; gap: 1px; margin-left: auto; padding-left: 12px; text-align: right; }
+.counts b { color: var(--theme-text); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.counts small { color: var(--theme-text-muted); font-size: 12px; white-space: nowrap; }

@@ -1,0 +1,89 @@
+{
+  "team": [
+    {
+      "name": "Fictional Editor",
+      "key": "fictional-editor",
+      "role": "Video Editor",
+      "pod": "Shared"
+    }
+  ],
+  "name_aliases": {
+    "Fictional Editor": [
+      "Fictional",
+      "Fictionaal Editor"
+    ]
+  },
+  "confirm_same_person": [
+    {
+      "name": "Fictional Editor",
+      "alias": "Fictionaal Editor"
+    }
+  ],
+  "mailbox_roles": {
+    "performancemarketer": "Performance Marketer",
+    "sales": "Sales"
+  },
+  "sensitive_access": [
+    "restricted@example.test"
+  ],
+  "role_grants": {
+    "admin": [
+      "admin-one@example.test",
+      "admin-two@example.test"
+    ],
+    "hr": [
+      "people@example.test"
+    ]
+  },
+  "same_person": [
+    {
+      "name": "Fictional Editor",
+      "primary": "editor@example.test",
+      "accounts": [
+        "editor@example.test",
+        "alternate@example.test"
+      ]
+    }
+  ],
+  "shared_local_parts": [
+    "ads",
+    "shoot",
+    "script",
+    "marketing",
+    "sales",
+    "performancemarketer",
+    "productionestateautopilots",
+    "businessautopilotsshoot"
+  ],
+  "project_paths": [
+    {
+      "match": "(?i)(?:^|/)client video shoot/(?P<year>20\\d{2})/(?![^/]*past data)(?P<month>[^/]+)/(?P<project>[^/]+)(?:/|$)"
+    },
+    {
+      "match": "(?i)(?:^|/)client video shoot/(?!20\\d{2}/)(?![^/]*past data)(?P<month>[^/]+)/(?P<project>[^/]+)(?:/|$)"
+    },
+    {
+      "match": "(?i)(?:^|/)#0 - client work video package/(?P<month>\\d+\\)\\s*[^/]+)/(?P<project>[^/]+)(?:/|$)"
+    }
+  ],
+  "pods": {
+    "pod1": "Pod 1",
+    "pod2": "Pod 2",
+    "leadership": "Leadership",
+    "shared": "Shared"
+  },
+  "delivery_rules": [
+    {
+      "match": ".*(?:drafts?|first draft).*",
+      "kind": "draft"
+    },
+    {
+      "match": ".*(?:final videos|model final|final designs|final creatives|approved videos|vovs|vov and designs|sample flat video|drone montage video).*",
+      "kind": "final"
+    }
+  ],
+  "shared_external_accounts": [
+    "shared-one@example.test",
+    "shared-two@example.test"
+  ]
+}

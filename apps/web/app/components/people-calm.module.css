@@ -1,0 +1,114 @@
+/* UX-PEOPLE (renamed from calm.module.css on landing: UX-BILLING took that name for its own My day pieces) (owner, 5 Nov 2026: "no UX/UI improvement in anything"): the calm parts of Work → My day, shared so every
+   screen reads the same: a page head with stat tiles, chip filters with counts, numbered "Start with" picks, cards with a
+   left colour stripe, a quiet right rail and empty states that say what to do. Phone first (390 wide, one column, every
+   control 44px); two columns from 1024. Colours are the theme's tokens, so light and dark both hold. */
+.page { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 1240px; margin: 0 auto; padding-bottom: 32px; color: var(--theme-text); min-width: 0; }
+/* The stripe colour: a tone, or a hue (role, pod, company) that holds in light and dark. */
+.stripe, .chip, .startList li { --stripe: var(--theme-action); }
+.stripe[data-tone="good"], .chip[data-tone="good"], .startList li[data-tone="good"] { --stripe: var(--theme-success); }
+.stripe[data-tone="warn"], .chip[data-tone="warn"], .startList li[data-tone="warn"] { --stripe: var(--theme-warning); }
+.stripe[data-tone="bad"], .chip[data-tone="bad"], .startList li[data-tone="bad"] { --stripe: var(--theme-danger); }
+.stripe[data-tone="quiet"], .chip[data-tone="quiet"] { --stripe: var(--theme-border-strong, var(--theme-text-muted)); }
+.stripe[style*="--hue"], .chip[style*="--hue"] { --stripe: hsl(var(--hue) 52% 42%); }
+:global(:root[data-theme="dark"]) .stripe[style*="--hue"], :global(:root[data-theme="dark"]) .chip[style*="--hue"] { --stripe: hsl(var(--hue) 58% 62%); }
+
+/* Head: eyebrow, title, one sentence, the primary action; stat tiles beside it on a computer. */
+.head { display: flex; flex-direction: column; gap: 12px; }
+.headText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.eyebrow { margin: 0; font-size: 13px; color: var(--theme-text-muted); }
+.title { margin: 0; font-size: 26px; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; }
+.lede { margin: 4px 0 0; font-size: 14px; line-height: 1.45; color: var(--theme-text-muted); max-width: 62ch; }
+.headActions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.back { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; font-size: 13px; color: var(--theme-text-muted); text-decoration: none; align-self: flex-start; }
+.back:hover { color: var(--theme-text); }
+
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.stat { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; background: var(--theme-surface); border: 1px solid var(--theme-border); min-width: 0; text-decoration: none; color: inherit; }
+.stat[data-link] { position: relative; }
+.stat[data-link]:hover { border-color: var(--theme-border-strong, var(--theme-text-muted)); }
+.statLink { color: inherit; text-decoration: none; }
+.statLink::after { content: ""; position: absolute; inset: 0; border-radius: 12px; }
+.stat dt, .statLabel { font-size: 12px; color: var(--theme-text-muted); }
+.stat dd, .statValue { margin: 0; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.statNote { font-size: 12px; color: var(--theme-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat[data-tone="bad"] .statValue { color: var(--theme-danger); }
+.stat[data-tone="warn"] .statValue { color: var(--theme-warning); }
+.stat[data-tone="good"] .statValue { color: var(--theme-success); }
+
+/* Chips: one row that scrolls sideways inside itself on a phone (never the page), wrapping on a computer. */
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0; padding: 2px 0; max-width: 100%; min-width: 0; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--theme-border);
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 550; cursor: pointer; white-space: nowrap;
+}
+.chip[aria-pressed="true"] { border-color: var(--theme-text); background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1px var(--theme-text); }
+.chipDot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--stripe); display: inline-block; }
+.chipCount { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--theme-surface-subtle); font-size: 12px; display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+
+/* Section heads and cards. */
+.sectionHead { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; font-weight: 650; color: var(--theme-text); min-height: 28px; }
+.sectionHead > svg { flex: none; color: var(--theme-text-muted); }
+.sectionHead small { margin-left: auto; font-weight: 500; color: var(--theme-text-muted); font-size: 12px; }
+.sectionHead[data-tone="bad"] { color: var(--theme-danger); }
+.sectionHead[data-tone="bad"] > svg { color: var(--theme-danger); }
+.card { display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border); min-width: 0; }
+
+.stripe {
+  position: relative; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px 12px 18px; border-radius: 14px; background: var(--theme-surface);
+  border: 1px solid var(--theme-border); min-width: 0; color: inherit; text-decoration: none;
+}
+.stripe::before { content: ""; position: absolute; left: 6px; top: 12px; bottom: 12px; width: 4px; border-radius: 2px; background: var(--stripe); }
+a.stripe:hover, button.stripe:hover { border-color: var(--theme-border-strong, var(--theme-text-muted)); }
+button.stripe { font: inherit; text-align: left; cursor: pointer; width: 100%; }
+.stripe[aria-pressed="true"], .stripe[aria-current="true"] { background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1px var(--theme-text); }
+.stripeTitle { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; min-width: 0; }
+.stripeTitle > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.stripeMeta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12.5px; color: var(--theme-text-muted); min-width: 0; }
+.stripeMeta > * { display: inline-flex; align-items: center; gap: 4px; min-width: 0; }
+
+/* Start with: numbered picks, what to do first. */
+.startList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.startList li { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 10px; }
+.startNo { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--theme-surface-subtle); color: var(--stripe); box-shadow: inset 0 0 0 1.5px var(--stripe); }
+.startOpen { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 2px; min-height: 44px; justify-content: center; min-width: 0; border-radius: 8px; color: var(--theme-text); }
+.startOpen b { font-weight: 600; font-size: 15px; }
+.startOpen small { color: var(--theme-text-muted); font-size: 12.5px; }
+@media (hover: hover) { .startOpen:hover b { color: var(--theme-action); } }
+
+/* Main column and quiet right rail. */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+.main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.rail { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.quiet { margin: 0; font-size: 13px; line-height: 1.45; color: var(--theme-text-muted); }
+
+.empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 28px 16px; text-align: center; border-radius: 16px; border: 1px dashed var(--theme-border-strong, var(--theme-border)); color: var(--theme-text-muted); }
+.empty b { color: var(--theme-text); font-size: 16px; }
+.empty > svg { color: var(--theme-text-muted); }
+.empty p { margin: 0; max-width: 46ch; font-size: 14px; line-height: 1.45; }
+.empty .emptyActions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
+
+.btn, .btnPrimary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); text-decoration: none; white-space: nowrap;
+}
+.btnPrimary { background: var(--theme-action); border-color: var(--theme-action); color: var(--theme-action-text, #fff); }
+.btn:disabled, .btnPrimary:disabled { opacity: 0.6; cursor: default; }
+
+.chip:focus-visible, .stripe:focus-visible, .startOpen:focus-visible, .btn:focus-visible, .btnPrimary:focus-visible, .statLink:focus-visible, .back:focus-visible {
+  outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px;
+}
+
+@media (min-width: 640px) {
+  .head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+  .head[data-stack] { flex-direction: column; align-items: stretch; }
+  .stats { grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); min-width: min(460px, 100%); }
+  .chips { flex-wrap: wrap; }
+}
+@media (min-width: 1024px) {
+  .grid { grid-template-columns: minmax(0, 1fr) 340px; column-gap: 20px; }
+  .rail { position: sticky; top: 12px; }
+  .chip { min-height: 36px; }
+  .btn, .btnPrimary, .startOpen { min-height: 36px; }
+}
+@media (min-width: 1024px) and (pointer: coarse) { .chip, .btn, .btnPrimary, .startOpen { min-height: 44px; } }

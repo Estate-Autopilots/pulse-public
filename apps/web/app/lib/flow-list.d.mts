@@ -1,0 +1,20 @@
+type Port = { key: string; label: string; kind: string; required?: boolean; many?: boolean };
+type Mod = { key: string; name: string; needs: Port[]; makes: Port[] };
+type Wire = { from: { step: string; port: string }; to: { step: string; port: string }; notify?: string[]; label?: string | null };
+type Step = { id: string; module: string; block?: string | null; stage?: string | null; settings?: Record<string, unknown> };
+type Def<S extends Step = Step> = { stages: { key: string; label: string }[]; steps: S[]; wires: Wire[] };
+
+export declare function isGate(def: Def, byKey: Record<string, Mod>, w: Wire): boolean;
+export declare function gates(def: Def, byKey: Record<string, Mod>): Wire[];
+export declare function ranks(def: Def, byKey: Record<string, Mod>): Map<string, number>;
+export declare function rows<S extends Step>(def: Def<S>, byKey: Record<string, Mod>): { key: string; label: string; rows: S[][] }[];
+export declare function wayOf(def: Def, byKey: Record<string, Mod>, id: string): { decide: string; port: string; label: string } | null;
+export declare function before(def: Def, byKey: Record<string, Mod>, id: string): Set<string>;
+export declare function insertAfter<D extends Def>(def: D, byKey: Record<string, Mod>, aId: string, step: D["steps"][number], port?: string | null): D;
+export declare function addBeside<D extends Def>(def: D, byKey: Record<string, Mod>, aId: string, step: D["steps"][number]): D;
+export declare function stageEnds<S extends Step>(def: Def<S>, byKey: Record<string, Mod>, stageKey: string | null): S[];
+export declare function appendTo<D extends Def>(def: D, byKey: Record<string, Mod>, stageKey: string | null, step: D["steps"][number]): D;
+export declare function removeStep<D extends Def>(def: D, byKey: Record<string, Mod>, id: string): D;
+export declare function swap<D extends Def>(def: D, byKey: Record<string, Mod>, id: string, dir: "up" | "down"): D;
+export declare function insertBefore<D extends Def>(def: D, byKey: Record<string, Mod>, id: string, step: D["steps"][number]): D;
+export declare function insertAfterRow<D extends Def>(def: D, byKey: Record<string, Mod>, ids: string[], step: D["steps"][number]): D;

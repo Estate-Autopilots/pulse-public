@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+"""Check Pulse health and shell routes at a supplied base URL."""
+
+from __future__ import annotations
+
+import math
+import os
+import sys
+import time
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+
+WEB_ROUTES = ("/", "/my-week", "/pod", "/leadership")
+TIMEOUT_SECONDS = 10
+
+
+class OffOriginRedirect(Exception):
+    def __init__(self, host: str):
+        self.host = host or "(unknown host)"
+
+
+def origin(url: str) -> tuple[str, str, int | None]:
+    parsed = urlsplit(url)
+    port = parsed.port or (443 if parsed.scheme.lower() == "https" else 80)
+    return parsed.scheme.lower(), (parsed.hostname or "").lower(), port
+
+
+class SameOriginRedirectHandler(HTTPRedirectHandler):
+    def __init__(self, base_url: str):
+        super().__init__()
+        self.base_origin = origin(base_url)
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        target = urlsplit(newurl)
+        if origin(newurl) != self.base_origin:
+            raise OffOriginRedirect(target.netloc or target.hostname or "(unknown host)")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def request(base_url: str, path: str) -> tuple[int, float, str | None]:
+    started = time.monotonic()
+    headers = {"User-Agent": "Pulse-Smoke/1.0"}
+    client_id = os.environ.get("PULSE_SMOKE_CF_ACCESS_CLIENT_ID")
+    client_secret = os.environ.get("PULSE_SMOKE_CF_ACCESS_CLIENT_SECRET")
+    if client_id and client_secret:
+        headers["CF-Access-Client-Id"] = client_id
+        headers["CF-Access-Client-Secret"] = client_secret
+
+    opener = build_opener(SameOriginRedirectHandler(base_url))
+    try:
+        with opener.open(Request(base_url + path, headers=headers), timeout=TIMEOUT_SECONDS) as response:
+            response.read(1)
+            return response.status, time.monotonic() - started, None
+    except OffOriginRedirect as error:
+        return 0, time.monotonic() - started, error.host
+    except HTTPError as error:
+        location = error.headers.get("Location", "")
+        target_host = urlsplit(location).netloc if 300 <= error.code < 400 else None
+        return error.code, time.monotonic() - started, target_host or None
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        print("usage: tools/smoke <base-url>", file=sys.stderr)
+        return 2
+
+    base_url = sys.argv[1].rstrip("/")
+    parsed = urlsplit(base_url)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path not in {"", "/"} or parsed.query or parsed.fragment:
+        print("smoke: base URL must be an http(s) origin, for example http://127.0.0.1:3000", file=sys.stderr)
+        return 2
+    try:
+        max_seconds = float(os.environ.get("PULSE_SMOKE_MAX_SECONDS", "2"))
+        if not math.isfinite(max_seconds) or max_seconds <= 0:
+            raise ValueError
+    except ValueError:
+        print("smoke: PULSE_SMOKE_MAX_SECONDS must be a finite number greater than zero", file=sys.stderr)
+        return 2
+
+    try:
+        health_status, health_time, health_redirect = request(base_url, "/healthz")
+        if health_redirect:
+            print(f"FAIL /healthz: off-origin redirect to {health_redirect}", file=sys.stderr)
+            return 1
+        if health_status not in {200, 404}:
+            print(f"FAIL /healthz: HTTP {health_status}", file=sys.stderr)
+            return 1
+
+        root_result = request(base_url, "/")
+        root_status, root_time, root_redirect = root_result
+        if root_redirect:
+            print(f"FAIL /: off-origin redirect to {root_redirect}", file=sys.stderr)
+            return 1
+        if root_status == 404:
+            health_ok = health_status == 200 and health_time <= max_seconds
+            root_ok = root_time <= max_seconds
+            root_result = "PASS" if root_ok else "FAIL"
+            if health_status == 200:
+                health_result = "PASS" if health_ok else "FAIL"
+                print(f"{health_result} /healthz: HTTP 200, {health_time:.3f}s (limit {max_seconds:.3f}s)")
+            print(f"{root_result} /: HTTP 404, {root_time:.3f}s (limit {max_seconds:.3f}s)")
+            print("API only: / returned HTTP 404; no shell routes to check")
+            if health_status == 404:
+                print("FAIL /healthz: HTTP 404; API-only mode requires HTTP 200", file=sys.stderr)
+            return 0 if health_ok and root_ok else 1
+
+        checks = [("/", root_status, root_time, root_redirect)]
+        checks.extend((path, *request(base_url, path)) for path in WEB_ROUTES[1:])
+    except (OSError, URLError, TimeoutError, ValueError) as error:
+        reason = getattr(error, "reason", error)
+        print(f"smoke: request failed: {reason}", file=sys.stderr)
+        return 1
+
+    failed = False
+    print(f"Pulse web smoke at {parsed.scheme}://{parsed.netloc}")
+    if health_status == 200:
+        result = "PASS" if health_time <= max_seconds else "FAIL"
+        print(f"{result} /healthz: HTTP 200, {health_time:.3f}s (limit {max_seconds:.3f}s)")
+        failed |= result == "FAIL"
+    for path, status, elapsed, redirect_host in checks:
+        if redirect_host:
+            result = "FAIL"
+            detail = f"off-origin redirect to {redirect_host}"
+        else:
+            result = "PASS" if 200 <= status < 300 and elapsed <= max_seconds else "FAIL"
+            detail = f"HTTP {status}, {elapsed:.3f}s (limit {max_seconds:.3f}s)"
+        print(f"{result} {path}: {detail}")
+        failed |= result == "FAIL"
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

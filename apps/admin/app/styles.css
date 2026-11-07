@@ -1,0 +1,17 @@
+/* PULSE-ADMIN: the page base (the Sales X-Ray admin's came from its operations package). Colours live in ui/tokens.css. */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  min-height: 100dvh;
+  background: var(--sx-paper, #f4f6fb);
+  color: var(--sx-ink, #0b1424);
+  font-family: var(--lx-font-ui, system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+code, kbd, pre { font-family: var(--lx-font-mono, ui-monospace, monospace); }
+.skip-link { position: absolute; left: -9999px; top: 8px; z-index: 100; padding: 8px 12px; border-radius: 8px; background: var(--sx-surface); }
+.skip-link:focus { left: 8px; }

@@ -1,0 +1,15 @@
+{
+  "orgs": [
+    {
+      "org": "00000000-0000-4000-8000-000000000001",
+      "brand": null,
+      "person": "00000000-0000-4000-8000-000000000002",
+      "authors": {"dev@example.com": "00000000-0000-4000-8000-000000000002"},
+      "repos": [
+        {"path": "/srv/example/app.git", "name": "example-app", "ref": "main", "commitUrl": "https://git.example.com/example/app/commit/{sha}", "brand": null, "tags": true}
+      ],
+      "laneReports": "/srv/example/reports",
+      "deploys": {"repo": "/srv/example/app.git", "ref": "production", "name": "example-app"}
+    }
+  ]
+}

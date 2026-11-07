@@ -1,0 +1,40 @@
+/* WA-NATIVE: the "moved from WhatsApp" marker, jump to a date, who wrote in WhatsApp, imported media. */
+.marker { align-self: center; display: flex; align-items: flex-start; gap: 10px; max-width: min(92%, 440px); margin: 14px 0 10px; padding: 10px 14px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); box-shadow: 0 1px 2px rgb(0 0 0 / 5%); font-size: 13px; line-height: 1.45; }
+.marker b { display: block; font-weight: 650; color: var(--theme-text); }
+.marker small { display: block; color: var(--theme-text-muted); font-size: 12.5px; }
+.markerIcon { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: color-mix(in srgb, #25d366 16%, var(--theme-surface)); color: #128c4b; }
+:global(:root[data-theme="dark"]) .markerIcon { color: #4ade80; }
+
+.jump { width: min(420px, 100%); }
+.jump h2 { display: inline-flex; align-items: center; gap: 8px; }
+.jumpForm { display: flex; align-items: flex-end; gap: 10px; }
+.jumpForm label { flex: 1; display: grid; gap: 4px; font-size: 12.5px; color: var(--theme-text-muted); }
+.jumpForm input { min-height: 40px; padding: 0 10px; border: 1px solid var(--theme-border-strong); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 15px; }
+.jumpForm button { min-height: 40px; padding: 0 18px; }
+.firstBtn { align-self: flex-start; padding: 6px 12px; border: 1px solid var(--theme-border); border-radius: 999px; background: transparent; color: var(--theme-action); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.months { display: grid; gap: 10px; max-height: min(46vh, 360px); overflow: auto; padding-top: 4px; border-top: 1px solid var(--theme-border); }
+.year { display: grid; grid-template-columns: 48px 1fr; align-items: start; gap: 8px; padding-top: 8px; }
+.year b { padding-top: 6px; font-size: 12.5px; color: var(--theme-text-muted); }
+.year span { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.year button { min-height: 34px; border: 1px solid var(--theme-border); border-radius: 9px; background: var(--theme-surface-subtle); color: var(--theme-text); font: inherit; font-size: 13px; cursor: pointer; }
+.year button:hover, .year button:focus-visible { border-color: var(--theme-action); color: var(--theme-action); }
+@media (max-width: 480px) { .year span { grid-template-columns: repeat(4, minmax(0, 1fr)); } .year button { min-height: 40px; } }
+
+.count { margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 11.5px; font-weight: 600; }
+.peopleNote { margin: 2px 0 8px; padding: 0 20px; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.45; }
+.people { display: grid; gap: 2px; margin: 0; padding: 0 20px 12px; list-style: none; }
+.people li { display: flex; align-items: center; gap: 10px; padding: 6px 2px; }
+.dot { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 13px; font-weight: 700; }
+.dot[data-kind="client"], .dot[data-kind="contact"] { background: color-mix(in srgb, #0ea5e9 16%, var(--theme-surface)); color: #0369a1; }
+.dot[data-kind="number"], .dot[data-kind="unknown"] { background: color-mix(in srgb, #25d366 14%, var(--theme-surface)); color: #128c4b; }
+:global(:root[data-theme="dark"]) .dot[data-kind="client"], :global(:root[data-theme="dark"]) .dot[data-kind="contact"] { color: #7dd3fc; }
+:global(:root[data-theme="dark"]) .dot[data-kind="number"], :global(:root[data-theme="dark"]) .dot[data-kind="unknown"] { color: #4ade80; }
+.who { min-width: 0; display: grid; }
+.who b, .who a { overflow: hidden; font-size: 14px; font-weight: 600; color: var(--theme-text); text-overflow: ellipsis; white-space: nowrap; text-decoration: none; }
+.who a:hover { text-decoration: underline; }
+.who small { color: var(--theme-text-muted); font-size: 12px; }
+
+.video { display: block; width: min(320px, 100%); max-height: 420px; margin-bottom: 20px; border-radius: 10px; background: #000; object-fit: contain; }
+.omitted { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin: 2px 0 4px; color: var(--theme-text); font-size: 13.5px; }
+.omitted span { color: var(--theme-text-muted); font-size: 12px; font-style: italic; }
+.importedEvent > span { max-width: 100%; }

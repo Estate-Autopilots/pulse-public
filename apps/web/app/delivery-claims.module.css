@@ -1,0 +1,12 @@
+.list { max-height: 320px; margin: 0; padding: 0; overflow: auto; list-style: none; }
+.row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 56px; padding: 8px 14px; border-top: 1px solid var(--soft); }
+.actions { display: flex; align-items: center; gap: 6px; }
+.reviewPanel { min-height: 0; }
+.reviewPanel .list { max-height: 240px; }
+
+@media (max-width: 760px) {
+  .row { grid-template-columns: 24px minmax(0, 1fr); }
+  .claimMeta { flex-wrap: wrap; white-space: normal; row-gap: 2px; }
+  .row > button, .actions { grid-column: 2; justify-self: start; }
+  .row > [role="status"] { grid-column: 2; justify-self: start; }
+}

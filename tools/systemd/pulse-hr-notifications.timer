@@ -1,0 +1,8 @@
+[Unit]
+Description=Deliver Pulse production HR notifications every minute
+[Timer]
+OnActiveSec=1min
+OnUnitInactiveSec=1min
+Persistent=true
+[Install]
+WantedBy=timers.target

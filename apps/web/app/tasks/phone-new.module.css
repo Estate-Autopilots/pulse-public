@@ -1,0 +1,11 @@
+/* PROJECTS-CREATE: the phone's "+ New", above the bottom tabs (and the home indicator), never on wider screens. */
+.fab { display: none; }
+@media (max-width: 760px) {
+  .fab {
+    position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+    display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 18px 0 14px; border: 0; border-radius: 999px;
+    background: var(--theme-action); color: var(--theme-action-text, #fff); font: inherit; font-size: 15px; font-weight: 650; cursor: pointer;
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--theme-text) 22%, transparent);
+  }
+  .fab:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 3px; }
+}

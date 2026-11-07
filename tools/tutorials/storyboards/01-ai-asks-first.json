@@ -1,0 +1,220 @@
+{
+ "id": "01-ai-asks-first",
+ "title": {
+  "en": "Your AI employee asks before it acts",
+  "hi": "Aapka AI employee pehle poochta hai"
+ },
+ "persona": "Rifob Desai, client coordinator at Brightside Studio (fictional demo company); Luna is its AI employee, Skyline Heights a fictional client",
+ "takes": [
+  {
+   "id": "r1",
+   "setup": [
+    {
+     "do": "login",
+     "user": "rifob.desai"
+    },
+    {
+     "do": "goto",
+     "url": "/chats"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "list"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "tap",
+     "text": "Skyline Heights",
+     "exact": true,
+     "mark": "open-group",
+     "zoom": 1.2
+    },
+    {
+     "do": "appear",
+     "text": "/Can we move Saturday/",
+     "mark": "ask",
+     "zoom": 1.38
+    },
+    {
+     "do": "wait",
+     "ms": 1600
+    },
+    {
+     "do": "back",
+     "mark": "back"
+    },
+    {
+     "do": "wait",
+     "ms": 700
+    },
+    {
+     "do": "tap",
+     "text": "Luna",
+     "exact": true,
+     "mark": "open-dm",
+     "zoom": 1.2
+    },
+    {
+     "do": "appear",
+     "sel": "[data-proposal][data-state=\"pending\"]",
+     "mark": "card",
+     "zoom": 1.12
+    },
+    {
+     "do": "wait",
+     "ms": 1800
+    },
+    {
+     "do": "tap",
+     "role": "button",
+     "name": "Send it",
+     "exact": true,
+     "mark": "send",
+     "zoom": 1.3
+    },
+    {
+     "do": "appear",
+     "text": "/Approved by/",
+     "mark": "approved",
+     "zoom": 1.3
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "tap",
+     "role": "link",
+     "name": "/See it in/",
+     "mark": "see",
+     "zoom": 1.25,
+     "sfx": "none"
+    },
+    {
+     "do": "appear",
+     "sel": "[data-proposal-sent]",
+     "mark": "landed",
+     "zoom": 1.3,
+     "sfx": "none"
+    },
+    {
+     "do": "wait",
+     "ms": 1800
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "r1",
+   "from": "landed",
+   "from_offset": 6,
+   "to": "end",
+   "camera": {
+    "cx": 585,
+    "cy": 1500,
+    "z": 1.12
+   },
+   "hook": {
+    "en": "Your AI asks first",
+    "hi": "AI pehle poochta hai"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] Your AI employee... asks before it acts!",
+     "cap": "Your AI employee... *asks* before it acts!"
+    },
+    "hi": {
+     "say": "[excited] आपका AI employee, act करने से पहले पूछता है!",
+     "cap": "Aapka AI employee, act karne se pehle *poochta* hai!"
+    }
+   }
+  },
+  {
+   "id": "ask",
+   "take": "r1",
+   "from": "open-group",
+   "to": "ask",
+   "to_offset": 36,
+   "line": {
+    "en": {
+     "say": "A client asks something in the group.",
+     "cap": "A *client* asks something in the group."
+    },
+    "hi": {
+     "say": "Client ने group में कुछ पूछा।",
+     "cap": "*Client* ne group mein kuch poocha."
+    }
+   }
+  },
+  {
+   "id": "dm",
+   "take": "r1",
+   "from": "open-dm",
+   "to": "send",
+   "to_offset": -4,
+   "line": {
+    "en": {
+     "say": "Luna doesn't just reply. She DMs you a draft first.",
+     "cap": "Luna doesn't just reply. She DMs you a *draft* first."
+    },
+    "hi": {
+     "say": "Luna सीधा reply नहीं करती, पहले आपको draft DM करती है।",
+     "cap": "Luna seedha reply nahi karti, pehle aapko *draft* DM karti hai."
+    }
+   }
+  },
+  {
+   "id": "send",
+   "take": "r1",
+   "from": "send",
+   "to": "see",
+   "to_offset": 8,
+   "line": {
+    "en": {
+     "say": "Looks good? Tap Send it.",
+     "cap": "Looks good? Tap *Send* *it.*"
+    },
+    "hi": {
+     "say": "सही लगा? Send it दबाइए।",
+     "cap": "Sahi laga? *Send* *it* dabaiye."
+    }
+   }
+  },
+  {
+   "id": "landed",
+   "take": "r1",
+   "from": "landed",
+   "to": "end",
+   "payoff": true,
+   "line": {
+    "en": {
+     "say": "[happy] Done! The reply lands in the group, approved by you.",
+     "cap": "Done! The reply *lands* in the group, approved by you."
+    },
+    "hi": {
+     "say": "[happy] हो गया! Reply group में पहुँच गया, आपकी approval के साथ।",
+     "cap": "Ho gaya! Reply group mein *pahunch* gaya, aapki approval ke saath."
+    }
+   },
+   "from_offset": -10
+  }
+ ],
+ "end": {
+  "frames": 27,
+  "text": {
+   "en": "AI that asks first",
+   "hi": "AI jo pehle poochhe"
+  }
+ }
+}

@@ -1,0 +1,10 @@
+export type BillingTone = "danger" | "warning" | "accent" | "success" | "neutral";
+export type DocStateInput = { docType: string; status: string; dueDate?: string | null; ownerApproval?: string | null; approvalAskedBy?: string | null; approvalToName?: string | null };
+export function docStateWords(d: DocStateInput, today: string, free?: boolean): { label: string; tone: BillingTone } | null;
+export const OTHER_WORDS: Record<string, string>;
+export const SUBJECT_WORDS: Record<string, string>;
+export function sentence(k: string): string;
+export function logTone(kind: string): BillingTone;
+export type LogInput = { subjectType: string; subjectId: string | null; kind: string; detail?: Record<string, unknown> | null; number?: string | null; docType?: string | null; item?: string | null };
+export function logShow(e: LogInput): "money" | "documents" | "catalogue" | "other";
+export function describeLog(e: LogInput, events?: Record<string, string>, types?: Record<string, string>): { what: string; of: string; href: string | undefined };

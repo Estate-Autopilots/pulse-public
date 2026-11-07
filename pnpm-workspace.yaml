@@ -1,0 +1,7 @@
+# pnpm workspace: the TypeScript side of the monorepo. Python packages live in uv; Rust crates use Cargo.
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "services/api"
+  - "infra/web"
+  - "tests/e2e"

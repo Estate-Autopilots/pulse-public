@@ -1,0 +1,55 @@
+import assert from 'node:assert/strict';
+import {Pool} from 'pg';
+import {writeFile} from 'node:fs/promises';
+import {createApp} from '../dist/app.js';
+const pool=new Pool(JSON.parse(process.env.TEST_API_CONFIG)),app=createApp(pool,pool);
+const people=JSON.parse(process.env.TEST_PEOPLE);let checks=0;
+const eq=(a,b,label)=>{assert.deepEqual(a,b,label);checks++;};
+async function call(path,who,body){const r=await app.inject({url:'/api/v0/'+path,method:body===undefined?'GET':'POST',headers:who?{'cf-access-authenticated-user-email':people[who].email}:{},...(body===undefined?{}:{payload:body})});return {status:r.statusCode,data:r.json()};}
+try{
+ eq((await call('companion/inbox')).status,401,'signed out inbox');
+ eq((await call('companion/snooze',null,{})).status,401,'signed out control authenticates before input');
+ eq((await call('companion/snooze','member',{})).status,400,'missing item rejected');
+ const initial=(await call('companion/notification-settings','member')).data.settings;
+ eq(initial.reminders.done,false,'done prompt is optional');
+ eq((await call('companion/notification-settings','member',{channels:{telegram:false},quiet:false})).status,200,'self controls');
+ eq((await call('companion/notification-settings','member',{channels:{web:false}})).status,200,'partial channel update');
+ const settings=(await call('companion/notification-settings','member')).data.settings;
+ eq(settings.channels.telegram,false,'partial save preserves other channel choice');
+ eq(settings.channels.web,false,'partial save applies selected channel');
+ eq((await call('companion/notification-settings','other')).data.settings.channels.web,true,'preferences are self only');
+ eq((await call('companion/notification-settings','member',{snoozedUntil:new Date(Date.now()+172800000).toISOString()})).status,400,'global snooze bounded');
+ process.env.PULSE_PAYROLL_NOTICES_ENABLED='0';
+ eq((await call('notifications/payroll-processed','admin',{personId:people.member.id,month:'2026-10-01',sourceKey:'synthetic-batch',confirmation:'accounts_processed'})).status,503,'payroll activation gate');
+ process.env.PULSE_PAYROLL_NOTICES_ENABLED='1';
+ const request={personId:people.member.id,month:'2026-10-01',sourceKey:'synthetic-batch',confirmation:'accounts_processed'};
+ eq((await call('notifications/payroll-processed','admin',request)).status,403,'admin role cannot infer accounts');
+ eq((await call('notifications/payroll-access','member',{personId:people.other.id,revoke:false})).status,403,'only admin grants accounts');
+ eq((await call('notifications/payroll-access','admin',{personId:people.other.id,revoke:false})).status,200,'explicit accounts grant');
+ const processed=await call('notifications/payroll-processed','other',request);eq(processed.status,200,'authorized processed transition');
+ eq((await call('notifications/payroll-processed','other',request)).data.id,processed.data.id,'processed replay identity');
+ eq((await call('notifications/payroll-processed','other',{...request,month:'2026-11-01'})).status,400,'key cannot name a different period');
+ const inbox=await call('companion/inbox','member');const row=inbox.data.rows.find(n=>n.eventType==='payroll.processed');
+ eq(row.subjectId,processed.data.id,'typed processed subject');eq(row.contractVersion,1,'versioned contract');
+ eq(row.subjectType,'payroll_notice','subject type');
+ eq((await call('notifications?event='+row.id,'member')).data.rows.length,1,'opaque deep link resolves owned event');
+ eq((await call('notifications?event='+row.id,'other')).data.rows.length,0,'deep link denies other person');
+ eq((await call('native/notifications/'+row.id+'/open','member')).data.target,'Payroll','narrow event target');
+ eq((await call('native/notifications/'+row.id+'/open','other')).status,404,'other person cannot open event');
+ eq((await call('companion/snooze','other',{id:row.id,minutes:60})).status,403,'cannot snooze another person');
+ eq((await call('companion/snooze','member',{id:row.id,minutes:500})).status,400,'item snooze bounded');
+ eq((await call('companion/snooze','member',{id:row.id,minutes:60})).status,200,'self snooze');
+ eq((await call('companion/updates','member')).data.rows.find(n=>n.id===row.id).pingAllowed,false,'snoozed event cannot ping');
+ eq((await call('companion/snooze','member',{id:row.id,minutes:60,dismiss:true})).status,200,'self dismiss');
+ eq((await call('companion/inbox','member')).data.rows.some(n=>n.id===row.id),false,'dismissed event hidden');
+ eq((await call('native/notifications/'+row.id+'/open','member')).status,404,'dismissed event cannot open through stale push');
+ // A native admin device still cannot operate payroll or connect arbitrary recipients.
+ const start=(await call('native/pair/start',null,{platform:'android',name:'Synthetic R27'})).data;
+ eq((await call('native/pair/decide','admin',{code:start.code,approve:true})).status,200,'synthetic device paired');
+ const paired=(await call('native/pair/poll',null,{pairId:start.pairId,pollSecret:start.pollSecret})).data;
+ const denied=await app.inject({url:'/api/v0/notifications/payroll-access',method:'POST',headers:{authorization:'Bearer '+paired.accessToken},payload:{personId:people.other.id,revoke:false}});
+ eq(denied.statusCode,403,'device scope cannot gain accounts administration');
+ const report={apiChecks:checks,syntheticOnly:true,emailsSent:0,providerNetworkCalls:0,attendanceWrites:0};
+ if(process.env.R27_REPORT)await writeFile(process.env.R27_REPORT,JSON.stringify(report,null,2)+'\n');
+ console.log(JSON.stringify(report));
+}finally{await app.close();await pool.end();}

@@ -1,0 +1,297 @@
+{
+ "id": "close-a-deal",
+ "title": {
+  "en": "Close a deal: send the client their link",
+  "hi": "Deal close: client ko unka link bhejiye"
+ },
+ "persona": "Meera Shah (founder of Brightside Studio); all fictional",
+ "takes": [
+  {
+   "id": "d1",
+   "setup": [
+    {
+     "do": "login",
+     "user": "meera.shah"
+    },
+    {
+     "do": "goto",
+     "url": "/connections"
+    }
+   ],
+   "steps": [
+    {
+     "do": "mark",
+     "mark": "start"
+    },
+    {
+     "do": "wait",
+     "ms": 900
+    },
+    {
+     "do": "type",
+     "mark": "company",
+     "value": "Lotus Interiors",
+     "zoom": 1.3,
+     "delay": 35,
+     "label": "Client company"
+    },
+    {
+     "do": "type",
+     "mark": "contact",
+     "value": "Kavya Iyer",
+     "zoom": 1.3,
+     "delay": 35,
+     "label": "Contact name"
+    },
+    {
+     "do": "type",
+     "mark": "project",
+     "value": "Showroom launch film",
+     "zoom": 1.3,
+     "delay": 35,
+     "label": "/^Project/"
+    },
+    {
+     "do": "type",
+     "mark": "summary",
+     "value": "Two launch films and ten reels.",
+     "zoom": 1.3,
+     "delay": 25,
+     "label": "/^Deal summary/"
+    },
+    {
+     "do": "eval",
+     "js": "(() => { const s = document.createElement('style'); s.dataset.learnBlur = ''; s.textContent = \"[data-client-link], [aria-label='Scan to open the client link'], [aria-label='E-mail preview'] pre { filter: blur(7px) !important; }\"; document.head.appendChild(s); })()",
+     "why": "the client link, its QR code and the e-mail preview carry a dev invite token: blurred in the page itself"
+    },
+    {
+     "do": "tap",
+     "mark": "make",
+     "zoom": 1.35,
+     "role": "button",
+     "name": "Make the client link"
+    },
+    {
+     "do": "appear",
+     "mark": "link",
+     "zoom": 1.15,
+     "sel": "[data-client-link]",
+     "timeout": 60000
+    },
+    {
+     "do": "wait",
+     "ms": 1800
+    },
+    {
+     "do": "mark",
+     "mark": "end"
+    }
+   ],
+   "blur": [
+    {
+     "mark": "link",
+     "pad": 8,
+     "why": "the link itself, blurred again in the edit"
+    }
+   ]
+  }
+ ],
+ "beats": [
+  {
+   "id": "hook",
+   "take": "d1",
+   "from": "link",
+   "to": "end",
+   "hook": {
+    "en": "Deal won? Send the link",
+    "hi": "Deal pakki? Link bhejiye"
+   },
+   "chapter": {
+    "en": "In short",
+    "hi": "Short mein"
+   },
+   "line": {
+    "en": {
+     "say": "[excited] Deal won? Send your client their own link!",
+     "cap": "Deal *won?* Send your client their own *link!*"
+    },
+    "hi": {
+     "say": "[excited] Deal पक्की? Client को उनका link भेजिए!",
+     "cap": "Deal *pakki?* Client ko unka *link* bhejiye!"
+    }
+   }
+  },
+  {
+   "id": "who",
+   "take": "d1",
+   "from": "company",
+   "to": "project",
+   "to_offset": -4,
+   "chapter": {
+    "en": "The client",
+    "hi": "Client"
+   },
+   "line": {
+    "en": {
+     "say": "In Connections, type the client and the contact.",
+     "cap": "In *Connections,* type the client and the contact."
+    },
+    "hi": {
+     "say": "Connections में client और contact का नाम लिखिए।",
+     "cap": "*Connections* mein client aur contact ka naam likhiye."
+    }
+   }
+  },
+  {
+   "id": "deal",
+   "take": "d1",
+   "from": "project",
+   "to": "make",
+   "to_offset": -4,
+   "chapter": {
+    "en": "The deal",
+    "hi": "Deal"
+   },
+   "line": {
+    "en": {
+     "say": "Add the project, and what you agreed.",
+     "cap": "Add the *project,* and what you *agreed.*"
+    },
+    "hi": {
+     "say": "Project और deal की बात भी लिखिए।",
+     "cap": "*Project* aur *deal* ki baat bhi likhiye."
+    }
+   }
+  },
+  {
+   "id": "link",
+   "take": "d1",
+   "from": "make",
+   "to": "end",
+   "payoff": true,
+   "chapter": {
+    "en": "Send the link",
+    "hi": "Link bhejiye"
+   },
+   "line": {
+    "en": {
+     "say": "[happy] Make the client link, and send it. Done!",
+     "cap": "Make the *client* *link,* and send it. Done!"
+    },
+    "hi": {
+     "say": "[happy] Client link बनाइए, और भेज दीजिए। हो गया!",
+     "cap": "*Client* *link* banaiye, aur bhej dijiye. Ho gaya!"
+    }
+   }
+  }
+ ],
+ "end": {
+  "frames": 30,
+  "text": {
+   "en": "More tutorials: Pulse, Learn",
+   "hi": "Aur tutorials: Pulse, Learn"
+  }
+ },
+ "screens": {
+  "setup": [
+   {
+    "do": "login",
+    "user": "meera.shah"
+   },
+   {
+    "do": "goto",
+    "url": "/connections"
+   }
+  ],
+  "steps": [
+   {
+    "do": "appear",
+    "text": "Invite a client"
+   },
+   {
+    "shot": "01",
+    "settle": 1200,
+    "focus": {
+     "role": "heading",
+     "name": "Invite a client"
+    }
+   },
+   {
+    "do": "type",
+    "value": "Lotus Interiors",
+    "delay": 20,
+    "label": "Client company"
+   },
+   {
+    "do": "type",
+    "value": "Kavya Iyer",
+    "delay": 20,
+    "label": "Contact name"
+   },
+   {
+    "shot": "02",
+    "settle": 1200,
+    "focus": {
+     "label": "Client company"
+    }
+   },
+   {
+    "do": "type",
+    "value": "Showroom launch film",
+    "delay": 20,
+    "label": "/^Project/"
+   },
+   {
+    "do": "type",
+    "value": "Two launch films and ten reels; first cut in two weeks.",
+    "delay": 20,
+    "label": "/^Deal summary/"
+   },
+   {
+    "shot": "03",
+    "settle": 1200,
+    "focus": {
+     "label": "/^Deal summary/"
+    }
+   },
+   {
+    "shot": "04",
+    "settle": 1200,
+    "focus": {
+     "role": "button",
+     "name": "Make the client link"
+    }
+   },
+   {
+    "do": "tap",
+    "role": "button",
+    "name": "Make the client link"
+   },
+   {
+    "do": "appear",
+    "sel": "[data-client-link]",
+    "timeout": 60000
+   },
+   {
+    "do": "wait",
+    "ms": 1500
+   },
+   {
+    "do": "eval",
+    "js": "document.querySelector('[data-client-link]')?.scrollIntoView({block:'center'})"
+   },
+   {
+    "do": "eval",
+    "js": "(() => { const s = document.createElement('style'); s.dataset.learnBlur = ''; s.textContent = \"[data-client-link], [aria-label='Scan to open the client link'], [aria-label='E-mail preview'] pre { filter: blur(7px) !important; }\"; document.head.appendChild(s); })()",
+    "why": "the client link, its QR code and the e-mail preview carry a dev invite token: blurred in the page itself"
+   },
+   {
+    "shot": "05",
+    "settle": 1200,
+    "focus": {
+     "sel": "[data-client-link]"
+    }
+   }
+  ]
+ }
+}

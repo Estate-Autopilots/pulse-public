@@ -1,0 +1,28 @@
+/* TASKS-4A: priority chips. The chosen one fills with its tone; its icon pops (Urgent's flame flickers once). */
+.group { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.chip { --tone: var(--theme-action); position: relative; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px 0 8px; border: 1px solid var(--theme-border);
+  border-radius: 999px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease, transform 140ms ease; -webkit-tap-highlight-color: transparent; }
+.chip:hover { border-color: color-mix(in srgb, var(--tone) 55%, var(--theme-border)); transform: translateY(-1px); }
+.chip:active { transform: translateY(0) scale(.97); }
+.chip:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.icon { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: color-mix(in srgb, var(--tone) 14%, var(--theme-surface)); color: var(--tone);
+  transition: background-color 140ms ease, color 140ms ease; }
+.chip[aria-checked="true"] { border-color: var(--tone); background: color-mix(in srgb, var(--tone) 12%, var(--theme-surface)); color: color-mix(in srgb, var(--tone) 80%, var(--theme-text)); }
+.chip[aria-checked="true"] .icon { background: var(--tone); color: var(--theme-surface); }
+.chip[data-pop] .icon { animation: pop 380ms cubic-bezier(.3, 1.7, .5, 1); }
+.chip[data-p="urgent"][data-pop] .icon svg { animation: flicker 420ms ease-in-out; transform-origin: 50% 90%; }
+.chip[data-p="low"][data-pop] .icon svg { animation: sink 380ms ease; }
+.chip[data-p="high"][data-pop] .icon svg { animation: rise 380ms ease; }
+.spark { position: absolute; top: -5px; right: -3px; color: var(--theme-action); filter: drop-shadow(0 0 2px var(--theme-surface)); }
+.group[data-compact] .chip { height: 28px; padding: 0 9px 0 5px; font-size: 12px; }
+.group[data-compact] .icon { width: 18px; height: 18px; }
+@keyframes pop { 45% { transform: scale(1.32); } }
+@keyframes flicker { 25% { transform: scaleY(1.25) rotate(-6deg); } 55% { transform: scaleY(.9) rotate(5deg); } 80% { transform: scaleY(1.1); } }
+@keyframes sink { 50% { transform: translateY(3px); } }
+@keyframes rise { 50% { transform: translateY(-3px); } }
+@media (max-width: 899.98px) { .chip { height: 40px; padding: 0 14px 0 10px; } }
+@media (prefers-reduced-motion: reduce) {
+  .chip, .icon { transition: none; } .chip:hover, .chip:active { transform: none; }
+  .chip[data-pop] .icon, .chip[data-pop] .icon svg { animation: none !important; }
+}

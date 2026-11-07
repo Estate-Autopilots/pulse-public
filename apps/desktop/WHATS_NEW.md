@@ -1,0 +1,1 @@
+Pulse uses your company’s own Pulse address: a new computer asks for it once, and Settings → Account changes it. You stay signed in. Pip names your company before you connect. After-hours check-ins get “Shift is over” four hours later.

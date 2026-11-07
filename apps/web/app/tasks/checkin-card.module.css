@@ -1,0 +1,50 @@
+/* ONBOARD-CHECKIN-TG: the day's check-in card on My day. Phone first (390 wide): one column, buttons at least 48 px
+   tall and never wider than the card; on a computer the actions sit in one row. A coloured left edge says the state, as
+   My day's cards do. */
+.card { display: grid; gap: 14px; padding: 16px; margin-bottom: 14px; border-radius: 14px; min-width: 0;
+  border: 1px solid var(--theme-border, rgba(127,127,127,.22)); border-left: 4px solid var(--edge, var(--theme-action, #5b45d6));
+  background: var(--theme-surface, transparent); }
+.card[data-tone="live"] { --edge: var(--theme-success, #328267); }
+.card[data-tone="done"] { --edge: var(--theme-success, #328267); }
+.card[data-tone="attention"] { --edge: var(--theme-warning, #b7791f); }
+.top { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.icon { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 10px;
+  color: var(--edge, var(--theme-action)); background: color-mix(in srgb, var(--edge, var(--theme-action)) 14%, transparent); }
+.head { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.head b { font-size: 1.05rem; font-weight: 650; }
+.head small { color: var(--theme-text-muted, inherit); line-height: 1.45; overflow-wrap: anywhere; }
+.streak { display: inline-flex; align-items: center; gap: 4px; flex: none; padding: 4px 10px; border-radius: 999px; font-size: .8rem; font-weight: 600;
+  color: var(--theme-warning, #b7791f); background: color-mix(in srgb, var(--theme-warning, #b7791f) 14%, transparent); white-space: nowrap; }
+.timer { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 0; }
+.clock { font-size: clamp(1.9rem, 7vw, 2.4rem); font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.timer small { color: var(--theme-text-muted, inherit); }
+.summary { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 12px; border-radius: 10px; line-height: 1.5;
+  background: color-mix(in srgb, var(--theme-success, #328267) 10%, transparent); }
+.summary svg { flex: none; margin-top: 3px; color: var(--theme-success, #328267); }
+.modes { display: flex; flex-wrap: wrap; gap: 8px; }
+.modes button { min-height: 40px; padding: 0 14px; border-radius: 999px; font: inherit; cursor: pointer; color: inherit; background: transparent;
+  border: 1px solid var(--theme-border, rgba(127,127,127,.35)); }
+.modes button[aria-pressed="true"] { border-color: var(--theme-action, #5b45d6); color: var(--theme-action, #5b45d6);
+  background: color-mix(in srgb, var(--theme-action, #5b45d6) 10%, transparent); font-weight: 600; }
+.actions { display: grid; gap: 8px; }
+.primary, .secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 12px;
+  font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; min-width: 0; text-align: center; }
+.primary { border: 0; color: #fff; background: var(--theme-action, #5b45d6); }
+.secondary { color: inherit; background: transparent; border: 1px solid var(--theme-border, rgba(127,127,127,.35)); }
+.primary:disabled, .secondary:disabled { opacity: .6; cursor: default; }
+.primary:focus-visible, .secondary:focus-visible, .modes button:focus-visible { outline: 2px solid var(--theme-action, #5b45d6); outline-offset: 2px; }
+.week { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.week ol { display: flex; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.week li { width: 10px; height: 10px; border-radius: 50%; background: var(--theme-border, rgba(127,127,127,.3)); }
+.week li[data-state="on_time"] { background: var(--theme-success, #328267); }
+.week li[data-state="late"] { background: var(--theme-warning, #b7791f); }
+.week li[data-state="missed"] { background: var(--theme-danger, #c53030); }
+.week li[data-state="today"] { box-shadow: 0 0 0 2px var(--theme-action, #5b45d6) inset; background: transparent; }
+.week small { color: var(--theme-text-muted, inherit); }
+@media (min-width: 720px) {
+  .actions { display: flex; flex-wrap: wrap; }
+  .primary { min-width: 180px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card { transition: border-color .3s ease; }
+}

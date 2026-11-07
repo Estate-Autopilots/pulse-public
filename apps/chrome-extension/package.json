@@ -1,0 +1,10 @@
+{
+  "name": "@pulse/chrome-extension",
+  "version": "0.3.4",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test --test-concurrency=2 test/*.test.js",
+    "lint": "node --check worker.js && node --check context.js && node --check popup.js && node --check companion-worker.js && node --check companion-store.js && node scripts/sync-shared.mjs --check"
+  }
+}

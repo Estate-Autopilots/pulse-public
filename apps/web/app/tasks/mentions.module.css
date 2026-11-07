@@ -1,0 +1,20 @@
+/* TASKS-P0: the comment box with @mention chips, and the chips in posted comments. */
+.wrap { position: relative; }
+.box { min-height: 64px; max-height: 240px; padding: 10px 12px; overflow-y: auto; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text);
+  font: inherit; font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; outline: none; cursor: text; }
+.box:focus-within, .box:focus { border-color: var(--theme-action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 16%, transparent); }
+.box:empty::before { content: attr(data-placeholder); color: var(--theme-text-muted); pointer-events: none; }
+.chip { display: inline-flex; align-items: center; gap: 4px; height: 24px; margin: 0 1px; padding: 0 8px 0 3px; border-radius: 12px; vertical-align: -6px;
+  background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); font-size: 13px; font-weight: 650; line-height: 1; white-space: nowrap; user-select: all; }
+.face { --size: 18px; display: inline-grid; flex: none; width: 18px; height: 18px; place-items: center; overflow: hidden; border-radius: 50%;
+  background: color-mix(in srgb, hsl(var(--hue, 225) 62% 52%) 22%, var(--theme-surface)); color: color-mix(in srgb, hsl(var(--hue, 225) 62% 42%) 72%, var(--theme-text)); font-size: 8px; font-weight: 700; }
+.face img { width: 100%; height: 100%; object-fit: cover; }
+.list { position: absolute; z-index: 30; bottom: calc(100% + 6px); left: 0; width: min(340px, 100%); margin: 0; padding: 6px; list-style: none; border: 1px solid var(--theme-border); border-radius: 10px;
+  background: var(--theme-surface); box-shadow: var(--theme-shadow); }
+.list li { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 4px 8px; border-radius: 8px; cursor: pointer; }
+.list li[aria-selected="true"] { background: var(--theme-surface-subtle); }
+.who { display: flex; flex-direction: column; min-width: 0; }
+.who b { overflow: hidden; font-size: 13px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.who small { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+/* TASKS-4B: two initials fit an 18 px face (they were clipped: "KM" read "KN"). */
+.chip > :first-child { font-size: 9px; letter-spacing: -0.02em; }

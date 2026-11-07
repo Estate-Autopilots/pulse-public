@@ -1,0 +1,65 @@
+/* FINANCE-TRUTH: Finance → Numbers and My sales. One scrolling page; on a phone every panel is one column and the
+   month table scrolls inside its own panel, never the page. */
+.page { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; min-width: 0; }
+.when { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.periods { display: inline-flex; flex-wrap: wrap; gap: 2px; max-width: 100%; padding: 3px; border-radius: 9px; background: var(--theme-surface-subtle); }
+.period { padding: 5px 12px; border-radius: 7px; color: var(--theme-text-muted); font-size: 13px; font-weight: 500; white-space: nowrap; }
+.period:hover { color: var(--theme-text); }
+.period[aria-current="true"] { background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 1px 2px rgb(24 20 60 / 10%); }
+.period:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.word { display: block; font-size: 15px; font-weight: 600; line-height: 1.3; white-space: normal; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; min-width: 0; }
+.grid > section { min-width: 0; }
+.body { padding: 0 20px 20px; min-width: 0; }
+.body.scroll { padding-bottom: 12px; }
+.panelLike { display: grid; gap: 4px; padding: 8px 16px 16px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); }
+.more { margin: 0; text-align: center; font-size: 13px; }
+.more a, .quiet a, .picker a { color: var(--theme-action); font-weight: 500; }
+.facts { display: grid; gap: 12px; margin: 0; }
+.facts > div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 4px 12px; }
+.facts dt { color: var(--theme-text); font-size: 13px; font-weight: 600; }
+.facts dd { margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.facts dd small { display: block; margin-top: 2px; font-size: 12px; }
+.gstFacts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; margin: 0 0 12px; }
+.gstFacts > div { display: grid; gap: 2px; padding: 10px 12px; border-radius: 10px; background: var(--theme-surface-subtle); }
+.gstFacts dt { color: var(--theme-text-muted); font-size: 12px; }
+.gstFacts dd { margin: 0; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.gstFacts dd[data-tone="warn"] { color: var(--theme-warning); }
+.picker { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 10px; margin: 0 0 12px; }
+.picker > label { flex: 1 1 220px; min-width: 0; }
+.picker > small { flex-basis: 100%; color: var(--theme-text-muted); font-size: 12px; }
+.quiet { display: flex; align-items: center; gap: 6px; margin: 4px 0 12px; color: var(--theme-text-muted); font-size: 13px; }
+.label { margin: 4px 0 6px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
+.scroll { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
+.table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.table th, .table td { padding: 8px 10px; border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); text-align: right; white-space: nowrap; }
+.table th:first-child { position: sticky; left: 0; background: var(--theme-surface); text-align: left; }
+.table thead th { color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+.table tbody th { font-weight: 500; }
+.table tfoot th, .table tfoot td { border-bottom: 0; font-weight: 600; }
+.table td small { display: block; color: var(--theme-text-muted); font-size: 11px; }
+.table td[data-tone="bad"] { color: var(--theme-danger); }
+.picker select, .picker input { width: 100%; }
+.person { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.person > label { min-width: 200px; }
+
+@media (max-width: 760px) {
+  .body { padding: 0 14px 16px; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .facts > div { grid-template-columns: minmax(0, 1fr); }
+  .head { flex-direction: column; align-items: stretch; }
+  .periods { display: flex; }
+  .person > label { flex: 1 1 100%; min-width: 0; }
+}
+@media (max-width: 420px) {
+  .gstFacts { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* FINANCE-TRUTH: the Numbers band at the top of Overview. */
+.band { display: grid; gap: 8px; }
+.bandHead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; font-size: 13px; color: var(--theme-text-muted); }
+.bandHead p { margin: 0; }
+.bandHead a { display: inline-flex; align-items: center; min-height: 36px; color: var(--theme-action); font-weight: 600; white-space: nowrap; }
+.bandHead a:focus-visible, .scroll:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 6px; }
+@media (max-width: 1279.98px) { .grid { grid-template-columns: minmax(0, 1fr); } }

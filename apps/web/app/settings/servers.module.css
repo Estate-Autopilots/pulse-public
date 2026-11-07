@@ -1,0 +1,85 @@
+/* SERVERS-AI: Settings → Servers & AI. Only what the calm kit (components/page-kit.module.css) does not have: the
+   numbered connect steps, the pairing code, the command box, the job rows and the server's log. Theme tokens only. */
+.stack { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.spin { animation: spin 1s linear infinite; vertical-align: -2px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+
+.steps { list-style: none; margin: 4px 0 6px; padding: 0; display: flex; flex-direction: column; gap: 14px; counter-reset: step; }
+.steps > li { position: relative; display: flex; flex-direction: column; gap: 6px; padding-left: 38px; min-width: 0; counter-increment: step; }
+.steps > li::before {
+  content: counter(step); position: absolute; left: 0; top: -2px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 13px; font-weight: 700; background: var(--theme-surface-subtle); color: var(--theme-action);
+}
+.steps b { font-size: 15px; font-weight: 600; }
+.steps small { font-size: 13px; line-height: 1.45; color: var(--theme-text-muted); }
+.steps code, .stack code { font-family: var(--theme-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 0.92em; }
+
+.code {
+  align-self: flex-start; font-family: var(--theme-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 28px; font-weight: 700;
+  letter-spacing: 0.12em; padding: 6px 14px; border-radius: 12px; border: 1px dashed var(--theme-border-strong, var(--theme-border)); background: var(--theme-surface-subtle);
+  font-variant-numeric: tabular-nums; user-select: all;
+}
+.code[data-expired] { color: var(--theme-text-muted); text-decoration: line-through; }
+
+.command {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px;
+  background: var(--theme-surface-subtle); border: 1px solid var(--theme-border); min-width: 0;
+}
+.command > svg { color: var(--theme-text-muted); }
+.command code { overflow-x: auto; white-space: nowrap; font-size: 13px; padding: 2px 0; scrollbar-width: thin; }
+.command small { grid-column: 1 / -1; font-size: 12.5px; color: var(--theme-text-muted); }
+.command[data-sample] code { color: var(--theme-text-muted); }
+
+.signins { display: inline-flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.signins > span { gap: 4px; }
+.danger { color: var(--theme-danger); }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--theme-text-muted); min-width: 0; flex: 1 1 220px; }
+.field input { min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 15px; }
+.field input:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 1px; }
+
+.jobs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.job {
+  width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 56px; padding: 8px 12px;
+  border-radius: 12px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.job:hover { background: var(--theme-surface-subtle); }
+.job:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+.job[aria-expanded="true"] { border-color: var(--theme-border-strong, var(--theme-text-muted)); }
+.jobIcon { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.jobText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.jobText b { font-size: 14.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jobText small { font-size: 12.5px; color: var(--theme-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jobEnd { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.jobEnd small { font-size: 12px; color: var(--theme-text-muted); white-space: nowrap; }
+.jobEnd > span { gap: 4px; }
+.detail { display: flex; flex-direction: column; gap: 10px; padding: 10px 4px 6px 12px; min-width: 0; }
+.log {
+  margin: 0; max-height: 260px; overflow: auto; padding: 10px 12px; border-radius: 10px; background: var(--theme-surface-subtle); border: 1px solid var(--theme-border);
+  font-family: var(--theme-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.log [data-type="status"] { color: var(--theme-text-muted); }
+.log [data-type="warning"] { color: var(--theme-warning); }
+
+@media (max-width: 639.98px) {
+  .job { grid-template-columns: auto minmax(0, 1fr); }
+  .jobEnd { grid-column: 2; flex-direction: row; align-items: center; justify-content: space-between; }
+  .code { font-size: 24px; }
+}
+
+/* AI-SERVER-TOOLS: an AI employee's areas, read and write per area. */
+.access { border-collapse: collapse; width: 100%; max-width: 32rem; margin: 0.5rem 0; }
+.access th, .access td { padding: 0.25rem 0.5rem; text-align: left; border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.08)); }
+.access td { text-align: center; }
+
+/* AI-EMPLOYEE-POWER: root access. One prominent red button, the grants in force and the root command log. */
+.rootBtn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 16px; border: 1px solid var(--theme-danger); border-radius: 10px;
+  background: var(--theme-danger); color: #fff; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer;
+}
+.rootBtn:hover { background: color-mix(in srgb, var(--theme-danger) 88%, #000); }
+.rootBtn:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+.rootBtn:disabled { opacity: .6; cursor: default; }
+.rootRow { display: flex; align-items: center; min-height: 48px; padding: 6px 12px; border-radius: 12px; border: 1px solid var(--theme-border); background: var(--theme-surface); min-width: 0; }
+.rootResult { display: flex; align-items: center; gap: 6px; margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--theme-surface-subtle); font-size: 13.5px; }

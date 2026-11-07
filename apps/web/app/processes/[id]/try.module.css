@@ -1,0 +1,39 @@
+/* FLOW-D Try it: Pip's line and the clock on top; the steps, your turn, and what happened, side by side. */
+.wrap { display: flex; flex-direction: column; gap: 14px; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--theme-surface); }
+.pip { display: flex; align-items: center; gap: 8px; flex: 1 1 320px; min-width: 0; margin: 0; font-size: 13.5px; } .pip svg { flex: none; color: var(--theme-action); }
+.barTools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.barTools button { display: inline-flex; align-items: center; gap: 6px; }
+.count { color: var(--theme-text-muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.danger { color: var(--theme-danger); }
+.grid { display: grid; grid-template-columns: 280px minmax(0, 1fr) 300px; gap: 14px; align-items: start; }
+.steps ol { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--theme-surface); list-style: none; }
+.steps button { display: flex; align-items: flex-start; gap: 9px; width: 100%; padding: 7px 8px; border: 0; border-radius: 9px; background: none; color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+.steps button:disabled { cursor: default; }
+.steps button[aria-current="step"] { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); }
+.steps button span:last-child { display: flex; flex-direction: column; min-width: 0; } .steps b { font-size: 12.5px; font-weight: 600; line-height: 1.3; }
+.steps small { overflow: hidden; color: var(--theme-text-muted); font-size: 11.5px; white-space: nowrap; text-overflow: ellipsis; }
+.steps button[data-state="skipped"] b, .steps button[data-state="done"] b { color: var(--theme-text-muted); }
+.dot { flex: none; width: 10px; height: 10px; margin-top: 3px; border-radius: 50%; background: var(--theme-border); }
+.dot[data-state="open"], .dot[data-state="in_progress"], .dot[data-state="in_review"], .dot[data-state="confirmed"] { background: var(--theme-action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 22%, transparent); }
+.dot[data-state="done"] { background: var(--theme-success, #17a673); } .dot[data-state="skipped"] { background: transparent; border: 1.5px dashed var(--theme-border); box-sizing: border-box; }
+.main { min-width: 0; }
+.turn, .done { display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--theme-surface); box-shadow: 0 10px 30px rgb(0 0 0 / 0.05); }
+.done { align-items: flex-start; } .done svg { color: var(--theme-action); } .done h2 { margin: 0; font-size: 18px; } .done p { margin: 0; color: var(--theme-text-muted); font-size: 13.5px; }
+.you { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin: 0; padding: 4px 12px; border-radius: 999px; background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); font-size: 13px; }
+.turn h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 19px; line-height: 1.3; }
+.icon { display: grid; flex: none; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: var(--theme-surface-subtle); }
+.what { margin: -4px 0 0; color: var(--theme-text-muted); font-size: 13px; }
+.check { margin: 0; padding-left: 20px; color: var(--theme-text); font-size: 13px; line-height: 1.6; }
+.text { margin: 0; padding: 10px 14px; border-left: 3px solid var(--theme-action); border-radius: 0 10px 10px 0; background: var(--theme-surface-subtle); font-size: 13.5px; white-space: pre-wrap; }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; } .acts button { height: 38px; padding: 0 16px; border-radius: 11px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+.quiet { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; } .quiet a { display: inline-flex; align-items: center; gap: 3px; color: var(--theme-action); }
+.link { margin: 0 6px 0 0; padding: 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 12.5px; cursor: pointer; }
+.side { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--theme-surface); }
+.side h3 { display: inline-flex; align-items: center; gap: 6px; margin: 6px 0 0; color: var(--theme-text-muted); font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.notices, .alerts, .due { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.notices li, .alerts li, .due li { display: flex; flex-direction: column; gap: 1px; font-size: 12.5px; line-height: 1.35; }
+.notices small, .alerts small, .due small { color: var(--theme-text-muted); font-size: 11.5px; }
+.alerts b { color: var(--theme-danger); } .due li[data-late] small { color: var(--theme-danger); font-weight: 600; }
+@media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } .steps { order: 3; } }

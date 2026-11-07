@@ -1,0 +1,15 @@
+/* UX-BILLING (5 Nov 2026): My day's chips (.chip, .chipCount, .dot in my-day.module.css), shared. */
+.chips { display: flex; gap: 8px; min-width: 0; max-width: 100%; padding: 2px; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { --stripe: hsl(var(--stripe-h, 214) var(--stripe-s, 70%) 44%);
+  flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--theme-border); border-radius: 999px;
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 550; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+:global(:root[data-theme="dark"]) .chip { --stripe: hsl(var(--stripe-h, 214) var(--stripe-s, 70%) 64%); }
+.chip[aria-pressed="true"] { border-color: var(--theme-text); background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1px var(--theme-text); }
+@media (hover: hover) { .chip:not([aria-pressed="true"]):hover { border-color: var(--theme-border-strong, var(--theme-border)); background: var(--theme-surface-subtle); } }
+.chip:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+.count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--theme-surface-subtle); color: var(--theme-text);
+  font-size: 12px; font-variant-numeric: tabular-nums; }
+.chip[style] .count { background: color-mix(in srgb, var(--stripe) 16%, var(--theme-surface)); color: var(--theme-text); }
+.dot { flex: none; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--stripe); }
+@media (min-width: 1024px) and (pointer: fine) { .chips { flex-wrap: wrap; overflow: visible; } .chip { min-height: 36px; } }

@@ -1,0 +1,16 @@
+/* COMPANY-MARKS: a company's logo or initials tile (company-mark.tsx). A rounded square with a 1px subtle border; the
+   logo keeps its shape (contain) on the page's surface. The size is set in whole pixels by the component. */
+.mark {
+  flex: none; display: inline-block; box-sizing: border-box; border-radius: 22%; border: 1px solid var(--theme-border);
+  object-fit: contain; background: var(--theme-surface); vertical-align: middle; overflow: hidden;
+  image-rendering: auto; user-select: none;
+}
+/* The initials tile: the brand colour when the company has set one, else one neutral grey (the same for every
+   company without one), in light and dark. */
+.tile {
+  --mark-neutral: #6b6f76;
+  display: inline-grid; place-items: center; border-color: color-mix(in srgb, var(--theme-text) 12%, transparent);
+  background: var(--mark-bg, var(--mark-neutral)); color: var(--mark-ink, #ffffff);
+  font-weight: 700; line-height: 1; letter-spacing: 0.02em; font-family: inherit; text-transform: uppercase;
+}
+:global(:root[data-theme="dark"]) .tile, :global(html[data-theme="dark"]) .tile { --mark-neutral: #5d6168; }
