@@ -1,0 +1,147 @@
+/* CONTRACTS-PRO: the agreement's page is the document first, with a slim side panel; the editor is words beside the
+   printed preview. Theme tokens only (light and dark). On a phone: where it stands, then the document, then the rest. */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "doc" "side"; gap: 16px; width: 100%; max-width: 1240px; margin: 0 auto; min-width: 0; }
+.layout > * { min-width: 0; }
+.top { grid-area: top; display: flex; flex-direction: column; gap: 12px; }
+.doc { grid-area: doc; display: flex; flex-direction: column; gap: 16px; }
+.side { grid-area: side; display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 1100px) {
+  .layout { grid-template-columns: minmax(0, 1fr) 340px; grid-template-areas: "doc top" "doc side"; grid-template-rows: auto 1fr; align-items: start; column-gap: 24px; }
+  .top { position: sticky; top: 12px; z-index: 1; }
+}
+.paper { position: relative; padding: 20px; border-radius: 14px; background: color-mix(in srgb, var(--theme-text, #1e1b2e) 9%, var(--theme-surface, #fff)); border: 1px solid var(--theme-border); min-height: 320px; }
+@media (max-width: 600px) { .paper { padding: 8px; border-radius: 10px; } }
+.paper[data-busy] { opacity: 0.92; }
+.paperSkeleton { display: flex; flex-direction: column; gap: 12px; padding: 40px 32px; background: #fff; border-radius: 4px; max-width: 760px; margin: 0 auto; }
+.paperSkeleton span { display: block; height: 12px; border-radius: 6px; background: rgb(15 27 51 / 8%); animation: shimmer 1.2s ease-in-out infinite; }
+.paperSkeleton span:nth-child(1) { width: 40%; height: 18px; margin: 0 auto 12px; }
+.paperSkeleton span:nth-child(3) { width: 86%; } .paperSkeleton span:nth-child(5) { width: 62%; }
+@keyframes shimmer { 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .paperSkeleton span { animation: none; } }
+.paperError { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px; text-align: center; color: var(--theme-text); }
+.paperError button { min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
+
+/* The side panel's small cards. */
+.box { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--theme-border); background: var(--theme-surface); }
+.box h2 { margin: 0; font-size: 14px; font-weight: 650; color: var(--theme-text-muted); text-transform: none; }
+.parties { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.parties li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 2px 10px; align-items: start; }
+.order { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  background: var(--theme-surface-muted, rgb(127 127 127 / 12%)); color: var(--theme-text); }
+.order[data-done] { background: var(--theme-success); color: #fff; }
+.pName { font-weight: 650; font-size: 14px; line-height: 1.3; overflow-wrap: anywhere; }
+.pMeta { grid-column: 2; font-size: 13px; color: var(--theme-text-muted); line-height: 1.35; overflow-wrap: anywhere; }
+.related { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.related a { color: var(--theme-action, var(--theme-text)); text-decoration: none; overflow-wrap: anywhere; }
+
+/* The editor: words and fields on the left, the printed preview on the right. */
+.editor { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; width: 100%; }
+@media (min-width: 1100px) { .editor { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
+.editPane { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 14px; border: 1px solid var(--theme-border); background: var(--theme-surface); min-width: 0; }
+.editHead { display: flex; flex-direction: column; gap: 10px; }
+.editHead h2 { margin: 0; font-size: 16px; font-weight: 650; }
+.tabs { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--theme-surface-muted, rgb(127 127 127 / 10%)); overflow-x: auto; }
+.tabs button { flex: 1 0 auto; min-height: 40px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: var(--theme-text-muted); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.tabs button[aria-selected="true"] { background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 1px 2px rgb(15 27 51 / 12%); }
+.words { display: flex; flex-direction: column; gap: 10px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; }
+.toolbar button, .toolbar select { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 10px; border-radius: 9px; border: 1px solid var(--theme-border);
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; cursor: pointer; max-width: 100%; }
+.wordsBox { width: 100%; min-height: 460px; resize: vertical; padding: 14px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface);
+  color: var(--theme-text); font: 15px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; box-sizing: border-box; }
+.partyList { display: flex; flex-direction: column; gap: 12px; }
+.partyCard { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--theme-border); min-width: 0; }
+.partyCard legend { padding: 0 6px; font-weight: 650; font-size: 14px; }
+.subhead { margin: 6px 0 0; font-size: 14px; font-weight: 650; }
+.gaps { margin: 0; padding: 10px 12px; border-radius: 10px; font-size: 14px; background: color-mix(in srgb, var(--theme-warning, #d97706) 14%, transparent); color: var(--theme-text); }
+.editActions { position: sticky; bottom: 0; padding-top: 8px; background: var(--theme-surface); }
+.livePaper { display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 14px; border: 1px solid var(--theme-border); background: var(--theme-canvas, rgb(127 127 127 / 8%)); min-width: 0; }
+@media (min-width: 1100px) { .livePaper { position: sticky; top: 12px; } }
+.liveNote { margin: 0; font-size: 13px; color: var(--theme-text-muted); }
+.wide { max-width: 1240px; }
+.layout[data-editing] { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "doc"; }
+.layout[data-editing] .top { position: static; }
+/* In the narrow side panel a signer's words keep a readable width; the signature picture and buttons go under them. */
+.side li { align-items: flex-start; }
+.side li > span { flex: 1 1 210px; }
+.side li > img { margin-left: 32px; }
+.side li > button { margin-left: 32px; }
+.paperHint { margin: 0 0 8px; font-size: 13px; color: var(--theme-text-muted); text-align: center; }
+@media (min-width: 700px) { .paperHint { display: none; } }
+/* The clause cards. */
+.clauses { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.clause { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 12px; border-radius: 12px; border: 1px solid var(--theme-border); background: var(--theme-surface); }
+.clauseHead { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.clauseNo { flex: none; min-width: 32px; padding: 2px 8px; border-radius: 999px; text-align: center; font-size: 13px; font-weight: 700;
+  background: color-mix(in srgb, var(--theme-action, #6b4cf0) 12%, transparent); color: var(--theme-action, #6b4cf0); }
+.clauseTitle { flex: 1 1 auto; min-width: 0; min-height: 40px; padding: 0 10px; border-radius: 8px; border: 1px solid transparent; background: transparent;
+  color: var(--theme-text); font: inherit; font-size: 15px; font-weight: 650; }
+.clauseTitle:hover, .clauseTitle:focus { border-color: var(--theme-border); background: var(--theme-surface); }
+.clauseTools { display: inline-flex; gap: 2px; flex: none; }
+.clauseTools button { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 0; border-radius: 8px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.clauseTools button:hover:not(:disabled) { background: var(--theme-surface-muted, rgb(127 127 127 / 12%)); color: var(--theme-text); }
+.clauseTools button:disabled { opacity: 0.35; cursor: default; }
+.clauseText { width: 100%; box-sizing: border-box; resize: vertical; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--theme-border); background: var(--theme-surface);
+  color: var(--theme-text); font: inherit; font-size: 15px; line-height: 1.55; }
+.gridWrap { display: flex; flex-direction: column; gap: 6px; overflow-x: auto; }
+.grid { border-collapse: collapse; width: 100%; }
+.grid td { padding: 0; border: 1px solid var(--theme-border); }
+.grid input { width: 100%; box-sizing: border-box; min-height: 38px; padding: 0 8px; border: 0; background: transparent; color: var(--theme-text); font: inherit; font-size: 14px; }
+.grid input.gridHead { font-weight: 650; background: color-mix(in srgb, var(--theme-action, #6b4cf0) 7%, transparent); }
+@media (max-width: 600px) { .clauseTools button { width: 32px; } }
+.check { display: flex; align-items: flex-start; gap: 10px; min-height: 44px; font-size: 15px; line-height: 1.4; cursor: pointer; }
+.check input { width: 20px; height: 20px; margin-top: 1px; flex: none; }
+/* The other side's request on its clause, in the editor. */
+.note { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 8px 10px; align-items: start; padding: 10px 12px; border-radius: 10px; font-size: 14px; line-height: 1.45;
+  background: color-mix(in srgb, var(--theme-warning, #d97706) 12%, var(--theme-surface)); border: 1px solid color-mix(in srgb, var(--theme-warning, #d97706) 35%, transparent); }
+.note > svg { margin-top: 2px; color: var(--theme-warning, #d97706); }
+@media (max-width: 600px) { .note { grid-template-columns: 16px minmax(0, 1fr); } .note > button { grid-column: 2; justify-self: start; } }
+/* Judge round 2: secondary actions look like buttons; clause tools wrap under the title on a phone; Save reads as a bar. */
+.outline { border: 1px solid var(--theme-border) !important; }
+.side li > button { border: 1px solid var(--theme-border); }
+.editActions { border-top: 1px solid var(--theme-border); box-shadow: 0 -10px 16px -12px rgb(15 27 51 / 0.25); margin: 0 -16px -16px; padding: 10px 16px 16px; border-radius: 0 0 14px 14px; }
+@media (max-width: 600px) { .clauseHead { flex-wrap: wrap; } .clauseTitle { flex: 1 1 calc(100% - 56px); } .clauseTools { margin-left: auto; } }
+/* Judge round 3: signatures sit on a white chip (dark ink on a dark card was invisible); Save at the top of the editor; while
+   editing, the status card steps aside; a slimmer frame round the paper; room for a phone's tab bar under the editor. */
+.side li > img { background: #fff; border-radius: 6px; padding: 4px; border: 1px solid var(--theme-border); }
+.editTop { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.editButtons { display: inline-flex; gap: 8px; }
+.layout[data-editing] .top { display: none; }
+.editActions { display: none; }
+@media (min-width: 1100px) { .paper { padding: 12px; } }
+@media (max-width: 700px) { .editor { padding-bottom: 96px; } }
+/* POLISH-1115: the agreement's layers beside the document (layers.tsx): one row per layer, an icon tile, its facts and
+   its clauses as small buttons that scroll the document to the clause's page. */
+.layers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.layers > li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px 0; border-top: 1px solid var(--theme-border); }
+.layers > li:first-child { border-top: 0; padding-top: 2px; }
+.layerIcon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 9px;
+  background: color-mix(in srgb, var(--theme-action, #6b4cf0) 12%, var(--theme-surface)); color: var(--theme-action, #6b4cf0); }
+.layers > li[data-layer="money"] .layerIcon { background: color-mix(in srgb, var(--theme-success, #16a34a) 14%, var(--theme-surface)); color: var(--theme-success, #16a34a); }
+.layers > li[data-layer="risk"] .layerIcon { background: color-mix(in srgb, var(--theme-warning, #d97706) 15%, var(--theme-surface)); color: var(--theme-warning, #b45309); }
+.layerBody { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.layerBody > strong { font-size: 14px; font-weight: 650; line-height: 30px; color: var(--theme-text); }
+.layerParties { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.layerParties > li { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.layerParties li > button { margin: 0; padding: 0; border: 0; background: none; color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.layerParties li > button:hover { text-decoration: underline; }
+.layerParties li > span { flex: none; font-size: 13px; color: var(--theme-text-muted); overflow-wrap: anywhere; }
+.layerFacts { margin: 0; display: flex; flex-direction: column; gap: 2px; }
+.layerFacts > div { display: flex; flex-wrap: wrap; gap: 0 6px; font-size: 13px; line-height: 1.45; min-width: 0; }
+.layerFacts dt { color: var(--theme-text-muted); }
+.layerFacts dt::after { content: ":"; }
+.layerFacts dd { margin: 0; color: var(--theme-text); font-weight: 600; overflow-wrap: anywhere; min-width: 0; }
+.layerTerms { margin: 0; font-size: 13px; color: var(--theme-text-muted); line-height: 1.45; }
+.layerClauses { display: flex; flex-wrap: wrap; gap: 6px; }
+.layerClauses button { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; max-width: 100%; padding: 0 10px 0 4px; border-radius: 999px;
+  border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; cursor: pointer; text-align: left; }
+.layerClauses button b { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 999px; font-size: 12px;
+  background: color-mix(in srgb, var(--theme-action, #6b4cf0) 12%, transparent); color: var(--theme-action, #6b4cf0); }
+.layerClauses button:hover { border-color: var(--theme-action, #6b4cf0); }
+.layerClauses button:focus-visible, .layerParties li > button:focus-visible { outline: 2px solid var(--theme-action, #6b4cf0); outline-offset: 2px; }
+/* The page a jump lands on glows once. */
+.paper canvas[data-flash] { animation: pageFlash 1.2s ease-out; }
+@keyframes pageFlash { from { box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-action, #6b4cf0) 45%, transparent); } to { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .paper canvas[data-flash] { animation: none; } }
+.wrongParty { display: block; margin-top: 4px; padding: 6px 10px; border-radius: 8px; font-size: 13px; line-height: 1.4; color: var(--theme-text);
+  background: color-mix(in srgb, var(--theme-warning, #d97706) 16%, var(--theme-surface)); border: 1px solid color-mix(in srgb, var(--theme-warning, #d97706) 40%, transparent); }

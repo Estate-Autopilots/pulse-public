@@ -1,0 +1,146 @@
+/* UX-PEOPLE: the permissions matrix. The page parts (cards, chips, stripes) are the shared calm components; this file
+   holds only what is the matrix's own: the table, the cells, the role chips, the person view and the bulk bar. */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+.main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.rail { display: flex; flex-direction: column; gap: 14px; min-width: 0; scroll-margin-top: 12px; }
+/* On a phone the open person comes first, the list after it. */
+.layout[data-open] .rail { order: -1; }
+.roleChip, .toggle { --stripe: hsl(var(--hue, 220) 52% 42%); }
+:global(:root[data-theme="dark"]) .roleChip, :global(:root[data-theme="dark"]) .toggle { --stripe: hsl(var(--hue, 220) 58% 62%); }
+
+.tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.tools > :first-child { flex: 1 1 auto; }
+.search { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text-muted); flex: 1 1 220px; max-width: 320px; }
+.search input { border: 0; background: transparent; color: var(--theme-text); font: inherit; font-size: 16px; min-width: 0; width: 100%; outline: none; }
+.search:focus-within { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 1px; }
+
+.tableWrap { display: none; }
+.cards { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cardRow { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 4px; }
+.cardRow:not(:has(input)) { grid-template-columns: minmax(0, 1fr); }
+.box { width: 20px; height: 20px; margin: 12px; accent-color: var(--theme-action); cursor: pointer; }
+.box:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+
+.table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+.table thead th { position: sticky; top: 0; z-index: 1; background: var(--theme-surface); text-align: center; font-size: 11.5px; line-height: 1.2; font-weight: 600; color: var(--theme-text-muted); padding: 8px 2px; border-bottom: 1px solid var(--theme-border); vertical-align: bottom; }
+.table td, .table tbody th { padding: 4px; border-bottom: 1px solid var(--theme-border); text-align: center; vertical-align: middle; }
+.table tbody tr:last-child > * { border-bottom: 0; }
+.table tbody tr[data-open] > * { background: var(--theme-surface-subtle); }
+.table tbody tr[data-chosen] > * { background: color-mix(in srgb, var(--theme-action) 8%, transparent); }
+@media (hover: hover) { .table tbody tr:hover > * { background: var(--theme-surface-subtle); } }
+.table .personCol { text-align: left; width: 26%; min-width: 176px; font-weight: 400; }
+.table .cell { height: auto; min-height: 24px; padding: 3px 6px; }
+.table .cellText { max-width: 76px; white-space: normal; line-height: 1.15; text-align: center; overflow: visible; }
+.table .pickCol { width: 44px; padding: 0; }
+.personBtn { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 4px 6px; border-radius: 10px; }
+.personBtn:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 1px; }
+.personText { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.personText b { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--theme-text); }
+@media (hover: hover) { .personBtn:hover b { color: var(--theme-action); } }
+.you { font-weight: 500; color: var(--theme-text-muted); }
+
+.roleChips { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.roleChip { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; color: var(--theme-text); background: color-mix(in srgb, var(--stripe) 14%, var(--theme-surface)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--stripe) 45%, transparent); }
+.noRole { font-size: 12px; font-weight: 400; color: var(--theme-text-muted); }
+
+.cell { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 26px; height: 24px; padding: 0 6px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.cell[data-level="yes"] { color: var(--theme-success); background: color-mix(in srgb, var(--theme-success) 13%, transparent); }
+.cell[data-level="part"] { color: var(--theme-text); background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1px var(--theme-border); }
+.cell[data-level="grant"] { color: var(--theme-text); background: color-mix(in srgb, var(--theme-warning) 14%, transparent); }
+.cell[data-level="idle"] { color: var(--theme-warning); background: color-mix(in srgb, var(--theme-warning) 14%, transparent); }
+.cell[data-level="no"] { color: var(--theme-text-muted); opacity: 0.7; }
+.cellText { max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 0; font-size: 12.5px; color: var(--theme-text-muted); }
+.legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .cellText { display: none; }
+.warn { color: var(--theme-warning); font-weight: 600; }
+.lingering { display: flex; flex-direction: column; gap: 8px; scroll-margin-top: 12px; }
+.lingering .cards { display: flex; }
+.goneItem { display: inline-flex; align-items: center; gap: 6px; }
+.goneEnd { min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.goneEnd:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+.goneEnd:disabled { opacity: 0.6; cursor: default; }
+@media (pointer: coarse) { .goneEnd { min-height: 44px; } }
+
+.templateList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.count { margin-left: auto; font-size: 12.5px; font-weight: 600; color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.sees { display: block !important; white-space: normal; line-height: 1.4; }
+.plain { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; line-height: 1.4; }
+
+.personHead { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.personHeadText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.personHeadText b { font-size: 16px; font-weight: 650; }
+.personHeadText small { font-size: 12.5px; color: var(--theme-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.close { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.close:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.close:focus-visible, .toggle:focus-visible, .more summary:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+
+.toggles { display: flex; flex-wrap: wrap; gap: 6px; }
+.toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13.5px; font-weight: 550; cursor: pointer; }
+.toggle[aria-pressed="true"] { background: color-mix(in srgb, var(--stripe) 16%, var(--theme-surface)); border-color: var(--stripe); box-shadow: inset 0 0 0 1px var(--stripe); }
+.toggle:disabled { cursor: default; opacity: 0.6; }
+
+.canList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.canList li { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 8px; }
+.canList li > span:last-child { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.canList b { font-size: 13.5px; font-weight: 600; }
+.canList small { font-size: 12.5px; color: var(--theme-text-muted); }
+.canList .cellText { display: none; }
+.more summary { cursor: pointer; min-height: 36px; display: flex; align-items: center; font-size: 13px; font-weight: 600; color: var(--theme-text-muted); }
+
+.grants { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.grants li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 6px 0; min-height: 44px; }
+.grants li + li { border-top: 1px solid var(--theme-border); }
+.grantText { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.grantText b { font-size: 13.5px; font-weight: 600; }
+.grantText small { font-size: 12px; color: var(--theme-text-muted); }
+.switch { position: relative; display: inline-flex; width: 44px; height: 26px; cursor: pointer; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: inherit; }
+.switch span { position: absolute; inset: 0; border-radius: 13px; background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1px var(--theme-border-strong, var(--theme-border)); transition: background-color 0.15s ease; }
+.switch span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--theme-text-muted); transition: transform 0.15s ease; }
+.switch input:checked + span { background: var(--theme-action); box-shadow: none; }
+.switch input:checked + span::after { transform: translateX(18px); background: #fff; }
+.switch input:disabled + span { opacity: 0.55; }
+.switch input:focus-visible + span { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .switch span, .switch span::after { transition: none; } }
+
+.facts { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; margin: 0; font-size: 13.5px; }
+.facts dt { color: var(--theme-text-muted); }
+.facts dd { margin: 0; font-weight: 600; text-align: right; }
+
+.bulkBar {
+  position: sticky; bottom: 12px; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; margin-top: 12px; border-radius: 16px;
+  background: var(--theme-surface); border: 1px solid var(--theme-border-strong, var(--theme-border)); box-shadow: 0 8px 28px rgb(0 0 0 / 0.16);
+}
+.bulkBar b { font-size: 14px; margin-right: 4px; }
+.bulkPick select { min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 550; cursor: pointer; max-width: 100%; }
+.bulkPick select:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+
+.confirm { margin: 0 0 8px; font-size: 14px; line-height: 1.45; }
+.changeList { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.changeList li { display: flex; align-items: center; gap: 8px; }
+.changeList li svg { color: var(--theme-success); flex: none; }
+.changeList[data-quiet] li { color: var(--theme-text-muted); }
+.changeList[data-quiet] li svg { color: var(--theme-text-muted); }
+
+/* The whole matrix needs the width: the rail sits beside it only on a wide screen; below that the open person comes
+   first and the role templates follow the table. */
+@media (min-width: 1024px) {
+  .rail:not(:has(.personHead)) { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; align-items: start; }
+  .tableWrap { display: block; max-height: 70vh; overflow: auto; margin: 0 -6px; }
+  .cards { display: none; }
+  .search { min-height: 36px; }
+  .toggle, .bulkPick select { min-height: 36px; }
+}
+@media (min-width: 1024px) and (pointer: coarse) { .toggle, .bulkPick select, .search { min-height: 44px; } }
+/* 1024-1599 (the owner's 1440): the matrix stays in view and the open person is a drawer on the right, over it. */
+@media (min-width: 1024px) and (max-width: 1599px) {
+  .layout[data-open] .rail { order: 0; position: fixed; top: 0; right: 0; bottom: 0; z-index: 40; width: min(420px, 100vw); overflow-y: auto; padding: 16px;
+    background: var(--theme-canvas, var(--theme-surface-subtle)); border-left: 1px solid var(--theme-border-strong, var(--theme-border)); box-shadow: -12px 0 32px rgb(0 0 0 / 0.18); overscroll-behavior: contain; }
+}
+@media (min-width: 1600px) {
+  .layout { grid-template-columns: minmax(0, 1fr) 320px; column-gap: 16px; }
+  .layout[data-open] .rail { order: 0; }
+  .rail, .rail:not(:has(.personHead)) { display: flex; position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; scrollbar-width: thin; }
+}

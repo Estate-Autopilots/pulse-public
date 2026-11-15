@@ -1,0 +1,120 @@
+/* UI-DIALOGS kit (8 Nov 2026): the app's own confirm and prompt (dialogs.tsx), and the toast shown where Pip's island is
+   not. A card in the middle of a computer screen, a sheet from the bottom of a phone (below 600 px). House accent
+   #6B4CF0, one primary button, theme tokens for everything else; motion is transform/opacity and off under
+   prefers-reduced-motion. */
+.dialog {
+  --dlg-accent: #6b4cf0; --dlg-accent-hover: #5a3bdc; --dlg-on-accent: #fff;
+  --dlg-danger: #c03b3b; --dlg-danger-hover: #a52f2f; --dlg-on-danger: #fff;
+  --dlg-soft: color-mix(in srgb, var(--theme-border) 60%, var(--theme-surface));
+  position: fixed; inset: 0; z-index: var(--ds-z-dialog, 120); box-sizing: border-box;
+  width: min(440px, calc(100vw - 32px)); max-width: none; height: fit-content; max-height: calc(100dvh - 32px); margin: auto; padding: 0;
+  overflow: auto; overscroll-behavior: contain;
+  border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); color: var(--theme-text);
+  font-family: inherit; font-size: 14px; line-height: 1.5; text-align: start;
+  box-shadow: 0 24px 64px rgb(14 10 44 / 22%), 0 2px 8px rgb(14 10 44 / 8%);
+  animation: pop 190ms cubic-bezier(.16, 1, .3, 1) both;
+}
+:global(html[data-theme="dark"]) .dialog {
+  --dlg-accent: #a99cff; --dlg-accent-hover: #bdb3ff; --dlg-on-accent: #17123a;
+  --dlg-danger: #ef9a9a; --dlg-danger-hover: #f6b4b4; --dlg-on-danger: #2b0f0f;
+  box-shadow: 0 24px 64px rgb(0 0 0 / 55%), 0 0 0 1px rgb(255 255 255 / 5%);
+}
+.dialog::backdrop { background: rgb(12 10 30 / 44%); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); animation: fade 190ms ease-out both; }
+.dialog[data-leaving] { animation: popOut 140ms ease-in both; pointer-events: none; }
+.dialog[data-leaving]::backdrop { animation: fadeOut 140ms ease-in both; }
+/* The page behind keeps still while a dialog is open. */
+:global(html):has(.dialog[open]) { overflow: hidden; }
+/* Browsers without <dialog>: the same card on a fixed layer. */
+.dialog[data-fallback] { display: block; }
+.dialog[data-fallback]::after { content: ""; position: fixed; inset: 0; z-index: -1; background: rgb(12 10 30 / 44%); }
+
+.card { display: flex; flex-direction: column; gap: 14px; padding: 22px 22px 18px; }
+.grip { display: none; }
+.head { display: flex; align-items: flex-start; gap: 12px; }
+.icon { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 11px;
+  background: color-mix(in srgb, var(--dlg-danger) 13%, var(--theme-surface)); color: var(--dlg-danger); }
+.words { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.title { margin: 0; font-size: 17px; font-weight: 650; line-height: 1.35; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.body { margin: 0; color: var(--theme-text-muted); font-size: 14px; overflow-wrap: anywhere; }
+.body p { margin: 0; }
+.body p + p { margin-top: 6px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 13px; font-weight: 600; color: var(--theme-text); }
+.need { display: inline-block; margin: 0 2px; padding: 0 6px; border-radius: 6px; background: var(--theme-surface-subtle); color: var(--theme-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; font-weight: 600; overflow-wrap: anywhere; }
+.input { box-sizing: border-box; width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid var(--theme-border-strong); border-radius: 10px;
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14.5px; line-height: 1.4;
+  transition: border-color 120ms ease, box-shadow 120ms ease; }
+.input::placeholder { color: color-mix(in srgb, var(--theme-text-muted) 80%, transparent); }
+.input:focus { outline: none; border-color: var(--dlg-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--dlg-accent) 24%, transparent); }
+.input[aria-invalid="true"] { border-color: var(--dlg-danger); }
+.input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--dlg-danger) 22%, transparent); }
+textarea.input { min-height: 92px; max-height: 40dvh; resize: vertical; field-sizing: content; }
+.under { display: flex; align-items: flex-start; gap: 10px; min-height: 18px; font-size: 12.5px; line-height: 1.4; color: var(--theme-text-muted); }
+.under > :first-child { flex: 1 1 auto; min-width: 0; }
+.problem { display: flex; align-items: flex-start; gap: 5px; color: var(--dlg-danger); font-weight: 550; }
+.problem svg { flex: none; margin-top: 1px; }
+.count { flex: none; font-variant-numeric: tabular-nums; }
+.count[data-over] { color: var(--dlg-danger); font-weight: 600; }
+
+.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 16px; border-radius: 10px;
+  font: inherit; font-size: 14px; font-weight: 600; line-height: 1; cursor: pointer; white-space: nowrap;
+  transition: background-color 120ms ease, border-color 120ms ease, transform 80ms ease; }
+.btn:active:not(:disabled) { transform: scale(.98); }
+.btn:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.quiet { border: 1px solid var(--theme-border); background: transparent; color: var(--theme-text); }
+.quiet:hover { background: var(--theme-surface-subtle); }
+.primary { border: 1px solid transparent; background: var(--dlg-accent); color: var(--dlg-on-accent); box-shadow: 0 1px 2px rgb(14 10 44 / 14%); }
+.primary:hover:not(:disabled) { background: var(--dlg-accent-hover); }
+.primary[data-danger] { background: var(--dlg-danger); color: var(--dlg-on-danger); }
+.primary[data-danger]:hover:not(:disabled) { background: var(--dlg-danger-hover); }
+.primary:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+/* "Shift+Enter starts a new line" only where there is a keyboard with a Shift key. */
+.hint { display: none; }
+@media (hover: hover) and (pointer: fine) { .hint { display: inline; } }
+
+/* ---- a phone: a sheet from the bottom, big buttons, the main one on top */
+@media (max-width: 599.98px) {
+  .dialog { inset: auto 0 0 0; width: 100%; max-height: 92dvh; margin: 0; border-width: 1px 0 0; border-radius: 20px 20px 0 0; animation-name: rise; animation-duration: 260ms; }
+  .dialog[data-leaving] { animation-name: sink; animation-duration: 180ms; }
+  .card { gap: 12px; padding: 8px 18px max(18px, env(safe-area-inset-bottom)); }
+  .grip { display: block; width: 38px; height: 4px; margin: 2px auto 6px; border-radius: 999px; background: var(--theme-border-strong); }
+  .title { font-size: 17.5px; }
+  .input { min-height: 48px; font-size: 16px; } /* 16 px: iOS does not zoom into the box */
+  .actions { flex-direction: column-reverse; gap: 8px; margin-top: 6px; }
+  .btn { width: 100%; min-height: 48px; font-size: 15.5px; }
+}
+
+/* ---- the toast, only where Pip's island is not on the page (a page framed in the chat's side panel, sign-in pages) */
+.toasts { position: fixed; inset: auto 0 max(16px, env(safe-area-inset-bottom)) 0; margin: 0 auto; padding: 0; border: 0; background: transparent; overflow: visible;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; width: min(420px, calc(100vw - 24px)); pointer-events: none; z-index: var(--ds-z-toast, 130); }
+.toast { box-sizing: border-box; display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 11px 12px 11px 14px; pointer-events: auto;
+  border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: var(--theme-text);
+  box-shadow: 0 12px 32px rgb(14 10 44 / 16%); font-size: 13.5px; line-height: 1.4; animation: toastIn 220ms cubic-bezier(.16, 1, .3, 1) both; }
+.toast[data-tone="success"] .toastIcon { color: var(--theme-success, #1f9d55); }
+.toast[data-tone="error"] .toastIcon { color: var(--theme-danger, #c03b3b); }
+.toast[data-tone="info"] .toastIcon { color: #6b4cf0; }
+.toastIcon { flex: none; margin-top: 1px; }
+.toastWords { flex: 1 1 auto; min-width: 0; }
+.toastWords strong { display: block; font-weight: 600; overflow-wrap: anywhere; }
+.toastWords span { display: block; color: var(--theme-text-muted); overflow-wrap: anywhere; }
+.toastAction { flex: none; align-self: center; min-height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: color-mix(in srgb, #6b4cf0 12%, var(--theme-surface)); color: #6b4cf0; font: inherit; font-weight: 600; cursor: pointer; }
+:global(html[data-theme="dark"]) .toastAction, :global(html[data-theme="dark"]) .toast[data-tone="info"] .toastIcon { color: #a99cff; }
+.toastClose { flex: none; display: grid; place-items: center; width: 28px; height: 28px; margin: -3px -4px 0 0; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.toastClose:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+
+@keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+@keyframes popOut { to { opacity: 0; transform: translateY(6px) scale(.98); } }
+@keyframes rise { from { transform: translateY(100%); } }
+@keyframes sink { to { transform: translateY(100%); } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes fadeOut { to { opacity: 0; } }
+@keyframes toastIn { from { opacity: 0; transform: translateY(12px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog, .dialog::backdrop, .dialog[data-leaving], .dialog[data-leaving]::backdrop, .toast { animation: none; }
+  .btn, .input { transition: none; }
+  .btn:active:not(:disabled) { transform: none; }
+}

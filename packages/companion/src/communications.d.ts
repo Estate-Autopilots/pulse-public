@@ -1,0 +1,15 @@
+export type CommunicationSnapshot={person:{id:string;name:string};counts:{chats:number;inbox:number;total:number};rows:unknown[];settings?:unknown;suppression?:string|null};
+export type Communications={todayHost:HTMLDivElement;attach:()=>void;refresh:()=>Promise<void>;status:(text:string|null)=>void;pingIssue:(text:string|null)=>void;snapshot:(state:CommunicationSnapshot)=>void;open:(id:string,href?:string)=>Promise<void>;showInbox:()=>void;showToday:()=>void;showChats:()=>void;destroy:()=>void};
+export type CommunicationTool={id:string;label:string;icon:string;onClick?:()=>void};
+export function mountCommunications(root:HTMLElement,options:{call:(path:string,body?:unknown)=>Promise<any>;onOpen:(href:string)=>void;onSwitch?:()=>void;onResize?:()=>void;onEnablePings?:()=>void;onFixPings?:()=>void;isVisible?:()=>boolean;platform?:string;tools?:CommunicationTool[]|null;store?:{get(key:string,fallback:unknown):any;set(key:string,value:unknown):void}|null}):Communications;
+export function conversationTarget(href:string):string|null;
+export function createFeed(options:Record<string,unknown>):{reset:(identity:string|null)=>void;poll:()=>Promise<void>};
+export function glyph(name:string,size?:number):string;
+export function initials(name:string|null|undefined):string;
+export function hueOf(text:string|null|undefined):number;
+export function shortTime(at:string,now?:number):string;
+export function dayLabel(at:string,now?:number):string;
+export function inboxGroups<T extends {kind?:string}>(rows:T[]):{id:string;title:string;items:T[]}[];
+export function primaryAction(row:{kind?:string}):string;
+export function visibleConversations<T extends {id:string;moderationOnly?:boolean;duplicateOf?:string|null;lastAt?:string|null;name:string}>(channels:T[],pinned?:string[]):{pinned:T[];recent:T[]};
+export const PING_TYPES:Record<string,[string,string]>;
