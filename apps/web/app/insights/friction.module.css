@@ -1,0 +1,38 @@
+/* BUGKIT-TELEMETRY: Insights → App friction. Theme tokens only, so light and dark both read; one column on a phone. */
+.page { display: grid; gap: 14px; min-width: 0; }
+.note { margin: 0; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface-subtle); font-size: 13px; }
+.empty { margin: 0; padding: 12px 16px; color: var(--theme-text-muted); font-size: 13px; }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 900px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+.alerts { display: grid; margin: 0; padding: 0; list-style: none; }
+.alert { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--theme-border); }
+.alert:first-child { border-top: 0; }
+.alert[data-highlight] { background: var(--theme-surface-subtle); box-shadow: inset 3px 0 0 var(--theme-action); }
+.alertIcon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--theme-surface-subtle); color: var(--theme-warning); }
+.alert[data-kind="rage"] .alertIcon, .alert[data-kind="error"] .alertIcon { color: var(--theme-danger); }
+.alertText { display: grid; gap: 2px; min-width: 0; }
+.alertText b { font-weight: 600; font-size: 13px; overflow-wrap: anywhere; }
+.alertText small { color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.alertActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+@media (max-width: 640px) {
+  .alert { grid-template-columns: auto minmax(0, 1fr); }
+  .alertActions { grid-column: 1 / -1; justify-content: flex-start; }
+}
+
+.heat { display: grid; gap: 8px; padding: 12px 16px 16px; border-top: 1px solid var(--theme-border); }
+.heatTitle { margin: 0; font-size: 13px; font-weight: 600; }
+
+.funnels { display: grid; gap: 16px; padding: 12px 16px 16px; }
+.funnel { margin: 0; display: grid; gap: 8px; }
+.funnel figcaption { font-weight: 600; font-size: 13px; }
+.funnel ol { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.funnel li { display: grid; grid-template-columns: minmax(90px, 140px) minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: 12px; }
+.stepLabel { color: var(--theme-text-muted); }
+.bar { height: 12px; border-radius: 6px; background: var(--theme-surface-subtle); overflow: hidden; }
+.bar span { display: block; height: 100%; border-radius: 6px; background: var(--theme-action); }
+.stepNum { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stepNum small { color: var(--theme-text-muted); }
+.stepNum small[data-bad] { color: var(--theme-danger); font-weight: 600; }
+
+.purpose { margin: 12px 16px 4px; padding: 10px 12px; border-left: 3px solid var(--theme-action); background: var(--theme-surface-subtle); border-radius: 6px; font-size: 13px; }

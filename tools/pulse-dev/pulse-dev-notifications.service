@@ -1,0 +1,11 @@
+[Unit]
+Description=Pulse dev personal decision notifications
+[Service]
+Type=oneshot
+WorkingDirectory=/home/eadev/work/pulse/strike
+EnvironmentFile=/etc/estate-autopilots/db/pulse_dev.env
+# POLISH-2: Telegram is optional. Without this file the minute tick (presence, reminders, forgotten check-outs, HR
+# copies) still runs and the worker reports Telegram as disabled; the "-" keeps a missing file from failing the unit
+# (it failed every minute from 8 to 10 Oct 2026 when the file was absent on this server).
+EnvironmentFile=-/etc/estate-autopilots/secrets/telegram.env
+ExecStart=/home/eadev/work/pulse/strike/.venv/bin/python -m pulse_workers.notifications

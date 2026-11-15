@@ -1,0 +1,76 @@
+/* CALENDAR-HUB: /calendar's own parts. The calendar itself is kit/calendar; these are the totals card of "My companies",
+   the footer line and the "Add to calendar" sheet. House style: #6B4CF0, white cards, tabular numbers, a 4px grid. */
+.stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; width: 100%; }
+.footButton { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 999px; font: inherit; font-size: 13px; font-weight: 650;
+  border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); cursor: pointer; }
+.footButton:hover:not(:disabled) { border-color: #6B4CF0; color: #6B4CF0; }
+.footButton:focus-visible { outline: 2px solid #6B4CF0; outline-offset: 2px; }
+.footButton:disabled { opacity: .6; cursor: progress; }
+
+/* "My companies": the totals card. */
+.totals { display: grid; grid-template-columns: minmax(140px, auto) minmax(0, 1fr); gap: 16px 24px; padding: 20px; border-radius: 16px; min-width: 0;
+  background: var(--theme-surface); border: 1px solid var(--theme-border); box-shadow: 0 1px 2px rgb(30 27 46 / 6%), 0 4px 16px rgb(30 27 46 / 5%); box-sizing: border-box; }
+:global(:root[data-theme="dark"]) .totals { box-shadow: 0 1px 2px rgb(0 0 0 / 30%); }
+.totalHead { display: flex; flex-direction: column; gap: 2px; padding-right: 24px; border-right: 1px solid var(--theme-border); min-width: 0; }
+.totalLabel { font-size: 14px; font-weight: 650; color: var(--theme-text-muted); }
+.totalValue { font-size: 40px; line-height: 1.1; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--theme-text); }
+.totalSub { font-size: 13px; color: var(--theme-text-muted); }
+.totalBody { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.bigBar { display: flex; gap: 3px; height: 20px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--theme-text) 6%, var(--theme-surface)); }
+.bigBar i { display: block; min-width: 6px; transition: flex-grow .4s ease; }
+.emptyBar { flex-grow: 1; }
+.legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.legendItem { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 0 12px; border-radius: 12px; font: inherit; font-size: 14px; text-align: left;
+  border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); cursor: pointer; box-sizing: border-box; }
+.legendItem[aria-pressed="true"] { border-color: color-mix(in srgb, var(--c) 45%, var(--theme-border)); background: color-mix(in srgb, var(--c) 8%, var(--theme-surface)); }
+.legendItem[aria-pressed="false"] { color: var(--theme-text-muted); }
+.legendItem[aria-pressed="false"] .swatch { background: transparent; }
+.legendItem:hover { border-color: var(--c); }
+.legendItem:focus-visible { outline: 2px solid #6B4CF0; outline-offset: 2px; }
+/* A tick box in the company's colour: filled with a tick when the company is shown, empty when hidden. */
+.swatch { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 6px; background: var(--c); border: 2px solid var(--c); box-sizing: border-box; color: #fff; }
+/* A long company name wraps to a second line rather than being cut. */
+.legendName { flex: 1; min-width: 0; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 1.25; font-weight: 600; overflow-wrap: anywhere; }
+.legendHours { flex: none; font-variant-numeric: tabular-nums; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.day { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border-radius: 12px; background: color-mix(in srgb, var(--theme-text) 3%, var(--theme-surface)); min-width: 0; }
+/* Today: a neutral ring (a company may own the violet). */
+.day[data-today] { background: color-mix(in srgb, var(--theme-text) 6%, var(--theme-surface)); box-shadow: inset 0 0 0 1.5px var(--theme-text-muted); }
+.dayName { font-size: 12px; font-weight: 650; color: var(--theme-text-muted); }
+/* Each day's bar is as tall as its hours (the busiest day fills the track; the inner bar's height is set inline). */
+.dayStack { display: flex; flex-direction: column; justify-content: flex-end; width: 16px; height: 44px; border-radius: 6px; overflow: hidden; background: color-mix(in srgb, var(--theme-text) 6%, var(--theme-surface)); }
+.dayFill { display: flex; flex-direction: column-reverse; gap: 2px; width: 100%; border-radius: 6px; overflow: hidden; }
+.dayStack i { display: block; min-height: 3px; }
+.dayHours { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 3px; font-size: 12px; line-height: 1.2; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.note { grid-column: 1 / -1; margin: 0; font-size: 13px; color: var(--theme-text-muted); }
+
+/* A day's split under its name in the week grid. */
+.dayBar { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; padding: 0 8px; box-sizing: border-box; }
+.dayBar b { font-size: 12px; font-weight: 650; color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.miniBar { display: flex; gap: 2px; width: 100%; max-width: 120px; height: 6px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--theme-text) 6%, var(--theme-surface)); }
+.miniBar i { display: block; min-width: 3px; }
+
+/* "Add to calendar". */
+.form { display: flex; flex-direction: column; gap: 16px; }
+.formEnd { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; padding-top: 4px; }
+.formError { margin: 0; font-size: 14px; color: var(--theme-danger, #be123c); }
+.form :global(input), .form :global(textarea) { font-size: 16px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.row :global(input) { min-width: 0; width: 100%; box-sizing: border-box; }
+
+
+@media (max-width: 720px) {
+  .totals { grid-template-columns: minmax(0, 1fr); padding: 16px; gap: 12px; }
+  .totalHead { flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; padding: 0 0 12px; border-right: 0; border-bottom: 1px solid var(--theme-border); }
+  .totalValue { font-size: 32px; }
+  /* One company per line on a phone: its whole name and its hours. */
+  .legend { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .legendItem { min-height: 44px; padding: 0 12px; font-size: 14px; }
+  .days { gap: 4px; }
+  /* "5h 30m" stays on one line in a phone's narrow day tile. */
+  .day { padding: 8px 2px; }
+  .dayHours { flex-wrap: nowrap; gap: 0 2px; font-size: 11px; letter-spacing: -.02em; }
+}
+@media (prefers-reduced-motion: reduce) { .bigBar i { transition: none; } }

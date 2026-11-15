@@ -1,0 +1,45 @@
+# services/api/openapi/service-events.yaml 1.0.0 (envelope; later versions add the data schemas from the table)
+openapi: 3.1.0
+info: { title: Pulse install events, version: 1.0.0 }
+webhooks:
+  pulseEvent:
+    post:
+      summary: One event per request to the operator-configured receiver
+      parameters:
+        - { name: Pulse-Event-Id, in: header, required: true, schema: { type: string, format: uuid } }
+        - { name: Pulse-Event-Type, in: header, required: true, schema: { type: string } }
+        - { name: Pulse-Delivery-Attempt, in: header, required: true, schema: { type: integer, minimum: 1, maximum: 5 } }
+        - { name: Pulse-Timestamp, in: header, required: true, schema: { type: integer } }
+        - { name: Pulse-Key-Id, in: header, required: true, schema: { type: string, pattern: '^[A-Za-z0-9_-]{1,32}$' } }
+        - { name: Pulse-Signature, in: header, required: true, schema: { type: string, pattern: '^v1=[0-9a-f]{64}$' } }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ServiceEvent' } } } }
+      responses: { '2XX': { description: Delivered } }
+components:
+  schemas:
+    ServiceEvent:
+      type: object
+      additionalProperties: false
+      required: [id, type, version, occurredAt, sequence, subject, data]
+      properties:
+        id: { type: string, format: uuid, description: 'Stable across retries, redrives and catch-up' }
+        type: { enum: [quote.sent, quote.accepted, quote.converted] }
+        version: { type: integer, minimum: 1, description: 'Schema version of this type; additive changes keep it, a breaking change bumps it and is announced 30 days ahead' }
+        occurredAt: { type: string, format: date-time }
+        sequence: { type: integer, minimum: 1 }
+        subject:
+          type: object
+          additionalProperties: false
+          required: [kind, id]
+          properties: { kind: { enum: [quotation, customer, document, task, site_visit, site_photo] }, id: { type: string, format: uuid } }
+        data: { oneOf: [{ $ref: '#/components/schemas/QuotationData' }] }
+    QuotationData:
+      type: object
+      additionalProperties: false
+      required: [status, clientId, leadId]
+      properties:
+        status: { enum: [sent, accepted, converted] }
+        clientId: { type: [string, 'null'], format: uuid }
+        leadId: { type: [string, 'null'], format: uuid }
+        acceptedVia: { enum: [staff, customer_link], description: accepted only }
+        resultDocumentId: { type: string, format: uuid, description: converted only }
+        resultType: { enum: [proforma, invoice], description: converted only }

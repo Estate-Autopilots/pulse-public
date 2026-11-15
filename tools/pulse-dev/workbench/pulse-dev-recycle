@@ -1,0 +1,187 @@
+#!/usr/bin/env bash
+# pulse-dev-recycle: give the memory a long-running `next dev` collects back (OPS-2, 15 Oct 2026). The dev server held
+# 1.7-2.0 GB after three days (peak 5.4 GB) on a 16 GB box whose 4 GB swap was full; on 11 Oct the kernel killed
+# Chromium and the dev server six times. Two timers run it:
+#   pulse-dev-recycle.timer          every 10 minutes: restart when the server's processes hold more than 2.5 GB
+#                                    (resident memory of the unit's processes; PULSE_DEV_RECYCLE_MB to change)
+#   pulse-dev-recycle-nightly.timer  02:30 IST: restart once a night if it has been up for 6 hours; while it is
+#                                    stopped, bound what it keeps on disk (strike was 17 GB, 11 of them this cache)
+#                                    without starting cold: Turbopack's persistent cache is kept, or replaced by a
+#                                    smaller warm seed, within 4 GiB (turbo_cache below), and harness build folders
+#                                    (apps/web/.next-*, git-ignored) untouched for 7 days and used by no process are
+#                                    removed
+# Never within 30 minutes of the server's last start, and never while it is not running (pulse-dev-heal owns that).
+# Both timers and pulse-dev-heal share one lock, so nothing starts the server while the nightly works on its cache.
+# After a restart pulse-dev-warm compiles the common routes again. Every decision is logged with the numbers.
+set -u
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+UNIT=pulse-dev-web
+LIMIT_MB=${PULSE_DEV_RECYCLE_MB:-2560}
+STATE=${PULSE_DEV_RECYCLE_STATE:-$HOME/.local/state/pulse-dev-recycle}
+LOG=${PULSE_DEV_RECYCLE_LOG:-$HOME/ea-intel/logs/pulse-dev-recycle.log}
+mkdir -p "$(dirname "$LOG")" "$STATE"
+note() { printf '%s %s\n' "$(date -u +%FT%TZ)" "$*" | tee -a "$LOG"; }
+
+# turbo_cache <web dir>: the nightly cache step (EST-1647); only while the server is stopped and the lock is held.
+# Turbopack's persistent cache (.next/dev/cache/turbopack/v<next version>-<hash>) is a log-structured database: Next 16
+# has no size limit for it and it cannot be trimmed, only kept, replaced or cleared whole. Merges leave superseded
+# entries behind, so it grows by gigabytes (4.8 GB in the 3 days to 18 Oct) while a cache warmed from empty holds
+# about 1 GB. An older cache is as valid as one kept across a restart after a merge: Turbopack re-checks the files it
+# read, and only what changed compiles again.
+#   - version directories other than the live one (the newest of the installed Next) are dead and removed;
+#   - the whole cache folder and the seed together never exceed the cap (PULSE_DEV_TURBO_CACHE_GB, 4 GiB, as before:
+#     the seed counts against it, so the disk bound is unchanged); whatever else is in the folder (a layout a later
+#     Next might use) counts too;
+#   - the live cache is kept while the folder and the seed fit the cap;
+#   - over the cap it is replaced by the seed, a copy of the same directory taken on an earlier night when it held at
+#     most half the cap, kept up to PULSE_DEV_TURBO_SEED_DAYS (7), if the folder and two copies of the seed fit; else
+#     it is cleared, as before;
+#   - a live cache within half the cap becomes the new seed if the folder and two copies of it fit the cap, unless the
+#     copy would leave less than PULSE_DEV_SEED_MIN_FREE_MB (18 GiB; ea-heavy refuses work below 16 GiB) free; below
+#     that the seed is dropped;
+#   - every exit ends in turbo_cache_cap, which measures again and enforces folder + seed within the cap.
+# Copies run at nice 19 and the lowest best-effort IO priority, and give up after 5 minutes (the server is down
+# meanwhile; a failed restore leaves the cache cleared, as before).
+turbo_cache() {
+  local root=$1/.next/dev/cache/turbopack seeds=$STATE/turbopack-seed
+  local cap=$(( ${PULSE_DEV_TURBO_CACHE_MB:-$(( ${PULSE_DEV_TURBO_CACHE_GB:-4} * 1024 ))} * 1024 ))
+  local floor=$(( ${PULSE_DEV_SEED_MIN_FREE_MB:-18432} * 1024 )) days=${PULSE_DEV_TURBO_SEED_DAYS:-7}
+  local ver live d name kb other seed_kb=0 free seeded
+  [[ -d $root && ! -L $root ]] || { turbo_cache_cap "$root" "$seeds" "$cap"; return 0; }
+  ver=$(grep -m1 -oE '"version": *"[^"]+"' "$1/node_modules/next/package.json" 2>/dev/null | cut -d'"' -f4)
+  live=$(find "$root" -mindepth 1 -maxdepth 1 -type d -name "v${ver:+$ver-}*" -printf '%T@ %f\n' | sort -n | tail -1 | cut -d' ' -f2-)
+  for d in "$root"/v* "$root"/.recycle-*; do
+    name=${d##*/}
+    [[ -d $d && ! -L $d && $name != "$live" ]] || continue
+    note "nightly: removed the Turbopack cache $name ($(du -sm -- "$d" | cut -f1) MB, not the live version)"
+    rm -rf -- "${d:?}"
+  done
+  mkdir -p "$seeds"
+  rm -rf -- "${seeds:?}/.incoming"
+  free=$(df -Pk -- "$root" | awk 'NR == 2 {print $4}')
+  for d in "$seeds"/*; do
+    [[ -e $d || -L $d ]] || continue
+    name=${d##*/}
+    if [[ $name != "$live" || -L $d || ! -d $d ]]; then note "nightly: dropped the Turbopack seed $name (not the live version)"
+    elif [[ -n $(find "$d" -maxdepth 0 -mmin +$(( days * 1440 ))) ]]; then note "nightly: dropped the Turbopack seed $name (older than $days days)"
+    elif (( free < floor )); then note "nightly: dropped the Turbopack seed $name ($(( free / 1024 )) MB free, under the $(( floor / 1024 )) MB floor)"
+    else continue
+    fi
+    rm -rf -- "${d:?}"
+  done
+  [[ -n $live ]] || { turbo_cache_cap "$root" "$seeds" "$cap"; return 0; }
+  kb=$(du -sk -- "$root/$live" | cut -f1)
+  other=$(( $(du -sk -- "$root" | cut -f1) - kb ))  # the rest of the folder, with its own directory blocks
+  [[ -d $seeds/$live ]] && seed_kb=$(du -sk -- "$seeds/$live" | cut -f1)
+  if (( seed_kb * 2 > cap )); then
+    note "nightly: dropped the Turbopack seed $live ($(( seed_kb / 1024 )) MB, over half the cap)"
+    rm -rf -- "${seeds:?}/${live:?}"; seed_kb=0
+  fi
+  if (( other + kb + seed_kb > cap )); then
+    rm -rf -- "${root:?}/${live:?}"
+    if (( seed_kb > 0 && other + 2 * seed_kb <= cap )) && seeded=$(date -u -r "$seeds/$live" +%FT%TZ) \
+        && timeout 300 nice -n 19 ionice -c2 -n7 cp -a -- "$seeds/$live" "$root/.recycle-restore" \
+        && mv -T -- "$root/.recycle-restore" "$root/$live"; then
+      note "nightly: replaced the Turbopack cache ($(( kb / 1024 )) MB, other $(( other / 1024 )) MB, over the cap with the seed) by the $(( seed_kb / 1024 )) MB seed of $seeded"
+    else
+      rm -rf -- "${root:?}/.recycle-restore"
+      note "nightly: cleared the Turbopack cache ($(( kb / 1024 )) MB, other $(( other / 1024 )) MB, over the cap; no usable seed)"
+    fi
+  elif (( kb * 2 <= cap )); then
+    if (( other + 2 * kb > cap )); then
+      note "nightly: kept the Turbopack cache ($(( kb / 1024 )) MB); not seeded: with the other $(( other / 1024 )) MB in the folder the seed would pass the cap"
+    elif (( free - kb < floor )); then
+      note "nightly: kept the Turbopack cache ($(( kb / 1024 )) MB); not seeded: the copy would leave less than $(( floor / 1024 )) MB free"
+    elif timeout 300 nice -n 19 ionice -c2 -n7 cp -a -- "$root/$live" "$seeds/.incoming" && touch -- "$seeds/.incoming" \
+        && rm -rf -- "${seeds:?}/${live:?}" && mv -T -- "$seeds/.incoming" "$seeds/$live"; then
+      note "nightly: kept the Turbopack cache ($(( kb / 1024 )) MB) and saved it as the seed"
+    else
+      rm -rf -- "${seeds:?}/.incoming"
+      note "nightly: kept the Turbopack cache ($(( kb / 1024 )) MB); saving the seed failed"
+    fi
+  else
+    note "nightly: kept the Turbopack cache ($(( kb / 1024 )) MB; other $(( other / 1024 )) MB; seed $(( seed_kb / 1024 )) MB; cap $(( cap / 1024 )) MB)"
+  fi
+  turbo_cache_cap "$root" "$seeds" "$cap"
+}
+
+# turbo_cache_cap <cache folder> <seed folder> <cap kb>: the bound on every exit of turbo_cache, measured again. A
+# cache folder over the cap on its own is cleared whole (the old bound); if the folder and the seed together are still
+# over, the seed goes (the live cache is the warm one). A symlinked cache folder is not ours and counts as empty.
+turbo_cache_cap() {
+  local kb=0 seed_kb=0
+  [[ -d $1 && ! -L $1 ]] && kb=$(du -sk -- "$1" | cut -f1)
+  [[ -d $2 && ! -L $2 ]] && seed_kb=$(du -sk -- "$2" | cut -f1)
+  if (( kb > $3 )); then
+    rm -rf -- "${1:?}"
+    note "nightly: cleared the Turbopack cache folder ($(( kb / 1024 )) MB, over the cap)"
+    kb=0
+  fi
+  (( kb + seed_kb > $3 )) || return 0
+  rm -rf -- "${2:?}"
+  note "nightly: dropped the Turbopack seed ($(( seed_kb / 1024 )) MB; with the $(( kb / 1024 )) MB cache folder over the $(( $3 / 1024 )) MB cap)"
+}
+
+# Sourced (by the tests) the script stops here, with the functions defined.
+[[ ${BASH_SOURCE[0]} == "$0" ]] || return 0
+
+# One recycle at a time, and pulse-dev-heal waits for it (it starts a stopped server otherwise). The nightly waits
+# for a running 10-minute check; the 10-minute check skips while the nightly holds the server.
+exec 9>>"$STATE/lock"
+if [[ ${1:-} == --nightly ]]; then
+  flock -w 900 9 || { note "nightly: skipped, another recycle held the lock for 15 minutes"; exit 0; }
+else
+  flock -n 9 || exit 0
+fi
+systemctl --user is-active --quiet "$UNIT" || exit 0
+started=$(systemctl --user show "$UNIT" -p ActiveEnterTimestampMonotonic --value 2>/dev/null || echo 0)
+up_s=$(( ($(cut -d. -f1 /proc/uptime) * 1000000 - ${started:-0}) / 1000000 ))
+(( up_s >= 1800 )) || exit 0
+cg=/sys/fs/cgroup/user.slice/user-$(id -u).slice/user@$(id -u).service/app.slice/$UNIT.service
+rss_kb=0
+while read -r pid; do
+  kb=$(awk '/^VmRSS:/ {print $2}' "/proc/$pid/status" 2>/dev/null)
+  rss_kb=$(( rss_kb + ${kb:-0} ))
+done < "$cg/cgroup.procs"
+mb=$(( rss_kb / 1024 ))
+hours=$(( up_s / 3600 ))
+if [[ ${1:-} == --nightly ]]; then
+  (( up_s >= 6 * 3600 )) || { note "nightly: $UNIT up ${hours} h, holds ${mb} MB: kept (up less than 6 h)"; exit 0; }
+  note "nightly: restarting $UNIT (up ${hours} h, holds ${mb} MB)"
+elif (( mb > LIMIT_MB )); then
+  note "restarting $UNIT: it holds ${mb} MB, over the ${LIMIT_MB} MB limit (up ${hours} h)"
+else
+  exit 0
+fi
+# READINESS (23 Oct 2026): a restart is not done until the app's routes answer: twice a new server answered 404 for
+# every /api/v0 call until it was restarted again. Wait (up to 15 minutes, the host may be starved) for /api/v0/me to
+# answer; a 404 (healthy is 401 without an identity) gets one more restart. pulse-dev-heal is the backstop.
+verify_routes() {
+  local i code
+  for i in $(seq 1 90); do
+    code=$(curl -s -o /dev/null -m 60 -w '%{http_code}' "http://127.0.0.1:${PULSE_DEV_PORT:-3200}/api/v0/me" 2>/dev/null || echo 000)
+    case $code in
+      000) sleep 10 ;;
+      404) note "after the restart /api/v0/me answered 404: restarting $UNIT once more"; systemctl --user restart "$UNIT"; return ;;
+      *) note "after the restart /api/v0/me answered $code: routes are there"; return ;;
+    esac
+  done
+  note "after the restart /api/v0/me did not answer within 15 minutes; pulse-dev-heal decides"
+}
+if [[ ${1:-} != --nightly ]]; then systemctl --user restart "$UNIT"; verify_routes; exit 0; fi
+web=$(systemctl --user show "$UNIT" -p WorkingDirectory --value)
+[[ -d $web && -f $web/next.config.ts ]] || web=$HOME/work/pulse/strike/apps/web
+systemctl --user stop "$UNIT"
+turbo_cache "$web"
+busy=$(cat /proc/[0-9]*/environ 2>/dev/null | tr '\0' '\n' | sed -n 's/^NEXT_DIST_DIR=//p' | sort -u)
+for dir in "$web"/.next-*; do
+  name=${dir##*/}
+  [[ -d $dir && ! -L $dir && $name =~ ^\.next-[a-z0-9-]+$ ]] || continue
+  git -C "$web" check-ignore -q "$name" || continue
+  grep -qxF "$name" <<<"$busy" && continue
+  [[ -z $(find "$dir" -newermt '-7 days' -print -quit 2>/dev/null) ]] || continue
+  note "nightly: removed $name ($(du -sm "$dir" | cut -f1) MB, unused for 7 days)"
+  rm -rf -- "${dir:?}"
+done
+systemctl --user start "$UNIT"
+verify_routes

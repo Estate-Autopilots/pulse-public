@@ -1,0 +1,241 @@
+/* UX-GAMIFY (owner, 9 Nov 2026: "make every new screen beautiful, fun and game-like"): the game-feel kit's look.
+   House style: accent #6B4CF0, white cards on #F6F5FA, tabular numbers, a 4px grid (every gap, pad and radius is a
+   multiple of 4), the theme's tokens for text and borders so dark mode reads. Delight-only motion stops under
+   prefers-reduced-motion and when the person switched Fun effects off (<html data-fun="off">). */
+.root, .card, .tile, .ring, .gauge, .row, .quest, .bar, .head, .recap, .empty, .stepper, .badge, .streak, .primary, .quiet, .chip, .tiles, .quests, .rows, .milestone, .skel {
+  --fx-accent: #6B4CF0; --fx-accent-ink: #ffffff; --fx-accent-soft: color-mix(in srgb, #6B4CF0 12%, var(--theme-surface));
+  --fx-accent-line: color-mix(in srgb, #6B4CF0 26%, var(--theme-surface)); --fx-canvas: #F6F5FA;
+  --fx-good: #16A34A; --fx-warn: #D97706; --fx-bad: #E11D48; --fx-ease: cubic-bezier(.22, 1, .36, 1);
+  --fx-shadow: 0 1px 2px rgb(30 27 46 / 6%), 0 4px 16px rgb(30 27 46 / 5%);
+}
+:global(:root[data-theme="dark"]) :is(.root, .card, .tile, .ring, .gauge, .row, .quest, .bar, .head, .recap, .empty, .stepper, .badge, .streak, .primary, .quiet, .chip, .tiles, .quests, .rows, .milestone, .skel) {
+  --fx-accent: #A897FF; --fx-accent-ink: #17123a; --fx-accent-soft: color-mix(in srgb, #A897FF 16%, var(--theme-surface));
+  --fx-accent-line: color-mix(in srgb, #A897FF 30%, var(--theme-surface)); --fx-canvas: var(--theme-canvas);
+  --fx-good: #4ADE80; --fx-warn: #FBBF24; --fx-bad: #FB7185; --fx-shadow: 0 1px 2px rgb(0 0 0 / 30%);
+}
+.num { font-variant-numeric: tabular-nums; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* The page column: equal gutters on every side (16px phone, 24px tablet, 32px desktop), never touching the sidebar,
+   never wider than the screen. */
+.root { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 1240px; margin: 0 auto; padding: 8px 0 40px; min-width: 0; color: var(--theme-text); box-sizing: border-box; }
+/* On a phone the shell already keeps 14px from the screen's edge; from 640px the page adds its own gutter. */
+/* A child never shrinks: a page taller than the shell's scroll box squeezed a scrolling child (the tabs) to nothing. */
+.root > * { flex-shrink: 0; }
+/* Segmented tabs are as wide as their tabs, not the page. */
+.root > [role="radiogroup"], .root > nav[aria-label] { align-self: flex-start; max-width: 100%; }
+@media (min-width: 640px) { .root { padding: 24px 24px 48px; gap: 20px; } }
+/* On a phone the page ends clear of the floating + button and the tab bar. */
+@media (max-width: 639px) { .root { padding-bottom: 112px; } }
+/* The scroll box on a desktop (the shell keeps the document still from 900px; ui.module.css .page does the same). */
+.scroll { min-width: 0; }
+@media (min-width: 900px) { .scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; } }
+@media (min-width: 1024px) { .root { padding: 28px 32px 56px; } }
+
+/* Header: title, one plain line, the one primary action; a ring or streak on the right. */
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; min-width: 0; }
+.headText { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 280px; }
+.eyebrow { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--fx-accent); }
+.title { margin: 0; font-size: 28px; line-height: 1.15; font-weight: 750; letter-spacing: -0.015em; overflow-wrap: anywhere; }
+.subtitle { margin: 0; max-width: 64ch; font-size: 15px; line-height: 1.5; color: var(--theme-text-muted); }
+.headSide { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 899.98px) { .title[data-shell-title] { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+@media (max-width: 639px) { .title { font-size: 24px; } .headSide { width: 100%; gap: 12px 8px; } .headSide > .primary { flex: 1 1 100%; } }
+
+/* Buttons: one primary per view (the kit draws it), quiet ones for the rest. 44px to press on a phone. */
+.primary, .quiet { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: 12px;
+  font: inherit; font-size: 14px; font-weight: 650; text-decoration: none; cursor: pointer; white-space: nowrap; border: 1px solid transparent; }
+.primary { background: var(--fx-accent); color: var(--fx-accent-ink); box-shadow: 0 4px 12px color-mix(in srgb, var(--fx-accent) 30%, transparent); }
+.primary:hover:not(:disabled) { filter: brightness(1.06); }
+.primary:active:not(:disabled) { transform: translateY(1px); }
+.primary:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+/* The one main button stays solid violet with white words in dark mode too (a pale one read as switched off). */
+:global(:root[data-theme="dark"]) .primary { background: #6B4CF0; color: #fff; box-shadow: 0 4px 12px rgb(0 0 0 / 35%); }
+.quiet { background: var(--theme-surface); color: var(--theme-text); border-color: var(--theme-border); }
+.quiet:hover:not(:disabled) { border-color: var(--fx-accent-line); color: var(--fx-accent); }
+.small { min-height: 32px; padding: 0 12px; border-radius: 8px; font-size: 13px; }
+@media (pointer: coarse) { .primary, .quiet { min-height: 44px; } .small { min-height: 36px; } }
+.primary:focus-visible, .quiet:focus-visible, .row:focus-visible, .questCheck:focus-visible { outline: 2px solid var(--fx-accent); outline-offset: 2px; }
+
+/* Cards: white on the canvas, a soft shadow, 16px radius. */
+.card { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border); box-shadow: var(--fx-shadow); min-width: 0; }
+@media (min-width: 640px) { .card { padding: 20px; } }
+.cardHead { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; font-size: 15px; font-weight: 700; min-height: 28px; }
+.cardHead > svg { color: var(--fx-accent); flex: none; }
+.cardHead small { margin-left: auto; font-size: 12px; font-weight: 550; color: var(--theme-text-muted); }
+
+/* Stat tiles: the row always fills its width, the tiles equal; 2 across on a phone. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--tile-min, 168px)), 1fr)); gap: 12px; margin: 0; min-width: 0; }
+@media (max-width: 479px) { .tiles[data-pair] { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border); box-shadow: var(--fx-shadow); min-width: 0; color: inherit; text-decoration: none; overflow: hidden; }
+.tile[data-link]:hover { border-color: var(--fx-accent-line); }
+.tileLink { color: inherit; text-decoration: none; }
+.tileLink::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.tile:has(.tileLink:focus-visible) { outline: 2px solid var(--fx-accent); outline-offset: 2px; }
+.tileLink:focus-visible { outline: none; }
+.tileLabel { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--theme-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tileLabel svg { flex: none; color: var(--fx-accent); }
+.tileValue { margin: 0; font-size: 26px; line-height: 1.15; font-weight: 750; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tileValue small { font-size: 14px; font-weight: 600; color: var(--theme-text-muted); margin-left: 2px; }
+.tile[data-tone="bad"] .tileValue { color: var(--fx-bad); } .tile[data-tone="warn"] .tileValue { color: var(--fx-warn); } .tile[data-tone="good"] .tileValue { color: var(--fx-good); }
+.tileFoot { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 20px; }
+.trend { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.trend[data-good] { color: var(--fx-good); } .trend[data-bad] { color: var(--fx-bad); } .trend[data-flat] { color: var(--theme-text-muted); }
+.spark { flex: none; width: 72px; height: 24px; overflow: visible; }
+.spark polyline { fill: none; stroke: var(--fx-accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.spark path { fill: color-mix(in srgb, var(--fx-accent) 12%, transparent); stroke: none; }
+@media (max-width: 479px) {
+  .tile { padding: 12px; } .tileValue { font-size: 22px; } .spark { width: 56px; }
+  /* On a phone a tile's name wraps to two lines rather than being cut, and an odd last tile takes the whole row. */
+  .tileLabel { white-space: normal; align-items: flex-start; line-height: 1.3; }
+  .tiles[data-pair] > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+/* Progress ring: fills from 0 once on mount. */
+.ring { position: relative; display: inline-grid; place-items: center; flex: none; }
+.ring svg { position: absolute; inset: 0; }
+.ringTrack { fill: none; stroke: color-mix(in srgb, var(--fx-accent) 22%, var(--theme-surface)); }
+.ringFill { fill: none; stroke: var(--fx-accent); stroke-linecap: round; transition: stroke-dashoffset 1.1s var(--fx-ease); }
+.ring[data-tone="good"] .ringFill { stroke: var(--fx-good); } .ring[data-tone="warn"] .ringFill { stroke: var(--fx-warn); } .ring[data-tone="bad"] .ringFill { stroke: var(--fx-bad); }
+.ringText { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ringText b { font-size: calc(var(--ring-size, 64px) * .26); font-weight: 800; }
+.ringText small { font-size: 11px; color: var(--theme-text-muted); font-weight: 550; }
+
+/* Streak chip and level badge. */
+.streak, .badge { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 650; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.streak { background: color-mix(in srgb, #F97316 12%, var(--theme-surface)); color: color-mix(in srgb, #C2410C 85%, var(--theme-text)); border: 1px solid color-mix(in srgb, #F97316 28%, var(--theme-surface)); }
+.streak svg { color: #F97316; }
+.streak[data-cold] { background: none; color: var(--theme-text-muted); border-color: transparent; padding: 0; min-height: 0; font-weight: 550; }
+.streak[data-cold] svg { color: var(--theme-text-muted); }
+:global(:root[data-theme="dark"]) .streak:not([data-cold]) { color: #FDBA74; }
+.badge { background: var(--fx-accent-soft); color: var(--fx-accent); border: 1px solid var(--fx-accent-line); padding: 4px 12px 4px 4px; }
+.badgeLevel { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--fx-accent); color: var(--fx-accent-ink); font-size: 12px; font-weight: 800; }
+.badgeText { display: flex; flex-direction: column; gap: 2px; line-height: 1.1; }
+.badgeText small { font-size: 11px; font-weight: 550; color: var(--theme-text-muted); }
+.badgeBar { display: block; width: 72px; height: 4px; border-radius: 4px; background: var(--fx-accent-line); overflow: hidden; }
+.badgeBar i { display: block; height: 100%; background: var(--fx-accent); border-radius: inherit; transition: width .9s var(--fx-ease); }
+
+/* Fuel gauge: a half dial, green to red, a reserve mark and a needle. */
+.gauge { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; text-align: center; }
+.gauge svg { width: 100%; max-width: var(--gauge-size, 148px); height: auto; overflow: visible; }
+.gaugeTrack { fill: none; stroke: color-mix(in srgb, var(--theme-text) 12%, transparent); }
+:global(:root[data-theme="dark"]) .gaugeTrack { stroke: color-mix(in srgb, var(--theme-text) 22%, transparent); }
+.gaugeZone { fill: none; }
+.gaugeFill { fill: none; stroke-linecap: round; transition: stroke-dashoffset 1.1s var(--fx-ease); }
+.gauge[data-tone="good"] .gaugeFill { stroke: var(--fx-good); } .gauge[data-tone="warn"] .gaugeFill { stroke: var(--fx-warn); } .gauge[data-tone="bad"] .gaugeFill { stroke: var(--fx-bad); }
+.gauge[data-tone="none"] .gaugeFill { stroke: transparent; }
+.gauge[data-stale] .gaugeFill { opacity: .55; }
+.gauge[data-stale] .gaugeValue { color: var(--theme-text-muted); }
+.gaugeReserve { stroke: var(--theme-text-muted); stroke-width: 2.5; stroke-linecap: round; }
+.gaugeNeedle { transform-origin: 50px 50px; transition: transform 1.1s var(--fx-ease); }
+.gaugeNeedle line { stroke: var(--theme-text); stroke-width: 2.5; stroke-linecap: round; }
+.gaugeNeedle circle { fill: var(--theme-text); }
+.gaugeValue { margin-top: -8px; font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.gaugeValue small { font-size: 14px; font-weight: 600; color: var(--theme-text-muted); }
+.gauge[data-tone="none"] .gaugeValue { font-size: 14px; font-weight: 650; color: var(--theme-text-muted); margin-top: -4px; }
+.gaugeLabel { font-size: 13px; color: var(--theme-text-muted); }
+
+/* Card list row: lead, title and one line, a chip, a chevron. The whole row is the press target. */
+.rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 56px; padding: 12px 16px; border-radius: 12px;
+  background: var(--theme-surface); border: 1px solid var(--theme-border); color: inherit; text-decoration: none; font: inherit; text-align: left; width: 100%; box-sizing: border-box; min-width: 0; }
+.row[data-stripe] { box-shadow: inset 4px 0 0 var(--row-stripe); }
+a.row, button.row { cursor: pointer; transition: border-color .15s, transform .15s var(--fx-ease); }
+a.row:hover, button.row:hover { border-color: var(--fx-accent-line); }
+.rowLead { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--fx-accent-soft); color: var(--fx-accent); flex: none; font-weight: 750; }
+.rowText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+/* VISUAL-QA (round 2 phone judge, Chats → Data: "every row subtitle is cut off"): a row's words wrap to two lines, then "…". */
+.rowText b { display: -webkit-box; font-size: 15px; font-weight: 650; line-height: 1.3; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.rowText small { display: -webkit-box; font-size: 13px; line-height: 1.4; color: var(--theme-text-muted); overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.rowEnd { display: flex; align-items: center; gap: 8px; color: var(--theme-text-muted); }
+.chip { display: inline-flex; align-items: center; gap: 4px; min-height: 24px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 650; white-space: nowrap;
+  background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.chip[data-tone="good"] { background: color-mix(in srgb, var(--fx-good) 12%, var(--theme-surface)); color: color-mix(in srgb, var(--fx-good) 65%, var(--theme-text)); } /* SETTINGS-APPLE: Focus's "Sending" 2.88:1 → over 4.5, as warn/bad */
+.chip[data-tone="warn"] { background: color-mix(in srgb, var(--fx-warn) 14%, var(--theme-surface)); color: color-mix(in srgb, var(--fx-warn) 60%, var(--theme-text)); } /* VISUAL-QA: 3.81:1 → over 4.5 */
+.chip[data-tone="bad"] { background: color-mix(in srgb, var(--fx-bad) 12%, var(--theme-surface)); color: color-mix(in srgb, var(--fx-bad) 75%, var(--theme-text)); }
+.chip[data-tone="accent"] { background: var(--fx-accent-soft); color: var(--fx-accent); }
+
+/* Quest list: each item a card with a round check that draws its tick. */
+.quests { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.quest { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 64px; padding: 12px 16px 12px 20px;
+  border-radius: 14px; background: var(--theme-surface); border: 1px solid var(--theme-border); min-width: 0; transition: background .2s, border-color .2s; }
+.quest::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 4px; border-radius: 0 4px 4px 0; background: var(--quest-color, var(--fx-accent)); }
+.quest[data-state="done"] { background: color-mix(in srgb, var(--fx-good) 5%, var(--theme-surface)); }
+.quest[data-state="done"] .questTitle { color: var(--theme-text-muted); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.quest[data-state="wait"] { border-style: dashed; }
+.quest[data-state="blocked"] { background: var(--theme-surface); }
+.questCheck { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--fx-accent) 60%, var(--theme-surface)); background: var(--theme-surface); color: var(--fx-accent-ink);
+  cursor: pointer; padding: 0; flex: none; transition: background .2s, border-color .2s, transform .2s var(--fx-ease); }
+.questCheck:hover:not(:disabled) { border-color: var(--fx-accent); }
+.questCheck[aria-pressed="true"] { background: var(--fx-good); border-color: var(--fx-good); color: #fff; }
+.questCheck:disabled { cursor: default; }
+.questIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; flex: none; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.quest[data-state="blocked"] .questIcon { background: color-mix(in srgb, var(--fx-bad) 12%, var(--theme-surface)); color: var(--fx-bad); }
+.quest[data-state="wait"] .questIcon { background: color-mix(in srgb, var(--fx-warn) 14%, var(--theme-surface)); color: var(--fx-warn); }
+.tick path { stroke-dasharray: 24; stroke-dashoffset: 24; }
+.questCheck[aria-pressed="true"] .tick path, .stepDot[data-state="done"] .tick path { stroke-dashoffset: 0; transition: stroke-dashoffset .35s var(--fx-ease) .05s; }
+.questText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.questTitle { font-size: 15px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+.questSub { font-size: 13px; line-height: 1.4; color: var(--theme-text-muted); overflow-wrap: anywhere; }
+.questEnd { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 479px) { .quest, .quest[data-state] { grid-template-columns: auto minmax(0, 1fr); border-color: transparent; background: var(--theme-surface-subtle); padding: 12px 12px 12px 16px; } .questEnd { grid-column: 2; justify-content: flex-start; } .quest .chip { background: var(--theme-surface); } }
+
+/* Stepper: numbered dots joined by a line; done dots draw a tick. */
+.stepper { list-style: none; margin: 0; padding: 0; display: flex; align-items: flex-start; gap: 0; min-width: 0; counter-reset: step; }
+.step { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; min-width: 0; text-align: center; }
+.step + .step::before { content: ""; position: absolute; top: 15px; right: calc(50% + 20px); left: calc(-50% + 20px); height: 2px; border-radius: 2px; background: var(--theme-border); }
+.step[data-state="done"] + .step::before, .step[data-state="now"]::before { background: var(--fx-accent); }
+.stepDot { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text-muted); font-size: 13px; font-weight: 750; font-variant-numeric: tabular-nums; }
+.stepDot[data-state="now"] { border-color: var(--fx-accent); color: var(--fx-accent); box-shadow: 0 0 0 4px var(--fx-accent-soft); }
+.stepDot[data-state="done"] { border-color: var(--fx-accent); background: var(--fx-accent); color: var(--fx-accent-ink); }
+.stepName { font-size: 12.5px; font-weight: 600; color: var(--theme-text-muted); line-height: 1.3; overflow-wrap: anywhere; padding: 0 4px; }
+.step[data-state="now"] .stepName { color: var(--theme-text); }
+@media (max-width: 479px) { .stepName { font-size: 11.5px; } .step:not([data-state="now"]) .stepName { display: none; } }
+
+/* Empty state: a Codex illustration, a line, one action. */
+.empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 24px 16px; min-width: 0; }
+.empty img { width: 136px; height: 136px; object-fit: contain; margin-bottom: 4px; }
+.empty b { font-size: 16px; font-weight: 700; }
+.empty span { max-width: 44ch; font-size: 14px; line-height: 1.5; color: var(--theme-text-muted); }
+.empty .primary { margin-top: 8px; }
+
+/* Skeleton: soft bars while the page loads. */
+.skel { display: block; border-radius: 8px; background: linear-gradient(90deg, var(--theme-surface-subtle) 0%, color-mix(in srgb, var(--theme-surface-subtle) 40%, var(--theme-surface)) 50%, var(--theme-surface-subtle) 100%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* Sticky action bar: stays at the bottom of the view while a long page scrolls. */
+.bar { position: sticky; bottom: 12px; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 16px; border-radius: 16px;
+  background: color-mix(in srgb, var(--theme-surface) 92%, transparent); backdrop-filter: blur(8px); border: 1px solid var(--theme-border); box-shadow: 0 8px 24px rgb(30 27 46 / 10%); min-width: 0; }
+.barText { font-size: 14px; color: var(--theme-text-muted); min-width: 0; }
+.barActions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+@media (max-width: 767px) { .bar { bottom: calc(72px + env(safe-area-inset-bottom, 0px)); } }
+
+/* Milestone: a pop card in the corner with the burst. */
+.milestone { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; background: linear-gradient(135deg, var(--fx-accent), color-mix(in srgb, var(--fx-accent) 60%, #E86A92));
+  color: var(--fx-accent-ink, #fff); box-shadow: 0 12px 32px color-mix(in srgb, var(--fx-accent) 35%, transparent); animation: pop .5s var(--fx-ease) both; }
+.milestone svg { flex: none; }
+.milestone b { display: block; font-size: 15px; }
+.milestone small { display: block; font-size: 13px; opacity: .9; }
+@keyframes pop { 0% { opacity: 0; transform: scale(.9) translateY(8px); } 60% { opacity: 1; transform: scale(1.02); } 100% { transform: none; } }
+
+/* Weekly recap: a few numbers from the week and the streak. */
+.recap { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap: 12px; margin: 0; }
+.recap div { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 12px; background: var(--fx-accent-soft); min-width: 0; }
+.recap dt { font-size: 12px; color: var(--theme-text-muted); }
+.recap dd { margin: 0; font-size: 20px; font-weight: 750; font-variant-numeric: tabular-nums; color: var(--theme-text); }
+
+/* Delight off: reduced motion or Fun effects off. Things still show their final state. */
+@media (prefers-reduced-motion: reduce) {
+  .ringFill, .gaugeFill, .gaugeNeedle, .badgeBar i, .quest, .questCheck, a.row, button.row, .tick path { transition: none !important; }
+  .skel, .milestone { animation: none !important; }
+}
+:global(:root[data-fun="off"]) :is(.ringFill, .gaugeFill, .gaugeNeedle, .badgeBar i, .tick path) { transition: none !important; }
+:global(:root[data-fun="off"]) :is(.milestone, .skel) { animation: none !important; }
+/* VISUAL-QA (D136, 13 Nov 2026): the empty-state pictures have a transparent background now, so dark mode needs no light
+   disc behind them (it sat as a bright circle on the dark page; in light mode the white square showed on the lavender canvas). */
+
+/* The /kit gallery of these pieces. */
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.gallery > section { gap: 12px; }
+.gallery h3 { margin: 0; font-size: 12px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--theme-text-muted); }
+.gallery .wide { grid-column: 1 / -1; }

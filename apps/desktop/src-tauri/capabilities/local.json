@@ -1,0 +1,6 @@
+{
+  "identifier": "local-pages",
+  "description": "Pulse's own bundled pages (the panel, Settings and the app window's sign-in and offline screens) may listen for app events. Remote Pulse pages loaded in the app window get no native access at all: Tauri rejects every command from a remote origin unless a capability names it, and none does.",
+  "windows": ["panel", "settings", "main"],
+  "permissions": ["core:event:default"]
+}
