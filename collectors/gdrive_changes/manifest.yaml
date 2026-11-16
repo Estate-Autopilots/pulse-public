@@ -1,0 +1,17 @@
+name: gdrive_changes
+version: 1.0.0
+source_kind: pull_and_push
+provider: google_drive
+auth: google_service_account
+scopes: [https://www.googleapis.com/auth/drive.metadata.readonly]
+emits: [drive.file.created, drive.file.updated, drive.file.moved, drive.file.renamed, drive.file.trashed,
+        drive.folder.created]
+purposes: [delivery]
+sensitivity: 1
+schedule: { poll: 5m, reconcile: 5m, channel_renewal: 6h before expiry }
+backfill: { source: none, note: a new root starts at Google's current start page token; backfill is a reviewed operation }
+consent: notice
+filters:
+  roots: approved pulse.drive_source rows only (owner errand E13)
+  content: false
+  excluded_paths: [EA Team Member Details, salary, finance]

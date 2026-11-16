@@ -1,0 +1,17 @@
+# Compiles the common routes right after the dev web server (re)starts, at idle priority. Tied to pulse-dev-web:
+# every restart of the web unit restarts this one too (PartOf), and the web unit pulls it in (Wants, in its drop-in).
+[Unit]
+Description=pulse-dev: pre-compile the common routes after the dev server starts
+After=pulse-dev-web.service
+PartOf=pulse-dev-web.service
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/.local/bin/pulse-dev-warm
+Nice=19
+CPUWeight=20
+TimeoutStartSec=20min
+
+[Install]
+WantedBy=pulse-dev-web.service

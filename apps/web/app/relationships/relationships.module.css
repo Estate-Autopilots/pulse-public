@@ -1,0 +1,81 @@
+/* R46: the relationship graph. Desktop fills the window: the list and the side column scroll inside it; phones scroll
+   the page and the side column moves below the list. */
+.layout { display: grid; gap: 12px; min-width: 0; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); }
+.main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.side { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.groups { display: grid; gap: 10px; align-content: start; }
+.note { display: flex; align-items: flex-start; gap: 8px; margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+.note svg { flex: none; margin-top: 2px; }
+.small { margin: 0; padding: 10px 12px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+.small b { color: var(--theme-text); font-weight: 550; }
+
+.group { overflow: hidden; }
+.groupHead { display: grid; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--theme-border); background: color-mix(in srgb, var(--theme-surface-subtle) 45%, var(--theme-surface)); }
+.groupTitle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.groupTitle b { font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.engagements { display: flex; flex-wrap: wrap; gap: 6px; }
+.engagement { display: inline-flex; align-items: baseline; gap: 6px; max-width: 100%; padding: 2px 8px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* EST-1201: on a 360 px phone an engagement record's long name widened the card's header past the card (its column took
+   the chip's whole one-line width) and ran off screen. The column now fits the card and the name ends in an ellipsis
+   (the chip's tooltip has it); the group's title wraps. */
+.groupHead { grid-template-columns: minmax(0, 1fr); }
+.engagement { min-width: 0; }
+.engagement > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.engagement small { flex: none; }
+.engagement small { color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.engagement:hover { border-color: var(--theme-border-strong); }
+
+.edges { list-style: none; margin: 0; padding: 0; }
+.edge { display: grid; gap: 4px; padding: 10px 12px; border-top: 1px solid var(--soft); }
+.edge:first-child { border-top: 0; }
+.edge[data-status="rejected"] .line, .edge[data-status="withdrawn"] .line { color: var(--theme-text-muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+.edgeMain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
+.kind { flex: none; min-width: 128px; color: var(--theme-text-muted); font-size: 12px; font-weight: 550; }
+.line { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-width: 0; font-size: 14px; }
+.node { font-weight: 550; overflow-wrap: anywhere; }
+.node:hover { color: var(--theme-action); }
+.subject { color: var(--theme-text-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.arrow { color: var(--theme-text-muted); }
+.unresolved { font-weight: 550; font-style: italic; border-bottom: 1px dashed var(--theme-warning); }
+.badges { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.meta { display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 0; padding-left: 138px; color: var(--theme-text-muted); font-size: 12px; line-height: 1.45; }
+.pending { margin: 0 0 0 138px; padding: 6px 10px; border-left: 3px solid var(--theme-action); border-radius: 0 6px 6px 0; background: var(--accent-soft); font-size: 13px; }
+.actions { display: grid; gap: 8px; padding-left: 138px; }
+
+.picker { display: grid; gap: 6px; max-width: 520px; padding: 8px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface-subtle); }
+.options { display: grid; gap: 2px; max-height: 220px; margin: 0; padding: 0; overflow: auto; list-style: none; font-size: 13px; }
+.option { display: grid; width: 100%; padding: 6px 8px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.option small { color: var(--theme-text-muted); font-size: 12px; }
+.option:hover { background: var(--hover); }
+.option[data-chosen] { border-color: var(--theme-action); background: var(--accent-soft); }
+.history { display: grid; gap: 6px; margin: 0; padding: 8px 8px 8px 26px; border-left: 2px solid var(--theme-border); font-size: 13px; }
+.history small { display: block; color: var(--theme-text-muted); font-size: 12px; }
+.history li[data-undone] { color: var(--theme-text-muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+
+.how { display: grid; gap: 8px; margin: 0; padding: 10px 12px 12px 28px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+.setup { display: grid; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--soft); }
+.setup:first-child { border-top: 0; }
+.setup h3 { margin: 0; font-size: 13px; font-weight: 600; }
+.setup .small { padding: 0; }
+.reviewers { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.reviewers li { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.reviewers li > span { display: grid; min-width: 0; }
+.reviewers small { color: var(--theme-text-muted); font-size: 12px; }
+.kinds { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; padding: 0; border: 0; font-size: 13px; }
+.kinds legend { margin-bottom: 4px; color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+.kinds label { display: inline-flex; align-items: center; gap: 5px; }
+
+@media (min-width: 1180px) and (min-height: 600px) {
+  .layout { grid-template-rows: minmax(0, 1fr); }
+  .main, .side { min-height: 0; overflow: auto; }
+}
+@media (max-width: 1179.98px), (max-height: 599.98px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 899.98px) {
+  .kind { min-width: 0; width: 100%; }
+  .meta, .actions { padding-left: 0; }
+  .pending { margin-left: 0; }
+  .badges { margin-left: 0; }
+}
