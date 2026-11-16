@@ -1,0 +1,23 @@
+/* KAZUK-REST slice 6: the cover page. */
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.wide { grid-column: 1 / -1; }
+.h { margin: 0; padding: 12px 14px 6px; font-size: 15px; font-weight: 600; }
+.list { display: grid; margin: 0; padding: 0 0 6px; list-style: none; }
+.row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 10px 14px; }
+.row + .row { border-top: 1px solid var(--theme-border); }
+.main { display: grid; gap: 2px; min-width: 0; flex: 1 1 220px; }
+.main b { font-size: 14px; overflow-wrap: anywhere; }
+.main small { color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.inline { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.inline select, .inline input, .policy input[type="number"] { height: 30px; max-width: 100%; padding: 0 8px; border: 1px solid var(--theme-border-strong); border-radius: 7px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.inline input { min-width: 0; width: 220px; }
+.steps { margin: 0; padding: 4px 14px 4px 32px; display: grid; gap: 6px; font-size: 13px; line-height: 1.5; }
+.fine { margin: 0; padding: 6px 14px 10px; color: var(--theme-text-muted); font-size: 12px; }
+.fine a { color: var(--theme-action); }
+.policy { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; padding: 10px 14px 14px; border-top: 1px solid var(--theme-border); }
+.policy label { display: grid; gap: 4px; font-size: 12px; font-weight: 600; }
+.policy input[type="number"] { width: 90px; }
+.sop { flex: 1 1 100%; }
+.sop textarea { width: 100%; min-height: 96px; padding: 6px 8px; border: 1px solid var(--theme-border-strong); border-radius: 7px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 400; resize: vertical; }
+.check { display: flex !important; align-items: center; gap: 6px; font-weight: 400 !important; }
+@media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); } .inline input { width: 100%; } }

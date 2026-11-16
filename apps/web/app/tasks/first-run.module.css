@@ -1,0 +1,26 @@
+/* ONBOARD-CHECKIN-TG: the admin's first-run list on My day. Phone first: rows are full-width links at least 56 px tall;
+   the Start/Done word drops below 360 px so nothing runs past the screen. */
+.card { display: grid; gap: 12px; padding: 16px; margin-bottom: 14px; border-radius: 14px; min-width: 0;
+  border: 1px solid var(--theme-border, rgba(127,127,127,.22)); border-left: 4px solid var(--theme-action, #5b45d6); background: var(--theme-surface, transparent); }
+.head { display: flex; align-items: flex-start; gap: 10px; }
+.title { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.title b { font-size: 1.05rem; font-weight: 650; }
+.title small { color: var(--theme-text-muted, inherit); overflow-wrap: anywhere; }
+.close { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border: 0; border-radius: 10px; background: transparent; color: inherit; cursor: pointer; }
+.bar { height: 6px; border-radius: 999px; overflow: hidden; background: var(--theme-border, rgba(127,127,127,.2)); }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--theme-success, #328267); }
+@media (prefers-reduced-motion: no-preference) { .bar i { transition: width .5s ease; } }
+.steps { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.step { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 10px; border-radius: 12px; color: inherit; text-decoration: none; min-width: 0; }
+.step:hover { background: color-mix(in srgb, var(--theme-action, #5b45d6) 6%, transparent); }
+.step:focus-visible { outline: 2px solid var(--theme-action, #5b45d6); outline-offset: 2px; }
+li[data-next] .step { background: color-mix(in srgb, var(--theme-action, #5b45d6) 8%, transparent); }
+.icon { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 10px;
+  color: var(--theme-action, #5b45d6); background: color-mix(in srgb, var(--theme-action, #5b45d6) 10%, transparent); }
+li[data-done] .icon { color: #fff; background: var(--theme-success, #328267); }
+li[data-done] .text b { text-decoration: line-through; color: var(--theme-text-muted, inherit); }
+.text { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.text small { color: var(--theme-text-muted, inherit); line-height: 1.4; }
+.go { flex: none; font-size: .85rem; font-weight: 600; color: var(--theme-action, #5b45d6); }
+li[data-done] .go { color: var(--theme-success, #328267); }
+@media (max-width: 359px) { .go { display: none; } }

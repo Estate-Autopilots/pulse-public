@@ -1,0 +1,9 @@
+{{> top}}
+<main class="main wk" style="gap:26px;justify-content:flex-start">
+  <div class="wk-h"><div><div class="lbl">{{week}}</div><h1 class="h1 s" data-key style="margin-top:8px">{{title}}</h1></div></div>
+  <div class="tiles">{{#tiles}}<div class="tile"><span class="tn" data-fit>{{num}}</span><div class="tt">{{text}}</div></div>{{/tiles}}</div>
+  {{#groups}}<div class="grp"><div class="gh"><span class="dot" style="background:{{color}}"></span>{{name}}</div><ul class="gl">{{#items}}<li>{{.}}</li>{{/items}}</ul></div>{{/groups}}
+  <div class="lbl" style="margin-top:6px">{{asks_label}}</div>
+  <div class="asks">{{#asks}}<div class="ask"><div class="an">{{who}}</div><ul>{{#items}}<li>{{.}}</li>{{/items}}</ul></div>{{/asks}}</div>
+</main>
+{{> foot}}

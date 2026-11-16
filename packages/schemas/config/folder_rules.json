@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pulse.estateautopilots.com/schemas/config/folder_rules.json",
+  "title": "Pulse folder rules v1",
+  "description": "Tenant-owned rules for delivery folders, creative taxonomies, project paths, and pods.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "index_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "match": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["draft", "final"] }
+        },
+        "required": ["match", "kind"]
+      }
+    },
+    "exclusions": {
+      "type": "array",
+      "default": ["raw", "b-roll", "reference", "examples?", "templates?"],
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "protected_paths": {
+      "description": "Extra path-segment patterns onboarding never proposes. They add to the built-in list (HR, finance, legal, credentials, personal, archive), which cannot be removed.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "design_type_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "exclude": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "folder_path": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "match": { "type": "string", "minLength": 1 },
+              "type": { "enum": ["single_image_ad", "carousel", "brochure", "logo", "pitch_deck"] }
+            },
+            "required": ["match", "type"]
+          }
+        }
+      },
+      "required": ["folder_path"]
+    },
+    "creative_types": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "folder_path": { "$ref": "#/$defs/creative_type_rules" },
+        "file_name": { "$ref": "#/$defs/creative_type_rules" },
+        "parsed_type_codes": {
+          "type": "object",
+          "patternProperties": {
+            "^[A-Z0-9_-]+$": { "$ref": "#/$defs/creative_type" }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "legacy_type_hints": {
+      "type": "object",
+      "patternProperties": { "^.+$": { "type": "string", "minLength": 1 } },
+      "additionalProperties": false
+    },
+    "legacy_version_tokens": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "project_paths": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "match": { "type": "string", "minLength": 1 },
+          "captures": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "client": { "type": "string", "minLength": 1 },
+              "project": { "type": "string", "minLength": 1 },
+              "year": { "type": "string", "minLength": 1 },
+              "month": { "type": "string", "minLength": 1 },
+              "deliverable": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "required": ["match"]
+      }
+    },
+    "pods": {
+      "type": "object",
+      "patternProperties": { "^.+$": { "type": "string", "minLength": 1 } },
+      "additionalProperties": false
+    },
+    "subfolders": {
+      "description": "Appendix F.1 stage and nested folder rules used by the work-graph projection.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "match": { "type": "string", "minLength": 1 },
+          "role": { "type": "string", "minLength": 1 },
+          "default_version_kind": { "enum": ["draft", "final"] },
+          "nested": { "type": "boolean" }
+        },
+        "required": ["match", "role"]
+      }
+    },
+    "storage": { "enum": ["gdrive"] },
+    "roots": { "enum": ["bound"] },
+    "noise_filters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "owner_in": { "type": "array", "items": { "type": "string" } },
+          "path_contains": { "type": "array", "items": { "type": "string" } }
+        },
+        "anyOf": [{ "required": ["owner_in"] }, { "required": ["path_contains"] }]
+      }
+    }
+  },
+  "required": ["schema_version"],
+  "$defs": {
+    "creative_type": {
+      "enum": ["model_video", "vov", "founder_video", "testimonial", "walkthrough"]
+    },
+    "creative_type_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "match": { "type": "string", "minLength": 1 },
+          "type": { "$ref": "#/$defs/creative_type" }
+        },
+        "required": ["match", "type"]
+      }
+    }
+  }
+}

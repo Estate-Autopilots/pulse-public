@@ -1,0 +1,13 @@
+.body { display: grid; gap: 12px; padding: 16px 20px; }
+.lead { margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.slip { display: grid; gap: 12px; min-width: 0; padding: 16px; border: 1px dashed var(--theme-border-strong); border-radius: 12px; background: var(--theme-surface); }
+.slip header { display: grid; gap: 2px; }
+.slip header b { font-size: 15px; }
+.slip header small { color: var(--theme-text-muted); font-size: 12px; }
+.slip dl { display: grid; gap: 8px; margin: 0; }
+.slip dl > div { display: grid; grid-template-columns: 140px minmax(0, 1fr); align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: var(--theme-surface-subtle); }
+.slip dt { color: var(--theme-text-muted); font-size: 12px; }
+.slip dd { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; margin: 0; }
+.slip code { overflow-wrap: anywhere; font-size: 14px; font-weight: 600; }
+.slip p { margin: 0; color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .slip dl > div { grid-template-columns: minmax(0, 1fr); } }
