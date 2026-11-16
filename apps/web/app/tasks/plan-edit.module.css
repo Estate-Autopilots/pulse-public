@@ -1,0 +1,22 @@
+/* TASKUX: the task's plan rows (start, state, repeat) in the properties panel and the repeat sheet. */
+.muted { color: var(--theme-text-muted); }
+.line { display: inline-flex; align-items: center; gap: 6px; }
+.select { min-width: 0; max-width: 100%; }
+.trigger {
+  display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; min-height: 32px; padding: 2px 6px; margin-left: -6px; border: 0; border-radius: 8px;
+  background: none; color: var(--theme-text); font: inherit; text-align: left; cursor: pointer;
+}
+.trigger small { color: var(--theme-text-muted); font-size: 12px; }
+@media (hover: hover) { .trigger:hover { background: var(--theme-surface-subtle); } }
+.trigger:focus-visible, .day:focus-visible, .primary:focus-visible, .secondary:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+@media (pointer: coarse) { .trigger { min-height: 44px; } }
+.field { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 14px; }
+.inline { display: inline-flex; align-items: center; gap: 8px; color: var(--theme-text-muted); }
+.inline input { width: 72px; min-height: 44px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 16px; text-align: center; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.day { min-height: 44px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; }
+.day[aria-pressed="true"] { background: var(--theme-action); border-color: var(--theme-action); color: var(--theme-action-text, #fff); }
+.note { margin: 0; font-size: 13px; color: var(--theme-text-muted); line-height: 1.45; }
+.primary, .secondary { min-height: 44px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); }
+.primary { background: var(--theme-action); border-color: var(--theme-action); color: var(--theme-action-text, #fff); }
+.primary:disabled, .secondary:disabled { opacity: 0.6; cursor: default; }

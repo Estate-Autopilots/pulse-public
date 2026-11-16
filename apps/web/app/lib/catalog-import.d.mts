@@ -1,0 +1,12 @@
+export type FieldKey = "name" | "unit" | "rate" | "gst" | "sac" | "category";
+export type Field = { key: FieldKey; label: string; hint: string; need?: boolean };
+export type Mapping = Record<FieldKey, number>;
+export type Plan = { created: number; updated: number; unchanged: number; skipped: { row: number; name: string; why: string }[] };
+export const FIELDS: Field[];
+export function parseTable(text: string): string[][];
+export function fromSheet(data: unknown[][]): string[][];
+export function guessMapping(header: string[], sample?: string[][]): Mapping;
+export function hasHeader(table: string[][]): boolean;
+export function mapRows(body: string[][], map: Mapping): Record<FieldKey, string>[];
+export function rupees(paise: number): string;
+export function planLine(p: Plan): string;

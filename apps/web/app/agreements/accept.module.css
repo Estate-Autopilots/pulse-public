@@ -1,0 +1,197 @@
+/* AGREEMENTS: the policy acceptance view (accept-view.tsx). About 78 % of a desktop screen over the dimmed app, the
+   whole screen on a phone. The game kit's colours (kit/game/game.module.css), light and dark. */
+.backdrop, .sheet {
+  --fx-accent: #6B4CF0; --fx-accent-ink: #ffffff; --fx-accent-soft: color-mix(in srgb, #6B4CF0 12%, var(--theme-surface));
+  --fx-accent-line: color-mix(in srgb, #6B4CF0 26%, var(--theme-surface)); --fx-good: #16A34A; --fx-good-soft: color-mix(in srgb, #16A34A 14%, var(--theme-surface));
+  --fx-ease: cubic-bezier(.22, 1, .36, 1);
+}
+:global(:root[data-theme="dark"]) :is(.backdrop, .sheet) {
+  --fx-accent: #A897FF; --fx-accent-ink: #17123a; --fx-accent-soft: color-mix(in srgb, #A897FF 16%, var(--theme-surface));
+  --fx-accent-line: color-mix(in srgb, #A897FF 30%, var(--theme-surface)); --fx-good: #4ADE80; --fx-good-soft: color-mix(in srgb, #4ADE80 16%, var(--theme-surface));
+}
+.backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 24px;
+  background: rgb(22 18 44 / 55%); backdrop-filter: blur(3px); animation: fade .25s var(--fx-ease); }
+/* The sheet fits its step: as tall as the term list at least, at most 88 % of the screen (a long term scrolls inside). */
+.sheet { position: relative; display: flex; flex-direction: column; width: min(1080px, 78vw); height: auto; max-height: min(780px, 88vh); min-height: 0; overflow: hidden;
+  background: var(--theme-surface); color: var(--theme-text); border-radius: 24px; box-shadow: 0 24px 64px rgb(22 18 44 / 30%);
+  animation: rise .35s var(--fx-ease); }
+.prose { font-size: 16px; line-height: 1.6; color: var(--theme-text); overflow-wrap: anywhere; text-wrap: pretty; }
+.prose :is(p, ul, ol) { margin: 0 0 12px; }
+.prose :is(ul, ol) { padding-left: 22px; }
+.prose li + li { margin-top: 4px; }
+/* A row's plain meaning, under its name (accept-view withHints). */
+.prose td em { display: inline-block; margin-top: 4px; font-style: normal; font-size: 13px; font-weight: 400; line-height: 1.35; color: color-mix(in srgb, var(--theme-text) 70%, transparent); }
+/* A sentence's plain meaning (accept-view withSentenceHints): a small note, not more policy text. */
+.prose p > br + em:last-child { display: block; margin-top: 6px; padding-left: 10px; border-left: 3px solid var(--fx-accent-line); font-style: normal; font-size: 14px; color: color-mix(in srgb, var(--theme-text) 78%, transparent); }
+.prose thead:has(tr:empty) { display: none; }
+.prose [class*="tableWrap"] td:first-child { white-space: normal; }
+/* The kit's ring track is faint at "0 of 6": a clearer one. */
+.ring svg circle:first-of-type { stroke: color-mix(in srgb, var(--fx-accent) 26%, var(--theme-surface)); }
+:global(:root[data-theme="dark"]) .ring svg circle:first-of-type { stroke: color-mix(in srgb, var(--fx-accent) 38%, var(--theme-surface)); }
+.prose table { table-layout: fixed; }
+/* A 3-column table (part, rule, amount): the amount narrow and to the right (wider screens; a phone stacks the rows). */
+@media (min-width: 641px) {
+  .prose :is(th, td):nth-child(1):nth-last-child(3) { width: 30%; }
+  .prose :is(th, td):nth-child(3):last-child { width: 28%; text-align: right; }
+}
+.prose :is(h3, h4, h5, h6) { font-size: 16px; margin: 16px 0 8px; }
+.prose > :last-child { margin-bottom: 0; }
+
+/* Header: what this is, the version, the ring and "Not now". */
+.head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 24px 32px 20px; border-bottom: 1px solid var(--theme-border); }
+.headText { min-width: 0; }
+.eyebrow { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--fx-accent); }
+.title { margin: 0; font-size: 28px; line-height: 1.2; font-weight: 750; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.meta { display: flex; flex-wrap: wrap; column-gap: 6px; margin: 6px 0 0; font-size: 14px; color: var(--theme-text-muted); }
+.meta > span { white-space: nowrap; }
+.meta > span:not(:last-child)::after { content: "·"; margin-left: 6px; }
+.headSide { display: flex; align-items: center; gap: 20px; flex: none; }
+/* The kit's ring places every svg over the ring and sizes its text at a quarter of the ring: the tick sits in the middle,
+   and "2 of 6" stays inside the line. */
+.ring b.ringCount { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ring small.ringWord { font-size: 12px; color: color-mix(in srgb, var(--theme-text) 70%, transparent); }
+.later { min-height: 40px; padding: 0 8px; border: 0; background: none; color: color-mix(in srgb, var(--theme-text) 72%, transparent); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px; border-radius: 8px; }
+.later:hover { color: var(--theme-text); }
+.later:focus-visible, .railItem:focus-visible, .back:focus-visible { outline: 2px solid var(--fx-accent); outline-offset: 2px; }
+
+/* The phone's bar: one segment per term (the rail does this on a wide screen). */
+.barRow { display: none; align-items: center; gap: 12px; padding: 12px 16px 0; }
+.bar { flex: 1; display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.barText { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 650; color: var(--theme-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.bar li { flex: 1; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--theme-text) 14%, transparent); transition: background .3s var(--fx-ease); }
+.bar li[data-state="done"] { background: var(--fx-good); }
+.bar li[data-state="now"] { background: var(--fx-accent); }
+
+/* Body: the terms on the left, the one being read on the right. */
+.body { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.rail { min-height: 0; overflow: auto; padding: 16px 12px 16px 24px; border-right: 1px solid var(--theme-border); }
+.rail ol { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.railItem { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 12px; border: 1px solid var(--theme-border); border-radius: 14px;
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; transition: border-color .2s, background .2s; }
+.railItem:disabled { cursor: default; color: var(--theme-text-muted); }
+.railItem[data-state="now"] { border-color: var(--fx-accent); background: var(--fx-accent-soft); box-shadow: 0 0 0 1px var(--fx-accent); }
+.railItem:not(:disabled):not([data-state="now"]):hover { border-color: var(--fx-accent-line); }
+.railDot { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
+  border: 2px solid var(--theme-border); color: var(--theme-text-muted); }
+.railItem[data-state="now"] .railDot { border-color: var(--fx-accent); background: var(--fx-accent); color: var(--fx-accent-ink); }
+.railItem[data-state="done"] { border-color: color-mix(in srgb, var(--fx-good) 35%, var(--theme-border)); background: color-mix(in srgb, var(--fx-good) 7%, var(--theme-surface)); }
+.railItem[data-state="done"] .railDot { border-color: transparent; background: color-mix(in srgb, var(--fx-good) 82%, var(--theme-surface)); color: #fff; animation: pop .35s var(--fx-ease); }
+:global(:root[data-theme="dark"]) .railItem[data-state="done"] .railDot { color: #0b2a17; }
+.railName { min-width: 0; font-size: 15px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+/* The term: at the top of its pane, in line with the list (a long one scrolls), its button right under it. */
+.term { min-height: 0; display: flex; flex-direction: column; }
+.termScroll { flex: 1; min-height: 0; overflow: auto; padding: 20px 32px 32px; }
+.termCard { animation: enter .3s var(--fx-ease); }
+.termTop { display: flex; align-items: center; gap: 12px; }
+.termIcon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 14px; background: var(--fx-accent-soft); color: var(--fx-accent); }
+.termFoot { position: relative; flex: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 16px 32px; border-top: 1px solid var(--theme-border); background: var(--theme-surface); }
+/* Words scrolling under the foot fade out, so the cut reads as "there is more". */
+.termFoot[data-more]::before { content: ""; position: absolute; left: 0; right: 0; bottom: calc(100% + 1px); height: 48px; background: linear-gradient(to bottom, transparent, var(--theme-surface)); pointer-events: none; }
+.footText { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.next { font-size: 14px; color: var(--theme-text-muted); }
+.nowrap { white-space: nowrap; }
+.barText[data-done] { color: var(--fx-good); }
+.moreLink { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 8px; border: 0; border-radius: 8px; background: none; color: var(--fx-accent); font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+.moreLink:focus-visible { outline: 2px solid var(--fx-accent); outline-offset: 2px; }
+
+/* About the policy: a quiet link under the first term, not a bar above it. */
+.intro { margin-top: 16px; }
+.intro > summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 650; color: var(--fx-accent); list-style: none; }
+.intro > summary::-webkit-details-marker { display: none; }
+.intro > summary svg { transition: transform .2s; transform: rotate(-90deg); }
+.intro[open] > summary svg { transform: none; }
+.intro[open] > summary { margin-bottom: 6px; }
+.intro .prose + .prose { margin-top: 10px; }
+.intro .prose { font-size: 15px; }
+.plain { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; padding: 12px 16px; border-radius: 12px; background: var(--fx-accent-soft); font-size: 14px; }
+.plain > p { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; color: var(--fx-accent); }
+.plain dt { display: inline; font-weight: 650; }
+.plain dt::after { content: ":\00a0"; }
+.plain dd { display: inline; margin: 0; color: var(--theme-text); }
+.termChip { display: inline-block; padding: 4px 10px; border-radius: 999px; background: var(--fx-accent-soft); color: var(--fx-accent); font-size: 13px; font-weight: 700; }
+.termTitle { margin: 12px 0 10px; font-size: 26px; line-height: 1.25; font-weight: 750; letter-spacing: -0.01em; outline: none; overflow-wrap: anywhere; }
+
+.count { font-weight: 600; color: color-mix(in srgb, var(--theme-text) 78%, transparent) !important; margin: 0; font-size: 14px; color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.big { min-height: 48px; padding: 0 24px; font-size: 16px; border-radius: 14px; }
+
+/* The finish: everything ticked, "I accept". */
+.finish { min-height: 0; overflow: auto; display: flex; flex-direction: column; padding: 24px 32px; text-align: center; animation: enter .3s var(--fx-ease); }
+.finishInner { display: flex; flex-direction: column; align-items: center; gap: 16px; padding-top: 8px; text-align: center; }
+.signIcon { display: grid; place-items: center; width: 80px; height: 80px; margin-top: 4px; border-radius: 50%; background: var(--fx-accent-soft); color: var(--fx-accent); box-shadow: 0 0 0 10px color-mix(in srgb, var(--fx-accent) 6%, transparent); }
+.finishText { display: flex; flex-direction: column; gap: 6px; max-width: 480px; }
+.finishText h3 { margin: 0; font-size: 26px; font-weight: 750; line-height: 1.2; outline: none; text-wrap: balance; }
+.finishText p { margin: 0; font-size: 15px; color: var(--theme-text-muted); text-wrap: balance; }
+.sign { width: min(480px, 100%); padding: 16px 20px; border: 1px solid color-mix(in srgb, var(--fx-accent) 35%, var(--theme-border)); border-radius: 16px; background: var(--theme-surface); box-shadow: 0 2px 10px rgb(22 18 44 / 6%); text-align: left; }
+.sign p { margin: 0 0 12px; font-size: 17px; font-weight: 650; }
+.signer { display: flex; align-items: center; gap: 12px; }
+.signer b { flex: 1; min-width: 0; font-size: 15px; overflow-wrap: anywhere; }
+.signer small { font-size: 14px; color: var(--theme-text-muted); white-space: nowrap; }
+.finishActions { display: flex; flex-direction: column; align-items: center; gap: 8px; width: min(480px, 100%); }
+.finishActions > .big { width: 100%; }
+.back { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 8px; border: 0; background: none; color: color-mix(in srgb, var(--theme-text) 75%, transparent); font: inherit; font-size: 14px; cursor: pointer; border-radius: 8px; }
+.back:hover { color: var(--theme-text); }
+.error { margin: 0; color: var(--theme-danger, #E11D48); font-size: 14px; font-weight: 600; }
+
+/* Done: the tick, the burst (kit celebrate()), back to work. */
+.done { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 32px; text-align: center; }
+.doneTick { display: grid; place-items: center; width: 96px; height: 96px; border-radius: 50%; background: var(--fx-good); color: #fff; box-shadow: 0 0 0 12px var(--fx-good-soft);
+  animation: pop .5s var(--fx-ease); }
+:global(:root[data-theme="dark"]) .signIcon { background: color-mix(in srgb, var(--fx-accent) 26%, var(--theme-surface)); color: #d9d1ff; }
+:global(:root[data-theme="dark"]) .doneTick { background: color-mix(in srgb, var(--fx-good) 62%, #0d1f14); color: #f0fff5; box-shadow: 0 0 0 12px color-mix(in srgb, var(--fx-good) 14%, transparent), 0 0 32px color-mix(in srgb, var(--fx-good) 30%, transparent); }
+.doneList { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 4px 0 0; padding: 0; list-style: none; font-size: 15px; font-weight: 600; }
+.doneList li { display: inline-flex; align-items: center; gap: 8px; }
+.doneList svg { color: var(--fx-good); }
+.doneWhere { font-size: 14px !important; }
+/* Done on a wide screen: a compact card, not a big empty sheet. */
+@media (min-width: 900px) { .sheet:has(> .done) { height: auto; width: min(520px, 90vw); } }
+.done h2 { margin: 12px 0 0; font-size: 30px; font-weight: 800; outline: none; text-wrap: balance; }
+.done p { margin: 0; max-width: 420px; font-size: 16px; color: var(--theme-text-muted); }
+.doneActions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 12px; }
+.doneActions > button { min-height: 48px; padding: 0 24px; font-size: 16px; }
+
+/* A phone, or a short window: the whole screen, the bar instead of the rail. */
+@media (max-width: 899px) {
+  .backdrop { padding: 0; }
+  .sheet { width: 100vw; height: 100dvh; max-height: none; border-radius: 0; }
+  .head { padding: max(16px, env(safe-area-inset-top)) 16px 12px; gap: 12px; }
+  .title { font-size: 22px; }
+  .headSide { flex-direction: column-reverse; align-items: flex-end; gap: 4px; }
+  .ring { display: none; }
+  .barRow { display: flex; }
+  .body { grid-template-columns: minmax(0, 1fr); }
+  .rail { display: none; }
+  .termScroll { padding: 16px 16px 24px; }
+  .termFoot { flex-direction: column; align-items: stretch; gap: 8px; padding: 12px 16px max(12px, env(safe-area-inset-bottom)); }
+  .footText { justify-content: center; }
+  .footText .count { display: none; }
+  .finishInner { padding-top: 0; }
+  .finishText h3 { font-size: 22px; }
+  .head { align-items: center; }
+  .doneActions { align-self: stretch; flex-direction: column; }
+  .doneActions > button { width: 100%; }
+  .by { display: none; }
+  .meta > span:nth-last-child(2)::after { content: "·"; }
+
+  .termTitle { font-size: 22px; }
+  .finish { padding: 16px 16px max(24px, env(safe-area-inset-bottom)); }
+  .finish h3 { font-size: 22px; }
+}
+@media (min-width: 900px) and (max-height: 640px) { .sheet { max-height: 94vh; } }
+
+/* A table term on a phone (the reader stacks rows below 641px): one short card per row, the amount at the right
+   ("Basic … ₹20,000", then its rule and meaning), not a card that repeats the column names. */
+@media (max-width: 640px) {
+  .prose [class*="tableWrap"] tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; margin: 0 0 6px; padding: 8px 12px; border-color: color-mix(in srgb, var(--theme-text) 18%, transparent) !important; }
+  .prose [class*="tableWrap"] td:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .prose [class*="tableWrap"] td:nth-child(3) { grid-column: 2; grid-row: 1; font-weight: 650; text-align: right !important; white-space: nowrap !important; }
+  .prose [class*="tableWrap"] td:nth-child(2) { grid-column: 1 / 3; grid-row: 2; }
+  .prose [class*="tableWrap"] td + td::before { display: none; }
+}
+
+@keyframes fade { from { opacity: 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(16px) scale(.98); } }
+@keyframes enter { from { opacity: 0; transform: translateX(12px); } }
+@keyframes pop { 0% { transform: scale(.4); } 70% { transform: scale(1.12); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .backdrop, .sheet, .termCard, .finish, .railDot, .doneTick, .railItem[data-state="done"] .railDot { animation: none !important; } }
+:global(:root[data-fun="off"]) :is(.backdrop, .sheet, .termCard, .finish, .doneTick) { animation: none; }

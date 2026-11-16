@@ -1,0 +1,8 @@
+/* PEOPLE-CONTACTS: a type label with its colour (the organisation's own types). Mixed with the theme's text colour so
+   it reads in light and dark alike. */
+.badge { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 2px 9px 2px 7px; border-radius: 999px; font-size: 12px; font-weight: 560; white-space: nowrap;
+  background: hsl(var(--type-h) var(--type-s) 52% / 0.13); color: color-mix(in srgb, hsl(var(--type-h) var(--type-s) 46%) 50%, var(--theme-text)); } /* VISUAL-QA (D112): 62% gave violet 4.25:1 in dark and teal 4.3:1 in light; 50% is over 5.5:1 for all ten colours in both */
+.badge i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: hsl(var(--type-h) var(--type-s) 52%); }
+.badge[data-archived] { opacity: 0.65; }
+.unset { color: var(--theme-text-muted); font-size: 12.5px; }
+.fact { display: contents; }

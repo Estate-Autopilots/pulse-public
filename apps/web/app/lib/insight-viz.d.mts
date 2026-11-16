@@ -1,0 +1,20 @@
+// INSIGHTS-2: types for insight-viz.mjs.
+export declare const KINDS: string[];
+export declare const FACETS: string[];
+export declare function kindOf(spec: unknown): string | null;
+export declare function normalize(spec: unknown, data: unknown): { kind: string | null; rows: Record<string, unknown>[] };
+export declare function applyFilters(rows: Record<string, unknown>[], spec: unknown, filters?: Record<string, string | undefined>, keys?: string[]): { rows: Record<string, unknown>[]; ignored: string[] };
+export declare function quantileFromBins(bins: { lo: number; hi: number | null; n: number }[], q: number): number | null;
+export declare function niceTop(max: number): number;
+export declare function niceStep(x: number): number;
+export declare function ticks(max: number, n?: number): number[];
+export declare function heatStep(v: number, max: number): number;
+export declare function activeWindow(hours: number[] | null | undefined, width?: number): { start: number; end: number; share: number } | null;
+export declare function toCsv(rows: Record<string, unknown>[]): string;
+export declare function minutes(m: number | null | undefined): string;
+export declare function days(d: number | null | undefined): string;
+export declare function count(n: number | null | undefined, short?: boolean): string;
+export declare function pct(x: number | null | undefined): string;
+export declare function rupees(x: number | null | undefined): string;
+export declare function delta(now: number | null | undefined, before: number | null | undefined, better?: "up" | "down"): { d: number; good: boolean; text: string } | null;
+export declare function baseline(values: (number | null | undefined)[]): number | null;

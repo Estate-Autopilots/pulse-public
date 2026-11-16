@@ -1,0 +1,127 @@
+/* CONTRACTS-2: the signing sheet and the client's signing page. Phone first (390px): big type, 48px buttons, one main
+   button; the sheet slides up from the bottom on a phone and sits in the middle on a computer. Theme tokens only. */
+.backdrop { position: fixed; inset: 0; z-index: 80; background: rgb(15 13 30 / 0.45); display: flex; align-items: flex-end; justify-content: center; }
+@media (min-width: 700px) { .backdrop { align-items: center; } }
+.sheet { position: relative; width: 100%; max-width: 520px; max-height: 92vh; overflow: auto; box-sizing: border-box; padding: 14px 20px calc(20px + env(safe-area-inset-bottom));
+  background: var(--theme-surface, #fff); color: var(--theme-text, #1e1b2e); border-radius: 22px 22px 0 0; display: flex; flex-direction: column; gap: 12px;
+  box-shadow: 0 -8px 40px rgb(0 0 0 / 0.18); }
+@media (min-width: 700px) { .sheet { border-radius: 20px; padding-bottom: 22px; } }
+.grab { width: 44px; height: 5px; border-radius: 99px; background: var(--theme-border, #ddd); align-self: center; }
+.close { position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; border: 0; background: transparent; color: var(--theme-text-muted, #6b6880); cursor: pointer; border-radius: 12px; }
+.sheet h2 { margin: 4px 0 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+.muted { margin: 0; color: var(--theme-text-muted, #6b6880); font-size: 15px; }
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 4px; border-radius: 14px; background: var(--theme-surface-subtle, #f4f3f8); }
+.tabs button { min-height: 44px; border: 0; border-radius: 10px; background: transparent; font: inherit; font-size: 15px; padding: 0 4px; font-weight: 600; color: var(--theme-text-muted, #6b6880); cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--theme-surface, #fff); color: var(--theme-action, #6b4cf0); box-shadow: 0 1px 4px rgb(0 0 0 / 0.08); outline: 2px solid var(--theme-action, #6b4cf0); }
+.label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; font-weight: 600; }
+.label input, .label textarea { min-height: 52px; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--theme-border, #ddd); font: inherit; font-size: 18px; font-weight: 400;
+  background: var(--theme-surface, #fff); color: var(--theme-text, #1e1b2e); box-sizing: border-box; width: 100%; }
+.label textarea { min-height: 96px; font-size: 16px; resize: vertical; }
+.label input:focus, .label textarea:focus { border-color: var(--theme-action, #6b4cf0); outline: none; }
+.preview, .padWrap { position: relative; border-radius: 14px; background: var(--theme-surface-subtle, #f4f3f8); padding: 10px 14px; min-height: 110px; display: flex; flex-direction: column; }
+.previewLabel { font-size: 13px; color: var(--theme-text-muted, #6b6880); }
+.script { flex: 1; display: flex; align-items: center; justify-content: center; font-family: "Segoe Script", "Snell Roundhand", "Brush Script MT", "Apple Chancery", cursive;
+  font-size: 36px; color: var(--theme-text, #1e1b2e); overflow-wrap: anywhere; text-align: center; }
+/* CONTRACTS-PRO: the pad is paper in both themes (dark ink on white, as it prints), with a signing line. */
+.pad { width: 100%; height: 150px; touch-action: none; background: #fff linear-gradient(to top, transparent 34px, #b9b6c8 34px, #b9b6c8 35px, transparent 35px) no-repeat; border-radius: 10px; margin-top: 6px; border: 1px dashed var(--theme-border, #ccc); cursor: crosshair; }
+.linkBtn { align-self: flex-end; min-height: 36px; border: 0; background: transparent; color: var(--theme-action, #6b4cf0); font: inherit; font-weight: 600; cursor: pointer; }
+.agree { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600; min-height: 44px; cursor: pointer; }
+.agree input { width: 24px; height: 24px; accent-color: var(--theme-action, #6b4cf0); }
+.error { margin: 0; color: var(--theme-danger, #e11d48); font-size: 15px; }
+.big { min-height: 54px; border-radius: 14px; border: 0; background: var(--theme-action, #6b4cf0); color: var(--theme-action-text, #fff); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%; }
+.big:disabled { opacity: 0.6; cursor: default; }
+.tiny { margin: 0; text-align: center; font-size: 13px; color: var(--theme-text-muted, #6b6880); }
+
+/* The client's page */
+.page { max-width: 640px; margin: 0 auto; padding: 18px 16px 120px; color: var(--theme-text, #1e1b2e); display: flex; flex-direction: column; gap: 16px; box-sizing: border-box; }
+.from { margin: 0; font-size: 15px; font-weight: 600; color: var(--theme-action, #6b4cf0); }
+.title { margin: 0; font-size: 28px; line-height: 1.15; font-weight: 750; letter-spacing: -0.015em; overflow-wrap: anywhere; }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0; border: 1px solid var(--theme-border, #e5e3ee); border-radius: 16px; background: var(--theme-surface, #fff); overflow: hidden; }
+.summary div { padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; border-left: 1px solid var(--theme-border, #e5e3ee); }
+.summary div:first-child { border-left: 0; }
+.summary span { font-size: 13px; color: var(--theme-text-muted, #6b6880); }
+.summary strong { font-size: 20px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.banner { padding: 14px 16px; border-radius: 14px; font-size: 16px; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--theme-border, #e5e3ee); background: var(--theme-surface, #fff); }
+.banner[data-tone="good"] { border-color: var(--theme-success, #16a34a); }
+.banner[data-tone="bad"] { border-color: var(--theme-danger, #e11d48); }
+.banner strong { font-size: 18px; }
+.h2 { margin: 6px 0 0; font-size: 20px; font-weight: 700; }
+.clauses { display: flex; flex-direction: column; gap: 10px; }
+.clause { border: 1px solid var(--theme-border, #e5e3ee); border-radius: 16px; background: var(--theme-surface, #fff); }
+.clause summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; min-height: 52px; cursor: pointer; font-size: 17px; font-weight: 650; box-sizing: border-box; }
+.clause summary::-webkit-details-marker { display: none; }
+.clause summary::after { content: "⌄"; font-size: 20px; color: var(--theme-text-muted, #6b6880); transition: transform 0.15s; }
+.clause[open] summary::after { transform: rotate(180deg); }
+.clauseBody { padding: 0 16px 14px; display: flex; flex-direction: column; gap: 10px; }
+.clauseText { margin: 0; white-space: pre-wrap; font-size: 16px; line-height: 1.6; overflow-wrap: anywhere; }
+.ask { align-self: flex-start; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--theme-action, #6b4cf0); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.askBox { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: var(--theme-surface-subtle, #f4f3f8); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1.5px solid var(--theme-border, #ddd); background: var(--theme-surface, #fff); color: var(--theme-text, #1e1b2e); font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.note { margin: 0; font-size: 14px; color: var(--theme-text-muted, #6b6880); }
+.notes { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.notes li { padding: 10px 12px; border-radius: 12px; background: var(--theme-surface-subtle, #f4f3f8); font-size: 15px; }
+.notes li span { display: block; font-size: 13px; color: var(--theme-text-muted, #6b6880); }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--theme-surface, #fff);
+  border-top: 1px solid var(--theme-border, #e5e3ee); box-shadow: 0 -6px 24px rgb(0 0 0 / 0.06); }
+.barInner { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+.parties { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.partyBox { border: 1px solid var(--theme-border, #e5e3ee); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; background: var(--theme-surface, #fff); }
+.partyBox img { max-width: 100%; height: 56px; object-fit: contain; align-self: flex-start; }
+.partyBox .script { font-size: 26px; justify-content: flex-start; }
+.ok { color: var(--theme-success, #16a34a); font-weight: 650; font-size: 14px; }
+.wait { color: var(--theme-text-muted, #6b6880); font-size: 14px; }
+/* CONTRACTS-PRO: sign with a photo of a signature on paper (before → after, then Lighter / Darker). */
+.upload { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; border-radius: 10px; border: 1px dashed var(--theme-border, #ccc);
+  background: var(--theme-surface, #fff); font-weight: 600; cursor: pointer; margin-top: 6px; }
+.upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.cleanPair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; align-items: center; margin-top: 8px; }
+.cleanBefore { width: 100%; max-height: 84px; object-fit: contain; border-radius: 8px; border: 1px solid var(--theme-border, #ddd); background: #eee; }
+.cleanAfter { width: 100%; max-height: 120px; object-fit: contain; border-radius: 8px; background: #fff; border: 1px solid var(--theme-border, #ddd); padding: 6px; box-sizing: border-box; }
+.inkRow { display: flex; gap: 16px; justify-content: flex-end; }
+/* CONTRACTS-PRO: a clause's words, typeset like the document (no raw Markdown). */
+.rich { display: flex; flex-direction: column; gap: 8px; font-size: 16px; line-height: 1.55; color: var(--theme-text, #1e1b2e); overflow-wrap: anywhere; }
+.rich p { margin: 0; }
+.richHead { margin: 6px 0 0; font-size: 16px; font-weight: 650; }
+.richNum, .richItem { display: grid; grid-template-columns: 2.6em minmax(0, 1fr); }
+.richItem[data-depth="1"] { padding-left: 0.4em; }
+.richItem[data-depth="2"] { padding-left: 2.8em; }
+.richNo { color: var(--theme-text-muted, #6b6880); font-variant-numeric: tabular-nums; }
+.richNote { padding: 10px 12px; border-left: 3px solid var(--theme-action, #6b4cf0); border-radius: 6px; background: color-mix(in srgb, var(--theme-action, #6b4cf0) 8%, transparent); }
+.gap { background: color-mix(in srgb, #f59e0b 25%, transparent); color: inherit; border-radius: 4px; padding: 0 3px; }
+.richTableWrap { overflow-x: auto; max-width: 100%; }
+.richTable { border-collapse: collapse; width: 100%; font-size: 15px; }
+.richTable th, .richTable td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--theme-border, #e2e4e8); }
+.richTable th { font-weight: 650; background: color-mix(in srgb, var(--theme-action, #6b4cf0) 7%, transparent); }
+/* CONTRACTS-PRO: a typed name written as handwriting (dark ink on the paper-white preview). */
+.typed { display: block; width: 100%; max-width: 360px; height: auto; max-height: 96px; margin: 0 auto; color: #1e1b2e; }
+.partyBox .typed { max-width: 220px; max-height: 64px; margin: 0; }
+/* The typed signature's preview is paper too, so dark ink shows in dark mode. */
+.preview { background: #fff; border: 1px dashed var(--theme-border, #ccc); }
+.preview .previewLabel { color: #6b6880; }
+/* CONTRACTS-PRO (walk): the sheet scrolls; its parts never shrink into each other (the photo's preview spilled over "I agree"). */
+.sheet > * { flex-shrink: 0; }
+.inkRow .linkBtn { min-height: 40px; padding: 0 14px; border: 1px solid var(--theme-border, #ccc); border-radius: 10px; }
+/* The main button keeps full strength in both themes (dark mode's pale violet read as disabled). */
+.big:not(:disabled) { background: #5b45d6; color: #fff; }
+/* Judge round 3: "I agree" and "Sign now" stay at the sheet's foot; on a computer the sheet is a centred card with room around it. */
+.signFoot { position: sticky; bottom: calc(-20px - env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; margin: 0 -20px; padding: 12px 20px calc(20px + env(safe-area-inset-bottom));
+  background: var(--theme-surface, #fff); box-shadow: 0 -10px 16px -12px rgb(15 27 51 / 0.3); z-index: 1; }
+@media (min-width: 700px) { .backdrop { align-items: center; } .sheet { max-height: 86vh; border-radius: 22px; } }
+.partyBox img, .partyBox .typed { background: #fff; border-radius: 6px; padding: 4px; }
+/* POLISH-1115 (judge round 1): the sheet's words scroll in their own part and the foot ("I agree", Sign now) sits under
+   them, never over them; Sign now says what it waits for; no drag handle on a computer; the cleaned ink has room. */
+.sheet { overflow: hidden; }
+.sheetBody { display: flex; flex-direction: column; gap: 12px; flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: -14px -20px 0; padding: 14px 20px 8px; }
+.sheetBody > * { flex-shrink: 0; }
+.signFoot { position: static; margin: 0 -20px calc(-20px - env(safe-area-inset-bottom)); }
+@media (min-width: 700px) { .signFoot { margin-bottom: -22px; padding-bottom: 18px; } .grab { display: none; } }
+.readyHint { margin: 0; font-size: 14px; color: var(--theme-text-muted, #6b6880); text-align: center; }
+.big:disabled { background: #5b45d6; color: #fff; opacity: 0.45; }
+.cleanAfter { padding: 12px; }
+.photoRow { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 10px; align-items: center; }
+.photoRow .cleanBefore { width: 72px; height: 54px; max-height: none; object-fit: cover; }
+.photoRow .muted { margin: 0; font-size: 13px; }
+.cleanAfter { max-height: 140px; }
+.big:disabled { opacity: 0.6; }
+.signFoot .tiny { margin: 0; text-align: center; }

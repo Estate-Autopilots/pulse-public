@@ -1,0 +1,16 @@
+# pulse-dev web: serves the release that deploy.sh last built (~/pulse-dev/current) on 127.0.0.1:3200, which
+# Cloudflare Access publishes as https://pulse-dev.estateautopilots.com. eadev user unit, no root.
+[Unit]
+Description=pulse-dev: Pulse web, newest web-lane build (next start on 127.0.0.1:3200)
+
+[Service]
+WorkingDirectory=%h/pulse-dev/current/apps/web
+Environment=PATH=%h/.local/opt/node/bin:/usr/local/bin:/usr/bin:/bin
+Environment=NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
+Environment=PULSE_DESKTOP_DOWNLOADS_DIR=%h/pulse-downloads/desktop
+ExecStart=%h/pulse-dev/current/apps/web/node_modules/.bin/next start -p 3200 -H 127.0.0.1
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
