@@ -1,0 +1,18 @@
+/* SETTINGS-APPLE (T1.3.1): breadcrumbs with Back / Forward on a computer; "‹ Settings" on a phone. */
+.crumbs { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 32px; margin: 0 0 2px; }
+.history { display: inline-flex; flex: none; gap: 2px; }
+.step { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease; }
+.step:hover:not(:disabled) { border-color: var(--theme-border-strong, var(--theme-border)); background: var(--theme-surface-subtle); }
+.step:disabled { color: var(--theme-text-muted); opacity: .45; cursor: default; }
+.step:focus-visible, .up:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.trail { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 0; min-width: 0; margin: 0; padding: 0; color: var(--theme-text-muted); font-size: 13px; list-style: none; }
+.trail li { display: inline-flex; align-items: center; min-width: 0; }
+.trail li + li::before { content: "›"; padding: 0 7px; color: var(--theme-text-muted); }
+.trail a { color: var(--theme-text-muted); font-weight: 550; text-decoration: none; border-radius: 4px; }
+.trail a:hover { color: var(--theme-action); }
+.trail [aria-current="page"] { color: var(--theme-text); font-weight: 650; }
+.up { display: none; align-items: center; gap: 2px; min-height: 44px; margin-left: -8px; padding: 0 10px 0 2px; border: 0; border-radius: 10px; background: transparent; color: var(--theme-action); font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+@media (max-width: 759.98px) {
+  .history, .trail { display: none; }
+  .up { display: inline-flex; }
+}

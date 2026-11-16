@@ -1,0 +1,70 @@
+/* FINANCE-UI chart marks. Series colours were run through the dataviz validator against Pulse's own surfaces
+   (light #ffffff, dark #1a1a24): money in / money out pass CVD separation (ΔE ≥ 27) and contrast ≥ 3:1 in both;
+   the ageing ramp passes the ordinal checks (one hue, monotone, light end ≥ 2:1). Dark steps are chosen, not flipped. */
+.chart, .hbars, .legend {
+  --fin-in: #5b45d6; --fin-out: #eb6834;
+  --age-1: #a99ced; --age-2: #8a78e6; --age-3: #6c55dc; --age-4: #4a35c0;
+  --grid: color-mix(in srgb, var(--theme-border) 70%, var(--theme-surface));
+}
+:global(:root[data-theme="dark"]) :is(.chart, .hbars, .legend) {
+  --fin-in: #8f80f5; --fin-out: #d95926;
+  --age-1: #4b3f99; --age-2: #6656c4; --age-3: #8676f0; --age-4: #b0a5ff;
+}
+.empty { margin: 0; padding: 12px 0; color: var(--theme-text-muted); font-size: 13px; }
+
+/* Revenue vs costs */
+.chart { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin: 0; container-type: inline-size; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--theme-text-muted); font-size: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.legend i, .tip i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--fin-in); }
+.legend i[data-s="out"], .tip i[data-s="out"] { background: var(--fin-out); }
+.legend i[data-bank] { background: color-mix(in srgb, var(--fin-in) 45%, var(--theme-surface)); }
+.tip i { width: 10px; height: 2px; border-radius: 1px; margin-right: 6px; vertical-align: middle; }
+.plot { position: relative; height: 180px; margin-left: 46px; }
+.grid { position: absolute; right: 0; left: 0; height: 1px; background: var(--grid); }
+.grid[data-base] { background: var(--theme-border-strong); }
+.grid span { position: absolute; right: calc(100% + 8px); top: -8px; color: var(--theme-text-muted); font-size: 11px; line-height: 16px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.groups { position: absolute; inset: 0; display: flex; align-items: stretch; }
+.group { position: relative; display: flex; flex: 1 1 0; align-items: flex-end; justify-content: center; gap: 2px; min-width: 0; border-radius: 4px; outline-offset: -2px; cursor: default; }
+.group:hover, .group:focus-visible { background: color-mix(in srgb, var(--theme-surface-subtle) 70%, transparent); }
+.group:focus-visible { outline: 2px solid var(--theme-focus); }
+.bar { display: block; width: min(11px, 34%); height: var(--h); border-radius: 3px 3px 0 0; background: var(--fin-in); }
+.bar[data-s="out"] { background: var(--fin-out); }
+.bar[data-bank] { background: color-mix(in srgb, var(--fin-in) 45%, var(--theme-surface)); }
+.tip { position: absolute; z-index: 20; bottom: calc(100% - 4px); left: 50%; display: grid; gap: 2px; width: max-content; max-width: 220px; padding: 7px 10px; border-radius: 8px; background: var(--theme-text); color: var(--theme-surface); font-size: 12px; line-height: 1.4; font-variant-numeric: tabular-nums; display: none; transform: translate(-50%, 0); pointer-events: none; }
+.tip b { font-weight: 600; }
+.tip > span { white-space: nowrap; }
+.tip > .tipNet { white-space: normal; }
+.tipNet { opacity: 0.75; }
+.group:hover .tip, .group:focus-visible .tip { display: grid; }
+.group:nth-child(-n + 3) .tip { left: 0; transform: none; }
+.group:nth-last-child(-n + 3) .tip { right: 0; left: auto; transform: none; }
+.axis { display: flex; margin-left: 46px; }
+.axis span { flex: 1 1 0; min-width: 0; color: var(--theme-text-muted); font-size: 11px; text-align: center; white-space: nowrap; }
+/* Labels count back from the latest month (data-k = months before it, mod 6), so the latest is always labelled. Long
+   series and narrow plots label every other month, phones every third; tips and aria labels carry every month. */
+.chart[data-dense] .axis span:is([data-k="1"], [data-k="3"], [data-k="5"]) { visibility: hidden; }
+@container (max-width: 560px) { .axis span:is([data-k="1"], [data-k="3"], [data-k="5"]) { visibility: hidden; } }
+@container (max-width: 380px) { .axis span:is([data-k="1"], [data-k="2"], [data-k="4"], [data-k="5"]) { visibility: hidden; } }
+
+/* Ranked bars: label above, value at the end of the label line, the bar underneath */
+.hwrap { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.hbars { display: grid; gap: 1px; margin: 0; padding: 0; list-style: none; }
+.hrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "label value" "bar bar"; gap: 3px 10px; padding: 4px 6px; margin: 0 -6px; border-radius: 6px; }
+a.hrow:hover { background: color-mix(in srgb, var(--theme-surface-subtle) 70%, transparent); }
+.hlabel { grid-area: label; display: flex; align-items: baseline; gap: 6px; min-width: 0; overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.hlabel small { color: var(--theme-text-muted); font-size: 12px; }
+.hvalue { grid-area: value; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.track { grid-area: bar; display: block; height: 8px; }
+.track i { display: block; height: 100%; min-width: 0; border-radius: 0 4px 4px 0; background: var(--fin-in); }
+.track i[data-s="out"] { background: var(--fin-out); }
+.track i[data-step="1"] { background: var(--age-1); }
+.track i[data-step="2"] { background: var(--age-2); }
+.track i[data-step="3"] { background: var(--age-3); }
+.track i[data-step="4"] { background: var(--age-4); }
+
+@media (forced-colors: active) { .bar, .track i, .legend i, .tip i { forced-color-adjust: none; } }
+/* Across the page the trend is a calm 220 px tall; nothing scrolls. */
+@media (min-width: 1180px) { .chart[data-fill] .plot { height: 220px; } }
+.chart[data-single] .bar { width: min(18px, 62%); }
+.legend i[data-s="out"][data-bank], .bar[data-s="out"][data-bank] { background: color-mix(in srgb, var(--fin-out) 45%, var(--theme-surface)); }

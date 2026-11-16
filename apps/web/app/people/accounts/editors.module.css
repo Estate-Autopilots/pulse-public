@@ -1,0 +1,10 @@
+.desktopOnly { display: block; }
+.mobileOnly { display: none; }
+.metrics { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.7fr); gap: 8px; margin: 0; }
+.metrics > div { min-width: 0; }
+.metrics dt { color: var(--theme-text-muted); font-size: 11px; }
+.metrics dd { display: grid; justify-items: start; gap: 4px; margin: 4px 0 0; font-variant-numeric: tabular-nums; font-weight: 600; overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .desktopOnly { display: none; }
+  .mobileOnly { display: grid; }
+}

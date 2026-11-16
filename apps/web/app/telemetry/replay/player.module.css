@@ -1,0 +1,17 @@
+/* BUGKIT-TELEMETRY: the session replay player and the heatmap frame. */
+.player { display: grid; gap: 10px; min-width: 0; }
+.box { position: relative; overflow: hidden; border: 1px solid var(--theme-border); border-radius: 9px; background: var(--theme-surface-subtle); }
+.stage { position: absolute; top: 0; left: 0; transform-origin: 0 0; pointer-events: none; }
+.stage :global(iframe) { border: 0; background: #fff; }
+.note { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 16px; color: var(--theme-text-muted); text-align: center; font-size: 13px; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.slider { flex: 1 1 160px; min-width: 120px; accent-color: var(--theme-action); }
+.time { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--theme-text-muted); white-space: nowrap; }
+.speeds { display: inline-flex; gap: 4px; }
+.speeds button[aria-pressed="true"] { border-color: var(--theme-action); color: var(--theme-action); }
+.fine { margin: 0; font-size: 12px; color: var(--theme-text-muted); }
+.overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; padding: 0; list-style: none; font-size: 12px; color: var(--theme-text-muted); }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.grid { position: absolute; inset: 0; background-image: linear-gradient(var(--theme-border) 1px, transparent 1px), linear-gradient(90deg, var(--theme-border) 1px, transparent 1px); background-size: 10% 10%; opacity: 0.5; }

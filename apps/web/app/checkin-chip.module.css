@@ -1,0 +1,124 @@
+/* The header's one-tap check-in. Desktop: a pill beside the inbox bell; phones: the same pill, shorter text. */
+.root { position: relative; display: flex; align-items: center; gap: 2px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 999px;
+  background: var(--theme-surface); color: var(--theme-text); font: 600 13px/1 inherit; font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; }
+.chip:hover:not(:disabled) { background: var(--theme-surface-subtle); }
+.chip:focus-visible, .more:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.chip:disabled { cursor: progress; color: var(--theme-text-muted); }
+.chip[data-tone="action"] { border-color: var(--theme-action); background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.chip[data-tone="action"]:hover:not(:disabled) { background: var(--theme-action-hover, var(--theme-action)); }
+.chip[data-tone="attention"] { border-color: color-mix(in srgb, var(--theme-warning) 60%, var(--theme-border)); background: color-mix(in srgb, var(--theme-warning) 16%, var(--theme-surface)); }
+.chip[data-tone="action"] + .more { border-color: var(--theme-action); }
+.chip[data-state="out"] { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+.more { display: grid; place-items: center; width: 26px; height: 36px; padding: 0; border: 1px solid var(--theme-border); border-radius: 6px 999px 999px 6px;
+  background: var(--theme-surface); color: var(--theme-text-muted); font-size: 11px; cursor: pointer; }
+/* POLISH-2: a past day's check-out is waiting for the time they left: a small dot on today's control. */
+.chip[data-fix] { position: relative; }
+.chip[data-fix]::after { content: ""; position: absolute; top: -1px; right: -1px; width: 9px; height: 9px; border: 2px solid var(--theme-surface); border-radius: 50%; background: var(--theme-warning); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--theme-text-muted); }
+.dot[data-state="in"] { background: var(--theme-success); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-success) 22%, transparent); animation: beat 2.4s ease-in-out infinite; }
+.dot[data-state="done"] { background: var(--theme-text-muted); }
+.chip[data-tone="attention"] .dot { background: var(--theme-warning); }
+@keyframes beat { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--theme-success) 0%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .dot[data-state="in"] { animation: none; } }
+.short { display: none; }
+.full { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+
+/* FLOAT: a popover on the floating layer (placed under the chip by checkin-chip.tsx), in the floating glass. */
+.menu { position: fixed; top: 64px; right: 8px; z-index: var(--ds-z-popover, 90); width: min(320px, calc(100vw - 16px)); box-sizing: border-box; padding: 14px; overflow-y: auto; overscroll-behavior: contain;
+  border: 0; border-radius: var(--ds-radius-lg, 16px); color: var(--theme-text);
+  background: var(--ds-glass-strong, var(--theme-surface)); -webkit-backdrop-filter: var(--ds-glass-blur, none); backdrop-filter: var(--ds-glass-blur, none);
+  box-shadow: var(--ds-glass-edge, inset 0 0 0 1px var(--theme-border)), var(--ds-glass-shadow, 0 12px 32px rgb(0 0 0 / 0.16));
+  animation: checkin-in var(--ds-float-in, 240ms) var(--ds-spring, ease-out) both; transform-origin: calc(100% - 24px) 0;
+  display: grid; gap: 12px; font-size: 13px; line-height: 1.4; white-space: normal; }
+.arrival { display: flex; gap: 10px; align-items: center; margin: -4px -4px 0; padding: 10px; border-radius: 10px; background: color-mix(in srgb, var(--theme-warning) 12%, var(--theme-surface)); }
+.arrival b { display: block; font-size: 14px; }
+.arrival small { color: var(--theme-text-muted); }
+.pip { flex: none; width: 40px; height: 40px; }
+.head { display: grid; gap: 2px; margin: 0; }
+.head b { font-size: 15px; }
+.head span, .timer { color: var(--theme-text-muted); }
+.timer { margin: 0; }
+.timer span { color: var(--theme-text); font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; }
+.modes { display: flex; gap: 4px; padding: 3px; border-radius: 10px; background: var(--theme-surface-subtle); }
+.modes button { flex: 1; min-height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--theme-text-muted); font: 600 12px/1 inherit; cursor: pointer; }
+.modes button[aria-pressed="true"] { background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions button { display: inline-flex; flex: 1 1 120px; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 12px; border-radius: 10px; font: 600 14px/1 inherit; cursor: pointer; }
+.primary { border: 1px solid var(--theme-action); background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.secondary { border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); }
+.actions button:disabled { opacity: 0.6; cursor: progress; }
+.week { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 10px; padding-top: 10px; border-top: 1px solid var(--theme-border); }
+.week > span { color: var(--theme-text-muted); font-size: 12px; }
+.week ol { display: flex; gap: 5px; margin: 0; padding: 0; list-style: none; justify-self: end; }
+.week li { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--theme-border-strong, var(--theme-border)); box-sizing: border-box; }
+.week li[data-state="on_time"] { border-color: var(--theme-success); background: var(--theme-success); }
+.week li[data-state="late"] { border-color: var(--theme-warning); background: var(--theme-warning); }
+.week li[data-state="missed"] { border-color: var(--theme-danger); }
+.week li[data-state="off"] { border-style: dashed; opacity: 0.5; }
+.week li[data-state="today"] { border-color: var(--theme-action); }
+.week b { grid-column: 1 / -1; font-size: 12px; font-weight: 600; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.link { color: var(--theme-action); font-weight: 600; text-decoration: none; }
+.link:hover { text-decoration: underline; }
+
+/* POLISH-1: a check-out forgotten yesterday: say so plainly, and send the time left as a correction in one tap. */
+.fix { display: grid; gap: 10px; }
+.fixForm { display: grid; gap: 8px; }
+.fixForm label { display: flex; align-items: center; gap: 10px; color: var(--theme-text-muted); font-weight: 600; }
+.fixForm input { flex: 1; min-width: 0; min-height: 40px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: 600 14px/1 inherit; font-variant-numeric: tabular-nums; }
+.fixForm button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 42px; padding: 0 12px; border-radius: 10px; font: 600 14px/1 inherit; white-space: nowrap; cursor: pointer; }
+.fixForm button:disabled { opacity: 0.6; cursor: progress; }
+.fixForm small { color: var(--theme-text-muted); font-size: 12px; }
+.fixForm .fixError { color: var(--theme-danger); }
+.chip[data-state="stale"] svg { color: var(--theme-warning); }
+@media (max-width: 899.98px) {
+  .chip { height: 36px; padding: 0 9px; gap: 4px; font-size: 13px; }
+  .full { display: none; }
+  .short { display: inline; }
+  .more { display: none; }
+  .chip[data-state="out"] { border-radius: 999px; }
+  .actions button { min-height: 44px; }
+}
+/* Narrow phones share the bar with "+ New", the bell and the profile: the words stay, the icon goes. */
+@media (max-width: 419.98px) {
+  .chip { padding: 0 8px; font-size: 12px; }
+  .chip[data-state="out"] svg, .chip[data-state="pending"] svg, .chip[data-state="stale"] svg { display: none; }
+}
+
+/* LAYOUT-SWEEP: a quiet control on the header's rhythm (32 px, hairline, no fill). Not checked in, it is one split
+   pill: "Check in" (one tap) and ▾ (where you work, the week); checked in, a dot and the time worked. */
+.chip, .more { height: 32px; border-color: color-mix(in srgb, var(--theme-border) 85%, transparent); background: transparent; font-size: 13px; font-weight: 600; }
+.chip { padding: 0 11px; gap: 7px; }
+.chip:hover:not(:disabled), .more:hover { background: var(--theme-surface-subtle); }
+.chip[data-tone="action"] { border-color: color-mix(in srgb, var(--theme-action) 40%, transparent); background: transparent; color: var(--theme-action); }
+.chip[data-tone="action"]:hover:not(:disabled) { background: color-mix(in srgb, var(--theme-action) 8%, transparent); }
+.chip[data-tone="action"] + .more { border-color: color-mix(in srgb, var(--theme-action) 40%, transparent); color: var(--theme-action); }
+.chip[data-state="out"] { border-right: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.more { width: 24px; border-radius: 0 999px 999px 0; }
+.root { gap: 0; }
+@media (max-width: 899.98px) {
+  .chip { height: 36px; }
+  .chip[data-state="out"] { border-right: 1px solid color-mix(in srgb, var(--theme-action) 40%, transparent); border-radius: 999px; }
+}
+/* EST-1196: on a phone, My desk's day card is the one attendance control; the header's copy of it steps aside there,
+   except while it carries a check-out to correct or its menu is open (data-keep). */
+@media (max-width: 899.98px) {
+  :global(html[data-today-card]) .root:not([data-keep]) { display: none; }
+}
+/* EST-1200: on a phone the 36 px chip takes a 44 px press (an invisible margin above and below it; ::after is its
+   check-out-to-fix dot). */
+@media (max-width: 899.98px) { .chip { position: relative; } .chip::before { content: ""; position: absolute; inset: -5px -1px; } }
+/* ATT: an automatic check-in, confirmed with one tap. */
+.autoIn { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--theme-surface-subtle); font-size: 13px; }
+.autoIn span { flex: 1 1 100%; }
+.autoIn .link { margin: 0; }
+@keyframes checkin-in { from { opacity: 0; transform: translateY(-4px) scale(.97); } }
+@media (prefers-reduced-motion: reduce) { .menu { animation: none; } }
+/* FLOAT-2 (device audit, 22 Oct 2026): on a phone every control here takes a 44 px press. */
+@media (max-width: 899.98px) {
+  .chip, .more { position: relative; }
+  .chip::before, .more::before { content: ""; position: absolute; inset: -5px -1px; }
+  .more { width: 30px; }
+  .more::before { inset: -5px -8px -5px -1px; }
+}
