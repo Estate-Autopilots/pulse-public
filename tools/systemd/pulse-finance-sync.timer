@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh Pulse live finance every six hours
+[Timer]
+OnCalendar=*-*-* 02,08,14,20:10:00 UTC
+Persistent=true
+Unit=pulse-finance-sync.service
+[Install]
+WantedBy=timers.target

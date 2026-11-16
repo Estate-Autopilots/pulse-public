@@ -1,0 +1,19 @@
+{
+  "name": "@pulse/sdk-ts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./dist/v0.d.ts",
+  "exports": {
+    "./v0": { "types": "./dist/v0.d.ts", "import": "./dist/v0.js" },
+    "./v0-fixtures": { "types": "./dist/v0-fixtures.d.ts", "import": "./dist/v0-fixtures.js" },
+    "./v1": { "types": "./dist/v1.d.ts", "import": "./dist/v1.js" },
+    "./synthetic-my-tasks": { "types": "./dist/synthetic-my-tasks.d.ts", "import": "./dist/synthetic-my-tasks.js" }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "pnpm build && node --test --test-concurrency=2 test/*.test.mjs"
+  },
+  "devDependencies": { "typescript": "5.9.3" }
+}

@@ -1,0 +1,100 @@
+/* WORK-SPINE: the trail, the due chip and the one-click task row (tasks/spine.tsx). */
+.trail { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; min-width: 0; margin: 0 0 6px; color: var(--theme-text-muted); font-size: var(--ds-text-sm, 0.85rem); }
+.trail svg { flex: none; }
+.trail a { color: var(--theme-text-muted); text-decoration: none; border-radius: 6px; }
+.trail a:hover { color: var(--theme-action); text-decoration: underline; }
+.trailRoot { display: inline-flex; align-items: center; gap: 4px; flex: none; }
+.trailStep { display: inline-flex; align-items: center; gap: 4px; min-width: 0; max-width: min(42ch, 100%); }
+.trailStep a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.trailStep a[data-kind="goal"] { color: var(--theme-action); font-weight: var(--ds-weight-strong, 600); }
+.trailNone { font-style: italic; }
+.trailMore { margin-left: 4px; }
+
+.due { display: inline-flex; align-items: center; gap: 4px; min-height: 22px; padding: 0 8px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted);
+  font-size: 12px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.due[data-state="late"] { background: color-mix(in srgb, var(--theme-danger) 12%, var(--theme-surface)); color: var(--theme-danger); }
+.due[data-state="today"], .due[data-state="soon"] { background: color-mix(in srgb, var(--theme-warning, #b7791f) 14%, var(--theme-surface)); color: var(--theme-warning-text, var(--theme-text)); }
+
+.ticks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.tick { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: start; gap: 10px; padding: 9px 2px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); min-width: 0; }
+.tick:first-child { border-top: 0; }
+.tick[data-done] .tickTitle { color: var(--theme-text-muted); text-decoration: line-through; }
+.box { display: grid; place-items: center; width: 24px; height: 24px; margin-top: 1px; padding: 0; border: 1.5px solid var(--theme-border-strong, var(--theme-border)); border-radius: 50%;
+  background: var(--theme-surface); color: transparent; cursor: pointer; transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease, transform 140ms ease; }
+.box:hover:not(:disabled) { border-color: var(--theme-success); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-success) 18%, transparent); }
+.box[data-done] { border-color: var(--theme-success); background: var(--theme-success); color: #fff; }
+.box:disabled:not([data-done]) { cursor: default; opacity: 0.55; }
+.box:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.tickMain { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tickTitle { color: var(--theme-text); font-weight: 600; line-height: 1.35; text-decoration: none; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tickTitle:hover { color: var(--theme-action); }
+.tickMeta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; color: var(--theme-text-muted); font-size: 12px; }
+.sub { display: inline-flex; align-items: center; gap: 3px; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--theme-text-muted); text-decoration: none; }
+.doneWord { color: var(--theme-success); font-weight: 600; }
+.who { flex: none; margin-top: 1px; }
+@media (max-width: 899.98px) { .box { width: 28px; height: 28px; } .tick { grid-template-columns: 32px minmax(0, 1fr) auto; padding: 11px 2px; } }
+@media (prefers-reduced-motion: reduce) { .box { transition: none; } }
+.keep { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 9px; background: var(--theme-surface);
+  color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.keep:hover:not(:disabled) { border-color: var(--theme-action); color: var(--theme-action); }
+.keepNote { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px; border-radius: 12px; background: color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface));
+  color: var(--theme-text); font-size: 13.5px; }
+.keepNote > span { flex: 1 1 260px; min-width: 0; }
+@media (max-width: 899.98px) { .keep { min-height: 44px; } }
+/* The task drawer. */
+.peekChips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.peekWho { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--theme-text); }
+.peekWhy { margin: 8px 0 0; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--theme-danger) 8%, var(--theme-surface)); color: var(--theme-text); font-size: 13px; }
+.peekQuiet { display: inline-flex; align-items: center; gap: 6px; margin: 10px 0 0; color: var(--theme-text-muted); font-size: 13px; }
+.peekSteps, .peekEvents { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.peekSteps label { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 4px 6px; border-radius: 8px; cursor: pointer; overflow-wrap: anywhere; }
+.peekSteps label:hover { background: var(--theme-surface-subtle); }
+.peekSteps input { width: 18px; height: 18px; flex: none; accent-color: var(--theme-action); }
+.peekEvents li { padding: 6px 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); font-size: 13px; color: var(--theme-text); overflow-wrap: anywhere; }
+.peekEvents li:first-child { border-top: 0; }
+.peekDone { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: var(--theme-action); color: var(--theme-action-text, #fff);
+  font: inherit; font-weight: 650; cursor: pointer; }
+.peekDone:disabled { opacity: .6; cursor: default; }
+.peekOpen { display: inline-flex; align-items: center; gap: 4px; color: var(--theme-action); font-weight: 600; text-decoration: none; }
+.peekOpen:hover { text-decoration: underline; }
+.addFile { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px dashed var(--theme-border-strong, var(--theme-border)); border-radius: 12px; }
+.addFileTask { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: var(--theme-text); }
+.addFileTask select { min-height: 38px; max-width: 100%; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 9px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-weight: 400; }
+@media (max-width: 899.98px) { .addFileTask select { min-height: 44px; font-size: 16px; } }
+.trail[data-compact] { margin: 2px 0 0; }
+.trail[data-compact] .trailStep { max-width: 100%; }
+.trail[data-compact] .trailStep a { white-space: normal; overflow-wrap: anywhere; }
+.peekNotes { margin: 10px 0 0; color: var(--theme-text); font-size: 13.5px; line-height: 1.5; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.peekAdd { display: flex; gap: 8px; margin-top: 8px; }
+.peekAdd input { flex: 1; min-width: 0; min-height: 38px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 9px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13.5px; }
+.peekAdd button { min-height: 38px; padding: 0 14px; border: 1px solid var(--theme-border); border-radius: 9px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-weight: 600; cursor: pointer; }
+.peekAdd button:disabled { opacity: .55; cursor: default; }
+@media (max-width: 899.98px) { .peekAdd input, .peekAdd button { min-height: 44px; font-size: 16px; } }
+.dropZone { display: flex; align-items: center; gap: 12px; width: 100%; padding: 16px 18px; border: 1.5px dashed color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); color: var(--theme-action); font: inherit; text-align: left; cursor: pointer; }
+.dropZone:hover { background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); }
+.dropZone span { display: flex; flex-direction: column; gap: 2px; }
+.dropZone b { color: var(--theme-text); font-size: 14px; }
+.dropZone small { color: var(--theme-text-muted); font-size: 12.5px; }
+/* WORK-SPINE (judge r13): the zone ends in a real button, so adding a file is the obvious next step. */
+.dropZone .dropBtn { flex-direction: row; align-items: center; margin-left: auto; padding: 7px 16px; border-radius: 9px; background: var(--theme-action); color: var(--theme-action-text, #fff); font-size: 13px; font-weight: 650; }
+.peekDone { background: #6B4CF0; color: #fff; }
+.peekDone:hover:not(:disabled) { background: #5a3be0; }
+.peekFacts { display: grid; gap: 8px; margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--theme-surface-subtle); }
+.peekFacts > div { display: grid; grid-template-columns: 70px minmax(0, 1fr); align-items: center; gap: 8px; }
+.peekFacts dt { color: var(--theme-text-muted); font-size: 12.5px; }
+.peekFacts dd { margin: 0; min-width: 0; font-size: 13.5px; overflow-wrap: anywhere; }
+.peekFacts a { color: var(--theme-action); font-weight: 600; text-decoration: none; }
+/* WORK-SPINE: the project's Add task in the house violet, solid in dark mode too (the theme's dark action colour read as disabled). */
+.solid { border-color: #6B4CF0 !important; background: #6B4CF0 !important; color: #fff !important; }
+.solid:hover:not(:disabled) { border-color: #5a3be0 !important; background: #5a3be0 !important; }
+.peekSection { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+.peekSection > h3 { margin: 0; color: var(--theme-text); font-size: 13.5px; font-weight: 650; }
+/* WORK-SPINE (judge r13): the discussion lines up with the drawer's other sections (Threads pads itself for a card). */
+.peekThreads > div { padding: 0; }
+.peekFacts + .peekDone { align-self: flex-start; margin-top: 12px; }
+:global(:root[data-theme="dark"]) .due[data-state="late"] { background: color-mix(in srgb, var(--theme-danger) 30%, var(--theme-surface)); color: #ffc2c2; }
+.peekDoneItem { color: var(--theme-text-muted); }
+.peekEvents a { color: var(--theme-text); text-decoration: none; }
+.peekEvents a:hover { color: var(--theme-action); }

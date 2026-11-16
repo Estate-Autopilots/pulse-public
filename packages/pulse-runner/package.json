@@ -1,0 +1,25 @@
+{
+  "name": "@vitalsos/pulse-runner",
+  "version": "0.1.0",
+  "description": "Connect a company's own server and AI subscriptions (Claude Code, Codex) to Pulse.",
+  "license": "UNLICENSED",
+  "author": "Vitals Technologies",
+  "type": "module",
+  "bin": {
+    "pulse-runner": "bin/pulse-runner.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "scripts",
+    "PROTOCOL.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=4 test/*.test.js"
+  }
+}

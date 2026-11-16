@@ -1,0 +1,13 @@
+[Unit]
+Description=Pulse: the daily review of problems AI employees met on people's screens (AGENT-OPERATOR, tools/operator-bug-review.py)
+[Service]
+Type=oneshot
+WorkingDirectory=/home/eadev/work/pulse/strike
+# The database's worker role: pulse.operator_bug_groups() and pulse.operator_bug_review() only (migration 2080).
+EnvironmentFile=/etc/estate-autopilots/db/pulse.env
+Environment=PATH=/home/eadev/.local/bin:/home/eadev/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
+# One model run per problem group, at most 10 a day, read-only tools in this checkout; nice and idle IO.
+Nice=19
+IOSchedulingClass=idle
+TimeoutStartSec=90min
+ExecStart=/home/eadev/work/pulse/strike/.venv/bin/python tools/operator-bug-review.py

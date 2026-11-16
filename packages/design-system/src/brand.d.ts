@@ -1,0 +1,11 @@
+export const BRAND: { iris: string; irisLight: string; irisDeep: string; lilac: string; ink: string; paper: string; canvas: string; night: string; live: string };
+export const MARK: { stroke: string; point: { cx: number; cy: number; r: number }; width: number };
+export const WORDMARK: { d: string; box: [number, number, number, number] };
+export type BrandDirection = { id: 'blink' | 'solid-p' | 'stem' | 'pebble' | 'rise' | 'point'; name: string; recommended?: boolean; glyph: (color: string, live?: string) => string; idea: string; verdict: string };
+export const DIRECTIONS: BrandDirection[];
+export const LIVE: BrandDirection;
+export function markGlyph(color?: string): string;
+export function markSvg(options?: { size?: number; tile?: boolean; color?: string; radius?: number; scale?: number; direction?: BrandDirection['id']; id?: string; title?: string }): string;
+export function wordmarkSvg(options?: { height?: number; color?: string }): string;
+export function lockupSvg(options?: { height?: number; theme?: 'light' | 'dark'; mono?: string; id?: string }): string;
+export function appIconSvg(options?: { size?: number; platform?: 'tile' | 'ios' | 'maskable' | 'mac' }): string;
