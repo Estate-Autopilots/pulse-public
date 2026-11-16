@@ -1,0 +1,20 @@
+{
+  "ea_team": [{"id": "team", "data": [
+    {"id": "synthetic-editor", "name": "Marin Example", "role": "General VE", "pod": "Pod 1", "pin": "synthetic-redacted"},
+    {"id": "synthetic-pm", "name": "Lio Example", "role": "Project Growth Strategist", "pod": "Pod 1"},
+    {"id": "synthetic-unmatched", "name": "Zuri Example", "role": "Designer", "pod": "Shared"}
+  ]}],
+  "ea_clients": [{"id": "synthetic-client", "data": {
+    "clientName": "Fictional Client", "companyName": "Fictional Studio", "projectName": "Fictional Orchard",
+    "assignedPmId": "synthetic-pm", "pod": "Pod 1", "location": "Example District", "segment": "synthetic",
+    "onboardingDate": "2026-09-01", "status": "On Hold", "contactNumber": "synthetic-redacted",
+    "deliverables": [
+      {"id": "synthetic-vov", "name": "VOV #1 script", "phase": "Phase 2", "ownerRole": "Video Editor", "targetEnd": "2026-09-10", "status": "not_started"},
+      {"id": "synthetic-cover", "name": "Cover design", "phase": "Phase 2", "ownerRole": "Designer", "status": "done", "completedById": "synthetic-editor", "notes": "Synthetic note", "delayCategory": "Synthetic delay", "delayNote": "Synthetic reason"},
+      {"id": "synthetic-unknown", "name": "Design handover", "phase": "Phase 2", "ownerRole": "Designer", "status": "other"},
+      {"id": "synthetic-research", "name": "Research, personas & positioning", "phase": "Phase 1", "ownerRole": "Project Growth Strategist", "targetStart": "2026-09-20", "targetEnd": "2026-09-15", "status": "in_progress"},
+      {"id": "synthetic-nurture", "name": "Automated Lead Nurturing System", "phase": "Phase 4", "ownerRole": "Project Growth Strategist", "status": "not_started"},
+      {"id": "synthetic-retired", "name": "Pod briefing", "phase": "Phase 1", "ownerRole": "Project Growth Strategist", "status": "not_started"}
+    ]
+  }}]
+}

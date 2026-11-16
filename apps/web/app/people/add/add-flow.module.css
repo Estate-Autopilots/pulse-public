@@ -1,0 +1,125 @@
+/* FIX-PEOPLE-MONEY C1: Add people in the shared side panel. Step 1 is a grid of choice cards (two columns, one on a
+   phone) with the chosen one's plain words under it; step 2 is a row of channel buttons; "Links you sent" folds away. */
+.form { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding-bottom: 8px; }
+.context { color: var(--theme-text-muted); font-size: 13px; }
+.no { display: inline-grid; width: 22px; height: 22px; margin-right: 8px; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); font-size: 12px; font-weight: 700; vertical-align: 1px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+/* A phone keeps two columns of short cards (the label only); the chosen one's words follow the grid. */
+@media (max-width: 479.98px) { .grid { gap: 6px; } .card { min-height: 48px; padding: 6px 10px; gap: 8px; } .cardText small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11.5px; } .icon { width: 28px; height: 28px; border-radius: 8px; } .cardText b { font-size: 13.5px; } .tick { display: none; } }
+/* A phone lists the AI's tools one under another, each one line. */
+@media (max-width: 479.98px) { .toolChips { grid-template-columns: minmax(0, 1fr); gap: 6px; } .toolChips label { min-height: 44px; } }
+.card { position: relative; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 12px; border: 1px solid color-mix(in srgb, var(--theme-border) 85%, transparent); border-radius: 12px; background: var(--theme-surface); cursor: pointer; transition: border-color 140ms, background 140ms; }
+.card:hover { border-color: color-mix(in srgb, var(--theme-action) 35%, var(--theme-border)); }
+.card[data-on] { border-color: var(--theme-action); background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.card input { position: absolute; opacity: 0; pointer-events: none; }
+.card:has(input:focus-visible) { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.icon { display: grid; flex: none; width: 34px; height: 34px; place-items: center; border-radius: 9px; background: var(--theme-surface-subtle); color: var(--theme-action); }
+.card[data-on] .icon { background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.cardText { display: grid; gap: 1px; min-width: 0; }
+.cardText b { font-size: 14.5px; font-weight: 650; }
+.cardText small { color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.3; }
+.tick { flex: none; margin-left: auto; color: var(--theme-action); }
+.words { display: grid; gap: 4px; margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: var(--theme-surface-subtle); font-size: 13.5px; line-height: 1.5; }
+.words p { margin: 0; }
+.check { display: flex; align-items: flex-start; gap: 10px; margin-top: 6px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); border-radius: 10px; background: var(--theme-surface); cursor: pointer; }
+.check input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--theme-action); }
+.check small { color: var(--theme-text-muted); }
+.warn { color: color-mix(in srgb, var(--theme-warning) 80%, var(--theme-text)); font-weight: 550; }
+.small { margin: 8px 0 0; color: color-mix(in srgb, var(--theme-text) 72%, var(--theme-surface)); font-size: 13px; line-height: 1.45; }
+.channels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.channels[data-four] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 479.98px) { .channels, .channels[data-four] { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.channel { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 10px; border: 1px solid color-mix(in srgb, var(--theme-border) 85%, transparent); border-radius: 12px; background: var(--theme-surface); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.channel input { position: absolute; opacity: 0; pointer-events: none; }
+.channel:has(input:focus-visible) { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.channel[data-on] { border-color: var(--theme-action); background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); color: var(--theme-action); }
+.inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; align-items: end; }
+@media (max-width: 479.98px) { .inputs { grid-template-columns: minmax(0, 1fr); } }
+/* The same label as the kit's form fields (12px, muted), so every step reads alike. */
+.field { display: flex; flex-direction: column; gap: 5px; color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+.field > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.field small { color: var(--theme-text-muted); font-weight: 400; }
+.field input { min-height: 40px; padding: 0 12px; border: 1px solid color-mix(in srgb, var(--theme-border) 90%, transparent); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 400; }
+/* A phone keeps 16px so the browser does not zoom into the field. */
+@media (max-width: 599.98px) { .field input { font-size: 16px; } }
+.field input:focus { outline: 0; border-color: var(--theme-action); }
+.field input:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 18%, transparent); }
+.record { display: grid; gap: 12px; margin-top: 12px; scroll-margin-top: 12px; }
+.ok { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 0; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--theme-success) 9%, var(--theme-surface)); font-size: 14px; }
+.ok > p:first-child, p.ok { display: flex; align-items: center; gap: 8px; margin: 0; flex-direction: row; color: var(--theme-success); font-weight: 600; }
+p.ok { margin-top: 12px; }
+.linkBox { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 9px; background: var(--theme-surface); }
+.linkBox code { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 12.5px; }
+.secondary { display: inline-flex; align-self: flex-start; align-items: center; min-height: 38px; padding: 0 16px; border: 1px solid var(--theme-action); border-radius: 10px; background: var(--theme-surface); color: var(--theme-action) !important; font-size: 14px; font-weight: 600; text-decoration: none; }
+.quiet { display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 0 10px; border: 1px solid color-mix(in srgb, var(--theme-border) 80%, transparent); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text-muted); font: inherit; font-size: 13px; cursor: pointer; }
+.confirm { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface)); font-size: 14px; line-height: 1.5; }
+.confirm svg { flex: none; margin-top: 2px; color: var(--theme-action); }
+.tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 0 0 8px; padding: 0; border: 0; }
+@media (max-width: 479.98px) { .tools { grid-template-columns: minmax(0, 1fr); } }
+.tools legend { margin-bottom: 6px; font-size: 13px; font-weight: 600; }
+.tools label { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border: 1px solid var(--theme-border); border-radius: 10px; cursor: pointer; }
+.tools label:has(input:checked) { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); }
+.tools input { margin-top: 3px; accent-color: var(--theme-action); }
+.tools span { display: grid; gap: 1px; }
+.tools b { font-size: 13.5px; }
+.tools small { font-size: 12px; color: var(--theme-text-muted); }
+.sent { margin: 8px 0 16px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); padding-top: 8px; }
+.sent summary { display: flex; align-items: center; gap: 8px; min-height: 40px; font-size: 14px; font-weight: 600; cursor: pointer; list-style: none; }
+.sent summary::-webkit-details-marker { display: none; }
+.sent summary svg { transition: transform 140ms; color: var(--theme-text-muted); }
+.sent[open] summary svg { transform: rotate(180deg); }
+.count { margin-left: auto; padding: 2px 8px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+.sent ul { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.sent li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 45%, transparent); }
+.sent li:last-child { border-bottom: 0; }
+.who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.who b { font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.who small { color: var(--theme-text-muted); font-size: 12.5px; }
+.state { padding: 2px 8px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.state[data-s="accepted"] { background: color-mix(in srgb, var(--theme-success) 12%, var(--theme-surface)); color: var(--theme-success); }
+@media (prefers-reduced-motion: reduce) { .card, .sent summary svg { transition: none; } }
+.group { grid-column: 1 / -1; margin: 6px 0 0; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 50%, transparent); color: var(--theme-text-muted); font-size: 13px; font-weight: 600; }
+.group:first-child { margin-top: 0; }
+.moreDetails { border-top: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); padding-top: 4px; }
+.moreDetails summary { display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--theme-action); font-size: 14px; font-weight: 650; cursor: pointer; list-style: none; }
+.moreDetails summary svg { color: var(--theme-action) !important; }
+.moreDetails summary::-webkit-details-marker { display: none; }
+.moreDetails summary small { color: var(--theme-text-muted); font-weight: 500; }
+.moreDetails summary svg { color: var(--theme-text-muted); transition: transform 140ms; }
+.moreDetails[open] summary svg { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .moreDetails summary svg { transition: none; } }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* What they will see folds to one line (open it to read); step 2 stays close to the top. */
+.wordsHead { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 28px; font-size: 13.5px; font-weight: 600; cursor: pointer; list-style: none; }
+.wordsHead::-webkit-details-marker { display: none; }
+.words[open] .wordsHead svg { transform: rotate(180deg); }
+.words > summary:not(.wordsHead) { display: none; }
+.words p + p { margin-top: 4px; }
+.note { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-text); font-size: 13px; line-height: 1.45; }
+.note svg { flex: none; margin-top: 2px; color: var(--theme-action); }
+.toolChips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0 0 12px; padding: 0; border: 0; }
+.toolChips label { position: relative; display: flex; align-items: center; min-height: 48px; padding: 6px 12px; border: 1px solid var(--theme-border); border-radius: 12px; cursor: pointer; }
+.toolChips label span { display: grid; gap: 1px; min-width: 0; }
+.toolChips b { font-size: 13.5px; font-weight: 650; }
+.toolChips small { color: var(--theme-text-muted); font-size: 12px; line-height: 1.3; }
+.toolChips input { position: absolute; opacity: 0; pointer-events: none; }
+.toolChips label { gap: 10px; }
+.box { display: grid; flex: none; place-items: center; width: 18px; height: 18px; border: 1.5px solid var(--theme-border-strong); border-radius: 5px; color: transparent; }
+.toolChips label:has(input:checked) .box { border-color: var(--theme-action); background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.toolChips label:has(input:focus-visible) { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.form { padding-bottom: 4px; }
+@media (max-width: 599.98px) { .form { padding-bottom: 72px; } }
+/* The six kinds of people in pairs; the AI employee is set apart on its own row under "or". */
+.card[data-ai] { grid-column: 1 / -1; }
+.orAi { grid-column: 1 / -1; margin: 6px 0 -2px; color: var(--theme-text-muted); font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.chosen { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 12px; border: 1px solid var(--theme-action); border-radius: 12px; background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.chosen .icon { background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.change { margin-left: auto; min-height: 36px; padding: 0 6px; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 13.5px; font-weight: 650; cursor: pointer; }
+.change:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Closed, "What they will see and do" is a quiet text toggle, not a grey block. */
+.words:not([open]) { padding: 0 2px; background: transparent; }
+.words:not([open]) .wordsHead { color: var(--theme-action); font-size: 13px; }
+@media (max-width: 479.98px) { .toolChips { gap: 6px; } .toolChips label { min-height: 52px; padding: 6px 8px; gap: 8px; } .toolChips small { font-size: 11.5px; } }
+.aiHelp { margin: -4px 0 4px; color: color-mix(in srgb, var(--theme-text) 72%, var(--theme-surface)); font-size: 13px; line-height: 1.45; }
+.chosen { margin-bottom: 12px; }
+.toolsHead { margin: 4px 0 8px; font-size: 13px; font-weight: 650; }

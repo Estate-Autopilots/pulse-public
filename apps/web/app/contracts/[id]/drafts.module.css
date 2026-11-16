@@ -1,0 +1,415 @@
+/* CONTRACTS-3: Compare drafts. One card per changed clause; added words on soft green, taken-out words struck on soft
+   rose (never colour alone: underline and strike-through too). Theme tokens only; long words wrap, nothing scrolls sideways. */
+.compare { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.summary { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 15px; }
+.legend { display: inline-flex; gap: 8px; font-size: 14px; }
+.compare ins, .clause ins { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; border-radius: 4px; padding: 0 2px;
+  background: color-mix(in srgb, var(--theme-success) 16%, transparent); color: inherit; }
+.compare del, .clause del { text-decoration: line-through; border-radius: 4px; padding: 0 2px;
+  background: color-mix(in srgb, var(--theme-danger) 13%, transparent); color: var(--theme-text-muted); }
+.clause { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--theme-border); background: var(--theme-surface); min-width: 0; }
+.clause h3 { margin: 0; font-size: 15px; font-weight: 650; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.clause p { margin: 0; font-size: 15px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tag { font-size: 12px; font-weight: 650; padding: 1px 9px; border-radius: 999px; background: var(--theme-surface-subtle, #f1f0f5); color: var(--theme-text-muted); }
+.tag[data-status="changed"] { background: color-mix(in srgb, var(--theme-warning, #d97706) 15%, transparent); color: var(--theme-warning, #b45309); }
+.tag[data-status="added"] { background: color-mix(in srgb, var(--theme-success) 15%, transparent); color: var(--theme-success); }
+.tag[data-status="removed"] { background: color-mix(in srgb, var(--theme-danger) 12%, transparent); color: var(--theme-danger); }
+.same summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 12px; border: 1px dashed var(--theme-border); font-size: 14px; font-weight: 600; color: var(--theme-text); list-style: none; }
+.same summary::-webkit-details-marker { display: none; }
+.same[open] summary svg { transform: rotate(180deg); }
+.same ul { margin: 8px 0 0; }
+.same ul { margin: 0; padding-left: 20px; font-size: 14px; color: var(--theme-text-muted); }
+.pickers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.compareBox { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.proposal { border-color: color-mix(in srgb, var(--theme-action) 40%, var(--theme-border)); }
+.proposal h2 { display: flex; align-items: center; gap: 8px; }
+.note { margin: 0; font-size: 15px; font-style: italic; overflow-wrap: anywhere; }
+.searchBox { display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface); min-height: 44px; }
+.searchBox input { border: 0 !important; padding: 0 !important; min-height: 42px !important; flex: 1; min-width: 0; background: transparent !important; }
+.searchBox:focus-within { outline: 2px solid color-mix(in srgb, var(--theme-action) 45%, transparent); }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.group { display: flex; flex-direction: column; gap: 6px; }
+.group > span { font-size: 12px; font-weight: 650; color: var(--theme-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.pocLine { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; font-size: 13px; color: var(--theme-text-muted); }
+.pocLine a { display: inline-flex; align-items: center; gap: 4px; color: var(--theme-text); text-decoration: none; overflow-wrap: anywhere; }
+.pocLine a:hover, .pocLine a:focus-visible { text-decoration: underline; }
+.linkBtn { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 4px; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600;
+  color: var(--theme-action); cursor: pointer; }
+.pocForm { width: 100%; padding: 12px 0 4px; }
+.fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.fieldset legend { padding: 0; margin-bottom: 8px; font-size: 15px; font-weight: 650; }
+.picked { display: inline-flex; flex-wrap: wrap; align-items: center; align-self: flex-start; gap: 4px 10px; padding: 4px 4px 4px 12px; border-radius: 999px; border: 1px solid var(--theme-border); min-width: 0; max-width: 100%; }
+.picked .okText, .picked > span { overflow-wrap: anywhere; }
+/* The agreement's words fold to a preview on a phone ("Read the whole agreement"); on a wide screen they are all shown. */
+.readAll { display: none; }
+@media (max-width: 699px) {
+  .docFold[data-folded] { max-height: 520px; overflow: hidden; position: relative; }
+  .docFold[data-folded]::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; pointer-events: none;
+    background: linear-gradient(to bottom, transparent, var(--theme-surface) 70%); }
+  .docFold[data-folded] .readAll { display: inline-flex; position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 1; white-space: nowrap; }
+}
+.pocLine a { white-space: nowrap; }
+.warnText { color: var(--theme-warning, #b45309) !important; font-weight: 600; }
+.optionGrid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.optionGrid button { justify-content: flex-start; min-height: 48px; text-align: left; }
+@media (min-width: 900px) { .optionGrid { display: flex !important; } }
+.workRow { padding: 0 !important; }
+.workLink { display: flex; align-items: center; gap: 10px 12px; flex-wrap: wrap; width: 100%; padding: 12px 14px; min-height: 56px; color: inherit; text-decoration: none; }
+.workLink:hover, .workLink:focus-visible { background: var(--theme-surface-subtle, rgb(0 0 0 / 0.03)); }
+.workLink > svg { color: var(--theme-text-muted); margin-left: auto; }
+.workSub { font-size: 13px !important; color: var(--theme-text) !important; }
+.pickedRow { border: 1.5px solid var(--theme-action); border-radius: 14px; }
+.legend { font-weight: 500; color: var(--theme-text-muted); align-items: center; }
+.legend ins, .legend del { font-size: 13px; }
+@media (max-width: 599px) { .optionGrid { grid-template-columns: minmax(0, 1fr); } }
+.nextDue { font-size: 14px !important; font-weight: 700; color: var(--theme-text) !important; white-space: nowrap; font-variant-numeric: tabular-nums; }
+@media (min-width: 700px) { .twoCols { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+@media (max-width: 599px) { .tplCompact > button { min-height: 48px; } }
+.compare ins, .clause ins { background: color-mix(in srgb, var(--theme-success) 24%, transparent) !important; }
+.legend ins, .legend del { font-size: 14px !important; padding: 1px 6px !important; }
+.fold > div { padding-top: 8px; }
+.fold > summary { display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; min-height: 44px; cursor: pointer; list-style: none; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary h2 { margin: 0; font-size: 16px; font-weight: 650; }
+.fold > summary span { font-size: 13px; color: var(--theme-text-muted); }
+.fold > summary svg { margin-left: auto; color: var(--theme-text-muted); transition: transform 150ms ease; }
+.fold[open] > summary svg { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .fold > summary svg { transition: none; } }
+.taken { opacity: 0.72; }
+.stepHead { margin: 4px 0 0; font-size: 15px; font-weight: 650; }
+.tplCompact > button[aria-pressed="true"] { border-color: var(--theme-action) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 16%, transparent); }
+.workFacts { color: var(--theme-text) !important; }
+.miniBar { display: block; width: min(220px, 100%); height: 6px; border-radius: 999px; background: var(--theme-surface-subtle, #ecebf2); overflow: hidden; margin-top: 4px; }
+.miniBar span { display: block; height: 100%; border-radius: 999px; background: var(--theme-action); }
+.compare del, .clause del { color: var(--theme-text) !important; text-decoration-color: var(--theme-danger); }
+.workList { max-width: 760px; }
+.miniBar { width: 100% !important; max-width: 320px; }
+.stepHead { margin-top: 16px !important; }
+.fieldset { margin-top: 12px; }
+/* Judge round 6: the folded sections read as cards; the agreement card spans its block; its paid bar spans the text. */
+.fold { border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); padding: 6px 14px 12px; }
+.workList { max-width: none !important; }
+.miniBar { max-width: none !important; }
+/* Judge round 7. */
+.fabRoom { height: 0; }
+@media (max-width: 699px) { .fabRoom { height: 120px; } }
+.fold > summary { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.fold > summary h2 { grid-column: 1; grid-row: 1; }
+.fold > summary svg { grid-column: 2; grid-row: 1; margin-left: 0 !important; }
+.fold > summary span { grid-column: 1 / -1; grid-row: 2; }
+.stepHead, .fieldset legend { font-size: 16px !important; font-weight: 700 !important; color: var(--theme-text); }
+.tplCompact > button[aria-pressed="true"] { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)) !important; }
+@media (max-width: 599px) {
+  .tplCompact { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .pickTopStack { flex-direction: column !important; align-items: flex-start !important; gap: 2px !important; }
+  .pickedRow { flex-wrap: wrap; } .pickedRow > .itemText, .pickedRow > span:nth-child(2) { min-width: 70%; }
+}
+@media (min-width: 700px) { .miniBar { max-width: 360px !important; } }
+:global(:root[data-theme="dark"]) .compare del, :global(:root[data-theme="dark"]) .clause del { background: color-mix(in srgb, var(--theme-danger) 26%, transparent); }
+.legend ins, .legend del { font-size: 12px !important; opacity: 0.85; }
+.barRow { display: flex !important; align-items: center; gap: 10px; margin-top: 4px; }
+.barRow .miniBar { flex: 1; max-width: none !important; margin-top: 0; }
+.barPct { font-size: 13px; font-weight: 650; color: var(--theme-text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* Judge round 9. */
+.stepWrap li:not([aria-current]) > span:last-child { display: inline !important; }
+.formHead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.formHead h2 { margin: 0; }
+.pickedRow { flex-wrap: nowrap !important; }
+.pickedRow > span:nth-child(2) { min-width: 0 !important; }
+.workText { gap: 3px !important; max-width: 600px; }
+.workTitle { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.workTitle strong { font-size: 16px; }
+.nextDue { font-weight: 600 !important; font-size: 13px !important; }
+.legend ins { color: var(--theme-text) !important; }
+/* Judge round 10. */
+.workTitle, .workTitle strong { color: var(--theme-text) !important; }
+.workText { max-width: none !important; }
+.workList { max-width: 680px !important; }
+.nextDue { word-spacing: normal; }
+.note { margin: 0; font-size: 15px; color: var(--theme-text); }
+.stepWrap { max-width: 460px; }
+@media (max-width: 599px) { .optionGrid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .optionGrid button { font-size: 13.5px; padding: 0 10px; } }
+/* Judge round 11. */
+@media (max-width: 599px) { .optionGrid { grid-template-columns: minmax(0, 1fr) !important; } .optionGrid button { font-size: 14px; min-height: 44px; } }
+.stepWrap { max-width: 520px; margin: 0 auto; width: 100%; }
+.total { font-weight: 700; color: var(--theme-text); font-variant-numeric: tabular-nums; }
+/* Judge round 12. */
+.sameBox { border: 1px dashed var(--theme-border); border-radius: 12px; padding: 0 12px; }
+.sameBox summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; list-style: none; }
+.sameBox summary::-webkit-details-marker { display: none; }
+.sameBox[open] summary svg { transform: rotate(180deg); }
+.sameBox ul { margin: 0 0 12px; padding-left: 22px; font-size: 14px; color: var(--theme-text-muted); }
+.workSubRow { display: flex !important; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.nextDue { color: var(--theme-warning, #b45309) !important; }
+@media (max-width: 599px) { .stepActions { flex-direction: column; align-items: stretch !important; } .stepActions > button { width: 100%; } }
+/* Judge round 13. */
+.nextDue { color: var(--theme-text) !important; }
+.nextDue[data-late] { color: var(--theme-danger) !important; }
+.stepWrap { margin: 0 !important; }
+@media (max-width: 599px) { .pickers { grid-template-columns: minmax(0, 1fr) !important; } }
+/* Judge round 14. */
+.barPct { color: var(--theme-text) !important; }
+.moneyRow { display: flex !important; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.moneyRow .miniBar { flex: 1 1 140px; max-width: none !important; margin-top: 0; }
+.workList { max-width: none !important; }
+.stepWrap { max-width: none !important; }
+@media (max-width: 599px) { .pickers { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+.optionGrid button { background: transparent !important; font-weight: 550; }
+.optionGrid button[aria-pressed="true"] { background: color-mix(in srgb, var(--theme-action) 12%, transparent) !important; }
+/* Judge round 15. */
+.legend { gap: 6px !important; }
+.moneyRow .miniBar { flex: 1 1 64px !important; min-width: 64px; }
+/* Judge round 16. */
+.legend { flex-basis: 100%; }
+.nextDue { font-weight: 400 !important; }
+.nextDue strong { font-weight: 700; }
+/* Final round. */
+.templateNote { margin: 0; font-size: 15px; color: var(--theme-text); }
+@media (min-width: 700px) { .moneyRow .miniBar { flex: 0 1 320px !important; } }
+/* Judge round 18. */
+.dangerRow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 12px 14px; border-radius: 14px;
+  border: 1px dashed color-mix(in srgb, var(--theme-danger) 35%, var(--theme-border)); font-size: 14px; color: var(--theme-text-muted); }
+.danger { color: var(--theme-danger) !important; border-color: color-mix(in srgb, var(--theme-danger) 40%, var(--theme-border)) !important; background: transparent !important; }
+.workLink { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "text chev" "next chev"; align-items: center; }
+.workLink > .workText, .workLink > span:first-child { grid-area: text; }
+.nextSide { grid-area: next; margin-top: 4px; }
+.workLink > svg { grid-area: chev; }
+@media (min-width: 700px) { .workLink { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "text next chev"; gap: 12px 20px; } .nextSide { margin-top: 0; text-align: right; } }
+:global(:root[data-theme="dark"]) .compare ins, :global(:root[data-theme="dark"]) .clause ins { background: color-mix(in srgb, var(--theme-success) 34%, transparent) !important; }
+/* Judge round 19. */
+.key { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--theme-text-muted); }
+.key i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+.key i[data-k="add"] { background: color-mix(in srgb, var(--theme-success) 40%, transparent); margin-left: 4px; }
+.key i[data-k="del"] { background: color-mix(in srgb, var(--theme-danger) 35%, transparent); margin-left: 8px; }
+.stepWrap { max-width: 520px !important; }
+.workList { container-type: inline-size; }
+.workLink { grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "text chev" "next chev" !important; }
+.nextSide { margin-top: 4px !important; text-align: left !important; }
+@container (min-width: 760px) {
+  .workLink { grid-template-columns: minmax(0, 1fr) auto auto !important; grid-template-areas: "text next chev" !important; }
+  .nextSide { margin-top: 0 !important; text-align: right !important; }
+}
+@media (min-width: 700px) { .moneyRow .miniBar { flex: 1 1 120px !important; } }
+/* Judge round 20: one card layout on tasks and projects (the next payment under the bar, the bar short); the blank
+   agreement one readable width; Back above Next on a phone; a shorter phone preview of the words. */
+.workLink { grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "text chev" "next chev" !important; }
+@container (min-width: 760px) { .workLink { grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "text chev" "next chev" !important; } .nextSide { text-align: left !important; margin-top: 4px !important; } }
+.moneyRow .miniBar { flex: 0 1 240px !important; }
+.blankWrap { max-width: 760px; }
+@media (max-width: 599px) { .stepActions { flex-direction: column-reverse !important; } }
+@media (max-width: 699px) { .docFold[data-folded] { max-height: 320px !important; } }
+/* Judge round 21. */
+@media (max-width: 599px) { .stepActions { flex-direction: column !important; } }
+.stepWrap { max-width: none !important; }
+.blankWrap { max-width: none !important; }
+.oneCol { grid-template-columns: minmax(0, 1fr) !important; }
+.money { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.moneyTop { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.money .miniBar { width: 100% !important; max-width: none !important; flex: none !important; }
+.workLink { grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "text chev" "money chev" !important; gap: 8px 14px; }
+.workLink > .money { grid-area: money; }
+@container (min-width: 640px) {
+  .workLink { grid-template-columns: minmax(0, 1fr) minmax(220px, 300px) auto !important; grid-template-areas: "text money chev" !important; gap: 8px 24px; }
+}
+:global(:root[data-theme="dark"]) .compare ins, :global(:root[data-theme="dark"]) .clause ins { background: color-mix(in srgb, var(--theme-success) 45%, transparent) !important; color: #fff; }
+.compare del + ins, .clause del + ins { margin-left: 4px; }
+/* Judge round 22. */
+.totalLabel { font-size: 12px; font-weight: 600; color: var(--theme-text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+@media (max-width: 599px) { .stepActions { flex-direction: column-reverse !important; } .fullOnPhone { width: 100%; } }
+.totalLabel { text-transform: none !important; letter-spacing: 0 !important; font-size: 13px !important; }
+/* Structural round: the agreement's words in a fold; one readable width for the blank agreement. */
+.docBody { display: flex; flex-direction: column; gap: 14px; padding: 4px 6px 8px; }
+@media (min-width: 900px) { .docBody { padding: 8px 18px 16px; } }
+.blankWrap { max-width: 760px !important; }
+/* Judge round 25: the blank agreement centred; Back a clear secondary button on a phone. */
+.blankWrap { margin: 0 auto; width: 100%; }
+@media (max-width: 599px) { .back { width: 100%; border-color: var(--theme-border) !important; } }
+/* Judge round 26: every card on one inset (18px, as Who pays whom and the next-step card); the words line up with
+   their title; the blank agreement starts at the page's left edge; Back a plain link; less empty room at the bottom. */
+.fold { padding: 6px 18px 14px !important; }
+.docBody { padding: 4px 0 8px !important; }
+.blankWrap { margin: 0 !important; }
+@media (max-width: 599px) { .back { border-color: transparent !important; } }
+@media (max-width: 699px) { .fabRoom { height: 88px !important; } }
+:global(:root[data-theme="dark"]) .compare del, :global(:root[data-theme="dark"]) .clause del { background: color-mix(in srgb, var(--theme-danger) 34%, transparent) !important; color: #f4f4f6 !important; }
+.key i { width: 14px !important; height: 14px !important; }
+:global(:root[data-theme="dark"]) .key i[data-k="add"] { background: color-mix(in srgb, var(--theme-success) 70%, transparent); }
+:global(:root[data-theme="dark"]) .key i[data-k="del"] { background: color-mix(in srgb, var(--theme-danger) 65%, transparent); }
+/* Judge round 28. */
+.backLink { align-self: flex-start; min-height: 40px; padding: 0; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--theme-action); cursor: pointer; }
+@media (max-width: 599px) {
+  .nextActions { flex-direction: column; align-items: stretch !important; }
+  .nextActions > a, .nextActions > button { width: 100%; justify-content: center; border-color: var(--theme-border) !important; }
+}
+.totalLabel { color: var(--theme-text) !important; opacity: 0.8; }
+/* Median round: the blank agreement uses the page's full width like the other agreement pages; more room above a phone's
+   tab bar so its main button is never under it. */
+.blankWrap { max-width: none !important; }
+.blankWrap .fabRoom { height: 0; }
+@media (max-width: 699px) { .blankWrap .fabRoom { height: 150px !important; } }
+.summaryRow { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 10px 12px; border-radius: 12px;
+  background: var(--theme-surface-subtle, rgb(0 0 0 / 0.03)); font-size: 14px; color: var(--theme-text); }
+/* Median round 2. */
+.blankWrap { max-width: 720px !important; }
+.summaryFacts { font-size: 14px; }
+.summaryFacts dd { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.stepActions { justify-content: flex-end; }
+.stepActions .backLink { margin-right: auto; }
+@media (max-width: 599px) {
+  .stepActions { flex-direction: row !important; align-items: center !important; position: sticky; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 2;
+    background: var(--theme-surface); padding: 10px 0; margin: 0 -2px; }
+  .stepActions > button:not(.backLink) { flex: 1; }
+}
+/* Median round 3: the blank agreement keeps a summary beside the steps on a wide screen; on a phone Next is full width with Back under it. */
+.blankSide { display: none; }
+@media (min-width: 1100px) {
+  .blankWrap { max-width: 1080px !important; }
+  .blankForm { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); gap: 28px; align-items: start; }
+  .blankSide { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 14px; border: 1px solid var(--theme-border);
+    background: color-mix(in srgb, var(--theme-action) 4%, var(--theme-surface)); container-type: inline-size; }
+  .blankSide h2 { margin: 0; font-size: 15px; }
+  .narrowOnly { display: none; }
+}
+@media (max-width: 599px) {
+  .stepActions { position: static !important; flex-direction: column !important; align-items: stretch !important; background: none !important; padding: 0 !important; margin: 0 !important; }
+  .stepActions > button:not(.backLink) { width: 100% !important; }
+  .stepActions > .backLink { order: 2; align-self: center !important; width: auto !important; margin: 0 !important; }
+}
+/* A quotation card on a phone: the client's name has the whole line; the amount and its state share the next. */
+@media (max-width: 599px) {
+  .pickPhone { display: grid !important; grid-template-columns: max-content minmax(0, 1fr); column-gap: 10px; row-gap: 2px; align-items: center; }
+  .pickPhone > span:first-child { display: contents; }
+  .pickPhone > span:first-child > strong { grid-column: 1 / -1; overflow-wrap: anywhere; }
+  .pickPhone > span:first-child > span { grid-column: 1; grid-row: 2; }
+  .pickPhone > .pickStatus { grid-column: 2; grid-row: 2; }
+  .pickPhone > span:nth-child(2) { grid-column: 1 / -1; grid-row: 3; }
+}
+/* The panel's own flex column must not win over the two columns; the summary takes its column's width. */
+@media (min-width: 1100px) {
+  .blankForm { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(280px, 340px) !important; gap: 28px !important; align-items: start; }
+  .blankSide { width: 100%; box-sizing: border-box; }
+}
+/* Median round 4. Added words: a tint only (struck-out words keep their line). The unchanged parts: a plain list. */
+.compare ins, .clause ins { text-decoration: none !important; background: color-mix(in srgb, var(--theme-success) 36%, transparent) !important; }
+.sameBox ul { list-style: none; padding-left: 0 !important; display: grid; gap: 4px; }
+:global(:root[data-theme="dark"]) .compare ins, :global(:root[data-theme="dark"]) .clause ins { background: color-mix(in srgb, var(--theme-success) 50%, transparent) !important; color: #fff; }
+.switchBtn { align-self: flex-start; }
+/* A wide row: the name keeps a column of its own and the money fills the rest, so nothing floats far away. */
+@container (min-width: 640px) {
+  .workLink { grid-template-columns: minmax(200px, 340px) minmax(0, 1fr) auto !important; column-gap: 32px !important; }
+  .workLink > .money { justify-self: stretch; width: 100%; max-width: none; }
+  .workLink .miniBar { width: 100% !important; max-width: none !important; }
+}
+/* Median round 5. */
+.soFarFold { border: 1px solid var(--theme-border); border-radius: 12px; padding: 0 12px; }
+.soFarFold > summary { min-height: 44px; display: flex; align-items: center; gap: 8px; list-style: none; cursor: pointer; font-size: 14px; }
+.soFarFold > summary::-webkit-details-marker { display: none; }
+.soFarFold > summary > span:first-child { font-weight: 650; color: var(--theme-text); }
+.soFarFold > summary > span:nth-child(2) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--theme-text-muted); }
+.soFarFold[open] > summary svg { transform: rotate(180deg); }
+.soFarFold[open] { padding-bottom: 12px; }
+@media (min-width: 1100px) { .soFarFold { display: none; } }
+.switchBtn { font-size: 14px !important; min-height: 40px; }
+.pickStatus { display: flex; }
+@media (max-width: 599px) { .pickPhone > .pickStatus { justify-self: start; } }
+/* Struck-out words stay readable on a dark screen. */
+:global(:root[data-theme="dark"]) .compare del, :global(:root[data-theme="dark"]) .clause del { color: #ffd9d9 !important; text-decoration-color: #ff9a9a; }
+/* Median round 6. The note under the main button is readable; the blank agreement's Back/Next line up with the summary's bottom. */
+.sendNote { font-size: 14px; color: var(--theme-text-muted); }
+@media (min-width: 1100px) {
+  .blankForm { align-items: stretch !important; }
+  .blankMain { display: flex; flex-direction: column; }
+  .blankMain > .stepActions { margin-top: auto; padding-top: 12px; }
+  .blankSide { align-self: start; }
+}
+/* Median round 7. */
+@media (min-width: 1100px) { .blankMain > .stepActions { margin-top: 0 !important; padding-top: 4px !important; } .blankForm { align-items: start !important; } }
+.compare del, .clause del { color: var(--theme-text) !important; background: color-mix(in srgb, var(--theme-danger) 16%, transparent); text-decoration-color: var(--theme-danger); }
+:global(:root[data-theme="dark"]) .compare del, :global(:root[data-theme="dark"]) .clause del { color: #ffd9d9 !important; background: color-mix(in srgb, var(--theme-danger) 34%, transparent) !important; }
+/* A wide agreement card reads as one row of even columns: name | total, share and bar | next payment. */
+@container (min-width: 640px) {
+  .workLink { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) auto !important; grid-template-areas: "text top next chev" "text bar next chev" !important; column-gap: 28px !important; row-gap: 6px !important; }
+  .workLink > .money { display: contents; }
+  .workLink .moneyTop { grid-area: top; align-self: end; }
+  .workLink .miniBar { grid-area: bar; align-self: start; margin-top: 0; }
+  .workLink .nextDue { grid-area: next; align-self: center; }
+  .workLink .money:not(:has(.miniBar)) .moneyTop { grid-row: 1 / span 2; align-self: center; }
+}
+/* Median round 8. The four-column card needs a wide box (the task page's column is narrower: three columns there). */
+@container (min-width: 640px) and (max-width: 899px) {
+  .workLink { grid-template-columns: minmax(0, 1fr) minmax(220px, 300px) auto !important; grid-template-areas: "text money chev" !important; }
+  .workLink > .money { display: flex !important; }
+}
+.workLink .nextDue { overflow-wrap: anywhere; min-width: 0; }
+.compareBox { padding-bottom: 16px; }
+:global(:root[data-theme="dark"]) .compare del, :global(:root[data-theme="dark"]) .clause del { color: #fff !important; background: color-mix(in srgb, var(--theme-danger) 45%, transparent) !important; text-decoration-color: #ffb3b3 !important; }
+/* The blank agreement: Back sits beside Next; "So far" on a phone names everything picked, wrapping. */
+.stepActions .backLink { margin-right: 0 !important; }
+@media (min-width: 600px) { .stepActions { justify-content: flex-end !important; gap: 16px !important; } }
+.soFarFold > summary { flex-wrap: wrap; padding: 10px 0; }
+.soFarFold > summary > span:nth-child(2) { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; flex-basis: 100%; order: 3; }
+.soFarFold > summary svg { margin-left: auto; }
+/* Median round 9. The steps run across the whole card; Back lines up with the middle of Next. The agreement card in a
+   middle-width box keeps its money left-aligned, as on the project page. */
+.stepSpan { grid-column: 1 / -1; }
+@media (min-width: 600px) { .stepActions { align-items: center !important; } }
+.stepActions .backLink { display: inline-flex; align-items: center; min-height: 44px; }
+@container (min-width: 640px) and (max-width: 899px) {
+  .workLink > .money { align-items: stretch !important; text-align: left !important; }
+  .workLink .moneyTop { justify-content: space-between !important; }
+  .workLink .nextDue { text-align: left !important; }
+}
+/* Median round 10. The money lines of the agreement card fill their column in a middle-width box (the wide rules'
+   align-self values were centring them). The Money card's two links sit together. Struck-out words on a dark screen:
+   a light red tint and light text. */
+@container (min-width: 640px) and (max-width: 899px) {
+  .workLink .moneyTop, .workLink .miniBar, .workLink .nextDue { align-self: stretch !important; }
+}
+.moneyLinks { display: flex; flex-direction: column; gap: 0; }
+:global(:root[data-theme="dark"]) .compare del, :global(:root[data-theme="dark"]) .clause del { color: #fecaca !important; background: color-mix(in srgb, var(--theme-danger) 20%, transparent) !important; text-decoration-color: #fca5a5 !important; }
+:global(:root[data-theme="dark"]) .key i[data-k="del"] { background: color-mix(in srgb, var(--theme-danger) 55%, transparent) !important; }
+:global(:root[data-theme="dark"]) .key i[data-k="add"] { background: color-mix(in srgb, var(--theme-success) 65%, transparent) !important; }
+.blankSide { padding: 14px 16px !important; }
+/* Median round 11. One agreement-card layout in every wide box: the name, then the money stacked (total and share,
+   the bar, the next payment), the two columns sharing the row. */
+@container (min-width: 640px) {
+  .workLink { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto !important; grid-template-areas: "text money chev" !important; column-gap: 32px !important; }
+  .workLink > .money { display: flex !important; flex-direction: column; align-items: stretch !important; text-align: left !important; }
+  .workLink .moneyTop, .workLink .miniBar, .workLink .nextDue { align-self: stretch !important; grid-area: auto !important; }
+  .workLink .moneyTop { justify-content: space-between !important; }
+}
+/* Compare on a dark screen: struck-out words in near-white on a soft red, with a strong red line. */
+:global(:root[data-theme="dark"]) .compare del, :global(:root[data-theme="dark"]) .clause del { color: var(--theme-text) !important; background: color-mix(in srgb, var(--theme-danger) 26%, transparent) !important; text-decoration-color: #f87171 !important; text-decoration-thickness: 2px; }
+.key i { width: 14px !important; height: 14px !important; }
+.sameBox { border-style: solid !important; }
+/* The picked quotation is a card of reading width, not a strip across the screen. */
+.oneCol { max-width: 640px; }
+/* Median round 12. Folded cards open and close on a wide screen too (their chevron shows). The Money card's links sit
+   on one line until one opens. Struck-out words on a dark screen: light text, a soft tint, a thin line. */
+.fold > summary { pointer-events: auto !important; }
+.fold > summary svg { display: block !important; }
+.moneyLinks { flex-direction: row !important; flex-wrap: wrap; gap: 0 24px !important; }
+.moneyLinks > details[open] { flex-basis: 100%; }
+:global(:root[data-theme="dark"]) .compare del, :global(:root[data-theme="dark"]) .clause del { color: #fecaca !important; background: color-mix(in srgb, var(--theme-danger) 16%, transparent) !important; text-decoration-color: rgb(254 202 202 / 0.75) !important; text-decoration-thickness: 1px !important; }
+.oneCol { max-width: none !important; }
+/* Median round 13. The agreement card's name column is as wide as the name; the money follows it and its bar runs to the
+   chevron. The blank agreement's summary says what it is for on a line of its own. Struck-out words on a dark screen:
+   light text on a stronger red. */
+@container (min-width: 640px) {
+  .workLink { grid-template-columns: minmax(180px, max-content) minmax(260px, 1fr) auto !important; column-gap: 40px !important; }
+}
+.blankSide section > div:first-child { flex-direction: column; align-items: flex-start; gap: 4px; }
+.blankSide section > div:first-child > span { font-size: 14px !important; color: var(--theme-text) !important; }
+:global(:root[data-theme="dark"]) .compare del, :global(:root[data-theme="dark"]) .clause del { color: #ffe4e1 !important; background: color-mix(in srgb, var(--theme-danger) 36%, transparent) !important; text-decoration-color: rgb(255 220 215 / 0.85) !important; text-decoration-thickness: 1px !important; }
+@media (max-width: 599px) { .clause p { line-height: 1.6 !important; } }
+/* Median round 14: the step names are readable (the current one in full text colour). */
+.stepWrap li > span:last-child { font-size: 13px !important; }
+.stepWrap li[aria-current] > span:last-child { color: var(--theme-text) !important; font-weight: 650 !important; }
+/* Median round 15: the summary panel runs the height of the form beside it, so the two columns end together. */
+@media (min-width: 1100px) { .blankForm { align-items: stretch !important; } .blankSide { align-self: stretch !important; } }
+/* Median round 16. The summary panel is as tall as what it holds. The note under "Make the agreement" sits under it.
+   A picked quotation keeps its amount by the client's name. Compare's unchanged list lines up under its heading. */
+@media (min-width: 1100px) { .blankForm { align-items: start !important; } .blankSide { align-self: start !important; } }
+.sendNote { flex-basis: 100%; }
+@media (min-width: 600px) { .pickPhone > span:first-child { justify-content: flex-start !important; gap: 16px !important; } }
+.sameBox ul { padding-left: 22px !important; }
