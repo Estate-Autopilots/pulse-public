@@ -1,0 +1,324 @@
+openapi: 3.1.0
+info:
+  title: Pulse Flow (processes, runs, steps, records)
+  version: 1.0.0
+  description: >-
+    FLOW-A (21 Oct 2026). The browser's API for Flow, as the signed-in person: the browser calls /api/v1/flow/…, the web
+    proxy forwards it to the API's /v1/flow/… with the person's identity. It is not a bearer-key operation of the v1
+    registry (openapi/v1.yaml). Only GET and POST are used; every write is a POST. Errors are {"error": "<a sentence>"}.
+    Shapes in full: services/api/src/flow/types.ts; contract with examples: ~/ea-research/flow/CONTRACT.md; modules:
+    services/api/src/flow/README.md. Leadership and admins design; leadership, HR, pod heads and a project's managers
+    start runs; a run's people act on its steps; every active staff member reads live processes and every run.
+servers: [{ url: /api/v1/flow }]
+paths:
+  /modules:
+    get:
+      summary: The module manifests, the kinds, categories, record types, step states, alert kinds and Pip actions
+      responses: { '200': { description: Registry, content: { application/json: { schema: { $ref: '#/components/schemas/Registry' } } } } }
+  /record-types:
+    get: { summary: Record types (built-in and the company's own), responses: { '200': { description: Record types } } }
+    post:
+      summary: Leadership adds or changes one of the company's own record types
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/RecordType' } } } }
+      responses: { '200': { description: The record type as kept }, '400': { description: Invalid }, '403': { description: Leadership only } }
+  /templates:
+    get: { summary: 'Templates a process starts from (ea_creative, solar_install, blank)', responses: { '200': { description: Templates } } }
+  /blocks:
+    get: { summary: 'FLOW-D: the primitives (Start … End, each with its kinds) and the company''s own blocks', responses: { '200': { description: '{ primitives: Primitive[], blocks: CompanyBlock[] }' } } }
+    post:
+      summary: 'FLOW-D: leadership saves a step as a company block ({ name, summary?, key?, step }); the same key replaces it'
+      responses: { '200': { description: '{ block: CompanyBlock }' }, '403': { description: Leadership only } }
+  /blocks/{id}:
+    post:
+      summary: 'FLOW-D: change a company block ({ name?, summary?, step? }) or remove it ({ archive: true })'
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { '200': { description: '{ block } or { ok }' }, '404': { description: Not found } }
+  /describe:
+    post:
+      summary: 'FLOW-D "Describe it": { text, title? } → Pip''s draft of the steps as primitives, who and when ({ definition, problems, notes, steps }); nothing is saved'
+      responses: { '200': { description: Draft }, '400': { description: Nothing to read }, '403': { description: Leadership only } }
+  /processes:
+    get:
+      summary: The process library, with older SOPs, workflows and boards read through it (read-only, ids sop:/workflow:/board:<uuid>)
+      parameters: [{ name: status, in: query, schema: { type: string, enum: [archived] } }]
+      responses: { '200': { description: '{ processes: ProcessSummary[], canEdit, canStart, templates }' } }
+    post:
+      summary: Leadership makes a process from a template, from an SOP/workflow/board, or blank
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                template: { type: string, enum: [ea_creative, solar_install, blank] }
+                from: { type: string, pattern: '^(sop|workflow|board):[0-9a-f-]{36}$' }
+                name: { type: string, maxLength: 200 }
+                summary: { type: string, maxLength: 2000 }
+                writeup: { type: array, items: { $ref: '#/components/schemas/WriteupSection' } }
+                definition: { $ref: '#/components/schemas/FlowDef' }
+      responses: { '200': { description: '{ id }' }, '403': { description: Leadership only } }
+  /processes/{id}:
+    parameters: [{ $ref: '#/components/parameters/ProcessId' }]
+    get: { summary: One process (ProcessDetail), responses: { '200': { description: ProcessDetail }, '404': { description: Not found } } }
+    post:
+      summary: Save (name, summary, write-up, definition). On an SOP/workflow/board id, makes a Flow process from it and returns that
+      requestBody: { content: { application/json: { schema: { type: object, properties: { name: { type: string }, summary: { type: string }, writeup: { type: array }, definition: { $ref: '#/components/schemas/FlowDef' } } } } } }
+      responses: { '200': { description: ProcessDetail }, '409': { description: Archived } }
+  /processes/{id}/publish:
+    parameters: [{ $ref: '#/components/parameters/ProcessId' }]
+    post: { summary: Publish a version (refused while the definition has errors), responses: { '200': { description: '{ version, problems }' }, '400': { description: The first error in words } } }
+  /processes/{id}/status:
+    parameters: [{ $ref: '#/components/parameters/ProcessId' }]
+    post:
+      summary: Live, paused, draft or archived
+      requestBody: { content: { application/json: { schema: { type: object, required: [status], properties: { status: { type: string, enum: [live, paused, draft, archived] } } } } } }
+      responses: { '200': { description: '{ status }' } }
+  /processes/{id}/runs:
+    parameters: [{ $ref: '#/components/parameters/ProcessId' }]
+    post:
+      summary: Start a run (live on the published version; demo on synthetic names, no task or notification)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, maxLength: 300 }
+                projectId: { type: string, format: uuid }
+                clientId: { type: string, format: uuid }
+                fields: { type: object, description: The process's variant and run fields }
+                people: { type: object, description: 'Role key → person id (demo: { name })' }
+                values: { type: array, items: { type: object, properties: { step: { type: string }, port: { type: string }, value: {} } } }
+                mode: { type: string, enum: [live, demo] }
+      responses: { '200': { description: '{ id }' }, '400': { description: Not live, or a field missing }, '403': { description: Not allowed to start runs } }
+  /check:
+    post:
+      summary: The builder's live check (problems with converter fixes, people by load, suggestions)
+      requestBody: { content: { application/json: { schema: { type: object, properties: { definition: { $ref: '#/components/schemas/FlowDef' }, stepId: { type: string } } } } } }
+      responses: { '200': { description: '{ definition, compiled, problems, people, suggestions }' } }
+  /runs:
+    get:
+      summary: Runs with where each stands
+      parameters:
+        - { name: processId, in: query, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [running, done, cancelled] } }
+        - { name: mode, in: query, schema: { type: string, enum: [live, demo] } }
+        - { name: mine, in: query, schema: { type: string, enum: ['1'] } }
+      responses: { '200': { description: '{ runs: RunSummary[], counts }' } }
+  /runs/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get: { summary: 'One run: steps with their state and what they wait for, values, intake, alerts, Pip''s line', responses: { '200': { description: RunDetail } } }
+  /runs/{id}/later:
+    post:
+      summary: 'FLOW-D Try it: pretend { days } pass on a try or demo run (its clock moves back; the tick runs); never a live run'
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { '200': { description: RunDetail }, '400': { description: Not a try or demo run } }
+  /runs/{id}/discard:
+    post:
+      summary: 'FLOW-D Try it: throw a try run away with everything it made'
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { '200': { description: '{ ok }' }, '400': { description: Not a try run } }
+  /runs/{id}/cancel:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: Stop a run (its open Work tasks are cancelled), responses: { '200': { description: '{ ok }' } } }
+  /runs/{id}/people:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'Name someone for a role ({ role, personId })', responses: { '200': { description: RunDetail } } }
+  /runs/{id}/fields:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'Change run fields ({ fields }); the clock and due dates follow', responses: { '200': { description: RunDetail } } }
+  /my-steps:
+    get: { summary: 'My steps: open for me, coming up (my role, waiting for data), asked of me', responses: { '200': { description: '{ steps, upcoming, asked }' } } }
+  /steps/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get: { summary: 'One step with its run, module, record, SOP part and values', responses: { '200': { description: Step detail } } }
+  /steps/{id}/open:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: Make the step's record the first time, responses: { '200': { description: Step detail } } }
+  /steps/{id}/move:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'In progress, sent for review (a round), confirmed', responses: { '200': { description: Step detail }, '400': { description: Not a move from here } } }
+  /steps/{id}/finish:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'Done: its Makes values land and whatever waited for them opens ({ outputs? })', responses: { '200': { description: RunDetail }, '409': { description: Waiting or closed } } }
+  /steps/{id}/verdict:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'An answer with who and when ({ answer, note? })', responses: { '200': { description: RunDetail } } }
+  /steps/{id}/input:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'What a step needs, typed in or uploaded ({ port, value })', responses: { '200': { description: RunDetail } } }
+  /steps/{id}/block:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'Blocked: data ({ blocked, note })', responses: { '200': { description: RunDetail } } }
+  /steps/{id}/check:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'Tick a checklist line ({ index, done })', responses: { '200': { description: '{ checks }' } } }
+  /steps/{id}/skip:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: A step marked "only when needed" is not needed this time, responses: { '200': { description: RunDetail } } }
+  /steps/{id}/nudge:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: Nudge whoever owes a waiting step its data (inside Pulse), responses: { '200': { description: '{ nudged, sent, demo }' } } }
+  /steps/{id}/actions/{action}:
+    parameters: [{ $ref: '#/components/parameters/Id' }, { name: action, in: path, required: true, schema: { type: string } }]
+    post: { summary: "The module's actions (each manifest lists its actions and their bodies)", responses: { '200': { description: Depends on the action }, '404': { description: The module has no such action } } }
+  /steps/{id}/pip:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      summary: Pip on a step (grounded on its SOP section and the run's records; no language model)
+      requestBody: { content: { application/json: { schema: { type: object, properties: { action: { type: string, enum: [draft, critique, summarise, extract, check, suggest] }, text: { type: string } } } } } }
+      responses: { '200': { description: '{ about, action, result, assistant }' } }
+  /task/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get: { summary: The Flow step a Work task belongs to, responses: { '200': { description: '{ step | null }' } } }
+  /records:
+    get:
+      summary: Records
+      parameters:
+        - { name: type, in: query, schema: { type: string } }
+        - { name: runId, in: query, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string } }
+        - { name: q, in: query, schema: { type: string } }
+        - { name: library, in: query, schema: { type: string, enum: ['1'] } }
+      responses: { '200': { description: '{ records: FlowRecord[] }' } }
+    post:
+      summary: 'A record ({ type, runId?, stepKey?, title?, data, status?, code?, source? })'
+      responses: { '200': { description: '{ record }' }, '400': { description: Required fields missing } }
+  /records/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get: { summary: 'A record with its links, versions and comments', responses: { '200': { description: '{ record, type, versions, comments }' } } }
+    post: { summary: 'Change its data (merged), title; the old state is kept as a version', responses: { '200': { description: '{ record }' }, '409': { description: Frozen } } }
+  /records/{id}/status:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: Move it along its status machine, responses: { '200': { description: '{ record }' } } }
+  /records/{id}/links:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'Link or unlink ({ toId, kind, remove? })', responses: { '200': { description: '{ ok }' } } }
+  /records/{id}/comments:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: 'A comment or a change with owner and date ({ body, section?, anchor?, kind?, ownerId?, dueOn? })', responses: { '200': { description: '{ id }' } } }
+  /records/{id}/freeze:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: Freeze, responses: { '200': { description: '{ record }' } } }
+  /records/{id}/archive:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: Archive, responses: { '200': { description: '{ ok }' } } }
+  /records/import:
+    post: { summary: 'Leadership adds library rows ({ type, records[] })', responses: { '200': { description: '{ created }' } } }
+  /comments/{id}/resolve:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post: { summary: Resolve (or reopen) a comment, responses: { '200': { description: '{ ok }' } } }
+  /scorecard:
+    get:
+      summary: The scorecard (on time, first-time confirmation, revisions, verdicts), per person
+      parameters:
+        - { name: processId, in: query, schema: { type: string, format: uuid } }
+        - { name: personId, in: query, schema: { type: string, format: uuid } }
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+      responses: { '200': { description: '{ from, to, processes }' } }
+  /capacity:
+    get: { summary: Open focused hours per person, by variant, against a weekly budget, responses: { '200': { description: '{ weekHours, people }' } } }
+  /sessions/agenda:
+    get:
+      summary: A session's agenda across every running run
+      parameters: [{ name: kind, in: query, schema: { type: string, enum: [rough_cut, live, open] } }]
+      responses: { '200': { description: '{ agenda }' } }
+components:
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    ProcessId: { name: id, in: path, required: true, schema: { type: string, pattern: '^((sop|workflow|board):)?[0-9a-f-]{36}$' } }
+  schemas:
+    Kind: { type: string, enum: [contact, talk, doc, media, answers, money, verdict, slot, list, any] }
+    Port:
+      type: object
+      required: [key, label, kind]
+      properties: { key: { type: string }, label: { type: string }, kind: { $ref: '#/components/schemas/Kind' }, required: { type: boolean }, many: { type: boolean }, recordType: { type: string } }
+    Registry:
+      type: object
+      properties:
+        modules: { type: array, items: { $ref: '#/components/schemas/ModuleManifest' } }
+        kinds: { type: array, items: { type: object, properties: { key: { $ref: '#/components/schemas/Kind' }, label: { type: string }, help: { type: string } } } }
+        categories: { type: array, items: { type: string } }
+        recordTypes: { type: array, items: { $ref: '#/components/schemas/RecordType' } }
+    ModuleManifest:
+      type: object
+      required: [key, version, name, icon, category, summary, needs, makes, surface, finish, settings, defaults, pip, engine, status]
+      properties:
+        key: { type: string }
+        version: { type: integer }
+        name: { type: string }
+        icon: { type: string, description: A lucide icon name }
+        category: { type: string, enum: [Start, People, Talk, Write, Media, Field, Money, Review, Flow, Apps, AI] }
+        summary: { type: string }
+        needs: { type: array, items: { $ref: '#/components/schemas/Port' } }
+        makes: { type: array, items: { $ref: '#/components/schemas/Port' } }
+        surface: { type: string, enum: [task, doc, meeting, media, form, money, review, board, none] }
+        finish: { type: string, enum: [person, auto, output, verdict] }
+        settings: { type: array, items: { type: object } }
+        defaults: { type: object }
+        pip: { type: array, items: { type: string, enum: [draft, critique, summarise, extract, check, suggest] } }
+        engine: { type: string, enum: [live, partial, stub] }
+        status: { type: string }
+        records: { type: array, items: { type: string } }
+        converter: { type: boolean }
+        legacy: { type: array, items: { type: string } }
+        actions: { type: array, items: { type: object, properties: { key: { type: string }, label: { type: string }, help: { type: string } } } }
+        link: { type: string }
+    RecordType:
+      type: object
+      required: [key, name, fields]
+      properties:
+        key: { type: string, pattern: '^[a-z][a-z0-9_]{1,39}$' }
+        name: { type: string }
+        plural: { type: string }
+        fields: { type: array, items: { type: object, required: [key, label, type], properties: { key: { type: string }, label: { type: string }, type: { type: string }, required: { type: boolean }, options: { type: array, items: { type: string } } } } }
+        statuses: { type: array, items: { type: object, required: [key, label, next], properties: { key: { type: string }, label: { type: string }, next: { type: array, items: { type: string } }, final: { type: boolean } } } }
+        initial: { type: string }
+        titleField: { type: string }
+    WriteupSection:
+      type: object
+      required: [key, title, body]
+      properties: { key: { type: string }, title: { type: string }, body: { type: string }, parent: { type: string }, source: { type: object } }
+    FlowDef:
+      type: object
+      description: services/api/src/flow/types.ts FlowDef (version 2)
+      properties:
+        version: { const: 2 }
+        fields: { type: array, items: { type: object } }
+        roles: { type: array, items: { type: object, properties: { key: { type: string }, label: { type: string } } } }
+        stages: { type: array, items: { type: object, properties: { key: { type: string }, label: { type: string } } } }
+        steps:
+          type: array
+          items:
+            type: object
+            required: [id, module, title, who]
+            properties:
+              id: { type: string, pattern: '^[A-Za-z0-9._-]{1,40}$' }
+              module: { type: string }
+              title: { type: string }
+              stage: { type: [string, 'null'] }
+              who: { type: object, properties: { by: { type: string, enum: [role, person, starter, project_owner, pool, domain] }, role: { type: string }, personId: { type: string } } }
+              settings: { type: object }
+              due: { type: [object, 'null'], properties: { from: { type: string }, days: {}, field: { type: string }, workdays: { type: boolean } } }
+              when: { type: array, items: { type: object } }
+              sop: { type: [object, 'null'] }
+              pos: { type: object, properties: { x: { type: number }, y: { type: number } } }
+              checklist: { type: array, items: { type: string } }
+              qualityTest: { type: array, items: { type: string } }
+              hours: {}
+              inputs: { type: array, items: { type: object } }
+        wires:
+          type: array
+          items:
+            type: object
+            required: [from, to]
+            properties:
+              from: { type: object, properties: { step: { type: string }, port: { type: string } } }
+              to: { type: object, properties: { step: { type: string }, port: { type: string } } }
+              notify: { type: array, items: { type: string } }
+              label: { type: string }
+        rules: { type: array, items: { type: object } }
+        scorecard: { type: array, items: { type: object } }
+        clock: { type: [object, 'null'] }
+        terms: { type: [object, 'null'] }

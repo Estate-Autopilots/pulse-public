@@ -1,0 +1,62 @@
+{
+ "id": "navy-gold",
+ "fonts_css": "https://fonts.googleapis.com/css2?family=Outfit:wght@400..900&family=Inter:wght@400..700&family=JetBrains+Mono:wght@400..700&display=block",
+ "font_display": "'Outfit', system-ui, sans-serif",
+ "font_body": "'Inter', system-ui, sans-serif",
+ "font_mono": "'JetBrains Mono', ui-monospace, monospace",
+ "motif": "roof",
+ "themes": {
+  "dark": {
+   "bg": "#021F2D",
+   "fg": "#E8E2DB",
+   "muted": "#A9B8C0",
+   "acc": "#FBC701",
+   "ok": "#7BD8A6",
+   "bad": "#FF9B8A",
+   "rule": "rgba(169,184,192,.22)",
+   "chip": "#FBC701",
+   "chipfg": "#021F2D",
+   "tile": "rgba(232,226,219,.07)",
+   "motif": "rgba(251,199,1,.14)"
+  },
+  "surface": {
+   "bg": "#0B3346",
+   "fg": "#E8E2DB",
+   "muted": "#B5C3CA",
+   "acc": "#FBC701",
+   "ok": "#7BD8A6",
+   "bad": "#FF9B8A",
+   "rule": "rgba(181,195,202,.22)",
+   "chip": "#FBC701",
+   "chipfg": "#021F2D",
+   "tile": "rgba(232,226,219,.08)",
+   "motif": "rgba(251,199,1,.14)"
+  },
+  "light": {
+   "bg": "#E8E2DB",
+   "fg": "#021F2D",
+   "muted": "#4F5B62",
+   "acc": "#7A5C00",
+   "ok": "#1D6B47",
+   "bad": "#A3341F",
+   "rule": "rgba(2,31,45,.14)",
+   "chip": "#021F2D",
+   "chipfg": "#E8E2DB",
+   "tile": "rgba(255,255,255,.55)",
+   "motif": "rgba(2,31,45,.08)"
+  },
+  "accent": {
+   "bg": "#FBC701",
+   "fg": "#021F2D",
+   "muted": "#3D3300",
+   "acc": "#021F2D",
+   "ok": "#021F2D",
+   "bad": "#021F2D",
+   "rule": "rgba(2,31,45,.2)",
+   "chip": "#021F2D",
+   "chipfg": "#FBC701",
+   "tile": "rgba(2,31,45,.08)",
+   "motif": "rgba(2,31,45,.10)"
+  }
+ }
+}

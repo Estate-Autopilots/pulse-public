@@ -1,0 +1,42 @@
+[project]
+name = "pulse-sdk"
+version = "0.1.0"
+description = "Pulse Event Core SDK: envelope, registry and validation, ids, collector contract and runtime, migrations"
+requires-python = ">=3.12"
+dependencies = [
+    "psycopg[binary]>=3.2",
+    "pyyaml>=6.0",
+    "jsonschema>=4.23",
+    "rfc3339-validator>=0.1.4",   # jsonschema enforces format: date-time only when this is installed
+    "cryptography>=44",
+    "pydantic>=2.8",
+    "zstandard>=0.23",
+]
+
+[project.scripts]
+pulse-migrate = "pulse_sdk.migrate:main"
+pulse-codegen = "pulse_sdk.codegen:main"
+pulse-admin = "pulse_sdk.admin:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.8"]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pulse_sdk"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pulse_sdk", "pulse_ingest", "pulse_workers"]
