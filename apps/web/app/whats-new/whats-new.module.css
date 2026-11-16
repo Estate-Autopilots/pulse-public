@@ -1,0 +1,77 @@
+/* RELEASE-COMMS: the releases on /whats-new, newest first; a share card beside the words on a wide screen, under them on a phone. */
+.quiet { margin: 0 0 16px; color: var(--theme-text-muted); font-size: 14px; }
+.releases { display: grid; gap: 14px; width: 100%; max-width: 1180px; margin: 0 auto 18px; padding: 0; list-style: none; box-sizing: border-box; }
+.release { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; padding: 16px 18px; border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); color: var(--theme-text); }
+.release:not(:has(.card)) { grid-template-columns: minmax(0, 1fr); }
+.main { min-width: 0; }
+.when { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 4px; font-size: 13px; color: var(--theme-text-muted); }
+.when span { font-variant-numeric: tabular-nums; }
+.release h2 { margin: 0 0 10px; font-size: 17px; line-height: 1.35; font-weight: 700; }
+.part { margin-top: 12px; }
+.part h3 { margin: 0 0 6px; font-size: 13px; font-weight: 650; color: var(--theme-text-muted); }
+.part ul { display: grid; gap: 6px; margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.45; }
+.part a { display: inline-flex; align-items: center; gap: 4px; color: var(--theme-action); text-decoration: none; }
+.part a:hover { text-decoration: underline; }
+.check { padding: 10px 12px; border-radius: 12px; background: color-mix(in oklab, var(--theme-action) 8%, var(--theme-surface)); }
+.issues { padding: 10px 12px; border-radius: 12px; background: color-mix(in oklab, var(--theme-warning) 10%, var(--theme-surface)); }
+.card { display: grid; gap: 10px; margin: 0; }
+.card img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface-subtle); }
+.share { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.wa { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: #1f8f4e; color: #fff; font-size: 14px; font-weight: 600; text-decoration: none; }
+.wa:hover { background: #18773f; }
+.save { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; font-size: 13px; color: var(--theme-action); text-decoration: none; }
+.save:hover { text-decoration: underline; }
+.earlier { margin-top: 8px; }
+.earlierTitle { margin: 0 0 10px; font-size: 15px; font-weight: 700; }
+@media (max-width: 760px) {
+  .release { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 14px; }
+  .card { max-width: 360px; }
+  .wa { flex: 1 1 auto; }
+}
+
+/* NEW-DOTS: what is still new for this person, above the releases; then Mark all as seen. */
+.unseen { width: 100%; max-width: 1180px; margin: 0 auto 18px; padding: 16px 18px; box-sizing: border-box; border: 1px solid color-mix(in srgb, var(--theme-danger, #d4373f) 26%, var(--theme-border)); border-radius: 16px;
+  background: color-mix(in oklab, var(--theme-danger, #d4373f) 4%, var(--theme-surface)); color: var(--theme-text); }
+.unseen h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 16px; font-weight: 700; }
+.unseenList { display: grid; gap: 4px; margin: 0 0 12px; padding: 0; list-style: none; }
+.unseenList a { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border-radius: 10px; color: var(--theme-text); text-decoration: none; }
+.unseenList a:hover { background: color-mix(in srgb, var(--theme-text) 5%, transparent); }
+.unseenList a:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.unseenText { display: grid; min-width: 0; flex: 1 1 auto; gap: 1px; }
+.unseenText b { font-size: 14px; font-weight: 600; line-height: 1.35; }
+.unseenText small { overflow: hidden; color: var(--theme-text-muted); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap; }
+.unseenList svg { flex: none; color: var(--theme-action); }
+/* NEW-DOTS-2: where the changed thing is ("More in Work › The pool"), and Show me. */
+.where { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; margin: 2px 0 1px; color: var(--theme-text-muted); font-size: 12.5px; }
+.where > span { padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--theme-action) 9%, transparent); color: var(--theme-text); }
+.where > span + span::before { content: "›"; margin: 0 6px 0 -2px; color: var(--theme-text-muted); }
+.showMe { display: inline-flex; flex: none; align-items: center; gap: 4px; min-height: 32px; padding: 0 12px; border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-action) 12%, transparent); color: var(--theme-action); font-size: 13px; font-weight: 650; white-space: nowrap; }
+.showMe svg { color: inherit; }
+.unseenList a:hover .showMe { background: color-mix(in srgb, var(--theme-action) 20%, transparent); }
+/* One entry per new thing: a red dot and the words, then Show me and where it is under them. The card is as wide as the
+   release cards below; the Show me buttons line up down its left side, each next to its line. A violet tint (the house
+   colour); the red is for the dots. */
+.unseen { border-color: color-mix(in srgb, var(--theme-action) 24%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 4%, var(--theme-surface)); }
+.unseenList a { align-items: flex-start; gap: 10px; }
+.unseenDot { display: grid; flex: none; width: 10px; height: 20px; place-items: center; }
+.unseenList .unseenText { flex: 1 1 auto; }
+.whereRow { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+.whereRow .where { flex: 1 1 auto; min-width: 0; flex-wrap: nowrap; overflow: hidden; margin: 0; }
+.where > span { white-space: nowrap; }
+.whereRow .showMe { flex: none; min-height: 34px; padding: 0 14px; font-size: 14px; }
+/* Readable at a glance on a wide card: the words a size up, the place one chip on one line. */
+.unseenList .unseenText b { font-size: 15px; }
+.whereRow .where > span { display: block; max-width: 100%; box-sizing: border-box; overflow: hidden; padding: 3px 10px; font-size: 13px; text-overflow: ellipsis; }
+
+
+.markRow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.markAll { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface);
+  color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.markAll:hover { border-color: color-mix(in srgb, var(--theme-action) 40%, var(--theme-border)); color: var(--theme-action); }
+.markAll:disabled { opacity: 0.6; cursor: progress; }
+.markAll:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.markError { color: var(--theme-danger, #d4373f); font-size: 13px; }
+.dotsOff { margin: 8px 0 0; color: var(--theme-text-muted); font-size: 13px; }
+.dotsOff a { color: var(--theme-action); }
+@media (max-width: 760px) { .unseen { padding: 14px; } .markAll { width: 100%; justify-content: center; } }

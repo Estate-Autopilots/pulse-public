@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh Pulse production delivery and project metadata every six hours
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:20:00 UTC
+Persistent=true
+Unit=pulse-drive-refresh.service
+[Install]
+WantedBy=timers.target

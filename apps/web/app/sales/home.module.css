@@ -1,0 +1,117 @@
+/* KAZUK-V2 G13: the one salesperson home (/sales) and Projects I sold. Theme tokens only, so dark mode follows; the
+   rings take the house accent through the goals ring's variables. Phone first: every row wraps, nothing is wider than
+   its card, the stage strip scrolls inside its own box. */
+.page {
+  --g-accent: #6B4CF0; --g-accent-soft: color-mix(in srgb, #6B4CF0 14%, var(--theme-surface)); --g-good: #16A34A; --g-warn: #D97706; --g-bad: #E11D48;
+  --g-ease: cubic-bezier(.22, 1, .36, 1);
+  display: flex; flex-direction: column; gap: 16px; min-width: 0;
+}
+:global(:root[data-theme="dark"]) .page { --g-accent: #a99cff; --g-accent-soft: color-mix(in srgb, #a99cff 18%, var(--theme-surface)); --g-good: #79c3a5; --g-warn: #e3a64f; --g-bad: #f08ca0; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; min-width: 0; }
+.person { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.person > label { min-width: 200px; }
+.section { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; min-width: 0; }
+.grid > * { min-width: 0; }
+.ringRow { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.ringRow p { margin: 0; color: var(--theme-text-muted); font-size: 14px; line-height: 1.4; }
+.ringRow p b { color: var(--theme-text); font-variant-numeric: tabular-nums; }
+.ringRow :global(b) { font-variant-numeric: tabular-nums; }
+.sync { margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.4; }
+.neeti { display: grid; gap: 0; margin: 0; }
+.neeti > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); }
+.neeti > div:first-child { border-top: 0; }
+.neeti dt { color: var(--theme-text); font-size: 14px; }
+.neeti dd { margin: 0; font-weight: 650; font-variant-numeric: tabular-nums; }
+.neeti dd[data-missing] { font-weight: 450; color: var(--theme-text-muted); font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.more.more { color: var(--theme-action); font-weight: 550; font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+.stages { display: flex; gap: 8px; margin: 0; padding: 4px 14px 12px; list-style: none; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.stages li { display: grid; gap: 2px; flex: 1 0 112px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.stages b { font-size: 20px; font-variant-numeric: tabular-nums; }
+.stages span { color: var(--theme-text-muted); font-size: 12.5px; }
+.stages small { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stages li[data-key="paid"][data-has] { background: color-mix(in srgb, var(--g-accent) 10%, var(--theme-surface)); border-color: color-mix(in srgb, var(--g-accent) 30%, var(--theme-border)); }
+.stages li[data-key="paid"][data-has] b { color: var(--g-accent); }
+.stages li[data-key="approval"] b { color: var(--theme-warning); }
+.deals { display: grid; margin: 0; padding: 0 14px 6px; list-style: none; }
+.deals > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "main value" "chips chips" "meta meta"; gap: 6px 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--theme-border); min-width: 0; }
+.deals > li:first-child { border-top: 0; }
+.dealMain { grid-area: main; display: grid; gap: 2px; min-width: 0; }
+.dealMain > a, .dealMain > b { font-weight: 620; color: var(--theme-text); text-decoration: none; overflow-wrap: anywhere; }
+.dealMain > a:hover { color: var(--theme-action); text-decoration: underline; }
+.dealMain small { color: var(--theme-text-muted); font-size: 13px; }
+.dealMain small a { color: var(--theme-action); }
+.dealValue { grid-area: value; font-weight: 650; font-variant-numeric: tabular-nums; }
+.dealChips { grid-area: chips; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+/* Projects I sold */
+.projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.project { display: grid; gap: 10px; padding: 14px; border-radius: 16px; border: 1px solid var(--theme-border); background: var(--theme-surface); min-width: 0; }
+.projectTop { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.projectTop > :first-child { flex: none; }
+.projectTop > div { display: grid; gap: 2px; min-width: 0; }
+.projectTop a { font-weight: 650; color: var(--theme-text); text-decoration: none; overflow-wrap: anywhere; }
+.projectTop a:hover { color: var(--theme-action); text-decoration: underline; }
+.projectTop small, .facts { color: var(--theme-text-muted); font-size: 13px; }
+.facts { display: grid; gap: 4px; margin: 0; justify-items: start; }
+.list { display: grid; gap: 0; margin: 0; padding: 0 14px 8px; list-style: none; }
+.list li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--theme-border); font-size: 14px; min-width: 0; }
+.list li:first-child { border-top: 0; }
+.list li span { overflow-wrap: anywhere; min-width: 0; }
+.list li small { color: var(--theme-text-muted); white-space: nowrap; }
+.list li[data-late] small { color: var(--theme-danger); }
+@media (max-width: 760px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  /* On a phone the stages are a plain list: the name on the left, the count and money on the right. */
+  .stages { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; overflow: visible; padding: 0 14px 8px; }
+  .stages li { display: grid; grid-template-columns: 2.4em minmax(0, 1fr) auto; align-items: baseline; gap: 8px; min-width: 0; padding: 9px 2px; border: 0; border-top: 1px solid var(--theme-border); border-radius: 0; background: none !important; }
+  .stages li:first-child { border-top: 0; }
+  .stages b { font-size: 16px; }
+  .head { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+  .person > label { flex: 1 1 100%; min-width: 0; }
+}
+.draft { width: 100%; min-height: 150px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; line-height: 1.5; resize: vertical; }
+.agentForm { display: grid; gap: 10px; min-width: 0; }
+.days { display: inline-flex; align-items: center; gap: 8px; color: var(--theme-text-muted); font-size: 14px; }
+.days input { width: 64px; min-height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-variant-numeric: tabular-nums; }
+.pipeFacts { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0; padding: 0 14px 12px; color: var(--theme-text-muted); font-size: 13px; }
+.pipeFacts b { color: var(--theme-text); font-variant-numeric: tabular-nums; }
+.facts b { color: var(--theme-text); font-weight: 650; }
+.incentive { font-size: 12.5px; font-weight: 550; color: var(--theme-text-muted); }
+.incentive::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--theme-border); vertical-align: 1px; }
+.incentive[data-tone="warning"]::before { background: var(--theme-warning); }
+.incentive[data-tone="success"]::before { background: var(--theme-success); }
+.project { grid-template-rows: auto auto 1fr; }
+.rows { display: grid; gap: 4px; color: var(--theme-text-muted); font-size: 13px; }
+.rows p { margin: 0; }
+.rows b { color: var(--theme-text); font-weight: 650; }
+.dealMain small + small { display: block; }
+.headline { margin: 0; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--g-accent) 8%, var(--theme-surface)); border: 1px solid color-mix(in srgb, var(--g-accent) 22%, var(--theme-border)); font-size: 15px; font-weight: 600; }
+.headline span { font-weight: 450; color: var(--theme-text-muted); }
+.today { display: grid; margin: 0; padding: 0 14px 6px; list-style: none; }
+.today > li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 4px 12px; align-items: start; padding: 11px 0; border-top: 1px solid var(--theme-border); }
+.today > li:first-child { border-top: 0; }
+.todayIcon { padding-top: 2px; color: var(--theme-text-muted); }
+.today > li[data-late] .todayIcon { color: var(--theme-warning); }
+.todayText { display: grid; gap: 2px; min-width: 0; }
+.todayText a { font-weight: 620; color: var(--theme-text); text-decoration: none; overflow-wrap: anywhere; }
+.todayText a:hover { color: var(--theme-action); text-decoration: underline; }
+.todayText small { color: var(--theme-text-muted); font-size: 13px; line-height: 1.4; }
+.todayEnd { display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-height: 28px; }
+.todayEnd b { font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) {
+  .today > li { grid-template-columns: 20px minmax(0, 1fr); }
+  /* Every row the same: the amount (when there is one) on the left, Open draft on the right, under the words. */
+  .todayEnd { grid-column: 2; justify-content: space-between; }
+  .todayEnd > :only-child { margin-left: auto; }
+}
+.ringWords { display: grid; justify-items: center; line-height: 1.05; }
+.ringWords b { font-size: 15px; }
+.ringWords small { font-size: 10px; color: var(--theme-text-muted); }
+.statusRow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 4px 14px 14px; font-size: 14px; }
+.dealMeta { grid-area: meta; color: var(--theme-text-muted); font-size: 12.5px; }
+.dealMeta a { color: var(--theme-action); font-weight: 550; }
+.stages li[data-empty] { opacity: .45; }
+.rows p:first-child { color: var(--theme-text); }
+.facts [data-warn] { color: var(--theme-warning); font-weight: 550; }
+.openLink { justify-self: start; color: var(--theme-action); font-weight: 600; font-size: 13.5px; }

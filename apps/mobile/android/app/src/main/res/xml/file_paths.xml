@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only these private folders can be shared with another app, one file at a time. -->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <cache-path name="downloads" path="downloads/" />
+    <cache-path name="pulse_updates" path="pulse-updates/" />
+    <external-files-path name="photos" path="Pictures/" />
+</paths>

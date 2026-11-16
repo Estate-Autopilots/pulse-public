@@ -1,0 +1,6 @@
+[Unit]
+Description=Restart the Pulse dev server when it holds more than 2.5 GB (OPS-2)
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/pulse-dev-recycle
+Nice=10

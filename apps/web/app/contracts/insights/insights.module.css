@@ -1,0 +1,40 @@
+/* CONTRACTS-3: what clients change. Tiles, then the ranked clauses; theme tokens only; one column on a phone. */
+.box { display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 16px; border: 1px solid var(--theme-border); background: var(--theme-surface); min-width: 0; }
+.rank { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.rank li { display: grid; grid-template-columns: 32px minmax(0, 1fr); grid-template-areas: "no what" "no meter"; gap: 8px 12px; padding: 14px 0; border-top: 1px solid var(--theme-border); }
+.rank li:first-child { border-top: 0; }
+.no { grid-area: no; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; font-weight: 700; font-size: 14px;
+  background: color-mix(in srgb, var(--theme-action) 12%, transparent); color: var(--theme-action); }
+.what { grid-area: what; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.what strong { font-size: 16px; font-weight: 650; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; overflow-wrap: anywhere; }
+.what > span { font-size: 13px; color: var(--theme-text-muted); }
+.what blockquote { margin: 4px 0 0; padding-left: 10px; border-left: 3px solid var(--theme-border); font-size: 14px; font-style: italic; overflow-wrap: anywhere; }
+.top { font-size: 12px; font-weight: 650; padding: 1px 9px; border-radius: 999px; background: color-mix(in srgb, var(--theme-warning, #d97706) 16%, transparent); color: var(--theme-warning, #b45309); }
+.meter { grid-area: meter; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; min-width: 0; }
+.bar { height: 8px; border-radius: 999px; background: var(--theme-surface-subtle, #ecebf2); overflow: hidden; }
+.bar span { display: block; height: 100%; border-radius: 999px; background: var(--theme-action); }
+.title { margin: 0; font-size: 17px; font-weight: 700; overflow-wrap: anywhere; }
+.next { margin: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 12px 14px; border-radius: 12px; font-size: 15px; font-weight: 400; color: var(--theme-text); background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); border: 1px solid color-mix(in srgb, var(--theme-action) 30%, var(--theme-border)); }
+.tabBarRoom { height: 0; }
+@media (max-width: 699px) { .tabBarRoom { height: 120px; } }
+.figures { margin: 0; font-size: 16px; line-height: 1.6; }
+.next p { margin: 0; flex: 1 1 260px; }
+.solid { background: #6B4CF0 !important; border-color: #6B4CF0 !important; color: #fff !important; }
+.sub { margin: 2px 0 0; font-size: 14px; color: var(--theme-text-muted); }
+.nowrap { white-space: nowrap; }
+.barLine { display: flex; align-items: center; gap: 12px; }
+.barLine .bar { flex: 1; }
+.barLine > span:last-child { white-space: nowrap; font-size: 13px; font-weight: 600; }
+@media (max-width: 599px) { .figures > .sep, .what .sep { display: none; } .figures > span:not(.sep), .lineOnPhone { display: block; } .barLine { flex-direction: column-reverse; align-items: stretch; gap: 4px; } .barLine .bar { flex: none; } }
+/* Median round 3: the count sits beside its bar on a phone too, as on a wide screen. */
+@media (max-width: 599px) { .barLine { flex-direction: row !important; align-items: center !important; gap: 10px !important; } .barLine .bar { flex: 1 !important; } }
+/* Median round 8: every count has the same width, so the bars end together. */
+.barLine > span:last-child { flex: none; width: 8.6em; }
+/* Median round 9: on a phone each bar has its own full-width row (its count above it); the one button is full width. */
+@media (max-width: 599px) {
+  .rank li { grid-template-areas: "no what" "meter meter" !important; }
+  .barLine { flex-direction: column-reverse !important; align-items: stretch !important; gap: 4px !important; }
+  .barLine .bar { flex: none !important; width: 100%; }
+  .barLine > span:last-child { width: auto !important; }
+  .next > a { width: 100%; justify-content: center; }
+}

@@ -1,0 +1,8 @@
+[Unit]
+Description=Pulse daily speed report at 07:30 India time (PROPOSED: not enabled)
+[Timer]
+OnCalendar=*-*-* 07:30:00 Asia/Kolkata
+Persistent=true
+AccuracySec=5m
+[Install]
+WantedBy=timers.target

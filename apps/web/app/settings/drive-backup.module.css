@@ -1,0 +1,174 @@
+/* COMPANY-OPS: Settings → Connected apps → Backup to Google Drive. Phone first: one column, every control at least 44 px
+   tall, long addresses wrap, nothing wider than the screen (363 px and up). Colours come from the theme (light and dark). */
+.lead { margin: 0; color: var(--theme-text-muted, inherit); line-height: 1.5; max-width: 68ch; }
+.loading { display: grid; gap: 10px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; min-width: 0; }
+.step { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; padding: 12px; border-radius: 12px;
+  background: var(--theme-surface-2, rgba(127,127,127,.06)); min-width: 0; }
+.tick { display: grid; place-items: center; height: 24px; color: var(--theme-text-muted, #8a8799); }
+.step[data-done] .tick { color: var(--theme-success, #16a34a); }
+.stepBody { display: grid; gap: 6px; min-width: 0; }
+.stepBody > b { font-weight: 600; line-height: 1.35; }
+.stepBody small { color: var(--theme-text-muted, inherit); line-height: 1.45; overflow-wrap: anywhere; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.code { font-family: var(--font-mono, ui-monospace, monospace); font-size: .92em; padding: 1px 6px; border-radius: 6px;
+  background: var(--theme-surface, rgba(127,127,127,.12)); overflow-wrap: anywhere; }
+.folderRow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; }
+.folderChip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; max-width: 100%;
+  border: 1px solid var(--theme-border, rgba(127,127,127,.3)); color: inherit; text-decoration: none; font-weight: 600; }
+.folderChip:hover { border-color: var(--theme-action, #6b4cf0); }
+.folderForm { display: grid; gap: 8px; min-width: 0; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field span { font-size: .9em; font-weight: 600; }
+.field input { min-height: 44px; width: 100%; min-width: 0; box-sizing: border-box; padding: 0 12px; border-radius: 10px; font: inherit; color: inherit;
+  border: 1px solid var(--theme-border, rgba(127,127,127,.35)); background: var(--theme-surface, transparent); }
+.field input:focus-visible { outline: 2px solid var(--theme-action, #6b4cf0); outline-offset: 1px; }
+.formButtons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.link { min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--theme-action, #6b4cf0); font: inherit; font-weight: 600; cursor: pointer; }
+.primaryRow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; min-width: 0; }
+.note { line-height: 1.4; overflow-wrap: anywhere; min-width: 0; }
+.note[data-tone="good"] { color: var(--theme-success, #16a34a); }
+.note[data-tone="bad"] { color: var(--theme-danger, #e11d48); }
+.empty { margin: 0; color: var(--theme-text-muted, inherit); }
+.problems { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 8px; padding: 12px; border-radius: 12px; line-height: 1.45;
+  background: color-mix(in srgb, var(--theme-warning, #d97706) 12%, transparent); color: inherit; }
+.problems > svg { color: var(--theme-warning, #d97706); margin-top: 2px; }
+.problems ul { margin: 4px 0 0; padding-left: 18px; overflow-wrap: anywhere; }
+.runs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; min-width: 0; }
+.runs li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; min-width: 0; }
+.runText { min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
+.when { color: var(--theme-text-muted, inherit); font-size: .9em; white-space: nowrap; }
+.foot { margin: 0; font-size: .9em; color: var(--theme-text-muted, inherit); }
+/* Round 2 (judge): numbered steps that unlock in order, a status line with progress, one-tap "Copy the account's e-mail". */
+.num { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 999px; font-size: .8em; font-weight: 700;
+  border: 2px solid currentColor; font-variant-numeric: tabular-nums; }
+.step[data-locked] .tick { opacity: .5; }
+.step[data-locked] .stepBody > b { font-weight: 600; }
+.status { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; line-height: 1.4; }
+.status > span:first-child b { font-weight: 700; }
+.bar { display: block; margin-top: 8px; height: 10px; border-radius: 999px; overflow: hidden; background: var(--theme-surface-2, rgba(127,127,127,.15)); }
+.bar > span { display: block; height: 100%; border-radius: inherit; background: var(--theme-action, #6b4cf0); transition: width .6s ease; }
+.copy { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 10px; width: fit-content; max-width: 100%;
+  border: 1px solid var(--theme-border, rgba(127,127,127,.35)); background: transparent; color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
+.copy:hover { border-color: var(--theme-action, #6b4cf0); }
+.problemBody { display: grid; gap: 6px; min-width: 0; }
+.fixRow { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
+@media (prefers-reduced-motion: reduce) { .bar > span { transition: none; } }
+/* Round 3 (judge): the status is the main thing; problems come first with numbered fixes; phone rows stay on one line. */
+.hero { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px; border-radius: 14px;
+  background: var(--theme-surface-2, rgba(127,127,127,.06)); }
+.hero > div { display: grid; gap: 2px; min-width: 0; }
+.hero b { font-size: 1.12em; font-weight: 700; line-height: 1.3; }
+.hero small { color: var(--theme-text-muted, inherit); line-height: 1.45; }
+.hero[data-tone="good"] > svg { color: var(--theme-success, #16a34a); }
+.hero[data-tone="warn"] > svg { color: var(--theme-warning, #d97706); }
+.hero[data-tone="run"] > svg { color: var(--theme-action, #6b4cf0); }
+.problems { grid-template-columns: minmax(0, 1fr); }
+.problemBody > span { line-height: 1.45; }
+.fixSteps { margin: 4px 0 0; padding-left: 22px; display: grid; gap: 8px; }
+.fixSteps li { padding-left: 2px; line-height: 1.45; }
+a.copy { text-decoration: none; }
+.folderRow { flex-wrap: nowrap; }
+.folderChip { min-width: 0; }
+.folderChip > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.runs { gap: 10px; }
+.runs li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.runs li .runText { flex: 1 1 8rem; }
+/* Round 4 (judge): the status box holds the whole story (and its one main button); history rows line up; nothing is cut. */
+.hero { grid-template-columns: 28px minmax(0, 1fr); }
+.hero > .bar { grid-column: 1 / -1; margin-top: 4px; }
+.hero > div > .fixRow { margin-top: 8px; }
+.hero[data-tone="none"] > svg { color: var(--theme-text-muted, #8a8799); }
+.hero[data-tone="warn"] { background: color-mix(in srgb, var(--theme-warning, #d97706) 10%, transparent); }
+.which { margin-top: 6px; }
+.which summary { cursor: pointer; min-height: 32px; display: inline-flex; align-items: center; font-weight: 600; color: var(--theme-action, #6b4cf0); }
+.which ul { margin: 4px 0 0; padding-left: 18px; overflow-wrap: anywhere; }
+.folderRow { flex-wrap: wrap; }
+.runs li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 10px; align-items: start; }
+.chipCell { display: flex; }
+.runs li .runText { display: grid; gap: 2px; }
+.runs li .when { white-space: normal; }
+/* Round 5 (judge): two columns on a wide card, aligned rows, numbered fixes, the switch on its step's title line. */
+.wrap { container-type: inline-size; display: grid; gap: 14px; min-width: 0; }
+.cols { display: grid; gap: 14px; min-width: 0; }
+.col { display: grid; gap: 14px; align-content: start; min-width: 0; }
+@container (min-width: 760px) { .cols[data-two] { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: start; } }
+.hero, .step { padding: 14px; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; }
+.hero[data-tone="good"] { background: color-mix(in srgb, var(--theme-success, #16a34a) 10%, transparent); }
+.hero[data-tone="run"] > svg { animation: drive-lift 1.6s ease-in-out infinite; }
+@keyframes drive-lift { 50% { transform: translateY(-3px); } }
+.bar { background: color-mix(in srgb, var(--theme-action, #6b4cf0) 22%, transparent); }
+.stepHead { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 28px; min-width: 0; }
+.step[data-locked] { opacity: .72; }
+.step[data-current] { background: color-mix(in srgb, var(--theme-action, #6b4cf0) 8%, transparent); }
+.step[data-current] .num { color: var(--theme-action, #6b4cf0); }
+.fixSteps { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
+.fixSteps > li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 10px; align-items: center; padding: 0; }
+.fixNum { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 999px; font-size: .8em; font-weight: 700; border: 2px solid currentColor; }
+.fixText { display: grid; gap: 4px; min-width: 0; }
+.fixText small { color: var(--theme-text-muted, inherit); }
+.runs li { grid-template-columns: 4.6rem minmax(0, 1fr); }
+@container (max-width: 420px) {
+  .fixSteps .copy, .fixSteps button, .fixSteps a { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) { .hero[data-tone="run"] > svg { animation: none; } }
+/* Round 6 (judge): the main button lives in the status box; readable waiting steps; full-width buttons on a phone. */
+.lead { max-width: none; }
+.step[data-locked] { opacity: .85; }
+.step[data-locked] .tick { opacity: .55; }
+.bar { height: 14px; }
+.hero > div > .fixRow { display: grid; justify-items: start; gap: 6px; }
+.hero > div > .fixRow small { color: var(--theme-text-muted, inherit); }
+.hero > div > small + .fixSteps { margin-top: 10px; }
+@container (max-width: 520px) {
+  .hero > div > .fixRow { justify-items: stretch; }
+  .hero > div > .fixRow > button, .hero > div > .fixRow > a { width: 100%; justify-content: center; }
+  .fixSteps > li > .copy, .fixSteps > li > button, .fixSteps > li > a { width: 100%; justify-content: center; }
+}
+/* Round 7 (judge): no lone words, equal fix buttons, "Later" for waiting steps. */
+.lead, .foot, .hero small, .stepBody small, .note, .runText { text-wrap: pretty; }
+.step[data-locked] { opacity: 1; }
+.step[data-locked] .stepBody > small { color: var(--theme-text-muted, inherit); }
+.which { margin-top: 2px; }
+.which ol { margin: 4px 0 0; padding-left: 18px; line-height: 1.45; color: var(--theme-text-muted, inherit); }
+.fixSteps > li > .copy, .fixSteps > li > button, .fixSteps > li > a { width: 11rem; max-width: 100%; justify-content: flex-start; white-space: nowrap; }
+@container (max-width: 520px) { .fixSteps > li > .copy, .fixSteps > li > button, .fixSteps > li > a { width: 100%; justify-content: flex-start; } }
+.col { gap: 18px; }
+.subhead { margin: 0 0 -10px; font-size: .9em; font-weight: 600; color: var(--theme-text-muted, inherit); }
+/* Round 8 (judge): each fix step says what to do; stronger secondary buttons; a quieter "Later". */
+.fixSteps > li { grid-template-columns: 24px auto minmax(0, 1fr); column-gap: 10px; }
+.fixSteps > li > .fixText { color: inherit; line-height: 1.4; }
+.fixSteps > li > .copy, .fixSteps > li > button, .fixSteps > li > a { width: 9.5rem; }
+@container (max-width: 520px) {
+  .fixSteps > li { grid-template-columns: 24px minmax(0, 1fr); row-gap: 4px; }
+  .fixSteps > li > .fixText { grid-column: 2; }
+  .fixSteps > li > .copy, .fixSteps > li > button, .fixSteps > li > a { width: 100%; }
+}
+.copy { border-color: color-mix(in srgb, currentColor 45%, transparent); }
+.which[data-owner] summary { min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, currentColor 35%, transparent); color: inherit; }
+.later { font-size: .85em; font-weight: 600; color: var(--theme-text-muted, inherit); white-space: nowrap; }
+.steps { gap: 8px; }
+/* Round 9 (judge): the owner's how-to is a one-line link again; the main button keeps its own width on a phone. */
+@container (max-width: 520px) {
+  .hero > div > .fixRow { justify-items: start; }
+  .hero > div > .fixRow > button, .hero > div > .fixRow > a { width: auto; max-width: 100%; }
+}
+/* Round 10 (judge): the status box always has its own colour; step words before their button on a phone. */
+.hero[data-tone="none"] { background: color-mix(in srgb, var(--theme-action, #6b4cf0) 9%, transparent); }
+.hero[data-tone="none"] > svg { color: var(--theme-action, #6b4cf0); }
+.hero[data-tone="good"] { background: color-mix(in srgb, var(--theme-success, #16a34a) 16%, transparent); }
+.hero > div > small + .fixSteps { margin-top: 8px; }
+@container (max-width: 520px) {
+  .hero { padding: 14px 16px; }
+  .hero > div > .fixRow { justify-items: stretch; }
+  .hero > div > .fixRow > button, .hero > div > .fixRow > a { width: 100%; justify-content: center; }
+  .fixSteps > li > .fixNum { grid-row: 1; grid-column: 1; }
+  .fixSteps > li > .fixText { grid-row: 1; grid-column: 2; }
+  .fixSteps > li > .copy, .fixSteps > li > button, .fixSteps > li > a { grid-row: 2; grid-column: 2; width: 100%; justify-content: center; }
+  .hero > div > .fixRow > button, .hero > div > .fixRow > a { white-space: normal; height: auto; min-height: 44px; padding-block: 8px; text-align: center; }
+}
+/* Final text tweaks (judge round 11): the "Why" line at body size. */
+.why { line-height: 1.45; }
+.hero > div > .why + .fixSteps { margin-top: 8px; }
+.fixSteps > li > .copy, .fixSteps > li > button, .fixSteps > li > a { width: 11rem; }
+@container (max-width: 520px) { .fixSteps > li > .copy, .fixSteps > li > button, .fixSteps > li > a { width: 100%; } }

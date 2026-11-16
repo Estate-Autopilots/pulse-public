@@ -1,0 +1,13 @@
+/* KAZUK-REST (1710): rate cards in Billing. Theme tokens only, so dark mode follows. */
+.body { display: grid; gap: 16px; padding: 0 0 24px; min-width: 0; }
+.note { margin: 0; padding: 0 4px; color: var(--theme-text-muted); font-size: 13px; }
+.note b { color: var(--theme-text); font-variant-numeric: tabular-nums; }
+.fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 4px; }
+.grid3, .grid4 { display: grid; gap: 8px; align-items: end; min-width: 0; }
+.grid3 { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto; }
+.grid4 { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto; }
+.grid3 > *, .grid4 > * { min-width: 0; }
+@media (max-width: 520px) {
+  .grid4 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .grid4 > :first-child { grid-column: 1 / -1; }
+}

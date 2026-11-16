@@ -1,0 +1,10 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {matchWorkUrl,allowedProfile} from '../match.js';
+const policy={email:'staff@company.test',domains:['drive.google.com','figma.com'],resources:[{id:'file1',domain:'drive.google.com',pathPrefix:'/file/d/work-id',projectId:'p'}]};
+test('ignore personal files, lookalike hosts, query strings and unmapped tools',()=>{for(const u of ['https://drive.google.com/file/d/personal','https://drive.google.com/file/d/work-id-personal','https://drive.google.com.evil.test/file/d/work-id','http://drive.google.com/file/d/work-id','https://figma.com/personal'])assert.equal(matchWorkUrl(u,policy),null);assert.deepEqual(matchWorkUrl('https://drive.google.com/file/d/work-id/view?password=never-kept#private',policy),{domain:'drive.google.com',resource:'file1',projectId:'p'});});
+test('ignore personal Chrome profiles and profiles with unavailable identity',()=>{assert.equal(allowedProfile({email:'user-f83e2abb@gmail.com'},policy),false);assert.equal(allowedProfile({},policy),false);assert.equal(allowedProfile({email:'STAFF@company.test'},policy),true);});
+
+test('ignore ambiguous Gmail accounts and broad personal Drive paths; Meta needs company account context',()=>{
+ const p={...policy,domains:['mail.google.com','drive.google.com','business.facebook.com'],resources:[{id:'mail',domain:'mail.google.com',pathPrefix:'/mail/u/0',projectId:'p'},{id:'drive',domain:'drive.google.com',pathPrefix:'/drive/u/0',projectId:'p'},{id:'ads',domain:'business.facebook.com',pathPrefix:'/adsmanager',projectId:'p',query:{act:'company-id'}}]};
+ assert.equal(matchWorkUrl('https://mail.google.com/mail/u/0/inbox',p),null);assert.equal(matchWorkUrl('https://drive.google.com/drive/u/0/my-drive',p),null);assert.equal(matchWorkUrl('https://business.facebook.com/adsmanager/manage?act=personal-id',p),null);
+ assert.deepEqual(matchWorkUrl('https://business.facebook.com/adsmanager/manage?act=company-id&private=ignored',p),{domain:'business.facebook.com',resource:'ads',projectId:'p'});
+});
