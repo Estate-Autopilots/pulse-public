@@ -1,0 +1,22 @@
+# EA-AI: production's AI employees' runtime (services/coworker/runner.mjs at production's live release), as eadev,
+# beside pulse-dev-coworker. Calls production's agent API on 127.0.0.1:4002 with each AI employee's key (600 files in
+# ~/.config/pulse-coworker-prod, issued by services/coworker/connect.sh). Models: this server's Claude Code / Codex
+# subscriptions only (no API keys). Low priority: the model CLIs it starts inherit nice 15, CPU weight 20, idle I/O.
+[Unit]
+Description=Pulse production: AI employees' runtime (runner.mjs at the live release)
+After=network-online.target
+[Service]
+WorkingDirectory=-%h/work/pulse/coworker-prod
+Environment=PATH=%h/.local/opt/node/bin:%h/.local/bin:%h/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PULSE_COWORKER_CONFIG=%h/.config/pulse-coworker-prod/prod.json
+ExecStartPre=%h/.local/bin/pulse-prod-coworker-follow --sync
+ExecStart=%h/.local/opt/node/bin/node services/coworker/runner.mjs
+Restart=always
+RestartSec=15
+Nice=15
+CPUWeight=20
+IOSchedulingClass=idle
+MemoryHigh=1G
+MemoryMax=2G
+[Install]
+WantedBy=default.target

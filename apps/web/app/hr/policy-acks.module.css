@@ -1,0 +1,11 @@
+/* KAZUK-REST slice 6: who has and has not acknowledged a published policy version. */
+.box { display: grid; gap: 8px; width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.head b { font-size: 14px; }
+.done { display: inline-flex; align-items: center; gap: 5px; color: var(--theme-success); font-size: 13px; }
+.label { margin: 0 0 4px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; cursor: default; }
+details .label { cursor: pointer; }
+.people { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.people li { padding: 3px 8px; border: 1px solid var(--theme-border); border-radius: 999px; font-size: 12px; overflow-wrap: anywhere; }
+.people li[data-pending] { border-color: var(--theme-warning); }
+.people small { color: var(--theme-text-muted); }

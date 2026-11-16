@@ -1,0 +1,14 @@
+/* FIX-DOCS-WORK: before Drive is connected, one plain message and one solid primary (readable in both themes). */
+.box { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; max-width: none; margin: 8px 0 0; box-sizing: border-box; padding: 36px 20px; text-align: center; border-radius: 18px; border: 1px dashed var(--theme-border); }
+.box h2 { margin: 0; font-size: 18px; font-weight: 750; }
+.box p { margin: 0; max-width: 460px; color: var(--theme-text-muted); font-size: 14px; line-height: 1.55; }
+.art { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 18px; background: color-mix(in srgb, #6b4cf0 12%, transparent); color: #6b4cf0; }
+.go { display: inline-flex; align-items: center; min-height: 44px; margin-top: 6px; padding: 0 18px; border-radius: 12px; background: #6b4cf0; color: #fff !important; font-weight: 700; text-decoration: none; }
+.go:hover { background: #5a3de0; }
+.preview { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; font-size: 13px; font-weight: 650; }
+.doc, .proc { padding: 4px 10px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text); font-size: 12.5px; }
+.proc { background: color-mix(in srgb, #6b4cf0 12%, var(--theme-surface)); color: color-mix(in srgb, #6b4cf0 80%, var(--theme-text)); }
+.arrow { color: var(--theme-text-muted); }
+.small { color: var(--theme-text-muted); font-size: 12.5px; }
+.alt { color: #6b4cf0 !important; font-size: 13.5px; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
+:global(:root[data-theme="dark"]) .alt { color: #c9bfff; }

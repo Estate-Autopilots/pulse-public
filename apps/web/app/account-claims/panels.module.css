@@ -1,0 +1,5 @@
+.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); align-items: stretch; }
+.claimRow { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 12px; }
+.claimActions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+@media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; align-items: start; } }
+@media (max-width: 480px) { .claimRow { grid-template-columns: minmax(0, 1fr); } .claimActions { justify-content: flex-start; } }

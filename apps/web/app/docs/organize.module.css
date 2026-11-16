@@ -1,0 +1,55 @@
+/* DOCS-MCP (owner, 8 Nov 2026): Docs organised like a Drive (concept "A" by Codex, reports/docs-mcp/concepts): folders on
+   the left, one search, tag chips, doc cards with their tags; and on a doc, the folder, tags and category under its title.
+   Theme tokens only (light and dark); the Vitals violet is the accent; every control a finger presses is 44px tall. */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0; padding: 0; list-style: none; }
+.tag { --dm-v: var(--theme-accent, #6d4aff); display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 0 10px; border-radius: 999px; font-size: 13px; font-weight: 550;
+  color: var(--dm-v); background: color-mix(in srgb, var(--dm-v) 11%, transparent); border: 1px solid transparent; text-decoration: none; white-space: nowrap; }
+a.tag:hover, button.tag:hover { border-color: color-mix(in srgb, var(--dm-v) 40%, transparent); }
+.tag[aria-current="page"], .tag[aria-pressed="true"] { background: var(--dm-v); color: #fff; }
+.tag button { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 24px; margin-right: -6px; border: 0; border-radius: 999px; background: none; color: inherit; cursor: pointer; }
+.tagRow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tagRow > svg { color: var(--theme-text-muted); }
+.chipBtn { min-height: 44px; display: inline-flex; align-items: center; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.card { position: relative; display: flex; flex-direction: column; gap: 8px; min-height: 168px; padding: 16px; border-radius: 16px; border: 1px solid var(--theme-border);
+  background: var(--theme-surface); transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease; }
+.card:hover { border-color: color-mix(in srgb, var(--theme-accent, #6d4aff) 45%, var(--theme-border)); box-shadow: 0 6px 22px rgb(40 30 90 / 0.08); }
+@media (prefers-reduced-motion: no-preference) { .card:hover { transform: translateY(-1px); } }
+.cardIcon { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; color: var(--theme-accent, #6d4aff);
+  background: color-mix(in srgb, var(--theme-accent, #6d4aff) 11%, transparent); }
+.cardTitle { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+.cardTitle a { color: inherit; text-decoration: none; }
+.cardTitle a::after { content: ""; position: absolute; inset: 0; border-radius: 16px; }
+.cardTitle a:focus-visible { outline: none; }
+.card:has(.cardTitle a:focus-visible) { outline: 2px solid var(--theme-focus, var(--theme-accent, #6d4aff)); outline-offset: 2px; }
+.cardText { margin: 0; font-size: 13px; line-height: 1.45; color: var(--theme-text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cardFoot { margin-top: auto; display: flex; align-items: center; gap: 6px; padding-top: 10px; border-top: 1px solid var(--theme-border); font-size: 12px; color: var(--theme-text-muted); }
+.cardFoot > span:last-child { margin-left: auto; display: inline-flex; }
+.cardTags { position: relative; z-index: 1; }
+.folderLock { margin-left: 2px; color: var(--theme-text-muted); }
+
+/* Under a doc's title: Docs / folder, tags (+ Add tag), category. */
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; color: var(--theme-text-muted); }
+.crumbs a { color: inherit; text-decoration: none; min-height: 36px; display: inline-flex; align-items: center; padding: 0 4px; border-radius: 8px; }
+.crumbs a:hover { color: var(--theme-text); background: var(--theme-surface-subtle); }
+.crumbs b { color: var(--theme-text); font-weight: 650; }
+.labels { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 13px; color: var(--theme-text-muted); }
+.labelGroup { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.labels select, .labels input { min-height: 36px; padding: 4px 10px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.labels input { width: 140px; }
+.addTag { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 10px; border-radius: 999px; border: 1px dashed var(--theme-border); background: none; color: var(--theme-text-muted);
+  font: inherit; font-size: 13px; cursor: pointer; }
+.addTag:hover { color: var(--theme-text); border-color: var(--theme-text-muted); }
+
+/* Import: a file, a zip, or a whole folder; the progress and what happened. */
+.progress { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--theme-border); background: var(--theme-surface); font-size: 14px; }
+.bar { height: 8px; border-radius: 999px; background: var(--theme-surface-subtle); overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--theme-accent, #6d4aff); transition: width 200ms ease; }
+.skipped { margin: 0; padding-left: 18px; font-size: 13px; color: var(--theme-text-muted); }
+
+/* Who a folder is for. */
+.people { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.people li { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 0 10px; border-radius: 10px; background: var(--theme-surface-subtle); font-size: 14px; }
+.found { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 4px; list-style: none; border: 1px solid var(--theme-border); border-radius: 10px; }
+.found button { width: 100%; min-height: 40px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: inherit; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.found button:hover { background: var(--theme-surface-subtle); }

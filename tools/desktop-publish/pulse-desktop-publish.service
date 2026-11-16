@@ -1,0 +1,13 @@
+[Unit]
+Description=Publish the newest verified Pulse Windows installer to the local downloads directory
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/opt/node/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PULSE_DESKTOP_DOWNLOADS_DIR=%h/pulse-downloads/desktop
+# PULSE-APPS (6 Nov 2026): Windows builds come from the public client repository's build-only workflow (publish.mjs
+# defaults); its isolated validation branch builds and signs but never publishes a GitHub release.
+Environment=PULSE_DESKTOP_BRANCHES=main,validation/mobile-shell
+ExecStart=/usr/bin/env node %h/pulse-downloads/bin/publish.mjs
+TimeoutStartSec=900
+Nice=10

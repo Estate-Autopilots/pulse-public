@@ -1,0 +1,11 @@
+{{> top}}
+<main class="main" style="gap:22px">
+  {{#label}}<div class="lbl">{{label}}</div>{{/label}}
+  <h2 class="h2" data-key>{{title}}</h2>
+  <div class="ba">
+    <div class="panel before"><div class="tag">{{before_tag}}</div><div class="pt">{{before}}</div></div>
+    <div class="arrow" aria-hidden="true">&darr;</div>
+    <div class="panel after"><div class="tag">{{after_tag}}</div><div class="pt">{{after}}</div>{{#after_items_any}}<ul class="pl">{{#after_items}}<li>{{.}}</li>{{/after_items}}</ul>{{/after_items_any}}</div>
+  </div>
+</main>
+{{> foot}}
