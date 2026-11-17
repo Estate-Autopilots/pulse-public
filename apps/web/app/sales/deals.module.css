@@ -1,0 +1,53 @@
+/* KAZUK-V2 G12: the negotiation board (Billing → Deals, My sales). Theme tokens, so dark mode follows; the ring takes
+   the house accent through the goals ring's own variables. Nothing is wider than its card: deals are cards, not a table. */
+.board {
+  --g-accent: #6B4CF0; --g-accent-soft: color-mix(in srgb, #6B4CF0 14%, var(--theme-surface)); --g-ease: cubic-bezier(.22, 1, .36, 1);
+  display: flex; flex-direction: column; gap: 16px; min-width: 0;
+}
+:global(:root[data-theme="dark"]) .board { --g-accent: #a99cff; --g-accent-soft: color-mix(in srgb, #a99cff 18%, var(--theme-surface)); }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; min-width: 0; }
+.grid > * { min-width: 0; }
+.pad { padding: 4px 14px 12px; min-width: 0; }
+.takeaway { margin: 0; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--g-accent) 8%, var(--theme-surface)); border: 1px solid color-mix(in srgb, var(--g-accent) 22%, var(--theme-border)); font-size: 14.5px; line-height: 1.45; }
+.takeaway { display: grid; gap: 8px; }
+.takeaway p { margin: 0; }
+.takeaway b { color: var(--g-accent); }
+.tryFirst { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-size: 13.5px; color: var(--theme-text-muted); }
+.tryFirst ol { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; color: var(--theme-text); font-weight: 550; }
+.tryFirst li { display: inline-flex; align-items: center; gap: 6px; }
+.tryFirst li b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--g-accent); color: var(--theme-action-text, #fff); font-size: 11.5px; }
+.tip { padding: 3px 10px; border-radius: 999px; background: var(--theme-surface); border: 1px solid color-mix(in srgb, var(--g-accent) 30%, var(--theme-border)); color: var(--theme-text); font-weight: 550; }
+.why { margin: 10px 0 0; color: var(--theme-text-muted); font-size: 13px; }
+.people { display: grid; gap: 0; margin: 0; padding: 0 14px 6px; list-style: none; }
+.person { display: grid; grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr)); gap: 4px 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid var(--theme-border); font-size: 14px; }
+.person:first-child { border-top: 0; }
+.person span { color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.deals { display: grid; gap: 0; margin: 0; padding: 0 14px 6px; list-style: none; }
+.deal { display: grid; gap: 6px; padding: 12px 0; border-top: 1px solid var(--theme-border); min-width: 0; }
+.deal:first-child { border-top: 0; }
+.dealTop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; min-width: 0; }
+.dealName { font-weight: 620; color: var(--theme-text); text-decoration: none; overflow-wrap: anywhere; min-width: 0; }
+a.dealName:hover { color: var(--theme-action); text-decoration: underline; }
+.price { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.price > span:nth-child(2) { color: var(--theme-text-muted); }
+.facts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.dots { display: inline-flex; align-items: center; gap: 4px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--g-accent); }
+.dots i:not(:last-of-type) { opacity: .45; }
+.dots small { margin-left: 4px; font-size: 13px; }
+@media (max-width: 760px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .person { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .person b { grid-column: 1 / -1; }
+}
+/* Five tiles on a phone: the odd one out spans the row instead of standing alone at half width. */
+@container kit-tiles (max-width: 640px) { .board section > div:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+.facts2 { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.facts2 li { display: grid; gap: 2px; padding: 10px 0; border-top: 1px solid var(--theme-border); min-width: 0; }
+.facts2 li:first-child { border-top: 0; }
+.facts2 b { font-size: 15px; font-weight: 620; overflow-wrap: anywhere; }
+.facts2 span { color: var(--theme-text-muted); font-size: 13px; }
+.personHead span { font-size: 12px; font-weight: 600; text-transform: none; color: var(--theme-text-muted); }
+@media (max-width: 760px) { .personHead { display: none; } }
+.dealRight { display: inline-flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
+.dealRight b { font-size: 15px; }

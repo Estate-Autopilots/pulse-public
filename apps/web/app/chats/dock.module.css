@@ -1,0 +1,137 @@
+/* CHAT-SHELL v2: the chat dock. Bottom left of the work area (Pip keeps the right corner), quiet until opened. */
+.tab, .dock { position: fixed; z-index: calc(var(--ds-z-float, 60) - 1); left: calc(var(--shell-rail-w, 64px) + 20px); bottom: 18px; }
+.tab { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px 0 12px; border: 0; border-radius: 999px; background: var(--ds-glass-strong); backdrop-filter: var(--ds-glass-blur);
+  box-shadow: var(--ds-glass-edge), var(--ds-glass-shadow); color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: transform var(--ds-fast, 140ms) var(--ds-ease, ease); animation: in 220ms var(--ds-ease, ease) both; }
+.tab:hover { transform: translateY(-1px); }
+.tab svg { color: var(--theme-action); }
+.tab i { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--theme-action); color: var(--theme-action-text); font-size: 10.5px; font-style: normal; font-weight: 700; }
+.dock { width: min(380px, calc(100vw - 120px)); height: min(520px, calc(100dvh - 120px)); display: flex; flex-direction: column; overflow: hidden; border-radius: 18px; background: var(--theme-surface);
+  box-shadow: var(--ds-elev-3); animation: in 240ms var(--ds-ease, ease) both; }
+@keyframes in { from { opacity: 0; translate: 0 10px; } }
+.dock header { flex: none; display: flex; align-items: center; gap: 2px; height: 46px; padding: 0 6px 0 16px; border-bottom: 1px solid var(--ds-line, var(--theme-border)); }
+.dock header b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 650; }
+.icon { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: none; color: var(--theme-text-muted); cursor: pointer; }
+.icon:hover { background: var(--ds-hover); color: var(--theme-text); }
+.msgs { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; background: color-mix(in srgb, var(--theme-canvas) 70%, var(--theme-surface)); }
+.msg { display: grid; justify-items: start; max-width: 82%; }
+.msg[data-mine] { align-self: flex-end; justify-items: end; }
+.msg small { margin: 4px 6px 1px; font-size: 11px; font-weight: 650; color: var(--theme-text-muted); }
+.msg p { margin: 0; padding: 6px 10px; border-radius: 12px; background: var(--theme-surface); box-shadow: 0 1px 0.5px rgb(11 20 26 / 10%); font-size: 13.5px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg[data-mine] p { background: color-mix(in srgb, var(--theme-action) 13%, var(--theme-surface)); }
+/* AI-AGENTS-2: an AI's typeset answer: one bubble around its paragraphs and lists (they are not bubbles themselves). */
+.rich { padding: 6px 10px; border-radius: 12px; background: var(--theme-surface); box-shadow: 0 1px 0.5px rgb(11 20 26 / 10%); font-size: 13.5px; line-height: 1.4; min-width: 0; }
+.msg .rich p { padding: 0; border-radius: 0; background: none; box-shadow: none; }
+.rich time { display: block; text-align: right; }
+.msg time { margin-left: 8px; font-size: 10.5px; color: var(--theme-text-muted); }
+.note { margin: auto; color: var(--theme-text-muted); font-size: 13px; text-align: center; }
+.note a { color: var(--theme-action); }
+.error { margin: 0; padding: 6px 12px; color: var(--theme-danger); font-size: 12.5px; }
+.box { flex: none; display: flex; align-items: flex-end; gap: 6px; padding: 8px; border-top: 1px solid var(--ds-line, var(--theme-border)); }
+.box textarea { flex: 1; min-width: 0; max-height: 110px; padding: 8px 12px; border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-canvas); color: var(--theme-text); font: inherit; font-size: 14px; resize: none; outline: none; field-sizing: content; }
+.box textarea:focus { border-color: color-mix(in srgb, var(--theme-action) 60%, transparent); }
+.box button { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--theme-action); color: var(--theme-action-text); cursor: pointer; }
+.box button:disabled { opacity: .35; cursor: default; }
+@media (max-width: 899.98px) { .tab, .dock { display: none; } }
+@media (prefers-reduced-motion: reduce) { .tab, .dock { animation: none; } }
+
+/* Owner workbench UI (22 Oct 2026): the Chat button sits in the top bar beside the bell (first in the row of actions),
+   and the dock drops down under it at the right, like the bell's panel. Nothing floats over the page while it is closed. */
+.tab { position: relative; left: auto; bottom: auto; order: -1; z-index: auto; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; gap: 0; border: 1px solid var(--theme-border);
+  border-radius: 8px; background: var(--theme-surface); box-shadow: none; backdrop-filter: none; animation: none; }
+.tab:hover { transform: none; background: var(--theme-surface-subtle); }
+.tab[data-open] { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); }
+.tab > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tab > i { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; border: 2px solid var(--theme-canvas); box-sizing: border-box; font-size: 10.5px; }
+/* HR-PEOPLE (owner, 13 Nov 2026: "the chat button … looks ugly"): frameless and round like the bell beside it, the same
+   muted icon, the count on its shoulder; it sits in the layout's slot just before the bell. */
+@media (min-width: 900px) {
+  .tab { order: 0; width: 34px; height: 34px; border-color: transparent; border-radius: 50%; background: transparent; color: var(--theme-text-muted); }
+  .tab svg { color: currentColor; }
+  .tab:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+  .tab[data-open] { border-color: transparent; color: var(--theme-action); }
+  .tab > i { top: -3px; right: -4px; line-height: 14px; font-variant-numeric: tabular-nums; }
+  .tab:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+}
+.dock { top: 56px; right: 16px; bottom: auto; left: auto; z-index: var(--ds-z-float, 60); height: min(520px, calc(100dvh - 80px)); }
+@media (max-width: 899.98px) { .tab, .dock { display: none; } }
+
+/* CHAT-V6: the conversation and Threads as two tabs in the dock's header; the threads list and an open thread. */
+.dock header { padding-left: 8px; }
+.tabs { flex: 1; display: flex; align-items: center; gap: 2px; min-width: 0; }
+.tabs button { display: inline-flex; align-items: center; gap: 6px; flex: none; height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--theme-text-muted); font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.tabs button:first-child { flex: 0 1 auto; min-width: 0; display: block; overflow: hidden; line-height: 32px; text-overflow: ellipsis; white-space: nowrap; }
+.tabs button:hover { background: var(--ds-hover, var(--theme-surface-subtle)); color: var(--theme-text); }
+.tabs button[aria-selected="true"] { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-text); }
+.tabs i { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--theme-action); color: var(--theme-action-text); font-size: 10.5px; font-style: normal; font-weight: 700; }
+.threadList { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; padding: 6px; }
+.threadRow { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 8px 10px; border: 0; border-radius: 10px; background: none; color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+.threadRow:hover { background: var(--ds-hover, var(--theme-surface-subtle)); }
+.threadTop { display: flex; align-items: center; gap: 6px; min-width: 0; color: var(--theme-text-muted); }
+.threadTop b { flex: 1; min-width: 0; overflow: hidden; color: var(--theme-text); font-size: 13.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.threadTop time { flex: none; font-size: 11px; }
+.threadRoot, .threadLast { display: block; overflow: hidden; font-size: 12.5px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.threadRoot b { font-weight: 600; }
+.threadLast { color: var(--theme-text-muted); }
+.threadLast em { font-style: normal; font-weight: 600; }
+.threadLast i { display: inline-grid; place-items: center; min-width: 18px; height: 18px; margin-left: 6px; padding: 0 5px; border-radius: 9px; background: var(--theme-action); color: var(--theme-action-text); font-size: 10.5px; font-style: normal; font-weight: 700; vertical-align: 1px; }
+.threadRow[data-unread] .threadLast em { color: var(--theme-action); }
+.threadIn { margin: 0 0 6px; color: var(--theme-text-muted); font-size: 12px; text-align: center; }
+.replies { align-self: stretch; margin: 6px 0 2px; padding-top: 6px; border-top: 1px solid var(--ds-line, var(--theme-border)); color: var(--theme-text-muted); font-size: 11.5px; font-weight: 600; }
+
+/* CALLS-V2 (CHAT-V6 leftover): pictures, voice notes, files, polls and reactions in the dock, as in Chats. */
+.msg p:has(.imgs) { padding: 4px; }
+.msg p:has(.imgs) time { margin-right: 6px; }
+.imgs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; width: 220px; max-width: 100%; margin-bottom: 4px; }
+.imgs[data-n="1"] { grid-template-columns: 1fr; }
+.imgs a { display: block; overflow: hidden; border-radius: 9px; aspect-ratio: 1; background: var(--theme-surface-subtle); }
+.imgs[data-n="1"] a { aspect-ratio: 4 / 3; }
+.imgs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.voice { display: block; min-width: 220px; margin-bottom: 2px; }
+.file { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; padding: 6px 9px; border-radius: 9px; background: color-mix(in srgb, var(--theme-text) 6%, transparent); color: var(--theme-text); font-size: 12.5px; font-weight: 600; text-decoration: none; }
+.file span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file:hover { background: color-mix(in srgb, var(--theme-text) 10%, transparent); }
+.pollWrap { display: grid; justify-items: end; gap: 2px; padding: 8px 10px; border-radius: 12px; background: var(--theme-surface); box-shadow: 0 1px 0.5px rgb(11 20 26 / 10%); max-width: 100%; }
+.pollWrap > div { min-width: 0; width: 100%; }
+.reacts { display: flex; flex-wrap: wrap; gap: 3px; margin: -3px 4px 2px; }
+.reacts button { display: inline-flex; align-items: center; gap: 3px; height: 24px; padding: 0 7px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; cursor: pointer; }
+.reacts button[data-mine] { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); }
+.reacts b { font-size: 11px; font-weight: 650; color: var(--theme-text-muted); }
+
+/* FIX-CHAT-AI (owner walkthrough, 10 Nov 2026): a compact popover under the Chat button: the recent conversations
+   (search, All · Unread · Threads, one "New message" button), a conversation opening inside it. 380 px wide, never half
+   the page. */
+.dock { width: min(380px, calc(100vw - 32px)); height: min(560px, calc(100dvh - 80px)); border: 1px solid var(--ds-line, var(--theme-border)); border-radius: 16px; }
+.dock header.head { gap: 6px; height: 52px; padding: 0 8px 0 14px; }
+.dock[data-view="chat"] header.head { padding-left: 6px; }
+.title { flex: 1; min-width: 0; overflow: hidden; color: var(--theme-text); font-size: 16px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.dock[data-view="chat"] .title { font-size: 14.5px; font-weight: 650; }
+.openAll { flex: none; padding: 6px 8px; border-radius: 8px; color: var(--theme-action); font-size: 13px; font-weight: 600; text-decoration: none; }
+.openAll:hover { background: color-mix(in srgb, var(--theme-action) 9%, transparent); }
+.openAll:focus-visible, .icon:focus-visible, .row:focus-visible, .primary:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 1px; }
+.tools { flex: none; display: grid; gap: 8px; padding: 10px 12px 8px; border-bottom: 1px solid var(--ds-line, var(--theme-border)); }
+.search { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-canvas); color: var(--theme-text-muted); }
+.search:focus-within { border-color: color-mix(in srgb, var(--theme-action) 60%, transparent); }
+.search input { flex: 1; min-width: 0; border: 0; background: none; color: var(--theme-text); font: inherit; font-size: 14px; outline: none; }
+.tools .tabs { gap: 4px; }
+.tools .tabs button:first-child { flex: none; display: inline-flex; line-height: normal; }
+.rows { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px 6px; display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 8px; border: 0; border-radius: 10px; background: none; color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+.row:hover { background: var(--ds-hover, var(--theme-surface-subtle)); }
+.rowMain { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.rowTop, .rowBottom { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.rowTop b { min-width: 0; overflow: hidden; font-size: 14px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.rowTop time { flex: none; margin-left: auto; color: var(--theme-text-muted); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.row[data-unread] .rowTop time { color: var(--theme-action); font-weight: 600; }
+.rowBottom span { flex: 1; min-width: 0; overflow: hidden; color: var(--theme-text-muted); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.row[data-unread] .rowBottom span { color: var(--theme-text); }
+.rowBottom i { flex: none; display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--theme-action); color: var(--theme-action-text); font-size: 11px; font-style: normal; font-weight: 700; }
+.foot { flex: none; padding: 10px 12px 12px; border-top: 1px solid var(--ds-line, var(--theme-border)); }
+.primary { display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: 10px; background: var(--theme-action); color: var(--theme-action-text); font-size: 14px; font-weight: 650; text-decoration: none; }
+.primary:hover { filter: brightness(1.06); }
+@media (prefers-reduced-motion: reduce) { .row, .primary { transition: none; } }
+
+/* BUGFIX #26: the "is working on an answer" line (Chats' style) stands out on the top-bar chat's own background. */
+.msgs .thinking { margin-top: 6px; }
+.msgs .thinking > span:first-child { border: 1px solid var(--theme-border); }
+.msgs .thinking i { background: var(--theme-action); }
