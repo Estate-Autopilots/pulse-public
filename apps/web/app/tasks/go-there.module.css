@@ -1,0 +1,66 @@
+/* UX-5B: "Go to …" in the task's hero and the "Done when" card. */
+.go { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.goBtn {
+  display: inline-flex;
+  min-height: 44px;
+  max-width: 100%;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1.5px solid var(--theme-action);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface));
+  color: var(--theme-action);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.goBtn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.goBtn svg { flex: none; }
+.goBtn:hover { background: color-mix(in srgb, var(--theme-action) 15%, var(--theme-surface)); }
+.goBtn:hover svg:last-child { transform: translateX(2px); }
+.goBtn:disabled { opacity: 0.7; cursor: progress; }
+.goBtn:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.where { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; color: var(--theme-text-muted); font-size: 12px; }
+.where small { font-size: 12px; }
+.textBtn { display: inline-flex; align-items: center; gap: 4px; padding: 2px 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.textBtn:hover { text-decoration: underline; }
+.picker { display: inline-flex; min-width: min(320px, 100%); align-items: center; gap: 4px; }
+.iconBtn { display: grid; width: 28px; height: 28px; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--theme-text-muted); cursor: pointer; }
+
+.card { border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); }
+.card[data-proposal] { border-style: dashed; border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); }
+.head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; padding: 12px 16px 6px; }
+.head h2 { display: inline-flex; align-items: center; gap: 7px; margin: 0; font-size: 15px; font-weight: 650; }
+.head h2 svg { color: var(--theme-action); }
+.head small { color: var(--theme-text-muted); font-size: 12px; }
+.signals { display: grid; gap: 7px; margin: 0; padding: 4px 16px 0; list-style: none; }
+.signals li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: 14px; }
+.signals i { display: grid; width: 16px; height: 16px; place-items: center; border: 1.5px solid var(--theme-border-strong); border-radius: 50%; }
+.signals li[data-met] i { border-color: var(--theme-success); background: var(--theme-success); color: #fff; }
+.signals li[data-met] span { color: var(--theme-text-muted); }
+.signals b { color: var(--theme-text-muted); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fine { margin: 8px 16px 0; color: var(--theme-text-muted); font-size: 12px; line-height: 1.45; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 16px 14px; }
+.card > .fine:last-child { margin-bottom: 14px; }
+.confirm {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  border: 1px solid var(--theme-action);
+  border-radius: 10px;
+  background: var(--theme-action);
+  color: var(--theme-action-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.confirm:disabled { opacity: 0.6; cursor: progress; }
+.switch { display: inline-flex; align-items: center; gap: 7px; color: var(--theme-text); font-size: 13px; cursor: pointer; }
+.switch input { width: 16px; height: 16px; accent-color: var(--theme-action); }
+@media (prefers-reduced-motion: reduce) { .goBtn, .goBtn svg { transition: none; } .goBtn:hover svg:last-child { transform: none; } }

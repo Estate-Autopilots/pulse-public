@@ -1,0 +1,75 @@
+// One Chromium instance, one context at a time (no test workers). Also usable as QA's route adapter example.
+// GATE-FINISH (16 Nov 2026): Account security has four tabs; the Google account you sign in with is under Password.
+import assert from 'node:assert/strict';
+import { readFileSync, statSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { routeGoogle } from './google-harness.mjs';
+const require = createRequire(new URL('../../../tests/e2e/package.json', import.meta.url));
+const { chromium } = require('@playwright/test');
+const scratch = process.env.PULSE_HARNESS_SCRATCH, m = JSON.parse(readFileSync(scratch + '/manifest.json'));
+const credentials = JSON.parse(readFileSync(m.credentialsFile));
+assert.equal(statSync(m.credentialsFile).mode & 0o777, 0o600);
+const browser = await chromium.launch({ headless: true });
+const context = await browser.newContext({ ignoreHTTPSErrors: true, serviceWorkers: 'block' });
+await routeGoogle(context, m.googleOrigin);
+const page = await context.newPage();
+const select = async (identity, session) => { const r = await fetch(m.googleOrigin + '/session', { method: 'POST', body: JSON.stringify({ identity, session }) }); assert.equal(r.status, 200); };
+const go = async (mode, next) => { const r = await page.goto(m.origin + '/api/v0/auth/google/start?' + new URLSearchParams({ mode, ...(next ? { next } : {}) })); assert.ok(r?.ok(), `${mode}: HTTP ${r?.status()} at ${new URL(page.url()).pathname}`); };
+const me = () => context.request.get(m.origin + '/api/v0/me');
+try {
+ const branding = await context.request.get(m.origin + '/api/v0/auth/branding'); assert.equal(branding.status(), 200); assert.equal((await branding.json()).google, true);
+ await select('linked', false); await go('silent', m.links.task);
+ assert.equal(new URL(page.url()).searchParams.get('google'), 'silent_failed', 'quiet fallback at ' + new URL(page.url()).pathname);
+ assert.equal((await me()).status(), 401);
+ // A real password form creates the browser session; its real Account link crosses Google and comes back.
+ await page.goto(m.origin + '/login?out=1&with=password');
+ await page.getByRole('textbox', { name: 'E-mail or username', exact: true }).fill(m.people.unlinked.username);
+ await page.getByLabel('Password', { exact: true }).fill(credentials.password);
+ await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+ await page.waitForURL(url => !url.pathname.startsWith('/login'));
+ // Linking keeps the company-domain rule (GOOGLE-ONE-CLICK only freed signing in): a Google account on another domain is refused.
+ await select('wrong-domain', false); await page.goto(m.origin + '/account');
+ await page.getByRole('tab', { name: 'Password', exact: true }).click();
+ await page.getByRole('link', { name: 'Link Google', exact: true }).click();
+ await page.waitForURL(url => url.pathname === '/account' && url.searchParams.has('google'));
+ assert.equal(new URL(page.url()).searchParams.get('google'), 'domain_not_allowed', 'linking a wrong-domain Google account');
+ await select('unlinked', false); await page.goto(m.origin + '/account');
+ await page.getByRole('tab', { name: 'Password', exact: true }).click();
+ await page.getByRole('link', { name: 'Link Google', exact: true }).click();
+ await page.getByText('Google account linked. You can now use Continue with Google on the sign-in page.', { exact: true }).waitFor();
+ assert.ok((await context.request.get(m.origin + '/api/v0/auth/account')).ok());
+ let r = await context.request.post(m.origin + '/api/v0/auth/sign-out', { headers: { origin: m.origin }, data: {} }); assert.ok(r.ok());
+ await go('signin', m.links.task);
+ assert.equal(new URL(page.url()).pathname, m.links.task);
+ assert.equal((await me()).status(), 200);
+ const cookie = (await context.cookies()).find(c => c.name === 'pulse_session');
+ assert.ok(cookie?.secure && cookie.httpOnly && cookie.sameSite === 'Lax');
+ assert.ok(!(await context.cookies()).some(c => c.name === 'pulse_oidc'));
+ assert.ok(!/code=|token=/.test(page.url()));
+ // Sign-out + quiet success, rejected identities and revocation all use the same real proxy.
+ await context.request.post(m.origin + '/api/v0/auth/sign-out', { headers: { origin: m.origin }, data: {} });
+ await go('silent', m.links.client); assert.equal(new URL(page.url()).pathname, m.links.client);
+ // GOOGLE-ONE-CLICK (5740082d): signing in takes any Google-verified e-mail on record, so another domain's address that
+ // is on no record is refused as not_linked; linking and invitations still refuse it as domain_not_allowed
+ // (tests/core/test_google_sign_in.py, test_onboard_google.py, google-invite-runner.mjs).
+ for (const [identity, reason] of [['wrong-domain', 'not_linked'], ['unverified', 'provider_error'], ['other-org', 'not_linked'], ['disabled', 'account_disabled']]) {
+  await select(identity, true); await go('signin'); assert.equal(new URL(page.url()).searchParams.get('google'), reason, identity);
+ }
+ // A password session can revoke the link and prevent subsequent Google sign-in.
+ await context.request.post(m.origin + '/api/v0/auth/sign-out', { headers: { origin: m.origin }, data: {} });
+ await page.goto(m.origin + '/login?out=1&with=password');
+ await page.getByRole('textbox', { name: 'E-mail or username', exact: true }).fill(m.people.unlinked.username);
+ await page.getByLabel('Password', { exact: true }).fill(credentials.password);
+ await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+ await page.waitForURL(url => !url.pathname.startsWith('/login'));
+ r = await context.request.post(m.origin + '/api/v0/auth/google/unlink', { headers: { origin: m.origin }, data: {} }); assert.ok(r.ok());
+ // The link is gone: Account offers Link Google again.
+ await page.goto(m.origin + '/account'); await page.getByRole('tab', { name: 'Password', exact: true }).click();
+ await page.getByRole('link', { name: 'Link Google', exact: true }).waitFor();
+ // GOOGLE-ONE-CLICK (5740082d5, 1450): signing in takes a Google-verified e-mail on record, linked or not, so after the
+ // unlink the person's own address (their profile e-mail) still signs them in; it no longer answers not_linked.
+ await context.request.post(m.origin + '/api/v0/auth/sign-out', { headers: { origin: m.origin }, data: {} });
+ await select('unlinked', true); await go('signin'); assert.equal(new URL(page.url()).searchParams.get('google'), null, 'the e-mail on record signs in after the unlink');
+ assert.equal((await me()).status(), 200);
+ console.log(`Google harness PASS @ ${m.sha}: browser link + sign-in, Secure cookies, quiet fallback/success, refused identities, unlink`);
+} finally { await context.close(); await browser.close(); }

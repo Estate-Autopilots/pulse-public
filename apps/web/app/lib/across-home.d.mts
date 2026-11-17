@@ -1,0 +1,11 @@
+import type { FounderCard } from "./founder.mjs";
+export function summaryLine(n?: { late?: number; today?: number; waiting?: number; collect?: number }): string;
+export type MoneyRow = { org: string; name: string; mark: string | null; accent: string | null; current: boolean; late: number; lateCount: number; due: number; unbilled: number };
+export function moneyRows(cards: readonly FounderCard[] | null | undefined): MoneyRow[];
+export function collectTotal(rows: readonly MoneyRow[] | null | undefined): number;
+type ContractLike = { key: string; canAccept: boolean; title: string; heldBy: string | null; parties?: { name: string; mine: boolean }[] };
+export type Waiting = { key: string; who: string; where: string | null; what: string; action: string; href: string; org: string | null; orgName: string | null;
+  current?: boolean; mark?: string | null; accent?: string | null };
+export function waitingItems(x?: { cards?: readonly FounderCard[] | null; contracts?: readonly ContractLike[] | null }): Waiting[];
+export function waitingCount(x?: { cards?: readonly FounderCard[] | null; contracts?: readonly ContractLike[] | null }): number;
+export function greeting(hour: number, name: string | null | undefined): string;

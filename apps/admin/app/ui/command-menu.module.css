@@ -1,0 +1,123 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--sx-control-h);
+  box-sizing: border-box;
+  padding: 0 8px 0 10px;
+  border: 1px solid var(--sx-line);
+  border-radius: var(--sx-radius-sm);
+  background: var(--sx-surface);
+  color: var(--sx-muted);
+  font: inherit;
+  font-size: var(--sx-text-sm);
+  cursor: pointer;
+}
+
+.trigger:hover {
+  color: var(--sx-ink);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--sx-accent);
+  outline-offset: 1px;
+}
+
+.trigger kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--sx-line);
+  border-radius: 4px;
+  background: var(--sx-sunken);
+  font: inherit;
+  font-size: var(--sx-text-xs);
+}
+
+.dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(480px, 70dvh);
+  margin: 12dvh auto auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--sx-line);
+  border-radius: var(--sx-radius-md);
+  background: var(--sx-surface);
+  box-shadow: var(--lx-shadow-2);
+  color: var(--sx-ink);
+}
+
+.dialog::backdrop {
+  background: color-mix(in oklab, var(--lx-film) 40%, transparent);
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--sx-line);
+  color: var(--sx-muted);
+}
+
+.input {
+  flex: 1;
+  min-height: 48px;
+  border: 0;
+  background: transparent;
+  color: var(--sx-ink);
+  font: inherit;
+  font-size: var(--sx-text-md);
+  outline: none;
+}
+
+.results {
+  max-height: 380px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: var(--sx-radius-sm);
+  cursor: pointer;
+}
+
+.result small {
+  color: var(--sx-muted);
+  font-size: var(--sx-text-xs);
+}
+
+.result[aria-selected="true"] {
+  background: var(--sx-accent-soft);
+  color: var(--sx-accent);
+}
+
+.none {
+  padding: 12px 10px;
+  color: var(--sx-muted);
+}
+
+@media (max-width: 760px) {
+  .trigger span,
+  .trigger kbd {
+    display: none;
+  }
+
+  .trigger {
+    width: var(--sx-control-h);
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .input {
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,88 @@
+/* DITASU-FIX: one person's day (telemetry/day/page.tsx). Theme tokens only; every list scrolls inside its own panel. */
+.days { display: inline-flex; gap: 4px; margin-left: 4px; vertical-align: middle; }
+.dayBtn { display: inline-flex; align-items: center; gap: 2px; height: 24px; padding: 0 8px 0 6px; border: 1px solid var(--theme-border); border-radius: 999px; color: var(--theme-text); background: var(--theme-surface); font-size: 12px; font-weight: 550; text-decoration: none; white-space: nowrap; }
+.dayBtn:hover { background: var(--theme-surface-subtle); }
+.people { list-style: none; margin: 0; padding: 4px 0; }
+.person { display: grid; grid-template-columns: minmax(160px, 260px) minmax(0, 1fr) 210px 16px; gap: 12px; align-items: center; padding: 12px 16px; color: var(--theme-text); text-decoration: none; border-top: 1px solid var(--theme-border); }
+.people li:first-child .person { border-top: 0; }
+.person:hover { background: var(--theme-surface-subtle); }
+.person b { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.person .seen { color: var(--theme-text-muted); font-size: 13px; white-space: nowrap; }
+.trouble { color: var(--theme-text-muted); font-size: 13px; }
+
+.person .seen { text-align: right; }
+.replay { display: grid; gap: 10px; padding: 12px 16px; }
+/* The moment being played, said in words above the replay (the recording may be zoomed away from it on a phone). */
+.moment1 { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: center; margin: 0; padding: 10px 12px; border-radius: 10px;
+  background: color-mix(in oklab, var(--theme-warning) 10%, var(--theme-surface)); border: 1px solid color-mix(in oklab, var(--theme-warning) 30%, var(--theme-border)); }
+.moment1[data-kind="refused"], .moment1[data-kind="error"] { background: color-mix(in oklab, var(--theme-danger) 8%, var(--theme-surface)); border-color: color-mix(in oklab, var(--theme-danger) 30%, var(--theme-border)); }
+.moment1 > span:last-child { display: grid; gap: 2px; min-width: 0; }
+.moment1 b { font-weight: 650; color: var(--theme-text); overflow-wrap: anywhere; }
+.moment1 > span:last-child > span { color: var(--theme-text-muted); font-size: 13px; overflow-wrap: anywhere; }
+.moment1[data-kind="refused"] .icon, .moment1[data-kind="error"] .icon { background: color-mix(in oklab, var(--theme-danger) 14%, transparent); color: var(--theme-danger); }
+
+.moments { list-style: none; margin: 0; padding: 4px 0; }
+.moment { display: grid; grid-template-columns: 30px 48px minmax(0, 1fr) auto 112px; gap: 12px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--theme-border); }
+.moments li:first-child { border-top: 0; }
+.moment[data-playing] { background: color-mix(in oklab, var(--theme-action) 8%, transparent); box-shadow: inset 3px 0 0 var(--theme-action); }
+.icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: color-mix(in oklab, var(--theme-warning) 16%, transparent); color: var(--theme-warning); }
+.moment[data-kind="refused"] .icon, .moment[data-kind="error"] .icon { background: color-mix(in oklab, var(--theme-danger) 14%, transparent); color: var(--theme-danger); }
+.when { font-variant-numeric: tabular-nums; color: var(--theme-text-muted); font-size: 13px; }
+.what { display: grid; gap: 2px; min-width: 0; }
+.what b { font-weight: 600; color: var(--theme-text); overflow-wrap: anywhere; }
+.what span { color: var(--theme-text-muted); font-size: 13px; overflow-wrap: anywhere; }
+.tags { display: inline-flex; gap: 8px; align-items: center; justify-content: flex-end; white-space: nowrap; }
+.ms { font-variant-numeric: tabular-nums; color: var(--theme-text-muted); font-size: 13px; text-align: right; white-space: nowrap; }
+.watch { justify-self: end; white-space: nowrap; }
+.off { opacity: .55; cursor: default; pointer-events: none; }
+.end { height: 0; }
+.noReplay { justify-self: end; color: var(--theme-text-muted); font-size: 12px; white-space: nowrap; }
+
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.slow { list-style: none; margin: 0; padding: 8px 16px 12px; display: grid; gap: 10px; }
+.slow li { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(60px, 1fr) 88px; gap: 12px; align-items: center; }
+.slowNums { text-align: right; }
+.slowName { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--theme-text); }
+.bar { height: 8px; border-radius: 99px; background: var(--theme-surface-subtle); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--theme-action); }
+.bar i[data-slow] { background: #f59e0b; }
+.slowNums { display: grid; justify-items: end; font-variant-numeric: tabular-nums; font-size: 13px; line-height: 1.25; color: var(--theme-text); white-space: nowrap; }
+.slowNums b { font-weight: 650; }
+.slowNums em { font-style: normal; font-size: 11px; color: var(--theme-text-muted); }
+.empty { margin: 0; padding: 12px 16px; color: var(--theme-text-muted); }
+
+.sessions { display: grid; max-height: 70vh; overflow: auto; overscroll-behavior: contain; }
+.session + .session { border-top: 1px solid var(--theme-border); }
+.sessionHead { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 10px 16px; background: var(--theme-surface); border-bottom: 1px solid var(--theme-border); }
+.sessionWhen { color: var(--theme-text-muted); font-size: 13px; flex: 1 1 auto; }
+.steps { list-style: none; margin: 0; padding: 6px 0; }
+.step { display: grid; grid-template-columns: 48px 10px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 5px 16px; font-size: 13px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--theme-border-strong, var(--theme-border)); }
+.step[data-tone="slow"] .dot { background: var(--theme-warning); }
+.step[data-tone="fail"] .dot { background: var(--theme-danger); }
+.step[data-tone="fail"] .label { color: var(--theme-danger); font-weight: 550; }
+.label { min-width: 0; color: var(--theme-text); overflow-wrap: anywhere; }
+
+@media (max-width: 760px) {
+  .end { height: 76px; }
+  .moment { padding: 12px 12px; column-gap: 10px; }
+  .two { grid-template-columns: minmax(0, 1fr); }
+  .moment { grid-template-columns: 30px 44px minmax(0, 1fr) auto; grid-template-areas: "icon what what what" "icon when tags tags" "icon watch watch watch"; row-gap: 6px; }
+  .moment .icon { grid-area: icon; align-self: start; }
+  .moment .when { grid-area: when; }
+  .moment .what { grid-area: what; }
+  .moment .tags { grid-area: tags; justify-content: flex-start; }
+  .moment .watch, .moment .noReplay { grid-area: watch; justify-self: start; }
+  .person { grid-template-columns: minmax(0, 1fr) 16px; row-gap: 2px; }
+  .person .trouble { grid-column: 1; grid-row: 2; }
+  .person .seen { grid-column: 1; grid-row: 3; }
+  .person .chev { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
+  .slow li { grid-template-columns: minmax(0, 1fr) 88px; row-gap: 4px; }
+  .person .seen { text-align: left; }
+  .sessionHead { display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: 2px; }
+  .sessionHead b { white-space: nowrap; }
+  .sessionWhen { grid-column: 1; grid-row: 2; }
+  .sessionHead > :last-child { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  .slowName { grid-column: 1 / -1; white-space: normal; overflow: visible; }
+  .step { grid-template-columns: 40px 8px minmax(0, 1fr) auto; gap: 8px; }
+}

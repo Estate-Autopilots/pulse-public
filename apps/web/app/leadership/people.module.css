@@ -1,0 +1,94 @@
+/* LIFECYCLE parts 2–4 for leadership and finance: value against cost, role seats, staffing gaps. Tables become cards
+   on phones; desktop pages inside the window. */
+.board { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.strip li { display: grid; gap: 2px; min-width: 0; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.strip b { font-size: 20px; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.strip span { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.filters { display: flex; gap: 4px; overflow-x: auto; padding: 3px; border-radius: 10px; background: var(--theme-surface-subtle); scrollbar-width: none; }
+.filters a { display: inline-flex; align-items: center; gap: 6px; flex: none; min-height: 30px; padding: 0 10px; border-radius: 8px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.filters a[aria-current="true"] { background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.filters span { min-width: 18px; padding: 2px 5px; border-radius: 999px; background: var(--theme-surface-subtle); text-align: center; font-variant-numeric: tabular-nums; }
+.month { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; }
+.month a { display: inline-grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--theme-border); border-radius: 8px; color: var(--theme-text); }
+.month b { min-width: 86px; text-align: center; }
+.tableWrap { min-height: 0; overflow: auto; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { position: sticky; top: 0; z-index: 1; padding: 8px 10px; border-bottom: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text-muted); font-size: 12px; font-weight: 600; text-align: left; white-space: nowrap; }
+.table td { padding: 8px 10px; border-bottom: 1px solid var(--theme-border); vertical-align: middle; }
+.table tr:last-child td { border-bottom: 0; }
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.who { display: inline-flex; align-items: center; gap: 8px; min-width: 0; color: inherit; text-decoration: none; }
+.who span { display: grid; min-width: 0; }
+.who b { overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.who small, .sub { color: var(--theme-text-muted); font-size: 11.5px; }
+.band { display: inline-flex; align-items: center; gap: 6px; }
+.band b { font-variant-numeric: tabular-nums; }
+.trend { display: inline-flex; align-items: flex-end; gap: 2px; height: 22px; }
+.trend i { display: block; width: 6px; min-height: 2px; border-radius: 2px 2px 0 0; background: color-mix(in srgb, var(--theme-action) 55%, transparent); }
+.trend i:last-child { background: var(--theme-action); }
+.note { margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.method { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font-size: 13px; }
+.method b { display: block; margin-bottom: 2px; }
+
+/* Seats: one card per seat; a comparison lays the holders side by side by tenure month. */
+.seats { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; align-content: start; min-height: 0; overflow: auto; }
+.seat { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: inherit; text-decoration: none; }
+.seat:hover { border-color: color-mix(in srgb, var(--theme-action) 50%, var(--theme-border)); }
+.seat[data-vacant] { border-color: color-mix(in srgb, var(--theme-warning) 55%, var(--theme-border)); }
+.col > .state { justify-self: start; }
+.seat h4 { margin: 0; font-size: 14px; font-weight: 650; }
+.holders { display: flex; flex-wrap: wrap; gap: 6px; }
+.holder { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px 3px 3px; border-radius: 999px; background: var(--theme-surface-subtle); font-size: 12px; }
+.holder[data-past] { opacity: 0.7; }
+.compare { display: grid; gap: 12px; min-height: 0; overflow: auto; }
+.cols { display: grid; grid-template-columns: repeat(var(--n, 2), minmax(220px, 1fr)); gap: 10px; }
+.col { display: grid; gap: 8px; align-content: start; padding: 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.col dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; margin: 0; font-size: 13px; }
+.col dt { color: var(--theme-text-muted); }
+.col dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.col dd small { display: block; color: var(--theme-text-muted); font-size: 11px; }
+.bars { display: flex; align-items: flex-end; gap: 3px; height: 48px; padding-top: 4px; border-bottom: 1px solid var(--theme-border); }
+.bars i { flex: 1 1 0; min-width: 4px; max-width: 18px; border-radius: 3px 3px 0 0; background: var(--theme-action); }
+.bars i[data-early] { background: color-mix(in srgb, var(--theme-action) 35%, transparent); }
+.add { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.add select, .add input { min-height: 32px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+
+/* Staffing gaps: short lists, one line each. */
+.gaps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; min-height: 0; overflow: auto; align-content: start; align-items: start; }
+.gap { display: grid; gap: 6px; align-content: start; padding: 12px 14px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); }
+.gap h3 { display: flex; align-items: baseline; gap: 8px; margin: 0; font-size: 14px; font-weight: 650; }
+.gap h3 small { color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+.gap ul { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.gap li { display: grid; gap: 2px; padding: 7px 0; border-bottom: 1px solid var(--theme-border); font-size: 13px; }
+.gap li:last-child { border-bottom: 0; }
+.fit { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.fit li { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; }
+.fit li span { display: grid; min-width: 0; }
+.fit li small { color: var(--theme-text-muted); }
+
+/* Owner workbench UI (stability): the board shares a fit page's height (Leadership); on a scrolling page (Finance →
+   People value) it keeps its own height and the page scrolls, not the table. */
+@media (min-width: 1180px) and (min-height: 600px) {
+  [data-fit] .board { flex: 1 1 0; }
+  [data-fit] .tableWrap { flex: 1 1 0; }
+  [data-fit] :is(.seats, .compare, .gaps) { flex: 1 1 0; }
+}
+:not([data-fit]) > .board .tableWrap { overflow: auto hidden; }
+@media (max-width: 1179.98px) { .gaps { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 899.98px) {
+  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .strip li:first-child { grid-column: 1 / -1; }
+  .table thead { display: none; }
+  .table, .table tbody { display: block; }
+  .table tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "who band" "value cost" "work work" "trend conf"; gap: 8px 12px; padding: 12px; border-bottom: 1px solid var(--theme-border); }
+  .table td { display: block; padding: 0; border: 0; min-width: 0; text-align: left; }
+  .table td[data-label]::before { content: attr(data-label); display: block; color: var(--theme-text-muted); font-size: 11px; }
+  .table td[data-label="Person"] { grid-area: who; } .table td[data-label="Person"]::before { display: none; }
+  .table td[data-label="Value ÷ cost"] { grid-area: band; justify-self: end; text-align: right; }
+  .table td[data-label="Value ÷ cost"]::before { display: none; }
+  .table td[data-label="Cost"] { grid-area: cost; } .table td[data-label="Value created"] { grid-area: value; } .table td[data-label="Work"] { grid-area: work; }
+  .table td[data-label="Six months"] { grid-area: trend; } .table td[data-label="Confidence"] { grid-area: conf; justify-self: end; }
+  .cols { grid-template-columns: minmax(0, 1fr); }
+}

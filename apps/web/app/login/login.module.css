@@ -1,0 +1,235 @@
+/* Sign-in: Pulse's own split screen. The brand panel carries the iris gradient and one heartbeat line; the form stays calm. */
+.screen { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 24px; min-height: 100dvh; padding: 12px; background: var(--theme-canvas); }
+.brand { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; overflow: hidden; padding: 40px 44px; border-radius: 22px;
+  background: radial-gradient(120% 90% at 85% 0%, #7c5cf5 0%, transparent 55%), linear-gradient(160deg, #2a1f6e 0%, #1b1446 55%, #120d31 100%); color: #f4f2ff; }
+.brand::after { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px); background-size: 36px 36px; mask-image: linear-gradient(180deg, transparent, #000 40%, #000 70%, transparent); pointer-events: none; }
+.wordmark { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; }
+.wordmark b { display: block; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.wordmark small { display: block; color: rgb(244 242 255 / 70%); font-size: 12px; }
+.headline { position: relative; z-index: 1; max-width: 520px; margin: 0; font-size: clamp(32px, 3.6vw, 52px); font-weight: 750; letter-spacing: -0.03em; line-height: 1.05; }
+.headline em { font-style: normal; background: linear-gradient(90deg, #c4b5fd, #f0abfc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lede { position: relative; z-index: 1; max-width: 460px; margin: 14px 0 0; color: rgb(244 242 255 / 78%); font-size: 16px; line-height: 1.5; }
+.beat { position: relative; z-index: 1; width: 100%; height: 120px; }
+.beat path { fill: none; stroke: url(#login-beat); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1400; stroke-dashoffset: 1400; animation: login-draw 1.8s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards; }
+@keyframes login-draw { to { stroke-dashoffset: 0; } }
+.chips { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.chips li { display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 13px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 999px; background: rgb(255 255 255 / 6%); font-size: 13px; font-weight: 550; }
+.chips svg { color: #c4b5fd; }
+.side { display: flex; align-items: center; justify-content: center; padding: 24px; }
+.form { display: grid; gap: 16px; width: min(400px, 100%); }
+.kicker { display: inline-flex; align-items: center; gap: 7px; margin: 0; color: var(--theme-action); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.kicker::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 20%, transparent); }
+.title { margin: 0; font-size: 30px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.15; }
+.sub { margin: -6px 0 4px; color: var(--theme-text-muted); font-size: 14px; line-height: 1.5; }
+.field { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+.field input { height: 44px; padding: 0 14px; border: 1px solid var(--theme-border-strong); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 15px; font-weight: 400; transition: border-color 120ms ease, box-shadow 120ms ease; }
+.field input:focus { outline: none; border-color: var(--theme-action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 18%, transparent); }
+.passwordField { display: grid; gap: 6px; min-width: 0; font-size: 13px; font-weight: 600; }
+.passwordLabel { cursor: text; }
+.passwordControl { position: relative; display: flex; min-width: 0; }
+.passwordField .passwordInput { box-sizing: border-box; width: 100%; min-width: 0; height: 44px; padding: 0 82px 0 14px; border: 1px solid var(--theme-border-strong); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 15px; font-weight: 400; transition: border-color 120ms ease, box-shadow 120ms ease; }
+.passwordField .passwordInput:focus { outline: none; border-color: var(--theme-action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 18%, transparent); }
+.passwordToggle { position: absolute; top: 0; right: 2px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 64px; height: 44px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: var(--theme-text-muted); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.passwordToggle:hover { color: var(--theme-action); }
+.passwordToggle:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -3px; }
+.primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border: 0; border-radius: 10px; background: linear-gradient(90deg, var(--theme-action), color-mix(in srgb, var(--theme-action) 70%, var(--theme-brand-2))); color: var(--theme-action-text); font: inherit; font-size: 15px; font-weight: 650; cursor: pointer; box-shadow: 0 6px 18px color-mix(in srgb, var(--theme-action) 28%, transparent); transition: filter 120ms ease, transform 80ms ease; }
+.primary:hover { filter: brightness(1.06); }
+.primary:active { transform: translateY(1px); }
+.primary:disabled { opacity: 0.6; cursor: progress; }
+.or { display: flex; align-items: center; gap: 10px; color: var(--theme-text-muted); font-size: 12px; }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--theme-border); }
+.secondary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 44px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.secondary:hover { border-color: var(--theme-border-strong); }
+/* EST-1399: Continue with Google is a link (a full navigation to the server's start route) dressed as the button. */
+a.secondary { text-decoration: none; }
+a.secondary:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.link { justify-self: center; min-height: 44px; padding: 6px 8px; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.link:hover { text-decoration: underline; }
+/* ACCOUNT-META: "Send a new code in N s" is not a link until the minute is up. */
+.link:disabled { color: color-mix(in srgb, var(--theme-text) 55%, transparent); cursor: default; text-decoration: none; }
+.status { min-height: 0; margin: 0; padding: 10px 12px; border-radius: 10px; font-size: 13px; line-height: 1.45; }
+.status[data-tone="error"] { border: 1px solid color-mix(in srgb, var(--theme-danger) 30%, var(--theme-border)); background: color-mix(in srgb, var(--theme-danger) 7%, var(--theme-surface)); color: var(--theme-danger); }
+.status[data-tone="info"] { border: 1px solid color-mix(in srgb, var(--theme-info) 30%, var(--theme-border)); background: color-mix(in srgb, var(--theme-info) 7%, var(--theme-surface)); color: var(--theme-text); }
+.rules { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; color: var(--theme-text-muted); font-size: 13px; }
+.rules li { display: flex; align-items: center; gap: 8px; }
+.rules li[data-ok] { color: var(--theme-success); }
+.foot { margin: 4px 0 0; color: var(--theme-text-muted); font-size: 12px; line-height: 1.5; text-align: center; }
+/* Inside the app frame (a forced password change on any page): the form alone, centred. */
+.framed { display: flex; align-items: center; justify-content: center; min-height: 100%; padding: 32px 16px; }
+.framed .form { padding: 28px; border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); box-shadow: var(--theme-shadow); }
+@media (max-width: 900px) {
+  .screen { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0; }
+  .brand { gap: 12px; padding: calc(22px + var(--pulse-safe-top, 0px)) max(20px, var(--pulse-safe-right, 0px)) 22px max(20px, var(--pulse-safe-left, 0px)); border-radius: 0 0 20px 20px; }
+  .headline { font-size: 26px; }
+  .lede, .beat, .chips { display: none; }
+  .side { align-items: flex-start; padding: 28px max(20px, var(--pulse-safe-right, 0px)) calc(40px + var(--pulse-safe-bottom, 0px)) max(20px, var(--pulse-safe-left, 0px)); }
+}
+/* LAYOUT-SWEEP: the organisation's own logo heads the form (its dark variant in dark mode). */
+.orgLogo { display: block; margin: 0 0 18px; }
+.orgLogo img { display: block; height: 40px; width: auto; max-width: 260px; object-fit: contain; }
+.orgDark { display: none !important; }
+:global(:root[data-theme="dark"]) .orgLight { display: none !important; }
+:global(:root[data-theme="dark"]) .orgDark { display: block !important; }
+/* EST-1200: on a phone "Keep me signed in" is a 44 px row: the box and its words are one press. */
+@media (max-width: 899.98px) { label.foot { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; } }
+/* FLOAT-2 (device audit): a phone on its side: the brand panel and the form side by side, so the form is on screen
+   (the 270 px brand panel pushed it below the fold). The "Keep me signed in" box is 20 px inside its 44 px row. */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  .screen { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); }
+  .brand { justify-content: center; padding: calc(16px + var(--pulse-safe-top, 0px)) 20px 16px max(20px, var(--pulse-safe-left, 0px)); border-radius: 0 20px 20px 0; }
+  .headline { font-size: 22px; }
+  /* QA-BULK: in the Android app the form side started under the status bar (its eyebrow sat behind the clock icons). */
+  .side { align-items: safe center; padding-top: calc(12px + var(--pulse-safe-top, 0px)); padding-right: max(20px, var(--pulse-safe-right, 0px)); padding-bottom: calc(12px + var(--pulse-safe-bottom, 0px)); }
+}
+@media (max-width: 899.98px) { label.foot input[type="checkbox"] { width: 20px; height: 20px; margin: 0; } }
+/* ONBOARD: the invitation's three steps, and links styled as the main button or a text link. */
+.steps { display: grid; gap: 6px; margin: 0; padding-left: 20px; color: var(--theme-text); font-size: 14px; line-height: 1.5; }
+a.primary { text-decoration: none; }
+a.link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+a.link:hover { text-decoration: underline; }
+/* STAFF-UX: the username hint, the Caps Lock line and "Forgot your password?" right under the password. */
+.hint { color: var(--theme-text-muted); font-size: 12px; font-weight: 400; line-height: 1.45; }
+.hint b { color: var(--theme-text); font-weight: 600; }
+.forgotInline { justify-self: end; min-height: 44px; margin-top: -10px; padding: 4px 2px; font-size: 13px; }
+/* BUGFIX #16 (28 Oct 2026, "the login page can't scroll"): the shell locks html and body at 900 px and up, and its bare-page
+   override needs :has(). A browser without :has() (Firefox before 121) kept the lock, so there the sign-in screen is its
+   own scroller, one window tall. */
+@supports not selector(:has(*)) {
+  @media (min-width: 900px) { .screen { box-sizing: border-box; height: 100vh; height: 100dvh; overflow-y: auto; } }
+}
+
+/* FIX-SHELL (owner, 10 Nov 2026: "retouch the sign-in screen"): the other ways in as one quiet list (rows, hairlines,
+   left aligned) under the form; the "keep me signed in" line reads left to right next to its box; "Create your account"
+   is a link like the others (it was a different blue, underlined). */
+.moreWays { display: grid; margin-top: 8px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.moreWays > .link { justify-self: stretch; display: flex; align-items: center; justify-content: flex-start; min-height: 46px; padding: 8px 14px; border-radius: 0; text-align: left; font-size: 14px; }
+.moreWays > .link + .link { border-top: 1px solid var(--theme-border); }
+.moreWays > .link:hover { text-decoration: none; background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.moreWays > .link:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; }
+label.foot { display: flex; align-items: flex-start; justify-content: flex-start; gap: 8px; text-align: left; font-size: 12.5px; }
+label.foot input[type="checkbox"] { flex: none; margin: 2px 0 0; }
+.foot a { color: var(--theme-action); font-weight: 600; text-decoration: none; }
+.foot a:hover { text-decoration: underline; }
+
+/* LOGIN-VITALS (owner, 13 Nov 2026: "a long page you have to scroll, even on a phone"): the sign-in fits one screen.
+   Google's "G" sits in its button; the help list waits behind one quiet "Trouble signing in?"; on a phone the brand panel
+   is one row (the product's icon and name), so the form starts high and ends above the fold (Redmi Note 8 Pro Chrome:
+   393x758 CSS px). */
+.providerIcon { flex: none; }
+.helpToggle { margin-top: -6px; font-size: 13.5px; }
+.form > .foot:has(> a) { margin-top: 0; font-size: 13.5px; }
+@media (max-width: 900px) {
+  /* The grid's spare height goes to the form's row, never to the brand row (it grew to fill a short page). */
+  .screen { grid-template-rows: auto 1fr; }
+  .pitch { display: none; }
+  .brand { flex-direction: row; align-items: center; padding: calc(14px + var(--pulse-safe-top, 0px)) max(20px, var(--pulse-safe-right, 0px)) 14px max(20px, var(--pulse-safe-left, 0px)); border-radius: 0 0 18px 18px; }
+  .side { padding-top: 22px; padding-bottom: calc(20px + var(--pulse-safe-bottom, 0px)); }
+  .form { gap: 14px; }
+  .title { font-size: 26px; }
+}
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  .brand { flex-direction: column; align-items: flex-start; }
+}
+.keepRow { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: -8px; }
+.keepRow > label.foot { align-items: center; min-height: 44px; margin: 0; }
+.keepRow > label.foot input[type="checkbox"] { margin: 0; }
+.keepRow > .forgotInline { margin: 0; justify-self: auto; }
+/* LOGIN-VITALS: the open help list is never clipped (overflow: hidden let the form's grid squeeze it); its first and
+   last rows keep the box's rounded corners on hover instead. */
+.moreWays > .link:first-child { border-radius: 11px 11px 0 0; }
+.moreWays > .link:last-child { border-radius: 0 0 11px 11px; }
+/* LOGIN-VITALS, screenshot judge round 1: the form reads at a glance on a desktop too (bigger labels and a stronger
+   "Keep me signed in"), "Trouble signing in?" is a link in the action colour, the box and its words sit on one line. */
+.form label.foot { align-items: center; color: var(--theme-text); font-size: 13.5px; }
+.form label.foot input[type="checkbox"] { margin: 0; }
+.helpToggle { color: var(--theme-action); font-weight: 600; }
+.helpToggle:hover { text-decoration: none; filter: brightness(1.1); }
+@media (min-width: 901px) {
+  .form { width: min(420px, 100%); }
+  .field { font-size: 14px; }
+  .title { font-size: 32px; }
+}
+/* LOGIN-VITALS, screenshot judge round 2: the form sits on a white card on a desktop (house style), and in the middle of
+   a phone's screen; both fields' labels share one size; "Forgot your password?" sits right under the password; the
+   placeholders read in both themes. */
+.field input::placeholder, .passwordField .passwordInput::placeholder { color: var(--theme-text-muted); opacity: 1; }
+.form > .forgotInline { margin-top: -10px; font-size: 13.5px; }
+@media (min-width: 901px) {
+  .side > .form { box-sizing: border-box; padding: 32px 32px 24px; border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-surface); box-shadow: var(--theme-shadow); }
+  .passwordField { font-size: 14px; }
+}
+/* LOGIN-VITALS, judge round 3: the form keeps one place on a phone (near the top: switching pages or opening help moves
+   nothing); "Trouble signing in?" heads its list with a chevron; hover tints only where there is a mouse; in the dark
+   theme the main button is a deep violet with white words and the card has a clear edge; on a desktop the card's words
+   are a size up and the headline a little quieter. */
+.helpToggle { display: inline-flex; align-items: center; gap: 4px; }
+.helpToggle svg { transition: transform 160ms ease; }
+.helpToggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.moreWays > .link:hover { background: var(--theme-surface); }
+@media (hover: hover) { .moreWays > .link:hover { background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); } }
+:global(:root[data-theme="dark"]) .primary { background: linear-gradient(90deg, #6b4cf0, #7a5cf4); color: #fff; }
+:global(:root[data-theme="dark"]) .passwordToggle { color: color-mix(in srgb, var(--theme-text) 80%, transparent); }
+.passwordToggle { font-size: 13px; }
+@media (min-width: 901px) {
+  :global(:root[data-theme="dark"]) .side > .form { border-color: var(--theme-border-strong); background: color-mix(in srgb, var(--theme-surface) 94%, white); }
+  .side > .form .primary, .side > .form .secondary { height: 48px; font-size: 15px; }
+  .headline { font-size: clamp(28px, 2.9vw, 42px); }
+  .form > .forgotInline { min-height: 32px; margin-top: -12px; }
+}
+.providerRow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; }
+.providerRow > .secondary { min-width: 0; padding: 0 8px; gap: 8px; }
+/* LOGIN-VITALS, judge round 4: the help list hangs right under its toggle; in the dark theme the divider, the card's
+   edge and the list's lines are visible; on a desktop the card's words are a size up again. */
+.helpToggle[aria-expanded="true"] + .moreWays { margin-top: -10px; }
+:global(:root[data-theme="dark"]) .or::before, :global(:root[data-theme="dark"]) .or::after { background: var(--theme-border-strong); }
+:global(:root[data-theme="dark"]) .moreWays, :global(:root[data-theme="dark"]) .moreWays > .link + .link { border-color: var(--theme-border-strong); }
+@media (min-width: 901px) {
+  .side > .form { width: min(440px, 100%); }
+  .field, .passwordField { font-size: 15px; }
+  .field input, .passwordField .passwordInput { height: 48px; font-size: 16px; }
+  .or { font-size: 13px; }
+  .form > .forgotInline { font-size: 14px; }
+  .passwordToggle { font-size: 14px; }
+}
+/* LOGIN-VITALS, judge round 5: clearer edges in the dark theme (inputs, outlined buttons, the help list); outlined buttons
+   never look sunken inside the desktop card; the desktop card's buttons are 16px; less air under Forgot your password. */
+:global(:root[data-theme="dark"]) .secondary, :global(:root[data-theme="dark"]) .field input, :global(:root[data-theme="dark"]) .passwordField .passwordInput { border-color: color-mix(in srgb, var(--theme-border-strong) 70%, var(--theme-text)); }
+.form > .forgotInline { margin-bottom: -6px; }
+@media (hover: none) { .link:hover { text-decoration: none; } }
+@media (min-width: 901px) {
+  .side > .form .primary, .side > .form .secondary { font-size: 16px; }
+  :global(:root[data-theme="dark"]) .side > .form .secondary { background: color-mix(in srgb, var(--theme-surface) 86%, white); }
+}
+/* LOGIN-VITALS, judge round 6: readable small words in the dark theme, an edge under the phone's header band in the
+   dark theme, and room around "Forgot your password?" on a desktop. */
+:global(:root[data-theme="dark"]) .or, :global(:root[data-theme="dark"]) .form > .foot { color: color-mix(in srgb, var(--theme-text) 78%, transparent); }
+@media (max-width: 900px) { :global(:root[data-theme="dark"]) .brand { box-shadow: 0 1px 0 rgb(255 255 255 / 10%), 0 8px 24px rgb(0 0 0 / 35%); } }
+@media (min-width: 901px) { .form > .forgotInline { min-height: 40px; margin-top: -8px; margin-bottom: 0; } }
+/* LOGIN-VITALS, judge round 7: "Trouble signing in?" is quieter than "Create your account"; the small words in the
+   desktop card are 15px; outlined buttons and the "or" line are a step clearer in the dark theme. */
+.helpToggle { color: var(--theme-text-muted); }
+.helpToggle:hover, .helpToggle[aria-expanded="true"] { color: var(--theme-action); }
+:global(:root[data-theme="dark"]) .secondary { border-color: color-mix(in srgb, var(--theme-border-strong) 50%, var(--theme-text)); }
+:global(:root[data-theme="dark"]) .or::before, :global(:root[data-theme="dark"]) .or::after { background: color-mix(in srgb, var(--theme-border-strong) 60%, var(--theme-text)); }
+@media (min-width: 901px) {
+  .side > .form .or, .side > .form > .foot, .side > .form .helpToggle, .side > .form .moreWays > .link { font-size: 15px; }
+}
+/* LOGIN-VITALS, judge round 8: each help row has a small icon; "Forgot your password?" starts under the field it is
+   about; dark-theme links a touch brighter. */
+.moreWays > .link { gap: 10px; }
+.moreWays > .link svg { flex: none; opacity: 0.85; }
+.form > .forgotInline { justify-self: start; padding-left: 0; }
+:global(:root[data-theme="dark"]) .form .link, :global(:root[data-theme="dark"]) .form .foot a { color: color-mix(in srgb, var(--theme-action) 80%, white); }
+:global(:root[data-theme="dark"]) .helpToggle { color: color-mix(in srgb, var(--theme-text) 72%, transparent); }
+/* LOGIN-VITALS, judge round 9: the help rows read as plain options (dark words, violet icons), not a second menu;
+   "Trouble signing in?" is the same quiet grey in both themes; on a desktop the card's top edge stays put between the
+   code and the password pages. */
+.moreWays > .link { color: var(--theme-text); font-weight: 550; }
+.moreWays > .link svg { color: var(--theme-action); opacity: 1; }
+:global(:root[data-theme="dark"]) .form .moreWays > .link { color: var(--theme-text); }
+:global(:root[data-theme="dark"]) .form .helpToggle:not([aria-expanded="true"]) { color: color-mix(in srgb, var(--theme-text) 72%, transparent); }
+@media (min-width: 901px) { .side { align-items: flex-start; padding-top: max(24px, 14vh); } }
+/* LOGIN-VITALS, judge round 10: the small grey words read in the dark theme too. */
+:global(:root[data-theme="dark"]) .or, :global(:root[data-theme="dark"]) .form > .foot, :global(:root[data-theme="dark"]) .form .helpToggle:not([aria-expanded="true"]),
+:global(:root[data-theme="dark"]) .passwordToggle { color: color-mix(in srgb, var(--theme-text) 86%, transparent); }
+:global(:root[data-theme="dark"]) .moreWays > .link + .link { border-top-color: color-mix(in srgb, var(--theme-border-strong) 60%, var(--theme-text)); }

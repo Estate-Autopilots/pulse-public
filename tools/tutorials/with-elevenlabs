@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Run a command with ELEVENLABS_API_KEY in its environment, taken from a secret store at run time. The key is never
+# printed, logged or written to disk.
+#
+#   tools/tutorials/with-elevenlabs python3 tools/tutorials/reels.py quota
+#
+# Sources, in order:
+#   1. EA's Infisical (ea-infisical-run), when this host has it and it holds ELEVENLABS_API_KEY.  Preferred: Pulse is
+#      an EA product.
+#   2. Atlas Crest' key through AC's own wrapper, only when REELS_ALLOW_AC_KEY=1 is set on purpose (the pilots ran
+#      this way on ac). Set REELS_AC_WRAPPER to that wrapper's path (AC repo: scripts/tutorials/with-elevenlabs); it
+#      runs the child as REELS_RUN_AS (default: you). Keep AC's spend small: `reels.py voice` refuses to pass --budget
+#      or 5 % of the plan, and stops when the quota is lower than expected.
+# Only ELEVENLABS_API_KEY and REELS_* variables reach the child through AC's wrapper; pass REELS_WORK with `env`.
+set -euo pipefail
+[ $# -gt 0 ] || { sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
+
+if command -v ea-infisical-run >/dev/null 2>&1 && sudo -n ea-infisical-run -- sh -c 'test -n "${ELEVENLABS_API_KEY:-}"' 2>/dev/null; then
+  exec sudo -n --preserve-env=REELS_WORK,REELS_DATE ea-infisical-run -- sudo -u "$(id -un)" --preserve-env=ELEVENLABS_API_KEY,REELS_WORK,REELS_DATE nice -n 19 "$@"
+fi
+if [ "${REELS_ALLOW_AC_KEY:-}" = 1 ] && [ -n "${REELS_AC_WRAPPER:-}" ]; then
+  exec env SXTUT_RUN_AS="${REELS_RUN_AS:-$(id -un)}" "$REELS_AC_WRAPPER" env REELS_WORK="${REELS_WORK:-/tmp/pulse-reels}" REELS_DATE="${REELS_DATE:-}" "$@"
+fi
+echo "with-elevenlabs: no ElevenLabs key: EA's Infisical has none here, and REELS_ALLOW_AC_KEY=1 with REELS_AC_WRAPPER is not set" >&2
+exit 1

@@ -1,0 +1,3 @@
+export type Fact={id:string;source_ref:{kind:string;id:string;href:string};occurred_at:string|null;observed_at:string;subject_ref:string;classification:string;freshness:string;override_version:string;statement:string};
+export type Insight={cause_key:string;id:string;headline:string;meaning:string;facts:Fact[];coverage:string;confidence_label:string;as_of:string;expires_at:string;baseline:string;exclusions:string[];hypotheses:string[];correction_href:string;next_action:{label:string;href:string;owner:string|null;authority:string;effect:string};lifecycle:string;supersedes_id:string|null;revised?:boolean;current_id?:string|null};
+export type Projection={cards:Insight[];backlog:Insight[];state:string;surface:string};
