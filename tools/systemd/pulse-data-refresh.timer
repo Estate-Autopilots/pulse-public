@@ -1,0 +1,8 @@
+[Unit]
+Description=Production snapshot refresh at 03:00 India time
+[Timer]
+OnCalendar=*-*-* 03:00:00 Asia/Kolkata
+Persistent=true
+AccuracySec=1m
+[Install]
+WantedBy=timers.target

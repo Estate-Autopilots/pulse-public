@@ -1,0 +1,14 @@
+export type Purpose = "work" | "test" | "demo";
+type OrgLike = { purpose?: Purpose | string | null; mine?: boolean; orgKind?: string | null; personal?: boolean } | null | undefined;
+export function isPractice(o: OrgLike): boolean;
+export function isPersonal(o: OrgLike): boolean;
+export function isRealCompany(o: OrgLike): boolean;
+export function switcherOrder<T extends NonNullable<OrgLike>>(orgs: readonly T[] | null | undefined): T[];
+export function companiesText(n: number): string;
+export function practiceWord(purpose: string | null | undefined): string;
+export type WorkWith = { key: string; name: string; org: string | null; handle: string | null; individual: boolean; kind: string; role: string | null;
+  weServe: boolean; since: string | null; via: { org: string; name: string; personal?: boolean } };
+export function workWithLine(w: WorkWith | null | undefined): string;
+export type WorkWithGroup = { key: string; name: string; org: string | null; handle: string | null; individual: boolean; lines: string[] };
+export function groupWorkWith(rows: readonly WorkWith[] | null | undefined): WorkWithGroup[];
+export function practiceLine(list: readonly { name: string; purpose: string }[] | null | undefined): string;

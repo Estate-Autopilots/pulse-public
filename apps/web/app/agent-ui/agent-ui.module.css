@@ -1,0 +1,306 @@
+/* AGENT-UI-CONTROL: an AI employee working the screen. Vitals violet (the action colour and brand-2) marks everything it
+   does, so a person always sees what came from it: the prompt tray at the top, the activity line, the glow on what it
+   points at, its side view and its cards in the chat. Calm by default; motion only when it acts (and none with reduced
+   motion). */
+
+.tray {
+  position: fixed;
+  z-index: 80;
+  top: 72px;
+  right: 20px;
+  display: grid;
+  width: min(392px, calc(100vw - 24px));
+  gap: 8px;
+  pointer-events: none;
+}
+.tray > * { pointer-events: auto; }
+
+.card {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px 12px;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  background:
+    linear-gradient(var(--theme-surface), var(--theme-surface)) padding-box,
+    linear-gradient(135deg, var(--theme-action), var(--theme-brand-2)) border-box;
+  box-shadow: var(--theme-shadow), 0 0 0 4px color-mix(in srgb, var(--theme-action) 8%, transparent);
+  color: var(--theme-text);
+  animation: drop 220ms cubic-bezier(.2, .8, .2, 1) both;
+}
+.head { display: flex; align-items: flex-start; gap: 10px; }
+.mark {
+  display: grid;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--theme-action), var(--theme-brand-2));
+  color: #fff;
+}
+.words { min-width: 0; flex: 1; font-size: 14px; line-height: 1.4; }
+.words b { font-weight: 650; }
+.meta { display: block; margin-top: 2px; color: var(--theme-text-muted); font-size: 12.5px; }
+.close {
+  display: grid;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  margin: -4px -6px 0 0;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--theme-text-muted);
+  cursor: pointer;
+}
+.close:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.buttons { display: flex; flex-wrap: wrap; gap: 8px; padding-left: 40px; }
+.btn, .primary, .ghost {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+  border: 1px solid var(--theme-border-strong);
+  border-radius: 9px;
+  background: var(--theme-surface);
+  color: var(--theme-text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.primary { border-color: var(--theme-action); background: var(--theme-action); color: var(--theme-action-text); }
+.primary:hover { background: var(--theme-action-hover); }
+.ghost { border-color: transparent; background: transparent; color: var(--theme-text-muted); }
+.ghost:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+/* AGENT-OPERATOR: a click that sends, pays or removes: its line reads at full strength and No is a real button. */
+.card[data-confirm] .meta { color: var(--theme-text); font-size: 14px; line-height: 1.45; }
+.card[data-confirm] .ghost { border-color: var(--theme-border-strong, var(--theme-border)); color: var(--theme-text); }
+.card[data-confirm] .buttons { gap: 12px; }
+.card[data-confirm] .buttons button { min-height: 40px; padding-inline: 18px; }
+.btn:hover { border-color: var(--theme-action); }
+.btn:disabled, .primary:disabled, .ghost:disabled { opacity: .55; cursor: default; }
+.error { margin: 0; padding-left: 40px; color: var(--theme-danger); font-size: 13px; }
+.more { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; text-align: right; }
+
+/* The activity line: what it just did, for a few seconds; "Pause" stops it driving this screen for a while. */
+.activity {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 8px;
+  max-width: 100%;
+  padding: 7px 8px 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--theme-action) 30%, var(--theme-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface));
+  box-shadow: var(--theme-shadow);
+  color: var(--theme-text);
+  font-size: 13px;
+  animation: drop 200ms cubic-bezier(.2, .8, .2, 1) both;
+}
+.activity svg { flex: none; color: var(--theme-action); }
+.activity span { overflow: hidden; min-width: 0; text-overflow: ellipsis; white-space: nowrap; }
+.activity button {
+  flex: none;
+  padding: 3px 9px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--theme-action);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.activity button:hover { background: color-mix(in srgb, var(--theme-action) 14%, transparent); }
+
+/* The count in the top bar (computer): prompts waiting, one click opens them again. */
+.barPill {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 0 9px;
+  border: 1px solid color-mix(in srgb, var(--theme-action) 45%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface));
+  color: var(--theme-action);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.barPill i { min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--theme-action); color: var(--theme-action-text); font-size: 11.5px; font-style: normal; line-height: 18px; text-align: center; }
+
+/* Its touch: a soft violet edge for a moment when it acts on the screen. */
+.touch {
+  position: fixed;
+  z-index: 79;
+  inset: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--theme-action) 60%, transparent), inset 0 0 48px color-mix(in srgb, var(--theme-brand-2) 22%, transparent);
+  pointer-events: none;
+  animation: touch 1100ms ease-out both;
+}
+
+/* The side view on pages without the chat's side panel. */
+.side {
+  position: fixed;
+  z-index: 75;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  width: min(480px, 92vw);
+  flex-direction: column;
+  border-left: 1px solid var(--theme-border);
+  background: var(--theme-surface);
+  box-shadow: -18px 0 44px rgb(24 20 60 / 12%);
+  animation: slide 220ms cubic-bezier(.2, .8, .2, 1) both;
+}
+.sideHead {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px 0 14px;
+  border-bottom: 1px solid var(--theme-border);
+}
+.sideHead strong { overflow: hidden; min-width: 0; flex: 1; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.sideHead em { flex: none; color: var(--theme-action); font-size: 12px; font-style: normal; font-weight: 600; }
+.iconBtn {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--theme-text-muted);
+  cursor: pointer;
+}
+.iconBtn:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.frame { width: 100%; min-height: 0; flex: 1; border: 0; background: var(--theme-canvas); }
+.sideNote { display: grid; gap: 12px; padding: 24px 18px; color: var(--theme-text-muted); font-size: 14px; }
+
+/* A card in the chat (Add client, Add task, Add project, Pick one). */
+.chatCard {
+  display: grid;
+  max-width: 420px;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--theme-action) 35%, var(--theme-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-action) 4%, var(--theme-surface));
+  color: var(--theme-text);
+}
+.chatCard[data-compact] { max-width: none; padding: 10px; }
+.chatCard h4 { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 14px; font-weight: 650; }
+.chatCard h4 svg { color: var(--theme-action); }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.chatCard[data-compact] .fields { grid-template-columns: minmax(0, 1fr); }
+.field { display: grid; gap: 4px; font-size: 12.5px; color: var(--theme-text-muted); }
+.field[data-wide] { grid-column: 1 / -1; }
+.field input, .field textarea {
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px solid var(--theme-border-strong);
+  border-radius: 8px;
+  background: var(--theme-surface);
+  color: var(--theme-text);
+  font: inherit;
+  font-size: 14px;
+}
+.field input:focus-visible, .field textarea:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.cardButtons { display: flex; flex-wrap: wrap; gap: 8px; }
+.cardDone { display: flex; align-items: flex-start; gap: 7px; margin: 0; color: var(--theme-success); font-size: 13.5px; font-weight: 600; line-height: 1.4; }
+.cardDone svg { flex: none; margin-top: 2px; }
+.cardDone a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.doneBy { color: var(--theme-text-muted); font-weight: 500; }
+/* While the side view is open on a computer, the tray sits to its left (never over its buttons). */
+.tray[data-beside] { right: calc(min(480px, 92vw) + 16px); }
+.cardClosed { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Screen control on the AI employee's profile. */
+.levels { display: grid; gap: 8px; }
+.level {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--theme-border);
+  border-radius: 10px;
+  background: var(--theme-surface);
+  cursor: pointer;
+}
+.level[data-on] { border-color: var(--theme-action); background: color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface)); }
+.level input { margin: 3px 0 0; accent-color: var(--theme-action); }
+.level b { font-size: 14px; }
+.level span { grid-column: 2; color: var(--theme-text-muted); font-size: 13px; }
+.log { display: grid; margin: 0; padding: 0; gap: 2px; list-style: none; }
+.log li { display: flex; flex-wrap: wrap; gap: 4px 10px; padding: 7px 0; border-top: 1px solid var(--theme-border); font-size: 13px; }
+.log time { color: var(--theme-text-muted); }
+.state { padding: 0 7px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 12px; line-height: 20px; }
+.state[data-s="done"] { color: var(--theme-success); }
+.state[data-s="failed"], .state[data-s="refused"] { color: var(--theme-danger); }
+.state[data-s="asked"] { color: var(--theme-action); }
+.allow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 13.5px; }
+
+@keyframes drop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes slide { from { opacity: .4; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes touch { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0; } }
+
+@media (max-width: 899.98px) {
+  .tray { top: calc(env(safe-area-inset-top, 0px) + 10px); right: 10px; left: 10px; width: auto; }
+  .activity { justify-self: stretch; }
+  .buttons { padding-left: 0; }
+  .error { padding-left: 0; }
+  .side { top: 10vh; left: 0; width: 100%; border-top: 1px solid var(--theme-border); border-left: 0; border-radius: 16px 16px 0 0; box-shadow: 0 -18px 44px rgb(24 20 60 / 18%); }
+  .fields { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card, .activity, .side { animation: none; }
+  .touch { display: none; }
+}
+
+/* FIX-CHAT-AI: the AI at work: who, its steps (ticked), Pause and Stop, at the bottom centre while it works. */
+.work { position: fixed; left: 50%; bottom: 22px; z-index: calc(var(--ds-z-float, 60) + 2); translate: -50% 0; display: grid; gap: 8px; width: min(440px, calc(100vw - 24px));
+  padding: 12px 14px 10px; border: 1px solid color-mix(in srgb, var(--theme-action) 28%, var(--theme-border)); border-radius: 16px; background: var(--theme-surface);
+  box-shadow: var(--ds-elev-3, var(--theme-shadow)); color: var(--theme-text); overflow: hidden; animation: drop 220ms cubic-bezier(.2, .8, .2, 1) both; pointer-events: auto; }
+.workHead { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.workMark { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: color-mix(in srgb, var(--theme-action) 14%, var(--theme-surface)); color: var(--theme-action); }
+.workHead p { flex: 1; min-width: 0; display: grid; margin: 0; }
+.workHead b { overflow: hidden; font-size: 14px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.workHead small { color: var(--theme-text-muted); font-size: 12px; }
+.workHead button { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px; border: 1px solid var(--theme-border); border-radius: 999px;
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.workHead button:hover { border-color: var(--theme-action); color: var(--theme-action); }
+.workHead button:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 1px; }
+.workSteps { display: grid; gap: 4px; margin: 0; padding: 0 0 0 42px; list-style: none; }
+.workSteps li { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--theme-text-muted); font-size: 13px; }
+.workSteps li[data-now] { color: var(--theme-text); font-weight: 600; }
+.workSteps li > span { flex: none; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--theme-danger); color: var(--theme-action-text, #fff); }
+.workSteps li[data-ok] > span { background: var(--theme-action); }
+.workBar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--theme-action); transform-origin: left; animation: workbar 8s linear both; }
+@keyframes workbar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) { .work, .workBar { animation: none; } }
+
+/* AGENT-OPERATOR: in the operator view the prompts sit at the top centre of the page the AI works in (left of the
+   chat), under its step strip, so the person sees the question where the click would happen. On a phone the view
+   stacks, and the tray keeps its usual place. */
+/* On a phone it sits low, above the bottom bar, so the strip and Stop stay in view. */
+@media (max-width: 899.98px) {
+  .tray[data-operator] { top: auto; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); left: 24px; right: 24px; width: auto; }
+}
+@media (min-width: 900px) {
+  .tray[data-operator] { width: min(460px, calc(100vw - 24px)); top: calc(var(--operator-top, 64px) + 16px); right: auto; left: calc(var(--operator-left, 0px) + (100vw - var(--operator-left, 0px) - var(--operator-chat-w, 400px)) / 2);
+    transform: translateX(-50%); }
+}

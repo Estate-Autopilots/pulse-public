@@ -1,0 +1,62 @@
+{
+ "id": "indigo-amber",
+ "fonts_css": "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=Manrope:wght@400..800&family=JetBrains+Mono:wght@400..700&display=block",
+ "font_display": "'Fraunces', Georgia, serif",
+ "font_body": "'Manrope', system-ui, sans-serif",
+ "font_mono": "'JetBrains Mono', ui-monospace, monospace",
+ "motif": "arcs",
+ "themes": {
+  "dark": {
+   "bg": "#0E1A3D",
+   "fg": "#FAF7F0",
+   "muted": "#B9C3DD",
+   "acc": "#F6A623",
+   "ok": "#4CC38A",
+   "bad": "#FF7A66",
+   "rule": "rgba(185,195,221,.22)",
+   "chip": "#F6A623",
+   "chipfg": "#0E1A3D",
+   "tile": "rgba(255,255,255,.07)",
+   "motif": "rgba(246,166,35,.13)"
+  },
+  "surface": {
+   "bg": "#24307A",
+   "fg": "#FAF7F0",
+   "muted": "#C9D0E6",
+   "acc": "#F6A623",
+   "ok": "#6FD6A3",
+   "bad": "#FF9A8A",
+   "rule": "rgba(255,255,255,.22)",
+   "chip": "#F6A623",
+   "chipfg": "#0E1A3D",
+   "tile": "rgba(255,255,255,.08)",
+   "motif": "rgba(246,166,35,.14)"
+  },
+  "light": {
+   "bg": "#FAF7F0",
+   "fg": "#0E1A3D",
+   "muted": "#4A5578",
+   "acc": "#8A4B00",
+   "ok": "#1F7A50",
+   "bad": "#B23A28",
+   "rule": "rgba(14,26,61,.12)",
+   "chip": "#0E1A3D",
+   "chipfg": "#FAF7F0",
+   "tile": "rgba(14,26,61,.055)",
+   "motif": "rgba(246,166,35,.22)"
+  },
+  "accent": {
+   "bg": "#F6A623",
+   "fg": "#0E1A3D",
+   "muted": "#3B2F12",
+   "acc": "#7A1F00",
+   "ok": "#0B4A2E",
+   "bad": "#7A1F00",
+   "rule": "rgba(14,26,61,.2)",
+   "chip": "#0E1A3D",
+   "chipfg": "#F6A623",
+   "tile": "rgba(14,26,61,.08)",
+   "motif": "rgba(14,26,61,.10)"
+  }
+ }
+}

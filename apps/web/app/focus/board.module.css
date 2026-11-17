@@ -1,0 +1,165 @@
+/* UX-GAMIFY (owner, 9 Nov 2026): Focus on the game-feel kit (kit/game). Gauges fill the row (no row that "stops
+   short"), nothing runs off the right edge (the burn graph and every row shrink inside their card; the gauge strip
+   scrolls inside its own box on a phone), the kit's page column keeps equal gutters from the sidebar. A company's
+   colour is --hue (a number). 4px grid; the theme's tokens, so dark mode reads. */
+.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; min-width: 0; }
+.gaugeCard { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border);
+  box-shadow: 0 1px 2px rgb(30 27 46 / 6%), 0 4px 16px rgb(30 27 46 / 5%); min-width: 0; }
+.gaugeCard[data-status="off"] { opacity: .7; }
+.gaugeHead { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.gaugeHead b { font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.serves { display: flex; gap: 4px; flex-wrap: wrap; min-height: 24px; }
+.company { display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  background: hsl(var(--hue, 260) 70% 95%); color: hsl(var(--hue, 260) 55% 32%); }
+:global(:root[data-theme="dark"]) .company { background: hsl(var(--hue, 260) 30% 22%); color: hsl(var(--hue, 260) 70% 80%); }
+.gaugeFacts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0; }
+.gaugeFacts div { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.gaugeFacts dt { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--theme-text-muted); }
+.gaugeFacts dd { margin: 0; font-size: 14px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.gaugeFoot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--theme-border); min-height: 40px; }
+.gaugeFoot > :last-child { margin-left: auto; }
+.fresh { font-size: 12px; color: var(--theme-text-muted); white-space: nowrap; }
+.fresh[data-stale] { display: inline-flex; align-items: center; gap: 4px; color: var(--theme-warning); font-weight: 650; }
+
+.paid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; min-width: 0; }
+.paidTile { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; background: var(--theme-surface);
+  border: 1px solid var(--theme-border); min-width: 0; }
+.paidIcon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: color-mix(in srgb, #6B4CF0 12%, var(--theme-surface)); color: #6B4CF0; }
+:global(:root[data-theme="dark"]) .paidIcon { color: #A897FF; }
+.paidText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.paidText small { font-size: 13px; color: var(--theme-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.paidText b { font-size: 18px; font-weight: 750; }
+.paidText .paidNone { font-size: 14px; font-weight: 600; color: var(--theme-text-muted); }
+
+/* Quests and the rail: one column on a phone, the rail beside from 1024px. */
+.split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; min-width: 0; }
+@media (min-width: 1024px) { .split { grid-template-columns: minmax(0, 1fr) 320px; } }
+.rail { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.mini { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.mini li { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 8px 12px; border-radius: 12px; background: var(--theme-surface-subtle); font-size: 14px; }
+.mini li b { font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.mini li span { font-weight: 650; white-space: nowrap; }
+.mini li[data-tone="bad"] { background: color-mix(in srgb, #E11D48 9%, var(--theme-surface)); }
+.mini li[data-tone="bad"] span { color: var(--theme-danger); }
+.mini li[data-tone="warn"] span { color: var(--theme-warning); }
+.quiet { margin: 0; font-size: 14px; line-height: 1.5; color: var(--theme-text-muted); }
+
+/* The burn graph scales to its card. */
+.burn { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.burn svg { width: 100%; height: auto; display: block; }
+.grid { stroke: var(--theme-border); stroke-width: 1; }
+.axis { fill: var(--theme-text-muted); font-size: 13px; }
+.line { stroke: hsl(var(--hue) 62% 52%); }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); font-size: 12px; color: var(--theme-text-muted); }
+.days span { text-align: left; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--theme-text-muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 4px; border-radius: 4px; background: hsl(var(--hue) 62% 52%); }
+
+/* Forms: Log a reading and Settings. */
+.logForm, .fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 640px) { .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.logForm label, .fields label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: var(--theme-text-muted); min-width: 0; }
+.logForm input, .logForm select, .fields input, .fields select, .weights input {
+  min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text);
+  height: 44px; font: inherit; font-size: 15px; font-variant-numeric: tabular-nums; box-sizing: border-box; width: 100%; min-width: 0; }
+.logForm input:focus, .logForm select:focus, .fields input:focus, .fields select:focus, .weights input:focus { outline: 2px solid #6B4CF0; outline-offset: 1px; border-color: transparent; }
+.wide { grid-column: 1 / -1; }
+.check { flex-direction: row !important; align-items: center; gap: 8px !important; min-height: 44px; color: var(--theme-text) !important; }
+.check input { width: 20px; height: 20px; min-height: 0; accent-color: #6B4CF0; }
+.settings { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+/* Settings: three short cards in one column. */
+.settings { max-width: 760px; }
+.weights { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.weights label { display: grid; grid-template-columns: minmax(0, 1fr) 96px; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; }
+.weights label span { display: inline-flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.weights label i { flex: none; width: 10px; height: 10px; border-radius: 50%; background: hsl(var(--hue) 62% 52%); }
+.key { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+.key code { padding: 8px 12px; border-radius: 8px; background: var(--theme-surface-subtle); font-size: 13px; overflow-wrap: anywhere; user-select: all; }
+.key span { font-size: 12px; color: var(--theme-warning); }
+
+/* The week's use: one bar per company, its share and about how many full windows. */
+.useBars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.useBars li { display: grid; grid-template-columns: minmax(96px, 180px) minmax(0, 1fr) 48px; grid-template-areas: "name bar pct" ". note note"; align-items: center; gap: 4px 12px; }
+.useName { grid-area: name; font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.useBar { position: relative; grid-area: bar; height: 12px; border-radius: 12px; background: var(--theme-surface-subtle); overflow: hidden; }
+/* SETTINGS-APPLE: the line is faded by its colour, not opacity, so its "plan" label keeps full contrast (2.95:1 before). */
+.useBar em { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: color-mix(in srgb, var(--theme-text) 70%, transparent); }
+.useBar i { display: block; height: 100%; border-radius: inherit; background: hsl(var(--hue) 62% 52%); }
+.useBars b { grid-area: pct; font-size: 15px; font-weight: 750; text-align: right; }
+.useBars small { grid-area: note; font-size: 12px; color: var(--theme-text-muted); }
+@media (max-width: 479px) { .useBars li { grid-template-columns: minmax(0, 1fr) 48px; grid-template-areas: "name pct" "bar bar" "note note"; } }
+
+/* The main button: in the header from 640px; on a phone, after the content in a bar that stays at the bottom. */
+.phoneBar { display: none; }
+@media (max-width: 639px) { .header [data-primary-action], .header :is(a, button)[class*="primary"] { display: none; } .phoneBar { display: block; } }
+.hint { font-size: 12px; font-weight: 500; color: var(--theme-text-muted); }
+@media (max-width: 639px) { .phoneBar [role="region"] > span:last-child { width: 100%; } .phoneBar [role="region"] button { flex: 1; } }
+.more { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 12px; }
+.more summary { cursor: pointer; font-size: 13px; font-weight: 650; color: #6B4CF0; min-height: 32px; display: flex; align-items: center; }
+.paidAdd { align-self: flex-start; padding: 0; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 650; color: #6B4CF0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+:global(:root[data-theme="dark"]) .paidAdd { color: #A897FF; }
+:global(:root[data-theme="dark"]) .gaugeCard, :global(:root[data-theme="dark"]) .paidTile { border-color: color-mix(in srgb, var(--theme-text) 18%, transparent); }
+/* The phone's save button stands alone at the bottom (no card around it). */
+@media (max-width: 639px) { .phoneBar [role="region"] { background: none; border: 0; box-shadow: none; padding: 0; -webkit-backdrop-filter: none; backdrop-filter: none; } .phoneBar [role="region"] > span:first-child { display: none; } }
+.useBar em span { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 10px; font-style: normal; font-weight: 650; color: var(--theme-text-muted); }
+.useBar { overflow: visible; margin-top: 12px; }
+.useBar i { border-radius: 12px; }
+@media (max-width: 639px) { .header [class*="eyebrow"] { display: none; } .gaugeCard svg { max-width: 120px; } }
+:global(:root[data-theme="dark"]) .company { background: hsl(var(--hue, 260) 32% 28%); color: hsl(var(--hue, 260) 80% 86%); }
+.useBars small[data-tone="over"] { color: var(--theme-text); font-weight: 650; font-size: 13px; }
+.useBars small[data-tone="under"] { color: var(--theme-text); font-weight: 650; font-size: 13px; }
+/* Small number boxes with their % sign (Settings). */
+.pct { position: relative; }
+.pct input, .weights input { max-width: 120px; padding-right: 28px; }
+.pct::after { content: "%"; position: absolute; left: 96px; bottom: 12px; font-size: 15px; color: var(--theme-text-muted); pointer-events: none; }
+.weights li { position: relative; }
+.weights label::after { content: "%"; position: absolute; right: 12px; bottom: 12px; font-size: 15px; color: var(--theme-text-muted); pointer-events: none; }
+/* More compact gauge cards on a computer, so today's quests show in the first screen. */
+@media (min-width: 640px) { .gaugeCard { padding: 12px 16px; gap: 4px; } .gaugeCard svg { max-width: 128px; } }
+.doNow { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, #6B4CF0 9%, var(--theme-surface)); border: 1px solid color-mix(in srgb, #6B4CF0 25%, var(--theme-surface)); color: inherit; text-decoration: none; font-size: 15px; line-height: 1.4; }
+.doNow > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.doNow b { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #6B4CF0; }
+:global(:root[data-theme="dark"]) .doNow b { color: #A897FF; }
+.doNow svg { margin-top: 2px; }
+.doNow svg { flex: none; color: #6B4CF0; }
+:global(:root[data-theme="dark"]) .doNow svg { color: #A897FF; }
+@media (max-width: 639px) { .gaugeCard { padding: 12px; gap: 4px; } .gaugeCard svg { max-width: 104px; } .serves { display: none; } }
+:global(:root[data-theme="dark"]) .company { background: hsl(var(--hue, 260) 36% 32%); color: hsl(var(--hue, 260) 85% 92%); }
+/* SETTINGS-APPLE (T1.4.2): this company or all my companies, one labelled switch under the header. */
+.scope { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; }
+.scope small { color: var(--theme-text-muted); font-size: 13px; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; min-width: 0; }
+.controls > * { min-width: 0; }
+/* SETTINGS-APPLE (judge: "Claude Max (EA, synt…" cut short in Refills next): account names wrap instead. */
+.mini li b { white-space: normal; overflow-wrap: anywhere; }
+/* SETTINGS-APPLE (judge: "a full calm-blue bar while over plan"): over plan, the bar is amber. */
+.useBars li[data-over] .useBar i { background: #d97706; }
+
+/* PULSE-POLISH (owner, 14 Nov 2026: "Focus is showing a lot of things … I don't know what to do with it"): one next step
+   with its reason, at most two more, the rest folded; one small privacy note at the foot. */
+.next { display: flex; flex-direction: column; gap: 8px; padding: 20px 24px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border);
+  border-left: 6px solid var(--next, #6B4CF0); box-shadow: 0 1px 2px rgb(30 27 46 / 6%), 0 8px 24px rgb(30 27 46 / 6%); min-width: 0; }
+.next[data-kind="blocked"] { border-left-color: #E11D48; }
+.nextKicker { margin: 0; font-size: 12px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; color: #6B4CF0; }
+.next[data-kind="blocked"] .nextKicker { color: var(--theme-danger); }
+:global(:root[data-theme="dark"]) .nextKicker { color: #A897FF; }
+.nextTitle { margin: 0; font-size: 22px; line-height: 1.25; font-weight: 750; overflow-wrap: anywhere; }
+.nextHow { margin: 0; font-size: 16px; font-weight: 600; color: var(--theme-text); }
+.nextWhy { margin: 0; font-size: 15px; line-height: 1.5; color: var(--theme-text-muted); max-width: 68ch; }
+.nextWhy b { color: var(--theme-text); font-weight: 650; }
+.nextNote { margin: 0; font-size: 13px; color: var(--theme-text-muted); }
+.next > div { margin-top: 4px; }
+.also { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.alsoHead { margin: 0; font-size: 15px; font-weight: 700; }
+.folds { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.folds > details { border-radius: 14px; background: var(--theme-surface); border: 1px solid var(--theme-border); padding: 4px 16px; }
+.folds > details[open] { padding-bottom: 16px; }
+.folds > details > div { display: flex; flex-direction: column; gap: 12px; }
+.foldActions { display: flex; flex-wrap: wrap; gap: 8px; }
+.folds .quiet svg { vertical-align: -2px; }
+.privacy { display: flex; align-items: center; gap: 6px; margin: 4px 0 0; font-size: 13px; color: var(--theme-text-muted); }
+@media (max-width: 639px) { .next { padding: 16px; } .nextTitle { font-size: 19px; } }
+:global(:root[data-theme="dark"]) .next, :global(:root[data-theme="dark"]) .folds > details { border-color: color-mix(in srgb, var(--theme-text) 18%, transparent); }
+.folds > details > summary { min-height: 48px; font-size: 15px; font-weight: 650; color: var(--theme-text); }
+.folds > details > summary > span:last-child { font-size: 13px; }

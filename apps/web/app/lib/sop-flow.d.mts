@@ -1,0 +1,11 @@
+export type FlowStep = { id: string; title: string; kind?: string; role?: string | null; personId?: string | null; phase?: string | null; next?: { to: string; label?: string | null }[] | null };
+export type FlowEdge = { from: string; to: string; label: string | null };
+export type FlowLane = { key: string; label: string; steps: number; y: number; h: number };
+export type FlowNode = { id: string; lane: string; col: number; x: number; y: number; w: number; h: number };
+export type FlowPath = FlowEdge & { d: string; back: boolean; handoff: boolean; lx: number; ly: number };
+export type FlowLayout = { lanes: FlowLane[]; nodes: FlowNode[]; edges: FlowPath[]; phases: { label: string; x0: number; x1: number }[]; width: number; height: number; cols: number };
+export declare const SIZE: { node: { w: number; h: number }; gapX: number; gapY: number; lanePad: number; rail: number; top: number; end: number };
+export declare function flowEdges(steps: FlowStep[]): FlowEdge[];
+export declare function layoutFlow(steps: FlowStep[], options?: { by?: "role" | "person"; names?: Record<string, string> }): FlowLayout;
+export declare function flowSummary(steps: FlowStep[]): string;
+export declare function hoursText(hours: number | null | undefined): string | null;
