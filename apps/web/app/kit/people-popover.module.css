@@ -1,0 +1,16 @@
+/* The people list that opens where you clicked (owner workbench, 21 Oct 2026); design-system tokens only. */
+.pop { width: 320px; max-width: calc(100vw - 24px); padding: 6px; border-radius: var(--ds-radius-lg); }
+.search { display: flex; align-items: center; gap: 8px; height: 38px; margin: 2px 2px 6px; padding: 0 10px; border-radius: var(--ds-radius-md); background: var(--ds-hover); color: var(--theme-text-muted); }
+.search:focus-within { background: var(--theme-surface); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 22%, transparent), var(--ds-ring); }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--theme-text); font: inherit; font-size: var(--ds-text-md); }
+.list { display: grid; gap: 1px; max-height: min(340px, 50vh); margin: 0; padding: 0; overflow-y: auto; list-style: none; scrollbar-width: thin; }
+.row { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 5px 8px; border-radius: var(--ds-radius-md); color: var(--theme-text); cursor: pointer; }
+.row[data-active] { background: var(--ds-hover); }
+.row[aria-disabled] { cursor: default; opacity: 0.6; }
+.text { display: grid; flex: 1 1 auto; gap: 1px; min-width: 0; }
+.text b { overflow: hidden; font-size: var(--ds-text-md); font-weight: var(--ds-weight-medium); text-overflow: ellipsis; white-space: nowrap; }
+.text small { overflow: hidden; color: var(--theme-text-muted); font-size: var(--ds-text-xs); text-overflow: ellipsis; white-space: nowrap; }
+.tick { flex: none; color: var(--theme-success); }
+.ask { flex: none; padding: 2px 7px; border-radius: var(--ds-radius-pill); background: color-mix(in srgb, var(--ds-hue-amber) var(--ds-tint), transparent); color: color-mix(in srgb, var(--ds-hue-amber) 80%, var(--theme-text)); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-strong); }
+.none { padding: 14px 10px; color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+.search input:focus, .search input:focus-visible { outline: none; box-shadow: none; }

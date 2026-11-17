@@ -1,0 +1,24 @@
+{
+  "contract": "connector.v1",
+  "key": "ea-connect",
+  "name": "EA Connect",
+  "version": "1.0.0",
+  "publisher": "Estate Autopilots (Pulse)",
+  "transport": "pull",
+  "auth": "google_service_account",
+  "scopes": [
+    {
+      "scope": "https://www.googleapis.com/auth/drive.metadata.readonly",
+      "why": "Read the names, folders, sizes, checksums and change times of files in the shared drives and folders your admin selects. Never file contents, comments or sharing settings."
+    }
+  ],
+  "sources": ["shared_drive", "folder"],
+  "entities": [
+    { "type": "drive.file.created", "schema": 1 },
+    { "type": "drive.file.updated", "schema": 1 },
+    { "type": "drive.file.moved", "schema": 1 },
+    { "type": "drive.file.renamed", "schema": 1 },
+    { "type": "drive.file.trashed", "schema": 1 },
+    { "type": "drive.folder.created", "schema": 1 }
+  ]
+}

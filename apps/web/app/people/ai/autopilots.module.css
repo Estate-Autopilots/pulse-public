@@ -1,0 +1,129 @@
+/* FIX-AI-EMPLOYEES (owner, 10 Nov 2026): Autopilots, the AI employees as cards (Codex concept 1, "Card grid"): who it
+   is, what it did today, what it waits on, what it cost. The house style of the game-feel kit (kit/game): accent
+   #6B4CF0, white cards on the canvas, 16px radius, a 4px grid, tabular numbers; the theme's tokens so dark mode reads. */
+.grid, .needs, .more, .quiet {
+  --ap-accent: #6B4CF0; --ap-good: #16A34A; --ap-warn: #D97706; --ap-bad: #E11D48;
+  --ap-shadow: 0 1px 2px rgb(30 27 46 / 6%), 0 4px 16px rgb(30 27 46 / 5%);
+}
+:global(:root[data-theme="dark"]) :is(.grid, .needs, .more, .quiet) { --ap-accent: #A897FF; --ap-good: #4ADE80; --ap-warn: #FBBF24; --ap-bad: #FB7185; --ap-shadow: 0 1px 2px rgb(0 0 0 / 30%); }
+
+/* The cards: equal width, every card in a row the same height, never wider than the screen. */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); align-items: start; gap: 16px; margin: 0; padding: 0; list-style: none; min-width: 0; }
+.grid > li { display: flex; min-width: 0; }
+.card { position: relative; display: flex; flex-direction: column; gap: 12px; width: 100%; padding: 16px 20px; border-radius: 16px; background: var(--theme-surface);
+  border: 1px solid var(--theme-border); box-shadow: var(--ap-shadow); min-width: 0; box-sizing: border-box; overflow: hidden; }
+.card[data-off] { background: var(--theme-surface-subtle); box-shadow: none; }
+
+.head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 12px; min-width: 0; }
+.who { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.nameRow { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.name { font-size: 16px; font-weight: 700; color: var(--theme-text); text-decoration: none; overflow-wrap: anywhere; line-height: 1.25; }
+.name:hover { color: var(--ap-accent); }
+.role { font-size: 13px; color: var(--theme-text-muted); overflow-wrap: anywhere; line-height: 1.35; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; min-height: 24px; border-radius: 999px; font-size: 12px; font-weight: 650; white-space: nowrap;
+  color: var(--theme-text-muted); background: var(--theme-surface-subtle); border: 1px solid var(--theme-border); box-sizing: border-box; }
+.chip[data-tone] { border-color: transparent; }
+.chip[data-tone="good"] { color: var(--ap-good); background: color-mix(in srgb, var(--ap-good) 12%, var(--theme-surface)); }
+.chip[data-tone="warn"] { color: color-mix(in srgb, var(--ap-warn) 80%, var(--theme-text)); background: color-mix(in srgb, var(--ap-warn) 14%, var(--theme-surface)); }
+.chip[data-tone="bad"] { color: var(--ap-bad); background: color-mix(in srgb, var(--ap-bad) 12%, var(--theme-surface)); }
+.chip[data-tone="accent"] { color: var(--ap-accent); background: color-mix(in srgb, var(--ap-accent) 12%, var(--theme-surface)); }
+
+/* What it did: one or two plain lines with an icon. */
+.line { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: start; gap: 8px; margin: 0; font-size: 14px; line-height: 1.45; color: var(--theme-text); }
+.line > svg { margin-top: 2px; color: var(--theme-text-muted); }
+.line small { color: var(--theme-text-muted); font-size: 13px; }
+.line a, .line button.link { color: var(--ap-accent); font-weight: 600; }
+.link { padding: 0; border: 0; background: none; font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.link:disabled { opacity: .6; cursor: progress; }
+
+/* What it waits on: one highlighted band. */
+.wait { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: start; gap: 8px; margin: 0; padding: 8px 12px; border-radius: 12px; font-size: 14px; line-height: 1.45;
+  background: var(--theme-surface-subtle); color: var(--theme-text); }
+.wait > svg { margin-top: 2px; }
+.wait[data-tone="good"] { background: color-mix(in srgb, var(--ap-good) 9%, var(--theme-surface)); }
+.wait[data-tone="good"] > svg { color: var(--ap-good); }
+.wait[data-tone="warn"] { background: color-mix(in srgb, var(--ap-warn) 12%, var(--theme-surface)); }
+.wait[data-tone="warn"] > svg { color: var(--ap-warn); }
+.wait[data-tone="bad"] { background: color-mix(in srgb, var(--ap-bad) 10%, var(--theme-surface)); }
+.wait[data-tone="bad"] > svg { color: var(--ap-bad); }
+.wait a { color: inherit; font-weight: 650; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Its cost: a footer line, and today's budget as a thin bar. */
+.cost { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--theme-border); }
+.costLine { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0; font-size: 13px; color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.costLine b { color: var(--theme-text); font-weight: 700; }
+.meter { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; font-size: 12px; color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.track { display: block; height: 6px; border-radius: 999px; background: color-mix(in srgb, var(--theme-text-muted) 18%, var(--theme-surface)); overflow: hidden; }
+.fill { display: block; height: 100%; border-radius: inherit; background: var(--ap-accent); }
+.fill[data-tone="warn"] { background: var(--ap-warn); }
+.fill[data-tone="bad"] { background: var(--ap-bad); }
+
+/* Needs a person: what waits on people, across every AI employee. */
+.needs { display: flex; flex-direction: column; gap: 8px; padding: 16px 20px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border); box-shadow: var(--ap-shadow); min-width: 0; }
+.needs h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 700; }
+.needs h2 > svg { color: var(--ap-warn); }
+.needs ul { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.needs li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--theme-border); min-width: 0; }
+.needs li:first-child { border-top: 0; }
+.needs li > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.needs li b { font-size: 14px; overflow-wrap: anywhere; }
+.needs li small { font-size: 13px; color: var(--theme-text-muted); overflow-wrap: anywhere; }
+.open { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--theme-border); background: var(--theme-surface);
+  color: var(--theme-text); font-size: 13px; font-weight: 650; text-decoration: none; white-space: nowrap; }
+.open:hover { border-color: var(--ap-accent); color: var(--ap-accent); }
+.needs > p { margin: 0; font-size: 13px; }
+.needs > p a { color: var(--ap-accent); font-weight: 600; }
+
+/* The day switcher in the header. */
+.day { display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 12px; border: 1px solid var(--theme-border); background: var(--theme-surface); }
+.day a, .day span[aria-disabled] { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; color: var(--theme-text); }
+.day a:hover { background: var(--theme-surface-subtle); }
+.day span[aria-disabled] { color: var(--theme-text-muted); opacity: .45; }
+.day b { min-width: 104px; padding: 0 4px; text-align: center; font-size: 14px; font-weight: 650; white-space: nowrap; }
+.today { font-size: 13px; font-weight: 650; color: var(--ap-accent, #6B4CF0); padding: 0 8px; }
+
+/* More about the AI team: quiet links under the cards. */
+.more { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 4px 0 72px; font-size: 14px; color: var(--theme-text-muted); }
+.more a { display: inline-flex; align-items: center; gap: 6px; color: var(--theme-text); font-weight: 600; text-decoration: none; }
+.more a:hover { color: var(--ap-accent); }
+.more a > svg { color: var(--ap-accent); }
+
+@media (max-width: 639px) {
+  .card, .needs { padding: 16px; }
+  .needs li { grid-template-columns: auto minmax(0, 1fr); }
+  .needs li > .open { grid-column: 2; justify-self: start; }
+  .day b { min-width: 88px; }
+}
+
+/* The tabs and the day switcher on one row (they wrap on a phone). */
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+@media (max-width: 639px) {
+  .bar > nav { flex: 1 1 100%; }
+  .bar > nav > * { flex: 1 1 0; justify-content: center; }
+  .day { flex: 1 1 100%; justify-content: space-between; }
+}
+
+/* Quiet today: AI employees with nothing to show, one line each. */
+.quiet { display: flex; flex-direction: column; gap: 4px; padding: 12px 20px; border-radius: 16px; border: 1px solid var(--theme-border); background: var(--theme-surface); min-width: 0; }
+.quiet h2 { margin: 0; padding: 4px 0; font-size: 14px; font-weight: 700; color: var(--theme-text-muted); }
+.quiet ul { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.quiet li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--theme-border); min-width: 0; }
+.quiet li:first-child { border-top: 0; }
+.quiet li > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.quiet li .name { font-size: 14px; }
+.quiet li small { font-size: 13px; color: var(--theme-text-muted); overflow-wrap: anywhere; }
+button.open { font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
+:global(:root[data-theme="dark"]) .chip[data-tone="bad"] { color: #FDA4AF; background: color-mix(in srgb, #FB7185 24%, var(--theme-surface)); }
+@media (max-width: 639px) {
+  .needs li { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+  .needs li > .open { grid-column: 1 / -1; justify-self: stretch; justify-content: center; }
+}
+
+.keep { white-space: nowrap; }
+/* The one urgent job stands out: Open is violet. */
+.needs .open { border-color: color-mix(in srgb, var(--ap-accent) 55%, var(--theme-border)); color: var(--ap-accent); }
+@media (max-width: 639px) {
+  .quiet li { grid-template-columns: auto minmax(0, 1fr); }
+  .quiet li > .open, .quiet li > .chip { grid-column: 2; justify-self: start; }
+  .more { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+}

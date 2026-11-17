@@ -1,0 +1,35 @@
+openapi: 3.1.0
+info: { title: Pulse Google sign-in, version: 1.0.0-rc.1 }
+# Frozen EST-1392 revision 9f3680c4-900f-40d3-9f9d-7797d15bf9e9, §3.
+# GET/PUT /api/v0/admin/sign-in/google are admin-only. PUT omits configured;
+# a fresh Pulse second factor travels in X-Pulse-Two-Step when changing trust.
+# POST /api/v0/auth/google/unlink accepts {}, self only; ends Google sessions.
+# POST /api/v0/people/{id}/login accepts {action: google-unlink}, admin only.
+# GET /api/v0/auth/google/start?mode=signin|silent|link&next=<path> (EST-1397): 302 to Google with header
+#   x-pulse-oidc-set (the proxy's pulse_oidc cookie, sent back as x-pulse-oidc); 404 when not configured or off.
+# GET /api/v0/auth/google/callback: 302 to next with x-pulse-session-token (12 h, via google), /account?google=linked,
+#   or /login?next=…&google=<§3 reason>. google=two_step carries x-pulse-two-step-challenge; the proxy keeps it and
+#   adds it as challenge to the body of POST /api/v0/auth/two-step.
+# There is no link-proof route.
+paths: {}
+components:
+  schemas:
+    GoogleSignInSettings:
+      type: object
+      additionalProperties: false
+      required: [configured, enabled, allowedDomains, trustGoogle2Step, passwordSignIn]
+      properties:
+        configured: { type: boolean, readOnly: true, description: 'PULSE_GOOGLE_CLIENT_ID and PULSE_GOOGLE_CLIENT_SECRET_FILE are set' }
+        enabled: { type: boolean, default: false }
+        allowedDomains: { type: array, maxItems: 10, uniqueItems: true, items: { type: string, maxLength: 253, pattern: '^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$' } }
+        trustGoogle2Step: { type: boolean, default: false, description: 'PUT needs a fresh Pulse 2-step from the admin if they have one; audited and announced to admins' }
+        passwordSignIn: { enum: ['on', off_for_linked], default: 'on', description: 'off_for_linked: people with a Google link must use Google. Admins always keep password + 2-step as the recovery path' }
+    GoogleLink:
+      type: object
+      additionalProperties: false
+      required: [email, linkedAt, lastUsedAt]
+      description: 'In GET /api/v0/auth/account as googleLink (null when none). The subject is never shown'
+      properties:
+        email: { type: string, description: The Google email at link time }
+        linkedAt: { type: string, format: date-time }
+        lastUsedAt: { type: [string, 'null'], format: date-time }
