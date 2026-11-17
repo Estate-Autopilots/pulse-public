@@ -1,0 +1,15 @@
+/* /kit: a review page for the shared controls. */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 16px; align-content: start; }
+.card { display: grid; align-content: start; gap: 12px; min-width: 0; padding: 16px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); }
+.card h2 { margin: 0; font-size: 14px; font-weight: 650; }
+.row { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 10px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+.field { padding: 9px 12px; border: 1px solid var(--theme-border); border-radius: 10px; font-size: 15px; }
+.field:focus-within { border-color: var(--theme-action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 16%, transparent); }
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.inline { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+.note { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface);
+  color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn:hover { border-color: var(--theme-border-strong); }
+.btn:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+@media (max-width: 899.98px) { .btn { min-height: 44px; } .row { grid-template-columns: 1fr; gap: 4px; } }

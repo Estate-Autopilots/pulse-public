@@ -1,0 +1,12 @@
+export type MediaReason = "media-denied" | "media-missing" | "media-busy" | "media-timeout" | "media-unsupported";
+export type Problem = { reason: string; title: string; text: string };
+export const MEDIA_WAIT_MS: number;
+export const SLOW_MS: number;
+export const STUCK_MS: number;
+export function mediaReason(name: string | undefined): MediaReason;
+export function mediaProblem(reason: string, video?: boolean): Problem;
+export function connectStage(since: number | null | undefined, now: number): "connecting" | "slow" | "stuck" | null;
+export function connectLine(stage: "connecting" | "slow" | "stuck" | null): string;
+export const STUCK_PROBLEM: Problem;
+export const MIC_LOST: Problem;
+export function withTimeout<T>(promise: Promise<T>, ms: number, late?: (value: T) => void): Promise<T>;

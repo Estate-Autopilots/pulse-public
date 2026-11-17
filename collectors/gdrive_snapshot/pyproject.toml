@@ -1,0 +1,37 @@
+[project]
+name = "pulse-gdrive-snapshot"
+version = "0.1.0"
+description = "Read-only EA Drive metadata index backfill into Pulse events"
+requires-python = ">=3.12"
+dependencies = ["pulse-rules", "pulse-sdk"]
+
+[project.scripts]
+pulse-ea-bootstrap = "pulse_gdrive_snapshot.bootstrap:main"
+pulse-drive-backfill = "pulse_gdrive_snapshot.backfill:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.8"]
+
+[tool.uv.sources]
+pulse-rules = { workspace = true }
+pulse-sdk = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pulse_gdrive_snapshot"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pulse_sdk", "pulse_gdrive_snapshot"]

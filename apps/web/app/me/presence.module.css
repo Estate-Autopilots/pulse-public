@@ -1,0 +1,98 @@
+/* My desk, PRESENCE-ONBOARD: payroll month, the habit card, the day timeline and the profile banner. */
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* "This is what payroll will use" */
+.payroll { display: grid; gap: 10px; min-width: 0; container-type: inline-size; }
+.payrollHead { display: grid; gap: 2px; margin: 0; }
+.payrollHead b { font-size: 14px; }
+.payrollHead span { color: var(--theme-text-muted); font-size: 13px; }
+.payrollHead span b { color: var(--theme-text); font-size: inherit; }
+.payroll[data-closed] .payrollHead span { color: var(--theme-text-muted); }
+.payrollStats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.payrollStats div { min-width: 0; padding: 8px 10px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); }
+.payrollStats dt { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.payrollStats dd { margin: 2px 0 0; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.payrollStats dd a { color: inherit; text-decoration: none; }
+.payrollStats div[data-warn] { border-color: color-mix(in srgb, var(--theme-warning) 55%, var(--theme-border)); }
+.payrollStats div[data-warn] dd { color: var(--theme-warning); }
+.payrollFix { margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+/* On My desk's overview the numbers are one line each, so the month below keeps its room. */
+.payroll[data-compact] { gap: 8px; }
+.payroll[data-compact] .payrollStats { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.payroll[data-compact] .payrollStats div { display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: baseline; gap: 6px; padding: 6px 8px; }
+.payroll[data-compact] .payrollStats dd { margin: 0; font-size: 16px; }
+.payroll[data-compact] .payrollFix { display: none; }
+@media (max-width: 1279.98px) { .payroll[data-compact] .payrollStats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* POLISH-2: in a narrow column on a wide window (My desk before the week card arrives) six cells cut every label. */
+@container (max-width: 639.98px) { .payroll[data-compact] .payrollStats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 479.98px) { .payroll[data-compact] .payrollStats, .payrollStats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* The habit: this week's dots and the streak */
+.habit { display: grid; gap: 8px; min-width: 0; }
+.habitHead { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0; }
+.habitHead b { font-size: 14px; }
+.habitHead span { color: var(--theme-text-muted); font-size: 12px; white-space: nowrap; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.days li { display: grid; justify-items: center; gap: 2px; color: var(--theme-text-muted); font-size: 11px; }
+.days i { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--theme-border-strong, var(--theme-border)); box-sizing: border-box; }
+.days li[data-state="on_time"] i { border-color: var(--theme-success); background: var(--theme-success); }
+.days li[data-state="late"] i { border-color: var(--theme-warning); background: var(--theme-warning); }
+.days li[data-state="missed"] i { border-color: var(--theme-danger); }
+.days li[data-state="off"] i { border-style: dashed; opacity: 0.45; }
+.days li[data-state="today"] i { border-color: var(--theme-action); }
+.days li[data-state="today"] { color: var(--theme-action); font-weight: 700; }
+.habitLine { margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.habitLine b { color: var(--theme-text); }
+
+/* Side by side under Today on wide screens */
+.presenceRow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 12px; }
+.presenceRow > section { padding: 10px 14px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+@media (max-width: 1023.98px) { .presenceRow { grid-template-columns: minmax(0, 1fr); } }
+
+/* The day timeline */
+.timeline { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 10px 2px 0; }
+.timelineHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.timelineHead b { font-size: 14px; }
+.dayNav { display: inline-flex; align-items: center; gap: 4px; }
+.dayNav input { min-height: 32px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.events { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.events li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: start; gap: 4px 10px; padding: 10px 0; border-top: 1px solid var(--theme-border); }
+.events li:first-child { border-top: 0; }
+.eventIcon { margin-top: 2px; color: var(--theme-text-muted); }
+.events li[data-tone="warning"] .eventIcon { color: var(--theme-warning); }
+.events li[data-tone="success"] .eventIcon { color: var(--theme-success); }
+.eventText { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.eventText b { font-size: 13px; font-weight: 600; }
+.eventText small { color: var(--theme-text-muted); font-size: 12px; }
+.empty { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+@media (max-width: 599.98px) { .events li { grid-template-columns: 22px minmax(0, 1fr); } .events li > :last-child:not(.eventText) { grid-column: 2; justify-self: start; } }
+
+/* "Finish your profile" */
+.banner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 14px; border: 1px solid color-mix(in srgb, var(--theme-action) 35%, var(--theme-border)); border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface)); }
+.banner > span { display: grid; flex: 1 1 260px; gap: 2px; min-width: 0; }
+.banner b { font-size: 14px; }
+.banner small { color: var(--theme-text-muted); font-size: 12px; }
+.meter { flex: 0 0 120px; height: 8px; overflow: hidden; border-radius: 999px; background: var(--theme-surface-subtle); }
+.meter i { display: block; height: 100%; border-radius: inherit; background: var(--theme-action); }
+/* LAYOUT-SWEEP: on a day off, one quiet line beside the greeting instead of a whole card. */
+.offDay { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-height: 28px; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); color: var(--theme-text); font-size: 12.5px; text-decoration: none; }
+.offDay svg { flex: none; color: var(--theme-action); }
+.offDay b { color: var(--theme-action); font-weight: 600; }
+.offDay:hover b { text-decoration: underline; }
+.offDay:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+
+/* UX-5A: the Attendance tab's one row of quiet actions (late marks, a correction, work on a day off). */
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-height: 34px; margin: 0 0 10px; }
+.toolbarEnd { display: inline-flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.ruleChip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 6px 0 10px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface);
+  color: var(--theme-text-muted); font-size: 12.5px; }
+.ruleChip b { color: var(--theme-text); }
+@media (max-width: 599.98px) { .toolbarEnd { width: 100%; margin-left: 0; } .toolbarEnd > * { flex: 1 1 auto; }
+  /* RELEASE-5: full width, the quiet buttons read as loose text; on a phone they are outlined. */
+  .toolbarEnd > :is(button) { border-color: var(--theme-border); background: var(--theme-surface); color: var(--theme-text); } }
+.banner > .bannerText { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-width: 0; }
+.bannerText small { color: var(--theme-text-muted); }
+/* READY: the "?" stays on the line that says what is left, never alone under it. */
+.bannerLeft { display: inline-flex; align-items: center; gap: 6px; }

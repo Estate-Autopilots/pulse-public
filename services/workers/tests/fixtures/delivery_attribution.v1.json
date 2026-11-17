@@ -1,0 +1,55 @@
+{
+  "version": "delivery-attribution/v1",
+  "people": {
+    "designer_a": "00000000-0000-0000-0000-000000000001",
+    "designer_b": "00000000-0000-0000-0000-000000000002"
+  },
+  "cases": [
+    {
+      "name": "mapped_designer_account",
+      "shared": false,
+      "mapped_person": "designer_a",
+      "signals": [{"person": "designer_a", "group": "uploader", "ratio": 20}],
+      "credit": "designer_a",
+      "how": "account map"
+    },
+    {
+      "name": "shared_account_without_person_evidence",
+      "shared": true,
+      "signals": [],
+      "credit": "shared login",
+      "how": "shared"
+    },
+    {
+      "name": "shared_account_fingerprint",
+      "shared": true,
+      "signals": [{"person": "designer_a", "group": "hash", "ratio": 1000}],
+      "credit": "designer_a",
+      "how": "fingerprint"
+    },
+    {
+      "name": "shared_account_folder_owner",
+      "shared": true,
+      "signals": [{"person": "designer_b", "group": "folder_owner", "ratio": 100}],
+      "credit": "designer_b",
+      "how": "folder owner"
+    },
+    {
+      "name": "shared_account_conflicting_owner_and_fingerprint",
+      "shared": true,
+      "signals": [
+        {"person": "designer_a", "group": "folder_owner", "ratio": 100},
+        {"person": "designer_b", "group": "hash", "ratio": 1000}
+      ],
+      "credit": "shared login",
+      "how": "shared"
+    },
+    {
+      "name": "unmapped_individual_account",
+      "shared": false,
+      "signals": [],
+      "credit": "unresolved",
+      "how": null
+    }
+  ]
+}

@@ -1,0 +1,179 @@
+/* UX-5B: the task companion. A small tab on the right edge, halfway down (the page's own buttons, which sit at the
+   bottom right, stay free); the card and the attention bubble open beside it. On a phone it sits above the tab bar and
+   the card opens as a sheet. Lit = something connected to the person's task just happened: a soft accent ring that
+   breathes twice, never a shake; reduced motion keeps the ring without the breathing. */
+.root {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  z-index: var(--ds-z-float, 60);
+  display: flex;
+  max-width: calc(100vw - 12px);
+  max-height: 92vh;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.root > * { pointer-events: auto; }
+.root[data-open] { right: 16px; }
+
+/* The side tab */
+.tab {
+  position: relative;
+  display: flex;
+  width: 40px;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 0 10px 2px;
+  border: 1px solid var(--theme-border);
+  border-right: 0;
+  border-radius: 12px 0 0 12px;
+  background: var(--theme-surface);
+  color: var(--theme-action);
+  box-shadow: -4px 6px 18px rgba(15, 23, 42, 0.14);
+  cursor: pointer;
+}
+.tab small { color: var(--theme-text-muted); font-size: 10px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tab:hover { background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.tab:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.dot { position: absolute; top: 6px; left: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--theme-action); }
+.root[data-lit] .tab { border-color: var(--theme-action); animation: lit 1.6s ease-in-out 2; box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-action) 18%, transparent), -4px 6px 18px rgba(15, 23, 42, 0.14); }
+@keyframes lit {
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-action) 18%, transparent), -4px 6px 18px rgba(15, 23, 42, 0.14); }
+  50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--theme-action) 6%, transparent), -4px 6px 18px rgba(15, 23, 42, 0.14); }
+}
+
+/* The card */
+.card {
+  display: flex;
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(80vh, 620px);
+  flex-direction: column;
+  border: 1px solid var(--theme-border);
+  border-radius: 16px;
+  background: var(--theme-surface);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.2);
+  animation: rise 0.18s ease-out both;
+}
+.card header, .pane header { display: flex; align-items: center; gap: 6px; padding: 10px 8px 8px 14px; border-bottom: 1px solid var(--theme-border); }
+.card header > svg, .pane header > svg { flex: none; color: var(--theme-action); }
+.card h2, .pane h2 { min-width: 0; flex: 1; margin: 0; font-size: 14px; font-weight: 650; line-height: 1.3; }
+.card h2 a, .pane h2 a { display: -webkit-box; overflow: hidden; color: var(--theme-text); text-decoration: none; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.card h2 a:hover, .pane h2 a:hover { text-decoration: underline; }
+.cardBody, .paneBody { display: flex; min-height: 0; flex-direction: column; gap: 12px; padding: 12px 14px; overflow: auto; }
+.icon { display: grid; width: 30px; height: 30px; flex: none; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.icon:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+@media (max-width: 1099px) { .icon[data-wide-only] { display: none; } }
+
+.status { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.status span { padding: 2px 8px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text); font-weight: 600; }
+.status span[data-status="in_progress"] { background: color-mix(in srgb, var(--theme-action) 14%, transparent); }
+.status span[data-status="blocked"] { background: color-mix(in srgb, var(--theme-warning) 18%, transparent); }
+.go {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 1px solid var(--theme-action);
+  border-radius: 10px;
+  color: var(--theme-action);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+}
+.go:hover { background: color-mix(in srgb, var(--theme-action) 8%, transparent); }
+.steps { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.steps li { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: start; gap: 8px; font-size: 13px; line-height: 1.4; }
+.steps li[data-done] span { color: var(--theme-text-muted); text-decoration: line-through; }
+.steps button { display: grid; width: 20px; height: 20px; margin-top: 1px; place-items: center; border: 1.5px solid var(--theme-border-strong); border-radius: 6px; background: var(--theme-surface); color: transparent; cursor: pointer; }
+.steps li[data-done] button { border-color: var(--theme-success); background: var(--theme-success); color: #fff; }
+.steps button:disabled { cursor: default; opacity: 0.7; }
+.signals { display: grid; gap: 6px; padding: 10px; border-radius: 10px; background: var(--theme-surface-subtle); }
+.signals small { display: inline-flex; align-items: center; gap: 5px; color: var(--theme-text-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.01em; }
+.signals ul { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.signals li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 7px; font-size: 13px; }
+.signals i { display: grid; width: 16px; height: 16px; place-items: center; border: 1.5px solid var(--theme-border-strong); border-radius: 50%; }
+.signals li[data-met] i { border-color: var(--theme-success); background: var(--theme-success); color: #fff; }
+.signals li[data-met] span { color: var(--theme-text-muted); }
+.signals b { color: var(--theme-text-muted); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.note { margin: 0; color: var(--theme-text-muted); font-size: 12px; }
+.link { padding: 0; border: 0; background: none; color: var(--theme-action); font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--theme-border); }
+.primary, .ghost {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+.primary { border: 1px solid var(--theme-action); background: var(--theme-action); color: var(--theme-action-text); }
+.ghost { border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); }
+.primary:disabled, .ghost:disabled { cursor: default; opacity: 0.6; }
+
+/* The attention bubble */
+.bubble {
+  width: min(340px, calc(100vw - 64px));
+  padding: 12px 12px 10px;
+  border: 1px solid var(--theme-action);
+  border-radius: 14px;
+  background: var(--theme-surface);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-action) 14%, transparent), 0 16px 36px rgba(15, 23, 42, 0.2);
+  animation: rise 0.2s ease-out both;
+}
+.bubble p { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 10px; font-size: 13px; line-height: 1.45; }
+.bubble p svg { flex: none; margin-top: 2px; color: var(--theme-action); }
+.bubbleActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.pane .bubble, .card .bubble { width: auto; box-shadow: none; }
+
+/* Open beside */
+.pane {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  display: flex;
+  width: var(--w);
+  flex-direction: column;
+  border-left: 1px solid var(--theme-border);
+  background: var(--theme-surface);
+  box-shadow: -10px 0 30px rgba(15, 23, 42, 0.08);
+}
+.paneBody { flex: 1; }
+.pane .foot { position: sticky; bottom: 0; background: var(--theme-surface); }
+.grip { position: absolute; top: 0; bottom: 0; left: -4px; width: 8px; cursor: col-resize; touch-action: none; }
+.grip:hover, .grip:focus-visible { background: color-mix(in srgb, var(--theme-action) 30%, transparent); outline: none; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .card, .bubble, .root[data-lit] .tab { animation: none; }
+}
+
+/* Phones: above the tab bar, the card as a sheet. */
+@media (max-width: 900px) {
+  .root { top: auto; bottom: calc(var(--lx-bottom-nav-h, 62px) + env(safe-area-inset-bottom, 0px) + 12px); flex-direction: column; align-items: flex-end; transform: none; }
+  .root[data-open] { right: 12px; left: 12px; }
+  .card { width: 100%; max-height: 62vh; }
+  .bubble { width: min(calc(100vw - 24px), 420px); margin-right: 12px; }
+}
+
+/* FLOAT (21 Oct 2026): the companion's tab and card are floating controls, so they wear the one floating glass and
+   motion (AC scale); Pip keeps clear of the tab (data-float-avoid). */
+.tab { border: 0; background: var(--ds-glass, var(--theme-surface)); -webkit-backdrop-filter: var(--ds-glass-blur, none); backdrop-filter: var(--ds-glass-blur, none);
+  box-shadow: var(--ds-glass-edge, inset 0 0 0 1px var(--theme-border)), var(--ds-glass-shadow, -4px 6px 18px rgba(15, 23, 42, 0.14)); }
+.tab:hover { background: var(--ds-glass-strong, var(--theme-surface)); }
+.card { border: 0; border-radius: var(--ds-radius-lg, 16px); background: var(--ds-glass-strong, var(--theme-surface)); -webkit-backdrop-filter: var(--ds-glass-blur, none); backdrop-filter: var(--ds-glass-blur, none);
+  box-shadow: var(--ds-glass-edge, inset 0 0 0 1px var(--theme-border)), var(--ds-glass-shadow, 0 18px 44px rgba(15, 23, 42, 0.2)); animation: rise var(--ds-float-in, 0.18s) var(--ds-spring, ease-out) both; }
+.bubble { border: 0; border-radius: var(--ds-radius-lg, 16px); background: var(--ds-glass-strong, var(--theme-surface)); -webkit-backdrop-filter: var(--ds-glass-blur, none); backdrop-filter: var(--ds-glass-blur, none);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--theme-action) 55%, transparent), var(--ds-glass-shadow, 0 16px 36px rgba(15, 23, 42, 0.2)); animation: rise var(--ds-float-in, 0.2s) var(--ds-spring, ease-out) both; }
+.pane .bubble, .card .bubble { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
