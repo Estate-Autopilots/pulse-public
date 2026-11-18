@@ -1,0 +1,68 @@
+/* BILLING (18 Oct 2026): the Billing home: big buttons for what people come to do, the "Needs you" tray. Pulse tokens
+   only; two buttons a row on a phone, 48 px rows. */
+.quick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; min-width: 0; }
+.big { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 64px; padding: 12px 14px; border: 1px solid var(--theme-border); border-radius: 14px;
+  background: var(--theme-surface); color: var(--theme-text); text-decoration: none; transition: border-color 140ms ease, transform 120ms ease; -webkit-tap-highlight-color: transparent; }
+.big:hover { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); }
+.big:active { transform: scale(0.98); }
+.big:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.big > svg { flex: none; padding: 8px; box-sizing: content-box; border-radius: 10px; background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); }
+.big > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.big b { font-size: 14px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+.big small { color: var(--theme-text-muted); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+.tray { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.trayHead { display: flex; align-items: center; gap: 8px; margin: 2px 2px 0; font-size: 15px; font-weight: 650; }
+.trayHead span { min-width: 22px; padding: 0 7px; border-radius: 999px; background: var(--theme-action); color: var(--theme-action-text, #fff); font-size: 12px; line-height: 22px; text-align: center; }
+.calm { margin: 0; padding: 14px; border: 1px dashed var(--theme-border); border-radius: 12px; color: var(--theme-text-muted); font-size: 13px; }
+.anchor { min-width: 0; scroll-margin-top: 72px; }
+.anchor > section { height: 100%; }
+.books { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; color: var(--theme-text-muted); font-size: 12.5px; }
+@media (max-width: 599.98px) { .quick { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 419.98px) { .big { gap: 10px; padding: 10px 12px; } .big small { white-space: normal; } }
+@media (prefers-reduced-motion: reduce) { .big { transition: none; } .big:active { transform: none; } }
+
+/* BILLING-WL (owner, 4 Nov 2026: "make the whole billing UI clean and intuitive", the Work → My day pattern): four quiet stat
+   tiles, a numbered "Start with", cards with a stripe in their state's colour, a quiet right rail. One column on a phone,
+   the rail beside from 1024 px; 44 px tap targets; theme tokens only (the stripe's hue is the state's). */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; min-width: 0; }
+.stats > * { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 10px 12px; border-radius: 12px; background: var(--theme-surface); border: 1px solid var(--theme-border);
+  color: var(--theme-text); text-decoration: none; }
+.stats > a:hover { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); }
+.stats span { font-size: 12px; color: var(--theme-text-muted); }
+.stats b { font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stats [data-tone="bad"] b { color: var(--theme-danger); }
+.stats [data-tone="good"] b { color: var(--theme-success); }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; min-width: 0; }
+.main, .side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+@media (min-width: 1024px) { .grid { grid-template-columns: minmax(0, 1fr) 340px; } }
+.card { display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border); min-width: 0; }
+.head { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 2px; font-size: 14px; font-weight: 650; color: var(--theme-text); min-height: 28px; }
+.head small { margin-left: auto; font-weight: 500; color: var(--theme-text-muted); font-size: 12px; }
+.more { margin-left: auto; font-size: 13px; font-weight: 550; color: var(--theme-action); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+.focus, .docs, .mini { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.focus li { --stripe: hsl(var(--stripe-h, 214) 70% 46%); display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 10px; padding: 2px 0; }
+:global(:root[data-theme="dark"]) .focus li, :global(:root[data-theme="dark"]) .docs li { --stripe: hsl(var(--stripe-h, 214) 70% 62%); }
+.no { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--stripe); background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1.5px var(--stripe); }
+.focusOpen { display: flex; flex-direction: column; gap: 2px; justify-content: center; min-height: 48px; min-width: 0; color: var(--theme-text); text-decoration: none; border-radius: 8px; }
+.focusOpen:hover b { color: var(--theme-action); }
+.focusOpen:focus-visible, .doc:focus-visible, .mini a:focus-visible, .stats > a:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+.focusOpen b { font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.focusOpen small { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--theme-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.focusOpen small svg { flex: none; color: var(--stripe); }
+.docs li { --stripe: hsl(var(--stripe-h, 214) 70% 46%); position: relative; }
+.docs li + li { border-top: 1px solid var(--theme-border); }
+.docs li::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 2px; background: var(--stripe); }
+.doc { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 56px; padding: 6px 4px 6px 14px; color: var(--theme-text); text-decoration: none; border-radius: 10px; }
+.doc:hover { background: var(--theme-surface-subtle); }
+.docMain, .docEnd { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.docEnd { align-items: flex-end; flex: none; }
+.docMain b, .docEnd b { font-size: 14.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.docMain small { font-size: 12.5px; color: var(--theme-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini li { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.mini li + li { border-top: 1px solid var(--theme-border); }
+.mini a { display: flex; flex-direction: column; gap: 2px; min-height: 48px; justify-content: center; min-width: 0; color: var(--theme-text); text-decoration: none; }
+.mini b { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini small { font-size: 12.5px; color: var(--theme-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.quiet { margin: 0; padding: 2px 2px 4px; color: var(--theme-text-muted); font-size: 13px; }
+.bigMain { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+@media (max-width: 899.98px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

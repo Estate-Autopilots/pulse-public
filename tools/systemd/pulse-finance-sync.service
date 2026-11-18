@@ -1,0 +1,11 @@
+[Unit]
+Description=Pulse live finance sync (FIN-LIVE): read-only sheets and finance mail, Shared Drive filing, uncertified model
+[Service]
+Type=oneshot
+Environment=PATH=/home/eadev/.local/opt/node/bin:/home/eadev/.local/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/etc/estate-autopilots/db/pulse.env
+# POLISH-2: the stable launcher runs the shipped release checkout's own tools/finance-sync-run.py (no installed copy to go stale).
+ExecStart=/usr/bin/python3 /home/eadev/.local/lib/pulse-release/release-run.py finance-sync-run.py
+Nice=19
+CPUWeight=20
+TimeoutStartSec=3h

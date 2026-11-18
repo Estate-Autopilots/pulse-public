@@ -1,0 +1,10 @@
+.wrap { display: grid; gap: 28px; padding-bottom: 32px; }
+.theme { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 14px 20px; }
+.field { display: grid; min-width: 0; gap: 6px; color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
+.field input[type="color"] { width: 100%; height: var(--ds-control-md); padding: 2px; border: 0; border-radius: var(--ds-radius-md); background: var(--theme-surface); box-shadow: var(--ds-ring); cursor: pointer; }
+.field input[type="file"] { width: 100%; min-width: 0; }
+.field input[type="range"] { width: 100%; accent-color: var(--theme-action); }
+.field code { color: var(--theme-text); font-size: var(--ds-text-xs); }
+.note { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 14px; }

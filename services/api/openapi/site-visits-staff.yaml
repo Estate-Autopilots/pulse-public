@@ -1,0 +1,45 @@
+openapi: 3.1.0
+info: {title: Persisted staff site visits (EST-2284 slice), version: 0.1.0}
+# This internal persistence slice precedes the frozen Visit/media projection and SDK.
+security: [{session: []}]
+paths:
+  /api/v0/customers/{id}/site-visits:
+    parameters: [{$ref: '#/components/parameters/id'}]
+    get:
+      responses: {'200': {description: 'customer: read-only CustomerSummary prefill; visits: persisted visit rows'}}
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [typeKey]
+              properties:
+                typeKey: {type: string, pattern: '^[a-z0-9_]{1,40}$'}
+                assignedPersonId: {type: string, format: uuid}
+                notes: {type: string, maxLength: 4000}
+      responses: {'200': {description: 'visit: persisted row (including starting_fields); fieldNotes: rows; history: visible rows'}}
+  /api/v0/site-visits/{id}:
+    parameters: [{$ref: '#/components/parameters/id'}]
+    get:
+      responses: {'200': {description: 'visit: persisted row (including starting_fields); fieldNotes: rows; history: visible rows'}}
+  /api/v0/site-visits/{id}/notes:
+    parameters: [{$ref: '#/components/parameters/id'}]
+    put:
+      requestBody: {$ref: '#/components/requestBodies/notes'}
+      responses: {'200': {description: Visit detail after save}}
+  /api/v0/site-visits/{id}/fields/{key}/notes:
+    parameters: [{$ref: '#/components/parameters/id'}, {name: key, in: path, required: true, schema: {type: string, pattern: '^[a-z0-9_]{1,40}$'}}]
+    put:
+      requestBody: {$ref: '#/components/requestBodies/fieldNotes'}
+      responses: {'200': {description: Visit detail after save}}
+components:
+  securitySchemes:
+    session: {type: apiKey, in: header, name: x-pulse-session}
+  parameters:
+    id: {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+  requestBodies:
+    notes: {required: true, content: {application/json: {schema: {type: object, additionalProperties: false, required: [notes], properties: {notes: {type: string, maxLength: 4000}}}}}}
+    fieldNotes: {required: true, content: {application/json: {schema: {type: object, additionalProperties: false, required: [notes], properties: {notes: {type: string, maxLength: 2000}}}}}}

@@ -1,0 +1,75 @@
+/* R49: internal jobs. The Skills & CV card language (skills.module.css) plus the ranked candidates and the per-requirement
+   explanation: each candidate is a row that opens on its requirements; each requirement shows the skill that counted
+   and the arithmetic, and every other skill on record with why it did not add. */
+.jobs { display: grid; margin: 0; padding: 0; list-style: none; }
+.jobs > li { display: grid; gap: 3px; padding: 11px 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 40%, transparent); }
+.jobs > li:first-child { border-top: 0; }
+.jobs a { color: var(--theme-text); font-size: 14px; font-weight: 620; text-decoration: none; overflow-wrap: anywhere; }
+.jobs a:hover, .jobs a:focus-visible { color: var(--theme-action); text-decoration: underline; }
+
+.method { display: grid; gap: 6px; margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; }
+.weights { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 10px 0 0; }
+.weights div { display: grid; gap: 2px; padding: 8px 10px; border-radius: 10px; background: var(--theme-surface-subtle); font-size: 12px; color: var(--theme-text-muted); }
+.weights b { color: var(--theme-text); font-size: 16px; font-weight: 650; }
+.accepted { margin-top: 10px; }
+.weightForm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 480px) { .weightForm { grid-template-columns: minmax(0, 1fr); } }
+
+.ask { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; color: var(--theme-text-muted); font-size: 12.5px; font-weight: 400; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.chips li { display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px 2px 9px; border-radius: 999px; background: var(--theme-surface-subtle); font-size: 12.5px; }
+.chips button { display: grid; width: 22px; height: 22px; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.chips button:hover, .chips button:focus-visible { background: var(--theme-surface); color: var(--theme-text); }
+
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin: 0 0 6px; }
+.toolbar p { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.45; flex: 1 1 260px; }
+.cands { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cand { border: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); border-radius: 12px; background: var(--theme-surface); }
+.cand[data-picked] { border-color: color-mix(in srgb, var(--theme-success) 55%, transparent); }
+.cand > details > summary { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 10px 12px; cursor: pointer; list-style: none; }
+.cand > details > summary::-webkit-details-marker { display: none; }
+.cand > details > summary:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; border-radius: 12px; }
+.rank { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: var(--theme-surface-subtle); font-size: 12.5px; font-weight: 650; }
+.who { display: grid; gap: 2px; min-width: 0; }
+.who b { font-size: 14px; font-weight: 620; overflow-wrap: anywhere; }
+.counts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 12px; color: var(--theme-text-muted); }
+.score { display: grid; justify-items: end; gap: 1px; font-size: 12px; color: var(--theme-text-muted); white-space: nowrap; }
+.score b { color: var(--theme-text); font-size: 15px; font-weight: 680; }
+@media (max-width: 560px) {
+  .cand > details > summary { grid-template-columns: 30px minmax(0, 1fr); }
+  .score { grid-column: 2; justify-items: start; }
+}
+.candBody { display: grid; gap: 10px; padding: 2px 12px 12px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 40%, transparent); }
+.candBody > .actions { padding-top: 8px; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.actions small { color: var(--theme-text-muted); font-size: 12px; }
+
+.req { display: grid; gap: 6px; padding: 10px 0 0; }
+.req + .req { border-top: 1px dashed color-mix(in srgb, var(--theme-border) 45%, transparent); }
+.reqHead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; }
+.reqName { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; font-size: 13.5px; }
+.reqName b { font-weight: 620; overflow-wrap: anywhere; }
+.reqScore { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; white-space: nowrap; }
+.why { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.5; }
+.considered { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.considered li { display: grid; gap: 1px; padding: 6px 9px; border-left: 3px solid color-mix(in srgb, var(--theme-border) 70%, transparent); border-radius: 0 8px 8px 0;
+  background: color-mix(in srgb, var(--theme-surface-subtle) 60%, transparent); font-size: 12.5px; line-height: 1.45; overflow-wrap: anywhere; }
+.considered li[data-counted] { border-left-color: var(--theme-success); }
+.considered small { color: var(--theme-text-muted); font-size: 12px; }
+
+.flag { color: var(--theme-warning); font-size: 12px; }
+.empty { margin: 0; padding: 10px 0; color: var(--theme-text-muted); font-size: 13px; }
+
+/* READY (0972): candidates for a job. */
+.hiring { display: flex; flex-direction: column; margin: 0 0 12px; padding: 0; list-style: none; }
+.hiring > li { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr) auto; align-items: center; gap: 8px 14px; padding: 10px 0; border-top: 1px solid var(--theme-border); }
+.hiring > li:first-child { border-top: 0; }
+.hiringWho { display: flex; flex-direction: column; min-width: 0; }
+.hiringWho small { color: var(--theme-text-muted); font-size: 12px; }
+.hiringStage { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; font-size: 13px; }
+.hiringWhen { display: inline-flex; align-items: center; gap: 5px; color: var(--theme-text); }
+.hiringTools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.hiringTools select, .hiringLink select { height: 30px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 7px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.hiringLink { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.hiringLink label { display: grid; gap: 4px; min-width: 220px; color: var(--theme-text-muted); font-size: 12px; }
+@media (max-width: 700px) { .hiring > li { grid-template-columns: 1fr; } }

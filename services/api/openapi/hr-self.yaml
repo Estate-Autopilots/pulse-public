@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info: { title: Pulse employee-owned HR record, version: 1.0.0 }
+paths:
+  /api/v0/me/hr:
+    get:
+      summary: Read the authenticated person's own employee-visible HR record
+      description: The subject is derived from the authenticated viewer. The route has no person parameter and returns only the fields allowed by privacy visibility §5. Every section read creates a subject-specific access receipt.
+      responses:
+        '200':
+          description: Employee-owned HR details and access history
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MyHrResponse' }
+        '403': { description: A personal staff record is unavailable to this account }
+        '404': { description: The authenticated account has no employee HR record }
+components:
+  schemas:
+    MyHrResponse:
+      type: object
+      additionalProperties: false
+      required: [employee, history, documents, accessHistory]
+      properties:
+        employee:
+          type: object
+          additionalProperties: false
+          required: [name, status, role, department, employmentType, joinedOn]
+          properties:
+            name: { type: string }
+            status: { type: string, enum: [active, inactive, offboarded] }
+            role: { type: [string, 'null'] }
+            department: { type: [string, 'null'] }
+            employmentType: { type: [string, 'null'], enum: [full_time, part_time, intern, contract, freelance, null] }
+            joinedOn: { type: [string, 'null'], format: date }
+        history:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [field, from, to, at, by]
+            properties:
+              field: { type: string, enum: [department, employmentType, joinedOn, role] }
+              from: { type: [string, 'null'] }
+              to: { type: [string, 'null'] }
+              at: { type: string, format: date-time }
+              by: { type: [string, 'null'] }
+        documents:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [type, seenAt]
+            properties:
+              type: { type: string, enum: [appointment_letter, joining_letter, offer_letter, relieving_letter] }
+              seenAt: { type: string, format: date-time }
+        accessHistory:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [at, viewer, resource, purpose]
+            properties:
+              at: { type: string, format: date-time }
+              viewer: { type: string }
+              resource: { type: string }
+              purpose: { type: string }

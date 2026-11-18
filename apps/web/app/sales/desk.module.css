@@ -1,0 +1,14 @@
+/* KAZUK-REST (A19): the salesperson's desk on My sales. Theme tokens only, so dark mode follows. */
+.desk { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; min-width: 0; }
+.desk > * { min-width: 0; }
+.wide { grid-column: 1 / -1; }
+.stages { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 4px 14px 10px; list-style: none; }
+.stage { display: grid; gap: 2px; flex: 1 1 96px; min-width: 96px; padding: 8px 10px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); }
+.stage b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.stage span { color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.stage[data-stage="won"] b { color: var(--theme-success); }
+.stage[data-stage="lost"] b { color: var(--theme-text-muted); }
+.quiet { margin: 0; padding: 8px 14px; color: var(--theme-text-muted); font-size: 13px; grid-column: 1 / -1; }
+.failed { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px; color: var(--theme-text-muted); }
+.failed p { margin: 0; }
+@media (max-width: 760px) { .desk { grid-template-columns: minmax(0, 1fr); } .stage { min-width: calc(50% - 4px); } }

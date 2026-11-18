@@ -1,0 +1,9 @@
+[Unit]
+Description=Pulse: tell the owner on Telegram about new bug reports (BUG-REPORT, tools/bug-report-notify.py)
+[Service]
+Type=oneshot
+WorkingDirectory=/home/eadev/work/pulse/strike
+# The production database's worker role (read only here: pulse.bug_report_feed()).
+EnvironmentFile=/etc/estate-autopilots/db/pulse.env
+Environment=PATH=/home/eadev/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/eadev/work/pulse/strike/.venv/bin/python tools/bug-report-notify.py

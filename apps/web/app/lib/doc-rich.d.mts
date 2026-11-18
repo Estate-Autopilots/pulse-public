@@ -1,0 +1,23 @@
+// DOCS-RICH: types for doc-rich.mjs.
+export type Cell = string | number | null;
+export type ChartType = "line" | "bar" | "area" | "pie" | "scatter" | "table" | "kpi";
+export type ChartSpec = { type?: ChartType; title?: string; unit?: string; columns?: string[]; rows?: Cell[][]; stacked?: boolean; horizontal?: boolean; note?: string };
+export declare const FRAME_CDNS: string[];
+export declare const FRAME_CSP: string;
+export declare const FRAME_SANDBOX: string;
+export declare const FRAME_GROWS_PER_SECOND: number;
+export declare function framePath(fileId: string): string;
+export declare function isFramePath(path: string[]): boolean;
+export declare function frameHeight(data: unknown): number | null;
+export declare function cellNumber(v: unknown): number | null;
+export declare function parseCsv(text: string): { columns: string[]; rows: Cell[][] };
+export declare function toCsv(columns: string[], rows: Cell[][]): string;
+export declare function tidyChart<T extends ChartSpec>(block: T): T & { type: ChartType; columns: string[]; rows: Cell[][] };
+export declare function formatValue(n: number | null | undefined, unit?: string): string;
+export declare function formatTick(n: number): string;
+export declare function axis(values: (number | null)[], fromZero?: boolean): { min: number; max: number; ticks: number[] };
+export declare function kpiOf(block: ChartSpec): { value: number; label: string; at: string; before: number | null; change: number | null; spark: number[] } | null;
+export declare const DIAGRAM_STARTERS: Record<"flowchart" | "timeline" | "gantt" | "mindmap", string>;
+export declare function diagramType(code: string): string;
+export declare function blocksOf(html: string): Record<string, unknown>[];
+export declare function blockChanges(beforeHtml: string, afterHtml: string): { kind: "added" | "removed" | "changed" | "words"; text: string }[];
