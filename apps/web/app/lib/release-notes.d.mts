@@ -1,0 +1,21 @@
+export type NoteLine = { text: string; href: string | null };
+export type ReleaseShare = { text: string; imageUrl: string | null };
+export type ReleaseNote = {
+  id: number; sha: string; version: string | null; releasedAt: string; headline: string;
+  items: Record<string, unknown>; pleaseCheck: { text?: string; href?: string; audience?: string }[]; knownIssues: string[];
+  share: Record<string, ReleaseShare>;
+};
+export type WhatsNewData = { audiences: string[]; main: string; notes: ReleaseNote[] };
+export declare const AUDIENCE_ORDER: string[];
+export declare const SEEN_KEY: string;
+export declare const RELEASE_ZONE: string;
+export declare function audienceHeading(audience: string, main: string, words?: Record<string, string> | null): string;
+export declare function safeHref(href: unknown): string | null;
+export declare function noteLine(item: unknown): NoteLine | null;
+export declare function noteGroups(items: Record<string, unknown>, main: string, words?: Record<string, string> | null): { audience: string; heading: string; lines: NoteLine[] }[];
+export declare function releasedAtText(iso: string): string;
+export declare function shareFor(share: Record<string, ReleaseShare>, audiences: string[]): { audience: string; text: string; imageUrl: string | null } | null;
+export declare function whatsAppLink(text: string): string;
+export declare const UPDATE_EVERY_MS: number;
+export declare const UPDATE_HIDE_MS: number;
+export declare function updateNote(stored: string | null | undefined, newest: number | null | undefined, lastShown?: string | null, now?: number): { show: boolean; remember: string | null };

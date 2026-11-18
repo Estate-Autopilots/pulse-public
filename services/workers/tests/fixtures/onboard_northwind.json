@@ -1,0 +1,29 @@
+{
+  "project_paths": [
+    {
+      "match": "(?P<client>[^/]+)/(?P<project>[^/]+)",
+      "captures": {"client": "client", "project": "project"}
+    }
+  ],
+  "pods": {"maple rise": "Northwind Pod", "cedar point": "Creative Pod"},
+  "creative_types": {"folder_path": [{"match": "model videos?", "type": "model_video"}]},
+  "design_type_rules": {"folder_path": [{"match": "brochures?", "type": "brochure"}]},
+  "files": [
+    {"file_id": "nw-file-001", "path": "Northwind Homes/Maple Rise/Exports/final.mp4"},
+    {"file_id": "nw-file-002", "path": "Northwind Homes/Maple Rise/Exports/thumb.png"},
+    {"file_id": "nw-file-003", "path": "Northwind Homes/Cedar Point/Briefs/launch.pdf"},
+    {"file_id": "nw-file-004", "path": "Lakeview Group/Maple Rise/Exports/final.mp4"},
+    {"file_id": "nw-file-005", "path": "Northwind Homes/Maple Rise/Exports/v2.mp4"},
+    {"file_id": "nw-file-006", "path": "Northwind Homes/Maple Rise/Exports/v3.mp4"},
+    {"file_id": "nw-file-007", "path": "Northwind Homes/Maple Rise/Exports/v4.mp4"},
+    {"file_id": "nw-file-008", "path": "Northwind Homes/Maple Rise/Exports/v5.mp4"},
+    {"file_id": "nw-file-009", "path": "Northwind Homes/readme.pdf", "mime": "application/pdf"},
+    {"file_id": "nw-file-010", "path": "Northwind Homes/Maple Rise/Model Videos/launch.mp4", "mime": "video/mp4"},
+    {"file_id": "nw-file-011a", "path": "Northwind Homes/Maple Rise/Model Videos/launch-v2.mp4", "mime": "video/mp4"},
+    {"file_id": "nw-file-011b", "path": "Northwind Homes/Maple Rise/Model Videos/launch-v3.mp4", "mime": "video/mp4"},
+    {"file_id": "nw-file-011c", "path": "Northwind Homes/Maple Rise/Model Videos/launch-v4.mp4", "mime": "video/mp4"},
+    {"file_id": "nw-file-011d", "path": "Northwind Homes/Maple Rise/Model Videos/launch-v5.mp4", "mime": "video/mp4"},
+    {"file_id": "nw-file-011e", "path": "Northwind Homes/Maple Rise/Model Videos/launch-v6.mp4", "mime": "video/mp4"},
+    {"file_id": "nw-file-011", "path": "Northwind Homes/Cedar Point/Brochures/overview.pdf", "mime": "application/pdf"}
+  ]
+}

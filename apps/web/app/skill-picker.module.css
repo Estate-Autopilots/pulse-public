@@ -1,0 +1,55 @@
+/* PROFILE-2: the skill picker. Read: chips, a pencil on hover (always shown on touch). Edit: chips + type-ahead in one
+   box, a short list under it, suggestions for the role, one Save. */
+.view { position: relative; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; min-width: 0; }
+.chip { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; min-height: 28px; padding: 3px 11px; border: 1px solid color-mix(in srgb, var(--theme-border) 80%, transparent);
+  border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text); font-size: 13px; font-weight: 520; line-height: 1.25; overflow-wrap: anywhere; }
+.chip button { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-right: -4px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--theme-text-muted); cursor: pointer; }
+.chip button:hover { background: color-mix(in srgb, var(--theme-danger) 14%, transparent); color: var(--theme-danger); }
+.on { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); }
+.add { border-style: dashed; background: var(--theme-surface); color: var(--theme-text); cursor: pointer; font: inherit; font-size: 13px; }
+.add:hover, .add:focus-visible { border-style: solid; border-color: var(--theme-action); color: var(--theme-action); }
+.empty { margin: 0; color: var(--theme-text-muted); font-size: 14px; }
+.edit { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 3px 10px; border: 1px solid transparent; border-radius: 999px;
+  background: none; color: var(--theme-action); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.edit:hover, .edit:focus-visible { border-color: color-mix(in srgb, var(--theme-action) 35%, transparent); background: color-mix(in srgb, var(--theme-action) 8%, transparent); }
+.edit:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+/* The whole chip area opens the editor too; the pencil appears on hover (always visible without a pointer). */
+.cover { position: absolute; inset: -4px; z-index: 0; border: 0; border-radius: 12px; background: none; cursor: text; }
+.view[data-editable] .cover:hover { background: color-mix(in srgb, var(--theme-action) 5%, transparent); }
+@media (hover: hover) and (pointer: fine) {
+  .view[data-editable] .edit { opacity: 0; transition: opacity 120ms ease; }
+  .view[data-editable]:hover .edit, .view[data-editable] .edit:focus-visible { opacity: 1; }
+  .view[data-editable]:has(.empty) .edit { opacity: 1; }
+}
+.view .chips, .view .empty { position: relative; }
+.view .chips > .chip, .view .empty { pointer-events: none; }
+.editItem { position: relative; z-index: 1; display: inline-flex; }
+
+.editor { position: relative; display: grid; gap: 10px; min-width: 0; }
+.box { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 44px; padding: 7px 9px; border: 1px solid var(--theme-border-strong, var(--theme-border)); border-radius: 12px;
+  background: var(--theme-surface); cursor: text; }
+.box:focus-within { border-color: var(--theme-action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 18%, transparent); }
+.input { flex: 1 1 140px; min-width: 120px; min-height: 28px; padding: 0 4px; border: 0; outline: 0; background: none; color: var(--theme-text); font: inherit; font-size: 14px; }
+.anchor { position: relative; }
+/* The open editor lifts its own card above the cards after it, so the list is never drawn under them. */
+:global(section):has(.editor) { position: relative; z-index: 6; }
+.menu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 20; max-height: 260px; margin: 0; padding: 4px; overflow: auto; list-style: none; border: 1px solid var(--theme-border);
+  border-radius: 12px; background: var(--theme-surface); box-shadow: 0 12px 32px rgb(15 27 51 / 16%); }
+.editor:has(.menu) .suggest { visibility: hidden; }
+.option { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--theme-text); font-size: 14px; cursor: pointer; }
+.option span { display: inline-flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
+.option small { flex: none; max-width: 45%; overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.option:hover, .option[data-on] { background: color-mix(in srgb, var(--theme-action) 10%, transparent); }
+.suggest { display: grid; gap: 7px; }
+.suggest p { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--theme-text-muted); font-size: 12.5px; font-weight: 600; }
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.credit { color: var(--theme-text-muted); font-size: 11.5px; }
+.actions { display: inline-flex; gap: 8px; margin-left: auto; }
+.quiet, .primary { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 6px 14px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.quiet { border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); }
+.primary { border: 1px solid var(--theme-action); background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.quiet:disabled, .primary:disabled { opacity: 0.6; cursor: default; }
+.quiet:focus-visible, .primary:focus-visible, .add:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.view .add { pointer-events: auto; }
+.hint { color: var(--theme-text-muted); font-size: 12.5px; }

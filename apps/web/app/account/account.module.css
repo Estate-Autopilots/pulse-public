@@ -1,0 +1,63 @@
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;height:100%;min-height:0;overflow:auto;padding-bottom:12px}.box{padding:20px;border:1px solid var(--theme-border);border-radius:14px;background:var(--theme-surface);overflow:auto;min-height:0}.box h2{font-size:16px;margin:0 0 12px}.box p{font-size:13px;color:var(--theme-text-muted);line-height:1.6}.form{display:flex;flex-direction:column;gap:12px}.form label{display:flex;flex-direction:column;gap:6px;font-size:13px}.form input{padding:9px;border:1px solid var(--theme-border);border-radius:8px;background:var(--theme-surface);color:var(--theme-text)}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--theme-border);font-size:13px}.row small{display:block;color:var(--theme-text-muted);margin-top:4px}.actions{display:flex;flex-wrap:wrap;gap:8px}.secret{padding:12px;overflow-wrap:anywhere;white-space:pre-wrap;border:1px solid var(--theme-border);border-radius:8px;user-select:all}.status{font-size:13px;padding:10px;color:var(--theme-text);background:var(--theme-surface-subtle);border-radius:8px}@media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr);height:auto}.box{overflow:visible}.row{flex-wrap:wrap}}
+.access{display:flex;flex-direction:column;gap:20px;min-width:0}.accessSection{min-width:0;padding-bottom:20px;border-bottom:1px solid var(--theme-border)}.accessSection:last-child{border-bottom:0}.accessSection h4{margin:0;font-size:14px}.accessSection p,.confirmation p{font-size:13px;line-height:1.5;color:var(--theme-text-muted);margin:8px 0 12px}.accessSection .accountStatus{font-size:18px;font-weight:650;color:var(--theme-text);text-transform:capitalize}.sectionTitle{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:space-between}.badge{font-size:12px;padding:4px 8px;border-radius:8px;background:var(--theme-surface-alt);color:var(--theme-text)}.address{overflow-wrap:anywhere}.access input{min-width:0;width:100%;box-sizing:border-box}.access .actions button{min-height:40px;white-space:normal;text-align:left;max-width:100%}.access .hint{font-size:12px;margin:0 0 10px}.access .error{font-size:13px;line-height:1.5;color:var(--theme-danger);padding:10px;border:1px solid var(--theme-border);border-radius:8px;overflow-wrap:anywhere}.confirmation{padding:16px;border:1px solid var(--theme-border);border-radius:12px;background:var(--theme-surface-subtle)}.access .secret{max-width:100%;box-sizing:border-box}.access .row span{overflow-wrap:anywhere}
+/* PEOPLE-CONTACTS: Account access at a glance (status pills), one-tap action tiles and the devices list. */
+.glance .accountStatus{display:flex;flex-wrap:wrap;gap:6px;text-transform:none}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:650;background:var(--theme-surface-subtle);color:var(--theme-text)}
+.pill[data-tone="ok"]{background:color-mix(in srgb,var(--theme-success) 14%,var(--theme-surface));color:color-mix(in srgb,var(--theme-success) 80%,var(--theme-text))}
+.pill[data-tone="off"]{background:color-mix(in srgb,var(--theme-danger) 12%,var(--theme-surface));color:var(--theme-danger)}
+.pill[data-tone="warn"]{background:color-mix(in srgb,var(--theme-warning) 16%,var(--theme-surface));color:color-mix(in srgb,var(--theme-warning) 70%,var(--theme-text))}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.tile{display:flex;align-items:flex-start;gap:10px;min-width:0;min-height:56px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--theme-border) 70%,transparent);border-radius:12px;background:var(--theme-surface);color:var(--theme-text);font:inherit;text-align:left;cursor:pointer;transition:border-color 120ms ease,background-color 120ms ease,transform 80ms ease}
+.tile:hover:not(:disabled){border-color:var(--theme-border-strong);background:color-mix(in srgb,var(--theme-surface-subtle) 50%,var(--theme-surface))}
+.tile:active:not(:disabled){transform:scale(0.985)}
+.tile:disabled{opacity:.5;cursor:default}
+.tile[data-tone="danger"] .tileIcon{color:var(--theme-danger);background:color-mix(in srgb,var(--theme-danger) 10%,var(--theme-surface))}
+.tileIcon{display:grid;flex:none;width:30px;height:30px;place-items:center;border-radius:9px;background:color-mix(in srgb,var(--theme-action) 10%,var(--theme-surface));color:var(--theme-action)}
+.tileText{display:grid;gap:2px;min-width:0}
+.tileText b{font-size:13.5px;font-weight:600}
+.tileText small{color:var(--theme-text-muted);font-size:12px;line-height:1.35}
+.devices{display:grid;margin:8px 0 0;padding:0;list-style:none}
+.devices li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid color-mix(in srgb,var(--theme-border) 50%,transparent)}
+.devices li:first-child{border-top:0}
+.deviceIcon{display:grid;flex:none;width:32px;height:32px;place-items:center;border-radius:9px;background:var(--theme-surface-subtle);color:var(--theme-text-muted)}
+.deviceText{display:grid;flex:1 1 auto;gap:1px;min-width:0}
+.deviceText b{overflow-wrap:anywhere;font-size:13.5px;font-weight:550}
+.deviceText small{color:var(--theme-text-muted);font-size:12px}
+@media(max-width:420px){.tiles{grid-template-columns:minmax(0,1fr)}}
+
+.status[data-tone="blocked"]{border:1px solid color-mix(in srgb,var(--theme-warning) 35%,var(--theme-border));background:color-mix(in srgb,var(--theme-warning) 9%,var(--theme-surface))}
+
+/* FIX-SHELL (owner, 10 Nov 2026: "retouch the sign-in, your account, username and password screens"): the sections as
+   one row of real buttons on a soft track (the open one raised), the form at a readable width with a normal-size main
+   button (it was a thin bar across the card), and a lone card no longer leaves half the page empty. */
+.actions[role="tablist"]{width:fit-content;max-width:100%;gap:4px;padding:4px;border-radius:12px;background:var(--theme-surface-subtle,color-mix(in srgb,var(--theme-text) 5%,transparent))}
+.actions[role="tablist"]>button{min-height:36px;padding:0 14px;border:0;border-radius:9px;background:transparent;box-shadow:none;color:var(--theme-text-muted);font-weight:600}
+.actions[role="tablist"]>button:hover{color:var(--theme-text);background:color-mix(in srgb,var(--theme-surface) 60%,transparent)}
+.actions[role="tablist"]>button[aria-selected="true"]{background:var(--theme-surface);color:var(--theme-text);box-shadow:0 1px 2px rgb(15 23 42 / 10%),0 0 0 1px var(--theme-border)}
+.grid>.box:only-child{grid-column:1/-1;width:100%;max-width:640px}
+.box h2{font-size:18px;font-weight:700}
+.form{gap:14px;max-width:520px}
+.form label{font-weight:600;color:var(--theme-text)}
+.form>p{margin:-6px 0 0;font-size:12.5px}
+.form>button{align-self:flex-start;min-width:200px;min-height:44px;padding:0 20px;border-radius:10px;font-size:15px;font-weight:650}
+@media(max-width:640px){.grid{grid-template-columns:minmax(0,1fr)}.form>button{align-self:stretch}}
+/* SETTINGS-APPLE (judge: "six tabs wrap onto three rows"; "the strip is wider than the card"): one row as wide as the card
+   at most; on a narrow screen it scrolls sideways instead of wrapping. */
+.actions[role="tablist"]{flex-wrap:nowrap;max-width:min(100%,640px);overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain}
+.actions[role="tablist"]::-webkit-scrollbar{display:none}
+.actions[role="tablist"]>button{flex:none;white-space:nowrap}
+/* SETTINGS-APPLE (judge: "the strip cuts Email f… with no hint that it scrolls"; "runs straight into the card"): air
+   under it, and on a narrow screen its right edge fades out so it reads as a row that scrolls. */
+.actions[role="tablist"]{margin-bottom:12px}
+@media(max-width:640px){.actions[role="tablist"]{-webkit-mask-image:linear-gradient(to right,#000 82%,transparent);mask-image:linear-gradient(to right,#000 82%,transparent);padding-right:28px}}
+/* SETTINGS-APPLE (judge, three rounds: the last tab cut off at "Email f…" even with a fade): on a phone the tabs are an
+   even grid of three across, all in view. */
+@media(max-width:640px){.actions[role="tablist"]{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;max-width:100%;overflow:visible;-webkit-mask-image:none;mask-image:none;padding-right:4px}.actions[role="tablist"]>button{padding:0 6px;white-space:normal}}
+/* GATE-FINISH: four tabs share one row on a phone (six were a 2×3 grid of buttons). */
+@media(max-width:640px){.actions[role="tablist"]{grid-template-columns:repeat(4,minmax(0,1fr))}.actions[role="tablist"]>button{padding:0 4px;font-size:13px}}
+/* GATE-FINISH (judge round s1: "the Google card is stretched to match the password card and about 40% empty"): each card
+   keeps its own height. */
+.grid{align-items:start}
+/* GATE-FINISH (judge, phone: "the assistant button covers the right end of Change password"): a form's button keeps its
+   own width at the left on a phone, clear of the assistant's corner. */
+@media(max-width:640px){.form>button{align-self:flex-start}}

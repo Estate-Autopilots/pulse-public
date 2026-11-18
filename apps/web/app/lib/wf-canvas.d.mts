@@ -1,0 +1,24 @@
+export type PortType = "lead" | "call" | "quote" | "photo" | "form" | "hand" | "any";
+export type Port = { key: string; label: string; type: PortType };
+export type BlockSpec = { module: string; label: string; group: string; kind: "task" | "decision" | "approval" | "wait" | "end"; inputs: Port[]; outputs: Port[];
+  engine: "live" | "auto" | "partial" | "stub"; what: string; status: string; checklist: string[]; slaHours?: number; waitHours?: number; needsForm?: boolean; link?: string };
+export type CanvasWire = { from: string; port: string | null; to: string; in: string | null; label: string | null; when: unknown };
+export type CanvasStep = { id: string; title: string; kind: BlockSpec["kind"]; module?: string | null; pos?: { x: number; y: number } | null;
+  next: { to: string; label: string | null; port?: string | null; in?: string | null; when?: unknown }[] | null };
+export declare const SIZE: { w: number; head: number; row: number; pad: number; gapX: number; gapY: number; margin: number; grid: number };
+export declare function specOf(step: Pick<CanvasStep, "module" | "kind">, byModule: Record<string, BlockSpec>): BlockSpec;
+export declare function nodeHeight(spec: BlockSpec | undefined): number;
+export declare function portPoint(pos: { x: number; y: number }, spec: BlockSpec, side: "in" | "out", key: string | null): { x: number; y: number };
+export declare function wirePath(a: { x: number; y: number }, b: { x: number; y: number }): string;
+export declare function fits(from: PortType, to: PortType): boolean;
+export declare function wiresOf(steps: CanvasStep[]): CanvasWire[];
+export declare function outType(steps: CanvasStep[], byModule: Record<string, BlockSpec>, stepId: string, portKey: string | null | undefined): PortType;
+export declare function canWire(steps: CanvasStep[], byModule: Record<string, BlockSpec>, blocks: BlockSpec[], from: string, port: string | null, to: string, inKey: string | null):
+  { ok: true; type: PortType } | { ok: false; why: string; type?: PortType; need?: PortType[]; adapters?: string[] };
+export declare function explicit<T extends CanvasStep>(steps: T[], byModule: Record<string, BlockSpec>): T[];
+export declare function autoLayout<T extends CanvasStep>(steps: T[], byModule: Record<string, BlockSpec>, force?: boolean): T[];
+export declare function freeSpot(steps: CanvasStep[], byModule: Record<string, BlockSpec>, near?: CanvasStep | null): { x: number; y: number };
+export declare function snap(n: number): number;
+export declare function extent(steps: CanvasStep[], byModule: Record<string, BlockSpec>): { w: number; h: number };
+export declare function checklistOf(detail: string | null | undefined): string[];
+export declare function detailOf(lines: string[]): string | null;

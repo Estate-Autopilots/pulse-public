@@ -1,0 +1,54 @@
+/* AGREEMENTS rounds 3–4: the lead → live card (quote-chain.tsx), on Billing's and Agreements' pages. */
+.card { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 14px; border: 1px solid var(--theme-border);
+  background: var(--theme-surface); min-width: 0; box-sizing: border-box; margin: 0 0 16px; }
+.card[data-done] { border-color: color-mix(in srgb, var(--theme-success) 45%, var(--theme-border)); }
+.head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; min-width: 0; }
+.head h2 { margin: 0; font-size: 16px; font-weight: 650; }
+.quiet { font-size: 13px; font-weight: 600; color: var(--theme-action); text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+.quiet:hover { text-decoration: underline; }
+.where { display: flex; align-items: center; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; min-width: 0; }
+.stepNow { margin: 0; font-size: 15px; color: var(--theme-text); min-width: 0; }
+.stepNow b { font-weight: 650; }
+.who { display: inline-flex; align-items: center; min-height: 28px; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  color: var(--theme-text); background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); max-width: 100%; overflow-wrap: anywhere; }
+.bar { height: 8px; border-radius: 999px; background: var(--theme-surface-subtle); overflow: hidden; }
+.bar span { display: block; height: 100%; border-radius: inherit; background: var(--theme-action); transition: width 400ms ease; }
+.card[data-done] .bar span { background: var(--theme-success); }
+.wide { min-width: 0; }
+.then { display: none; margin: 0; font-size: 13px; color: var(--theme-text-muted); }
+.foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; min-width: 0; }
+.text { margin: 0; font-size: 14px; line-height: 1.45; color: var(--theme-text); flex: 1 1 260px; min-width: 0; overflow-wrap: anywhere; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 18px; border-radius: 10px;
+  border: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 600;
+  cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn[data-primary] { background: var(--theme-action); color: var(--theme-action-text, #fff); border-color: var(--theme-action); }
+.btn:disabled { opacity: 0.6; cursor: default; }
+.btn:focus-visible, .quiet:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.error { margin: 0; font-size: 13px; color: var(--theme-danger); }
+@media (max-width: 720px) {
+  .wide { display: none; }
+  .then { display: block; }
+}
+@media (max-width: 520px) {
+  .foot { flex-direction: column; align-items: stretch; }
+  .text { flex: none; }
+  .btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .bar span { transition: none; } }
+/* POLISH-1115: beside a contract the chain is a small reference card (the step, its records, the next step). */
+.card[data-compact] { gap: 10px; padding: 14px 16px; margin: 0; }
+.card[data-compact] .head h2 { font-size: 14px; color: var(--theme-text-muted); }
+.count { font-size: 13px; font-weight: 600; color: var(--theme-text); }
+.refs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.refs li { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 32px; font-size: 14px; min-width: 0; }
+.refs a { color: var(--theme-action); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; min-width: 0; }
+.refs a:hover { text-decoration: underline; }
+.refs span { flex: none; font-size: 13px; color: var(--theme-text-muted); }
+.card[data-compact] .then { display: block; }
+.card[data-compact] .btn { width: 100%; }
+/* POLISH-1115: when every step is done the steps' dots are green like the bar. */
+.card[data-done] .wide { --theme-action: var(--theme-success); }
+/* POLISH-1115 (judge: the pale main button read as disabled in dark mode): the card's main step keeps full strength. */
+:global(:root[data-theme="dark"]) .btn[data-primary]:not(:disabled) { background: #5b45d6; border-color: #5b45d6; color: #fff; }
+.say { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--theme-text); overflow-wrap: anywhere; }
+.card[data-compact] .who { align-self: flex-start; }

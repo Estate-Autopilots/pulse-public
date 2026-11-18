@@ -1,0 +1,23 @@
+/* KAZUK-REST slice 5: the Pulse dev team's inbox of bug reports from other companies. */
+.list { display: grid; margin: 0; padding: 0; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); list-style: none; overflow: hidden; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 12px; padding: 12px 14px; }
+.row + .row { border-top: 1px solid var(--theme-border); }
+.main { display: grid; gap: 4px; min-width: 0; }
+.from { color: var(--theme-text-muted); font-size: 12px; overflow-wrap: anywhere; }
+.from b { color: var(--theme-text); }
+.title { font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.row[data-status="fixed"] .title, .row[data-status="wontfix"] .title { color: var(--theme-text-muted); font-weight: 500; }
+.facts { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--theme-text-muted); font-size: 12px; }
+.facts code { font-size: 12px; overflow-wrap: anywhere; }
+.stop { color: var(--theme-danger, var(--theme-warning)); font-weight: 600; }
+.side { display: grid; justify-items: end; gap: 6px; min-width: 150px; }
+.pick select { height: 30px; padding: 0 8px; border: 1px solid var(--theme-border-strong); border-radius: 7px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.action { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 10px; border: 1px solid var(--theme-border-strong); border-radius: 7px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; text-decoration: none; cursor: pointer; }
+.action:hover { background: var(--theme-surface-subtle, var(--theme-canvas)); }
+.action:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.fine { color: var(--theme-text-muted); font-size: 11px; overflow-wrap: anywhere; text-align: right; }
+@media (max-width: 640px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .side { grid-auto-flow: row; justify-items: start; min-width: 0; }
+  .fine { text-align: left; }
+}

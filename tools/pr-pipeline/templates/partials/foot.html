@@ -1,0 +1,5 @@
+<footer class="foot">
+  {{#receipt}}<div class="rcpt">{{receipt}}</div>{{/receipt}}
+  {{#cue}}<div class="cue">{{cue}} &rarr;</div>{{/cue}}
+  {{^cue}}{{#has_progress}}<div class="prog" data-deco>{{#progress}}<i class="{{#on}}on{{/on}}"></i>{{/progress}}</div>{{/has_progress}}{{/cue}}
+</footer>
