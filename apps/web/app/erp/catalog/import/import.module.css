@@ -1,0 +1,87 @@
+/* GROWTH-LOOP slice 5: "Import a price list" (Codex concept 1). Theme tokens; one primary button per step; one column
+   on a phone (their column, then its field under it). */
+/* WL-ONBOARD-FIX: one column that never grows past the page (a grid item is as wide as its widest table by default, so
+   on a phone the steps and cards ran off the screen); the tables scroll inside .tableWrap. */
+.root { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; max-width: 1080px; padding-bottom: 32px; }
+.steps { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; color: var(--theme-text-muted); font-size: 14px; }
+.steps li { display: inline-flex; align-items: center; gap: 8px; }
+.steps li span { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--theme-border-strong); font-size: 13px; font-weight: 600; }
+.steps li[data-on] { color: var(--theme-text); font-weight: 650; }
+.steps li[data-on] span, .steps li[data-done] span { border-color: var(--theme-action); background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.card { padding: 18px; border-radius: 14px; background: var(--theme-surface); border: 1px solid var(--theme-border); }
+.card h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 18px; }
+.head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; margin-bottom: 8px; }
+.head h2 { margin: 0; }
+.lead { margin: 0 0 14px; color: var(--theme-text-muted); font-size: 15px; line-height: 1.45; }
+.ways { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.way { display: grid; gap: 6px; justify-items: start; padding: 14px; border-radius: 12px; background: var(--theme-surface-subtle); }
+.way span, .paste span { color: var(--theme-text-muted); font-size: 13px; }
+.field { width: 100%; }
+.field input, .paste textarea, .match select { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid var(--theme-border-strong); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; }
+.paste { display: grid; gap: 6px; margin-bottom: 10px; }
+.paste textarea { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; resize: vertical; }
+.hidden { display: none; }
+.primary, .secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.primary { border: 0; background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.secondary { border: 1px solid var(--theme-border-strong); background: var(--theme-surface); color: var(--theme-text); }
+.primary:disabled, .secondary:disabled { opacity: 0.55; cursor: not-allowed; }
+.link { border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 44px; padding: 0 4px; }
+.primary:focus-visible, .secondary:focus-visible, .link:focus-visible, .match select:focus-visible { outline: 3px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+.check { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 14px; }
+.match { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.match li { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 10px; }
+.theirs { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border-radius: 8px; background: var(--theme-surface-subtle); font-weight: 600; overflow-wrap: anywhere; }
+.theirs em { padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--theme-action) 12%, transparent); color: var(--theme-action); font-style: normal; font-size: 12px; font-weight: 600; }
+.arrow { color: var(--theme-text-muted); }
+.tableWrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th, .table td { padding: 8px 10px; border-bottom: 1px solid var(--theme-border); text-align: left; white-space: nowrap; }
+.table th { color: var(--theme-text-muted); font-weight: 600; background: var(--theme-surface-subtle); }
+.table s { color: var(--theme-text-muted); }
+.num { font-variant-numeric: tabular-nums; }
+.tag { padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 650; background: var(--theme-surface-subtle); }
+.tag[data-kind="created"] { background: color-mix(in srgb, #16a34a 14%, transparent); color: #15803d; }
+.tag[data-kind="updated"] { background: color-mix(in srgb, #d97706 16%, transparent); color: #b45309; }
+.skipped { margin-top: 10px; font-size: 14px; }
+.skipped summary { cursor: pointer; color: var(--theme-text-muted); }
+.bar { position: sticky; bottom: 0; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--theme-surface-subtle, transparent); }
+.plan { flex: 1 1 200px; color: var(--theme-text-muted); font-size: 14px; text-align: right; }
+.past { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.past li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--theme-border); }
+.past li div { display: grid; gap: 2px; }
+.past li span, .muted { color: var(--theme-text-muted); font-size: 13px; }
+.problem { margin: 0; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, #e11d48 10%, transparent); color: #be123c; font-size: 14px; }
+.ok { margin: 0; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, #16a34a 10%, transparent); color: #15803d; font-size: 14px; }
+.tick { color: #16a34a; }
+.stockMove { white-space: nowrap; }
+.stockMove i { margin: 0 4px; color: var(--theme-text-muted); font-style: normal; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 640px) {
+  .ways { grid-template-columns: 1fr; }
+  .match li { grid-template-columns: 1fr; gap: 4px; }
+  .arrow { display: none; }
+  .plan { text-align: left; flex-basis: 100%; order: -1; }
+  .bar .primary { flex: 1 1 auto; }
+}
+/* WL-ONBOARD-FIX: on a phone the bar sits above the app's bottom menu (it slid under it, hiding Import and Back); the
+   done steps show their tick only; what changed reads as one small card per item, Stock included, not a cut table. */
+@media (max-width: 899.98px) {
+  .root { padding-bottom: calc(var(--shell-tabbar-height, 64px) + 24px); }
+}
+.card .bar { margin-top: 14px; }
+@media (max-width: 640px) {
+  .bar { position: static; }
+  .bar .secondary, .bar .primary { flex: 1 1 100%; }
+  .steps { flex-wrap: nowrap; }
+  .steps li:not([aria-current]) { gap: 0; font-size: 0; }
+  .steps li:not([aria-current]) span { font-size: 13px; }
+  .changes thead { display: none; }
+  .changes, .changes tbody { display: grid; gap: 8px; }
+  .changes tr { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; }
+  .changes td { padding: 0; border: 0; white-space: normal; }
+  .changes td[data-label]::before { content: attr(data-label); display: inline-block; min-width: 72px; margin-right: 8px; color: var(--theme-text-muted); font-size: 12px; }
+  .changes td:first-child { grid-column: 1 / -1; }
+  .changes td:nth-child(2) { grid-column: 1 / -1; font-weight: 650; }
+  .changes td:nth-child(n+3) { grid-column: 1 / -1; }
+  .changes td[data-empty] { display: none; }
+}

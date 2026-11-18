@@ -1,0 +1,65 @@
+/* ONBOARD-CHECKIN-TG: the day's check-in card above My work. A coloured left edge says the state, as My day's cards do.
+   TASKS-SCROLL (owner, 7 Nov 2026: "the top area eats the screen, people can't see their tasks"): it is one compact strip,
+   not a 240 px card: the state and its line, the running time, the actions and the week's dots in a single row on a
+   computer (two short rows on a phone), so the list starts right under it. Touch targets stay 44 px on a phone. */
+.card { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-width: 0; margin: 0; padding: 8px 12px; border-radius: 12px;
+  border: 1px solid var(--theme-border, rgba(127,127,127,.22)); border-left: 4px solid var(--edge, var(--theme-action, #5b45d6));
+  background: var(--theme-surface, transparent); }
+.card[data-tone="live"] { --edge: var(--theme-success, #328267); }
+.card[data-tone="done"] { --edge: var(--theme-success, #328267); }
+.card[data-tone="attention"] { --edge: var(--theme-warning, #b7791f); }
+.top { display: flex; flex: 1 1 230px; align-items: center; gap: 10px; min-width: 0; }
+.icon { display: grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: 9px;
+  color: var(--edge, var(--theme-action)); background: color-mix(in srgb, var(--edge, var(--theme-action)) 14%, transparent); }
+.head { display: grid; gap: 0; min-width: 0; flex: 1; }
+.head b { overflow: hidden; font-size: 14px; font-weight: 650; line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+.head small { overflow: hidden; color: var(--theme-text-muted, inherit); font-size: 12px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.streak { display: inline-flex; align-items: center; gap: 4px; flex: none; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  color: var(--theme-warning, #b7791f); background: color-mix(in srgb, var(--theme-warning, #b7791f) 14%, transparent); white-space: nowrap; }
+.timer { display: flex; flex: none; align-items: baseline; gap: 6px; margin: 0; }
+.clock { font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -.01em; line-height: 1.2; }
+/* The line under the state already says when they came in and how long they have worked. */
+.timer small { display: none; }
+.summary { display: flex; flex: 1 1 260px; gap: 8px; align-items: center; min-width: 0; margin: 0; padding: 6px 10px; border-radius: 9px; font-size: 13px; line-height: 1.4;
+  background: color-mix(in srgb, var(--theme-success, #328267) 10%, transparent); }
+.summary svg { flex: none; color: var(--theme-success, #328267); }
+.modes { display: flex; flex: none; flex-wrap: wrap; gap: 6px; }
+.modes button { min-height: 34px; padding: 0 12px; border-radius: 999px; font: inherit; font-size: 13px; cursor: pointer; color: inherit; background: transparent;
+  border: 1px solid var(--theme-border, rgba(127,127,127,.35)); }
+.modes button[aria-pressed="true"] { border-color: var(--theme-action, #5b45d6); color: var(--theme-action, #5b45d6);
+  background: color-mix(in srgb, var(--theme-action, #5b45d6) 10%, transparent); font-weight: 600; }
+.actions { display: flex; flex: none; flex-wrap: wrap; gap: 6px; }
+.primary, .secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 10px;
+  font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; text-decoration: none; min-width: 0; text-align: center; white-space: nowrap; }
+.primary { border: 0; color: var(--theme-action-text, #fff); background: var(--theme-action, #5b45d6); }
+.secondary { color: inherit; background: transparent; border: 1px solid var(--theme-border, rgba(127,127,127,.35)); }
+.primary:disabled, .secondary:disabled { opacity: .6; cursor: default; }
+.primary:focus-visible, .secondary:focus-visible, .modes button:focus-visible { outline: 2px solid var(--theme-action, #5b45d6); outline-offset: 2px; }
+.week { display: flex; flex: none; align-items: center; gap: 8px; }
+.week ol { display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.week li { width: 8px; height: 8px; border-radius: 50%; background: var(--theme-border, rgba(127,127,127,.3)); }
+.week li[data-state="on_time"] { background: var(--theme-success, #328267); }
+.week li[data-state="late"] { background: var(--theme-warning, #b7791f); }
+.week li[data-state="missed"] { background: var(--theme-danger, #c53030); }
+.week li[data-state="today"] { box-shadow: 0 0 0 2px var(--theme-action, #5b45d6) inset; background: transparent; }
+.week small { color: var(--theme-text-muted, inherit); font-size: 12px; white-space: nowrap; }
+/* The week's words are its dots' tooltip; the dots show where the row has room for them. */
+.week small { display: none; }
+@media (max-width: 1439.98px) { .week { display: none; } }
+/* A phone: one row. The line under the state says the time worked (the top bar's chip ticks it too); while checked in,
+   Break and Check out are 44 px icon buttons named by their words (Check in keeps its word). */
+@media (max-width: 899.98px) {
+  .card { flex-wrap: nowrap; gap: 8px; padding: 6px 8px 6px 10px; }
+  .card:has(.modes), .card:has(.summary), .card:has(a.secondary) { flex-wrap: wrap; }
+  .top { flex: 1 1 0; }
+  .streak, .timer { display: none; }
+  .card:is([data-state="in"], [data-state="break"]) .actions > button { width: 44px; padding: 0; }
+  .card:is([data-state="in"], [data-state="break"]) .actions > button .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .primary, .secondary, .modes button { min-height: 44px; }
+  /* UI-SWEEP: with Office / Home / On duty to choose, the title takes its own row ("Ready to…", "Check in b…" were
+     squeezed beside the choice); the choice and Check in sit under it. */
+  .card:has(.modes) .top { flex-basis: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card { transition: border-color .3s ease; }
+}

@@ -1,0 +1,65 @@
+/* SELLER-ONBOARD: the people intake's card in a chat (intake-card.tsx). Theme tokens only, as the other chat cards. */
+.line { align-self: stretch; display: grid; gap: 6px; justify-items: center; width: 100%; max-width: min(98%, 980px); margin: 8px auto; text-align: left; }
+.line > span { padding: 4px 12px; border-radius: 8px; background: color-mix(in srgb, var(--theme-surface) 85%, transparent); color: var(--theme-text-muted); font-size: 12.5px; box-shadow: 0 1px 1px rgb(0 0 0 / 6%); text-align: center; }
+.line > span b { color: var(--theme-text); font-weight: 600; }
+.card { display: grid; gap: 8px; width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--theme-action) 35%, var(--theme-border)); border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); color: var(--theme-text); font-size: 13px; }
+.card[data-state="applied"] { border-color: color-mix(in srgb, #23a55a 45%, var(--theme-border)); background: color-mix(in srgb, #23a55a 5%, var(--theme-surface)); }
+.card[data-state="dismissed"], .card[data-state="superseded"] { opacity: .75; background: var(--theme-surface); }
+.card[data-loading] { color: var(--theme-text-muted); }
+.card header { display: grid; gap: 2px; }
+.card header b { font-size: 15px; }
+.card header small, .muted { color: var(--theme-text-muted); font-size: 12px; }
+.counts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.counts span { padding: 2px 8px; border-radius: 999px; background: var(--theme-surface-subtle); font-size: 12px; }
+.counts span[data-kind="add"] { background: color-mix(in srgb, #23a55a 14%, var(--theme-surface)); }
+.counts span[data-kind="skip"] { background: color-mix(in srgb, var(--theme-danger) 12%, var(--theme-surface)); }
+.scroll { overflow-x: auto; max-height: 340px; overflow-y: auto; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); }
+.scroll:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+.table th, .table td { padding: 6px 8px; border-bottom: 1px solid var(--theme-border); text-align: left; vertical-align: top; }
+.table thead th { position: sticky; top: 0; z-index: 1; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-weight: 600; white-space: nowrap; }
+.table tbody tr:last-child > * { border-bottom: 0; }
+.table td > span, .table th[data-col="name"] > span { display: block; }
+.table td > small, .table th > small { display: block; color: var(--theme-text-muted); font-size: 11.5px; font-weight: 400; overflow-wrap: anywhere; }
+.table td[data-col="contact"] { overflow-wrap: anywhere; }
+.table th[data-col="name"] { font-weight: 600; min-width: 120px; }
+.table small[data-status="add"] { color: #1b7f45; }
+.table small[data-status="skip"] { color: var(--theme-danger); }
+.table tr[data-action="skip"] > :not([data-col="check"]) > span { color: var(--theme-text-muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--theme-text-muted) 60%, transparent); }
+.table input { width: 16px; height: 16px; margin: 2px 0 0; accent-color: var(--theme-action); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.problems { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; max-height: 200px; overflow-y: auto; }
+.problems li { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; }
+.problems li svg { flex: none; margin-top: 2px; }
+.problems li[data-level="block"] svg { color: var(--theme-danger); }
+.problems li[data-level="warn"] svg { color: #c27c0e; }
+.problems li[data-level="info"] { color: var(--theme-text-muted); }
+.what { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; }
+.result { display: grid; gap: 6px; }
+.result p { display: flex; gap: 6px; align-items: flex-start; margin: 0; }
+.result p svg { flex: none; margin-top: 2px; }
+.result a { color: var(--theme-action); }
+.links { display: grid; gap: 6px; }
+.links > span { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.links b { min-width: 120px; }
+.card [role="alert"] { color: var(--theme-danger); }
+/* A phone: each seller is a block of short lines (nothing hides behind a sideways scroll). */
+@media (max-width: 640px) {
+  .line { max-width: 100%; } .card { padding: 10px; }
+  .scroll { max-height: 420px; }
+  .table thead { display: none; }
+  .table, .table tbody { display: block; }
+  .table tr { display: grid; grid-template-columns: 1fr; gap: 1px 8px; padding: 8px 10px; border-bottom: 1px solid var(--theme-border); }
+  .table[data-pick] tr { grid-template-columns: 24px 1fr; }
+  .table tr:last-child { border-bottom: 0; }
+  .table th, .table td { display: block; padding: 0; border: 0; }
+  .table[data-pick] th, .table[data-pick] td { grid-column: 2; }
+  .table[data-pick] td[data-col="check"] { grid-column: 1; grid-row: 1 / span 6; }
+  .table td[data-col="n"] { display: none; }
+  .table th[data-col="name"]::before { content: attr(data-n) ". "; }
+  .table td > small, .table th > small { display: inline; }
+  .table td > small::before { content: " · "; }
+  .table td > span, .table th[data-col="name"] > span { display: inline; }
+  .table th[data-col="name"] > small { display: block; }
+}

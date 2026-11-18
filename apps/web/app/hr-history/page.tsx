@@ -1,0 +1,21 @@
+import { RecordForm } from '../records';
+import { HistoryEvidence } from './evidence';
+import Link from 'next/link';
+import { api } from '../lib/api';
+import { CalendarRange } from 'lucide-react';
+import { Pager, Message, Page, PageHeader, Empty, styles } from '../ui';
+import { Navigation, text, s, type Row } from '../company/common';
+import css from '../company/company.module.css';
+import hist from './history.module.css';
+// UI-UPGRADE: a count the report did not give reads as a quiet dash (with why on hover), not "Unknown" in every cell;
+// a month reads "Dec 2026".
+const blank = (v: unknown) => v === null || v === undefined || v === '';
+const cell = (v: unknown) => blank(v) ? <span className={styles.muted} title="Not in the report">—</span> : text(v);
+const month = (v: unknown) => { const m = /^(\d{4})-(\d{2})/.exec(s(v)); return m ? new Date(Date.UTC(+m[1], +m[2] - 1, 15)).toLocaleDateString('en-IN', { month: 'short', year: 'numeric', timeZone: 'UTC' }) : s(v).slice(0, 7); };
+// VISUAL-QA (D135, 13 Nov 2026): no records → one empty state, not a bare table frame with "Page 1 · 0 records".
+// VISUAL-QA (D137): the header and note in plain words (were "Imported Drive reports" plus an audit note, "Blank counts
+// remain unknown; unanchored years stay explicit"); "My history" read as this same page.
+export default async function History({searchParams}:{searchParams:Promise<Record<string,string>>}) {
+ const q=await searchParams,r=await api<{rows:Row[];total:number;page:number;detail:string;canEdit:boolean;people:{id:string;name:string}[]}>(`hr/imported-history?${new URLSearchParams(q)}`);if(r.error)return <Message text={r.error}/>;const d=r.data;if(!d)return null;
+ return <Page fit><PageHeader title="Attendance & leave history" context={['Past months from HR’s reports']} actions={<>{d.canEdit?<RecordForm path="hr/imported-history" title="Record a historical month" label="Add past month" fields={[{key:"personId",label:"Person",type:"select",required:true,options:d.people.map(p=>({value:p.id,label:p.name}))},{key:"month",label:"Month (YYYY-MM)",required:true,placeholder:"2026-09"},{key:"leaveDays",label:"Leave days",type:"text"},{key:"wfhDays",label:"WFH days",type:"text"},{key:"halfDays",label:"Half days",type:"text"},{key:"coverage",label:"Attendance dates / coverage",type:"textarea"},{key:"reason",label:"Source or reason",required:true,type:"textarea"}]} note="Blank counts stay unknown. Pulse entries remain separate from imported reports and survive source replay."/>:null}{d.canEdit?<Link className={styles.btn} href="/hr?tab=payroll">Restricted salary history</Link>:<Link className={styles.btn} href="/me?tab=history">History on My desk</Link>}</>}/><p className={css.note}>{d.people.length?'Monthly attendance and leave from past reports. A blank means the report did not say, not zero; these counts are not leave decisions.':'Your attendance and leave in past months, as HR confirmed them. A blank means the report did not say, not zero.'}</p><div className={css.content} data-grow="">{!d.rows.length&&!d.page?<section className={styles.panel}><Empty first icon={CalendarRange} title="No past months yet" text="Months HR records from older attendance and leave reports show here, each with where its numbers came from."/></section>:<Pager className={css.sheet} primary mobile={6}><table className={hist.hist}><thead><tr><th>Person</th><th>Period</th><th>Leave days</th><th>WFH days</th><th>Half days</th><th>Coverage / source</th></tr></thead><tbody>{d.rows.map(h=><tr key={s(h.source_key)}><td>{h.person_id?<Link href={`/people/${h.person_id}?tab=attendance`}>{text(h.personName)}</Link>:text(h.person_label)}</td><td className={styles.nowrap}>{h.month?month(h.month):<>{text(h.month_label)}<span className={styles.cellSub}>Year not established</span></>}</td><td data-label="Leave">{cell(h.leave_days)}</td><td data-label="WFH">{cell(h.wfh_days)}</td><td data-label="Half days">{cell(h.half_days)}</td><td>{cell(h.attendance_dates)}<span className={styles.cellSub}>{text(h.basis)}</span><HistoryEvidence value={h.evidence}/></td></tr>)}</tbody></table></Pager>}{d.rows.length||d.page?<Navigation base="/hr-history" page={d.page} total={d.total} query={q}/>:null}</div></Page>;
+}

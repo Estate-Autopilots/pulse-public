@@ -1,0 +1,83 @@
+{
+  "platform": {
+    "project": "Pulse · Platform",
+    "engineer": "Platform Engineer",
+    "paths": [
+      "services/api/",
+      "services/ingest/",
+      "services/workers/",
+      "collectors/",
+      "packages/schemas/",
+      "packages/sdk-py/",
+      "packages/sdk-ts/",
+      "db/",
+      "infra/",
+      "services/bot/",
+      "tools/",
+      ".github/"
+    ]
+  },
+  "web": {
+    "project": "Pulse · Web",
+    "engineer": "Web Engineer",
+    "paths": [
+      "apps/web/",
+      "packages/design-system/"
+    ]
+  },
+  "web2": {
+    "project": "Pulse · Web 2",
+    "engineer": "Web Engineer 2",
+    "paths": [
+      "apps/web/"
+    ]
+  },
+  "data": {
+    "project": "Pulse · Data",
+    "engineer": "Data Engineer",
+    "paths": [
+      "collectors/",
+      "packages/sdk-py/",
+      "services/data/"
+    ]
+  },
+  "desktop": {
+    "project": "Pulse · Desktop",
+    "engineer": "Desktop Engineer",
+    "paths": [
+      "apps/desktop/",
+      "plugins/"
+    ]
+  },
+  "intel": {
+    "project": "Pulse · Intelligence",
+    "engineer": "Intelligence Engineer",
+    "paths": [
+      "services/ml/",
+      "config/role-packs/"
+    ]
+  },
+  "mobile": {
+    "project": "Pulse · Mobile",
+    "engineer": "Mobile Engineer",
+    "planned": true,
+    "paths": [
+      "apps/mobile/"
+    ]
+  },
+  "qa": {
+    "project": "Pulse · Quality & Release",
+    "engineer": "QA & Release",
+    "paths": [
+      "tests/"
+    ]
+  },
+  "ops": {
+    "project": "Pulse · Product & Ops",
+    "engineer": "Pulse Planner",
+    "paths": [
+      "docs/"
+    ],
+    "auto_start": false
+  }
+}

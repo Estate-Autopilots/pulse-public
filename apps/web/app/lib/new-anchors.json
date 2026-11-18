@@ -1,0 +1,22 @@
+{
+  "about": "NEW-DOTS-2 (owner, 10 Nov 2026): the things on a page a release note can point at, so a red dot leads the person to the exact place. Each id is the element's data-new-anchor. route: the page it is on (the note's href); href: where to open it (a tab of the page), when that differs; label: its name in plain words; via: the things to open on the way (a menu, a tab), outermost first; words (NAV-CONNECT): other words a release line may use for it, so a line without an anchor still finds it when exactly one thing on its page matches (lib/new-path.mjs inferAnchor). A release note's line names one with {\"text\", \"href\", \"anchor\"}. The release-notes writer reads this file (/opt/release-comms/relcomms.py), and a web unit test keeps it equal to the data-new-anchor ids in the code (lib/new-anchors.test.mjs). Ids: lowercase words joined by dots or dashes.",
+  "anchors": {
+    "work.new-task": { "route": "/tasks", "label": "New task" },
+    "work.tab.my-work": { "route": "/tasks", "label": "My work" },
+    "work.tab.projects": { "route": "/tasks", "label": "Projects" },
+    "work.tab.goals": { "route": "/tasks", "label": "Goals" },
+    "work.tab.people": { "route": "/tasks", "label": "People" },
+    "work.more": { "route": "/tasks", "label": "More in Work" },
+    "work.more.team": { "route": "/tasks", "label": "Team dashboard", "via": ["work.more"] },
+    "work.more.outcomes": { "route": "/tasks", "label": "Outcomes", "via": ["work.more"] },
+    "work.more.reviews": { "route": "/tasks", "label": "Reviews", "via": ["work.more"] },
+    "work.more.pool": { "route": "/tasks", "label": "The pool", "via": ["work.more"] },
+    "work.more.blocking": { "route": "/tasks", "label": "What's blocking us", "via": ["work.more"] },
+    "work.more.search": { "route": "/tasks", "label": "Search all tasks", "via": ["work.more"] },
+    "work.more.deleted": { "route": "/tasks", "label": "Recently deleted", "via": ["work.more"] },
+    "settings.notifications.dots": { "route": "/settings", "href": "/settings?tab=notifications", "label": "Red dots on what's new" },
+    "shell.rail": { "route": "/", "label": "The side menu", "words": ["side menu", "menu tips", "menu group", "side ribbon"] },
+    "chats.search": { "route": "/chats", "label": "Search chats", "words": ["chats search", "search chats"] },
+    "contacts.tabs": { "route": "/contacts", "label": "People, Companies and Clients", "words": ["people, companies and clients tabs"] }
+  }
+}

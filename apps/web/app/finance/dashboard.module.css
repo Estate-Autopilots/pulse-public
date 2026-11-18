@@ -1,0 +1,117 @@
+/* FIX-PEOPLE-MONEY C4: Finance's Overview as six equal cards (three across on a computer, two on a tablet, one on a
+   phone), built on the game kit's cards, quests, chips and ring. Only the layout and the few marks inside the cards
+   (ageing bars, revenue against expenses, the month bars) are drawn here. */
+.dash { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+/* Two columns of three cards, chosen so they end level (Cash, Others owe us, How long the cash lasts | We owe, Profit and
+   loss, Tax due); a phone reads all six in the owner's order (data-order) in one column. */
+.grid { columns: 2; column-gap: 16px; min-width: 0; }
+.col { display: contents; }
+.cell { min-width: 0; break-inside: avoid; margin-bottom: 16px; }
+@media (max-width: 699.98px) {
+  .grid { columns: auto; display: flex; flex-direction: column; align-items: stretch; gap: 12px; } .cell { margin-bottom: 0; }
+  .col { display: contents; }
+  .cell[data-order="1"] { order: 1; } .cell[data-order="2"] { order: 2; } .cell[data-order="3"] { order: 3; }
+  .cell[data-order="4"] { order: 4; } .cell[data-order="5"] { order: 5; } .cell[data-order="6"] { order: 6; }
+}
+.figure { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.figure b { font-size: 28px; line-height: 1.15; font-weight: 750; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.figure b[data-tone="good"] { color: var(--fx-good); }
+.figure b[data-tone="bad"] { color: var(--fx-bad); }
+.figure b[data-tone="warn"] { color: color-mix(in srgb, var(--fx-warn) 85%, var(--theme-text)); }
+.figure span { color: var(--theme-text-muted); font-size: 13.5px; line-height: 1.4; }
+.hint { margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+.alert { margin: 0; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--fx-bad) 9%, var(--theme-surface)); color: var(--fx-bad); font-size: 13px; font-weight: 600; }
+.dash a.more { display: inline-flex; align-items: center; gap: 4px; margin-top: auto; padding-top: 4px; color: var(--theme-action); font-size: 14px; font-weight: 650; text-decoration: none; align-self: flex-start; min-height: 32px; margin-top: 0; }
+.dash a.more:hover { text-decoration: underline; text-underline-offset: 3px; }
+.questLink { color: inherit; text-decoration: none; }
+.questLink:hover { text-decoration: underline; text-underline-offset: 3px; }
+.go { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; color: var(--fx-accent); background: var(--fx-accent-soft); }
+
+/* Others owe us: one row per ageing bucket, green to rose. */
+.ageing { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.ageing li { display: grid; grid-template-columns: 84px minmax(0, 1fr) 76px; align-items: center; gap: 10px; font-size: 13px; }
+.ageLabel { color: var(--theme-text-muted); white-space: nowrap; }
+.ageTrack { height: 10px; border-radius: 999px; background: var(--theme-surface-subtle); overflow: hidden; }
+.ageTrack i { display: block; height: 100%; border-radius: inherit; }
+.ageing li[data-step="0"] .ageTrack i { background: var(--fx-good); }
+.ageing li[data-step="1"] .ageTrack i { background: color-mix(in srgb, var(--fx-warn) 70%, var(--fx-good)); }
+.ageing li[data-step="2"] .ageTrack i { background: var(--fx-warn); }
+.ageing li[data-step="3"] .ageTrack i { background: var(--fx-bad); }
+.ageAmount { font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+
+/* Lists of lines with an amount on the right (we owe, the month's costs, tax). */
+.rows { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.rows li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); min-width: 0; }
+.rows li:last-child { border-bottom: 0; }
+.rows li > span:first-child { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.rows b { font-size: 14px; font-weight: 650; }
+.rows small { color: var(--theme-text-muted); font-size: 12.5px; overflow-wrap: anywhere; }
+.amount, .amountLink { flex: none; font-size: 14px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
+.dash a.amountLink { color: var(--theme-action); text-decoration: none; }
+.amountLink:hover { text-decoration: underline; }
+.when { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; }
+
+/* Profit and loss: revenue against expenses as two bars on one scale. */
+.pnl { display: grid; grid-template-columns: auto minmax(0, 1fr) 76px; align-items: center; gap: 6px 10px; font-size: 13px; }
+.pnl > span:not(.pnlTrack) { color: var(--theme-text-muted); }
+.pnl b { font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
+.pnlTrack { height: 10px; border-radius: 999px; background: var(--theme-surface-subtle); overflow: hidden; }
+.pnlTrack i { display: block; height: 100%; border-radius: inherit; }
+.pnlTrack i[data-kind="in"] { background: var(--fx-accent); }
+.pnlTrack i[data-kind="out"] { background: #e8743b; }
+:global([data-theme="dark"]) .pnlTrack i[data-kind="out"] { background: #f0915e; }
+
+/* Burn and runway: the figure beside the runway ring; six months of net as small bars (below the line is a loss). */
+.burn { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ringText { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.ringText b { font-size: 20px; font-weight: 750; }
+.ringText small { font-size: 11px; color: var(--theme-text-muted); }
+.bars { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; height: 64px; align-items: end; }
+.bar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; min-width: 0; }
+.barTrack { display: flex; align-items: flex-end; justify-content: center; width: 100%; height: 52px; }
+.bar i { display: block; width: 100%; max-width: 28px; border-radius: 6px 6px 2px 2px; background: var(--fx-good); }
+.bar i[data-neg] { background: color-mix(in srgb, var(--fx-bad) 75%, var(--theme-surface)); }
+.bar small { font-size: 11px; color: var(--theme-text-muted); }
+
+.trend { min-height: 220px; min-width: 0; }
+.stale { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--fx-warn) 9%, var(--theme-surface)); font-size: 13px; line-height: 1.45; list-style: none; }
+.stale li { display: flex; gap: 8px; align-items: flex-start; }
+.stale svg { flex: none; margin-top: 2px; color: color-mix(in srgb, var(--fx-warn) 85%, var(--theme-text)); }
+.source { margin: -4px 0 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.source a { color: var(--theme-action); font-weight: 600; }
+@media (max-width: 699.98px) { .dash { padding-bottom: 72px; } }
+.runwayChip { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 96px; padding: 10px 12px; border-radius: 14px; background: var(--theme-surface-subtle); text-align: center; }
+.runwayChip b { font-size: 14px; font-weight: 700; }
+.runwayChip small { color: var(--theme-text-muted); font-size: 12px; }
+.muted { color: var(--theme-text-muted); font-weight: 500; }
+.step { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--fx-accent-soft); color: var(--fx-accent); font-size: 13px; font-weight: 700; }
+.bar em { font-style: normal; font-size: 11.5px; font-weight: 600; color: var(--theme-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.bars { height: 84px; }
+/* A computer shows every card in full; a phone shows the headline figure and its line, and "Show details" opens the rest. */
+.detail { display: contents; }
+.toggle { display: none; }
+@media (max-width: 699.98px) {
+  .detail:not([data-open]) { display: none; }
+  .detail[data-open] { display: flex; flex-direction: column; gap: 12px; }
+  .toggle { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; min-height: 40px; padding: 0 4px; border: 0; background: none; color: var(--theme-action); font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+  .toggle svg[data-open] { transform: rotate(180deg); }
+}
+.first { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.first a { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 60px; padding: 10px 14px 10px 18px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); color: inherit; text-decoration: none; }
+.first a::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 4px; border-radius: 0 4px 4px 0; background: var(--fx-accent); }
+.first li[data-tone="bad"] a::before { background: var(--fx-bad); }
+.first li[data-tone="warn"] a::before { background: var(--fx-warn); }
+.first a:hover { border-color: var(--fx-accent-line, var(--theme-border-strong)); }
+.first a > svg { color: var(--theme-text-muted); }
+.firstText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.firstText b { font-size: 14.5px; font-weight: 650; overflow-wrap: anywhere; }
+.firstText small { color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.4; }
+@media (max-width: 699.98px) { .toggle { align-self: flex-end; } }
+@media (max-width: 699.98px) { .burn { flex-direction: column; align-items: flex-start; } }
+/* A phone leaves out the twelve-month chart (too cramped to read); the cards above tell the story. */
+@media (max-width: 699.98px) { .trendCard { display: none; } }
+.phoneOnly { display: none; }
+@media (max-width: 699.98px) { .phoneOnly { display: block; margin: 0; color: color-mix(in srgb, var(--fx-warn) 70%, var(--theme-text)); font-size: 13px; font-weight: 600; } }
+/* A loss is drawn down from the zero line (the track's top), a gain up from its bottom. */
+.barTrack[data-down] { align-items: flex-start; border-top: 1.5px solid color-mix(in srgb, var(--theme-text) 35%, transparent); }
+.barTrack[data-down] i { border-radius: 2px 2px 6px 6px; }
