@@ -1,0 +1,263 @@
+/* NEW-DOTS-2: the dot trail on a page and the "Show me" spotlight (new-trail.tsx).
+   A mark sits over its thing (fixed, measured): a red dot on its corner, and on the thing itself a soft ring that pulses
+   twice. The spotlight dims the page with one big shadow around a rounded cut-out that glides from thing to thing; the
+   card says what is new. prefers-reduced-motion, the app's reduced motion or Fun effects off: nothing moves. */
+.mark {
+  --red: var(--theme-danger, #d4373f);
+  position: fixed;
+  z-index: 2147480000;
+  top: var(--t);
+  left: var(--l);
+  width: var(--w);
+  height: var(--h);
+  pointer-events: none;
+}
+.dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--red);
+  box-shadow: 0 0 0 2px var(--theme-surface, #fff);
+  font-style: normal;
+  animation: trail-in 620ms cubic-bezier(0.2, 0.9, 0.3, 1.4) both, trail-glow 1100ms ease-out 200ms 2, trail-shimmer 8s ease-out 2.4s 7;
+}
+/* On a menu or tab on the way: how many new things wait inside, on the corner of what it shows (above its chevron). */
+.dot[data-count] {
+  top: -13px;
+  right: -15px;
+  width: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+/* A thing in an open menu: a softly tinted row with the dot inside it, beside the words (an outline read as an error). */
+.mark[data-inmenu] .ring { display: none; }
+.mark[data-inmenu] .newTag {
+  position: absolute;
+  top: calc(50% - 9px);
+  right: 10px;
+  height: 18px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #e11d48;
+  color: #fff;
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 18px;
+  text-transform: uppercase;
+}
+/* The thing itself: a soft red ring around it, pulsing twice, then still. */
+.ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--r, 12px);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 55%, transparent), 0 0 14px 2px color-mix(in srgb, var(--red) 22%, transparent);
+  animation: trail-ring 1300ms ease-out 2 both;
+}
+
+/* The top layer (popover="manual"): the whole window, see-through, never catching a tap. */
+.top { position: fixed; z-index: 2147480000; inset: 0; width: auto; height: auto; max-width: none; max-height: none; margin: 0; padding: 0; overflow: visible;
+  border: 0; background: transparent; color: inherit; pointer-events: none; }
+.top::backdrop { display: none; }
+.layer { position: fixed; z-index: 2147483000; inset: 0; pointer-events: none; }
+.hole {
+  --red: var(--theme-danger, #d4373f);
+  position: fixed;
+  /* One soft red ring and its glow, then the dimmed page. */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 55%, transparent), 0 0 24px 6px color-mix(in srgb, var(--red) 28%, transparent),
+    0 0 0 200vmax rgba(18, 14, 38, 0.7);
+  transition: top 420ms cubic-bezier(0.3, 0.8, 0.2, 1), left 420ms cubic-bezier(0.3, 0.8, 0.2, 1), width 420ms cubic-bezier(0.3, 0.8, 0.2, 1),
+    height 420ms cubic-bezier(0.3, 0.8, 0.2, 1), border-radius 420ms ease;
+}
+.layer[data-ready] .hole { animation: hole-glow 1100ms ease-out 2; }
+/* Around a whole menu: no red ring (the thing inside has it), just the menu lit as one card. */
+.hole[data-menu], .layer[data-ready] .hole[data-menu] { box-shadow: 0 0 0 200vmax rgba(18, 14, 38, 0.7); animation: none; }
+.thingRing {
+  --red: var(--theme-danger, #d4373f);
+  position: fixed;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 60%, transparent), 0 0 12px 2px color-mix(in srgb, var(--red) 20%, transparent);
+  pointer-events: none;
+  animation: thing-glow 1100ms ease-out 2;
+}
+.card {
+  position: fixed;
+  box-sizing: border-box;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--theme-surface, #fff);
+  border: 1px solid color-mix(in srgb, var(--theme-action, #6b4cf0) 22%, transparent);
+  box-shadow: 0 18px 48px rgba(18, 14, 38, 0.28), 0 2px 6px rgba(18, 14, 38, 0.12);
+  color: var(--theme-text, #1e1b2e);
+  pointer-events: auto;
+  animation: card-in 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.card:not([data-below]):not([data-side]) { transform: translateY(-100%); animation-name: card-in-above; }
+/* The little arrow pointing at the thing. */
+.card::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--arrow-x) - 7px);
+  width: 14px;
+  height: 14px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+.card[data-below]::before { top: -6px; border-radius: 3px 0 0 0; }
+.card:not([data-below]):not([data-side])::before { bottom: -6px; border-radius: 0 0 3px 0; }
+/* Beside a menu: the arrow points across at the thing. */
+.card[data-side]::before { top: calc(var(--arrow-y) - 7px); left: auto; }
+.card[data-side="left"]::before { right: -6px; border-radius: 0 3px 0 0; }
+.card[data-side="right"]::before { left: -6px; border-radius: 0 0 0 3px; }
+.cardHead { position: relative; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+/* A fixed rose with white words: readable in light and dark (the theme's danger colour turns pale in dark). */
+.chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e11d48;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.where { min-width: 0; overflow: hidden; color: var(--theme-text-muted, #6b6880); font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.count { margin-right: auto; color: var(--theme-text-muted, #6b6880); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.close {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  margin: -6px -8px -6px auto;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--theme-text-muted, #6b6880);
+  cursor: pointer;
+}
+.close:hover { background: color-mix(in srgb, var(--theme-text, #1e1b2e) 7%, transparent); color: var(--theme-text, #1e1b2e); }
+.title { position: relative; margin: 2px 0 14px; font-size: 16.5px; font-weight: 700; line-height: 1.35; }
+/* Read out by screen readers, not shown (the card shows the same). */
+.said { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.actions { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.primary, .quiet {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.primary { border: 0; background: var(--theme-action, #6b4cf0); color: var(--theme-action-text, #fff); }
+.primary:hover { filter: brightness(1.06); }
+/* Got it is the quiet way out; Next is the step forward. */
+.quiet { border: 0; background: transparent; color: var(--theme-text-muted, #6b6880); font-weight: 500; }
+.quiet:hover { background: color-mix(in srgb, var(--theme-text, #1e1b2e) 5%, transparent); }
+.primary:focus-visible, .quiet:focus-visible, .close:focus-visible { outline: 2px solid var(--theme-focus, #6b4cf0); outline-offset: 2px; }
+:global(html[data-theme="dark"]) .primary { background: #a897ff; color: #17123a; }
+/* Dark: a lighter dim (the page behind stays readable). */
+:global(html[data-theme="dark"]) .hole { box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 55%, transparent), 0 0 24px 6px color-mix(in srgb, var(--red) 28%, transparent), 0 0 0 200vmax rgba(8, 6, 18, 0.58); }
+:global(html[data-theme="dark"]) .hole[data-menu] { box-shadow: 0 0 0 200vmax rgba(8, 6, 18, 0.58); }
+/* Dark: a brighter red, so the rings and dots glow instead of turning brown. */
+:global(html[data-theme="dark"]) .mark, :global(html[data-theme="dark"]) .hole, :global(html[data-theme="dark"]) .thingRing { --red: #ff5a78; }
+
+/* The sparkle as a thing clears: eight small specks fly out and fade. */
+.sparkle { position: fixed; z-index: 2147483001; width: 0; height: 0; pointer-events: none; }
+.sparkle i {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--theme-action, #6b4cf0);
+  animation: speck 760ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.sparkle i:nth-child(odd) { background: #f5b301; width: 5px; height: 5px; }
+.sparkle i:nth-child(3n) { background: var(--theme-danger, #d4373f); }
+
+@keyframes trail-in { 0% { transform: scale(0); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+@keyframes trail-glow {
+  0% { box-shadow: 0 0 0 2px var(--theme-surface, #fff), 0 0 0 2px color-mix(in srgb, var(--red) 50%, transparent); }
+  100% { box-shadow: 0 0 0 2px var(--theme-surface, #fff), 0 0 0 11px transparent; }
+}
+@keyframes trail-shimmer {
+  0%, 84% { box-shadow: 0 0 0 2px var(--theme-surface, #fff), 0 0 0 2px color-mix(in srgb, var(--red) 45%, transparent); }
+  100% { box-shadow: 0 0 0 2px var(--theme-surface, #fff), 0 0 0 10px transparent; }
+}
+@keyframes trail-ring { 0% { opacity: 0; transform: scale(1.08); } 35% { opacity: 1; transform: scale(1); } 100% { opacity: 0.85; transform: scale(1); } }
+@keyframes hole-glow {
+  0%, 100% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 55%, transparent), 0 0 24px 6px color-mix(in srgb, var(--red) 28%, transparent), 0 0 0 200vmax rgba(18, 14, 38, 0.7); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--red) 40%, transparent), 0 0 36px 12px color-mix(in srgb, var(--red) 32%, transparent), 0 0 0 200vmax rgba(18, 14, 38, 0.7); }
+}
+@keyframes thing-glow {
+  0%, 100% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 60%, transparent), 0 0 18px 4px color-mix(in srgb, var(--red) 26%, transparent); }
+  50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--red) 42%, transparent), 0 0 28px 8px color-mix(in srgb, var(--red) 30%, transparent); }
+}
+@keyframes card-in { from { opacity: 0; transform: translateY(6px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes card-in-above { from { opacity: 0; transform: translateY(calc(-100% - 6px)) scale(0.97); } to { opacity: 1; transform: translateY(-100%); } }
+@keyframes speck {
+  0% { opacity: 1; transform: rotate(var(--a)) translateX(0) scale(1); }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(26px) scale(0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot, .ring, .card, .layer[data-ready] .hole, .thingRing { animation: none; }
+  .hole { transition: none; }
+}
+:global(html[data-fun="off"]) .dot, :global(html[data-fun="off"]) .ring, :global(html[data-fun="off"]) .card, :global(html[data-fun="off"]) .layer[data-ready] .hole,
+:global(html[data-motion="reduced"]) .dot, :global(html[data-motion="reduced"]) .ring, :global(html[data-motion="reduced"]) .card, :global(html[data-motion="reduced"]) .layer[data-ready] .hole,
+:global(html[data-reduced-motion="true"]) .dot, :global(html[data-reduced-motion="true"]) .ring, :global(html[data-reduced-motion="true"]) .card,
+:global(html[data-reduced-motion="true"]) .layer[data-ready] .hole { animation: none; }
+:global(html[data-fun="off"]) .hole, :global(html[data-motion="reduced"]) .hole, :global(html[data-reduced-motion="true"]) .hole { transition: none; }
+:global(html[data-fun="off"]) .thingRing, :global(html[data-motion="reduced"]) .thingRing, :global(html[data-reduced-motion="true"]) .thingRing { animation: none; }
+/* NAV-CONNECT: the what's-new path (new-path.tsx). A line under the change saying where it is; the page as a whole is
+   lit with a calm violet edge (no red ring: it is not one thing), and its card has no arrow. */
+.pathHint { position: relative; margin: -8px 0 14px; color: var(--theme-text-muted, #6b6880); font-size: 13.5px; line-height: 1.4; }
+/* The path's light is violet (the way there), not the tour's red (a new thing), so it never reads as an alert. */
+[data-new-path] .hole, [data-new-path][data-ready] .hole { box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action, #6b4cf0) 70%, transparent), 0 0 26px 6px color-mix(in srgb, var(--theme-action, #6b4cf0) 32%, transparent), 0 0 0 200vmax rgba(18, 14, 38, 0.84); animation: none; }
+[data-new-path] .hole[data-menu] { box-shadow: 0 0 0 200vmax rgba(18, 14, 38, 0.84); }
+[data-new-path] .thingRing { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--theme-action, #6b4cf0) 85%, transparent), 0 0 14px 2px color-mix(in srgb, var(--theme-action, #6b4cf0) 26%, transparent); animation: none; }
+.hole[data-whole], .layer[data-ready] .hole[data-whole], [data-new-path] .hole[data-whole] { box-shadow: 0 0 0 2px #6B4CF0, 0 0 0 200vmax rgba(10, 8, 24, 0.76); animation: none; }
+.card[data-plain]::before { display: none; }
+.pathScrim { position: fixed; inset: 0; background: rgba(18, 14, 38, 0.28); }
+/* The path's card and button in house violet in dark too, the card lifted off the dimmed page. */
+:global(:root[data-theme="dark"]) [data-new-path] .card { background: #2d2748; border: 1.5px solid rgb(139 116 255 / 75%); box-shadow: 0 22px 56px rgb(0 0 0 / 55%), 0 0 0 4px rgb(139 116 255 / 16%); }
+[data-new-path] .primary, :global(html[data-theme="dark"]) [data-new-path] .primary { background: #6B4CF0; color: #fff; }
+:global(:root[data-theme="dark"]) [data-new-path] .hole[data-whole] { box-shadow: 0 0 0 2px #8b74ff, 0 0 0 200vmax rgba(0, 0, 0, 0.84); }
+/* During the path the lit group list keeps one soft shadow, no violet halo (one ring at a time: the row). */
+:global(html[data-new-touring] [id^="pulse-flyout-"][role="group"]) { box-shadow: 0 18px 44px rgb(15 27 51 / 22%); }
+/* The path's pointer (rail icon, list row) is larger and outlined, so the card visibly points at what is lit. */
+[data-new-path] .card[data-side]::before { width: 18px; height: 18px; left: -10px; top: calc(var(--arrow-y) - 9px); border-left: 1.5px solid #6B4CF0; border-bottom: 1.5px solid #6B4CF0; border-radius: 0 0 0 4px; }
+/* During the path only the lit row stands out in the group's list: the current page's own fill steps back. */
+:global(html[data-new-touring] [id^="pulse-flyout-"] a[aria-current="page"]) { background: none; color: inherit; font-weight: 600; }
+:global(html[data-new-touring] [id^="pulse-flyout-"] a[aria-current="page"] > svg) { color: inherit; }
+/* NAV-CONNECT: on the rail and list steps the page behind is softened, so half-hidden sentences do not compete. */
+:global(html[data-new-path-step="rail"] #main-content), :global(html[data-new-path-step="menu"] #main-content),
+:global(html[data-new-path-step="rail"] #pulse-sidebar-panel), :global(html[data-new-path-step="menu"] #pulse-sidebar-panel) { filter: blur(2px); }
+[data-new-path] .primary, [data-new-path] .quiet { white-space: nowrap; }
+/* While the path shows, the what's-new dots step aside: the lit row is the one thing to look at. */
+:global(html[data-new-touring] [data-new-dot]) { visibility: hidden; }
+/* The path's last word on a page as a whole: a slim violet banner at the top of the page, nothing dimmed; the top bar's
+   "New: …" line steps aside while it shows (it would say the same). */
+.noteBar { display: flex; gap: 12px; align-items: center; margin: 12px 24px 4px; padding: 10px 12px 10px 14px; border: 1.5px solid color-mix(in srgb, #6B4CF0 40%, transparent); border-radius: 12px;
+  background: color-mix(in srgb, #6B4CF0 7%, var(--theme-surface, #fff)); color: var(--theme-text, #1e1b2e); pointer-events: auto; animation: card-in 220ms ease-out both; }
+.noteBar > p { flex: 1 1 auto; display: grid; gap: 2px; min-width: 0; margin: 0; font-size: 14px; }
+.noteBar > p > small { color: var(--theme-text-muted, #6b6880); font-size: 12.5px; }
+.noteBar > .close { position: static; flex: none; }
+@media (max-width: 599.98px) { .noteBar { flex-wrap: wrap; margin: 8px 12px 4px; } }
+@media (prefers-reduced-motion: reduce) { .noteBar { animation: none; } }
+:global(html[data-new-touring] [data-new-pill]) { display: none; }

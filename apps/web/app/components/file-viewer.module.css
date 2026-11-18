@@ -1,0 +1,47 @@
+/* DOCS-WORKBENCH: the side panel that opens any file. Full screen on a phone; a panel on the right from 900. Theme
+   tokens only (light and dark). */
+.panel { position: fixed; z-index: 80; inset: 0; display: flex; flex-direction: column; background: var(--theme-surface); color: var(--theme-text); box-shadow: -12px 0 32px rgb(0 0 0 / 0.18); }
+@media (min-width: 900px) { .panel { left: auto; width: min(760px, 55vw); border-left: 1px solid var(--theme-border); } }
+.head { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 8px 4px 16px; border-bottom: 1px solid var(--theme-border); }
+.head strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+.actions { display: flex; gap: 2px; }
+.icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 10px; border: 0; background: none; color: var(--theme-text); cursor: pointer; }
+.icon:hover { background: var(--theme-surface-subtle); }
+.body { flex: 1; min-height: 0; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.note { margin: 0; font-size: 13px; color: var(--theme-text-muted); }
+.fallback { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 16px; text-align: center; color: var(--theme-text-muted); }
+.fallback p { margin: 0; font-size: 15px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--theme-border); background: var(--theme-surface);
+  color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; white-space: nowrap; }
+.media { max-width: 100%; max-height: calc(100vh - 100px); object-fit: contain; align-self: center; border-radius: 8px; }
+.audio { width: 100%; }
+.pdf { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.page { box-shadow: 0 1px 6px rgb(0 0 0 / 0.2); background: #fff; max-width: 100%; }
+.htmlWrap { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--theme-text-muted); }
+.bar span { flex: 1; min-width: 180px; }
+.frame { flex: 1; width: 100%; min-height: 70vh; border: 1px solid var(--theme-border); border-radius: 10px; background: #fff; }
+.code { margin: 0; padding: 12px; border-radius: 10px; background: var(--theme-surface-subtle); overflow: auto; font-size: 13px; line-height: 1.5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; }
+.code :global(.hljs-keyword), .code :global(.hljs-built_in) { color: #b4469b; }
+.code :global(.hljs-string), .code :global(.hljs-attr) { color: #2f8a4a; }
+.code :global(.hljs-comment) { color: var(--theme-text-muted); font-style: italic; }
+.code :global(.hljs-number), .code :global(.hljs-literal) { color: #b25d00; }
+.code :global(.hljs-title), .code :global(.hljs-function) { color: #3a64c8; }
+.prose { font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.prose img { max-width: 100%; }
+.prose pre { padding: 10px; border-radius: 8px; background: var(--theme-surface-subtle); overflow: auto; }
+.prose table { border-collapse: collapse; }
+.prose th, .prose td { border: 1px solid var(--theme-border); padding: 4px 8px; }
+.tableWrap { overflow: auto; border: 1px solid var(--theme-border); border-radius: 10px; }
+.table { border-collapse: collapse; font-size: 13px; }
+.table th, .table td { border: 1px solid var(--theme-border); padding: 4px 8px; white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+.table th { position: sticky; top: 0; background: var(--theme-surface-subtle); }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; }
+.tabs button { min-height: 36px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--theme-border); background: none; color: var(--theme-text); font: inherit; font-size: 13px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--theme-surface-subtle); font-weight: 650; }
+.slide { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--theme-border); background: var(--theme-surface); }
+.slide h3 { margin: 4px 0 6px; font-size: 17px; }
+.slide p { margin: 4px 0; font-size: 14px; }
+.slideNo { font-size: 12px; color: var(--theme-text-muted); }
+.linkButton { display: inline; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; text-align: left; }

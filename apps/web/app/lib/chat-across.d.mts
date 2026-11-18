@@ -1,0 +1,24 @@
+export type AcrossChannel = { id: string; name: string; kind: string; peerId: string | null; peerPhotoAt: string | null; peerAgent: boolean; photoAt: string | null;
+  pinnedAt: string | null; mutedUntil: string | null; archivedAt: string | null; markedUnread: string | null; unread: number; mentions: number;
+  lastAt: string | null; preview: string | null; previewAuthor: string | null; previewAuthorId: string | null; previewKind: string | null;
+  previewRemoved: boolean; previewAttachment: unknown; withOrg: string | null; clientFacing: boolean; members: number };
+export type AcrossSeat = { org: string; name: string; handle: string | null; kind: string; current: boolean; personal: boolean; purpose: "work" | "test" | "demo";
+  mark: string | null; viewer: string | null; state: "ok" | "locked" | "unavailable" | "current"; guest: boolean;
+  unreadChats: number; unreadMessages: number; mentions: number; more: number; channels: AcrossChannel[]; shared: { ref: string; hostOrg: string }[] };
+export type AcrossRead = { generatedAt: string; seats: AcrossSeat[]; more: number };
+/** A chat of the list with its company: `remote` lives in another company (opening it moves there); `here` is my person there. */
+export type Tagged = { org?: string; orgName?: string; orgMark?: string | null; orgHue?: number; remote?: boolean; here?: string | null };
+type Countable = { id: string; unread: number; markedUnread?: string | null; archivedAt?: string | null; mutedUntil?: string | null };
+export declare function switchSeats(seats: AcrossSeat[] | null | undefined): AcrossSeat[];
+export declare function hueOf(org: string | null | undefined, seats?: AcrossSeat[] | null, name?: string | null): number;
+export declare function hasSwitch(seats: AcrossSeat[] | null | undefined): boolean;
+export declare function validScope(scope: string, seats: AcrossSeat[] | null | undefined): string;
+export declare function scopeChannels<T extends { id: string }>(current: T[], seats: AcrossSeat[] | null | undefined, scope: string): (T & Tagged)[];
+export declare function counts(c: Countable, now?: number): boolean;
+export declare function scopeTotals<T extends Countable>(current: T[], seats: AcrossSeat[] | null | undefined, now?: number): Record<string, number> & { all: number };
+export declare function newsSince(before: Map<string, number> | null, seats: AcrossSeat[] | null | undefined, now?: number): (AcrossChannel & { org: string; orgName: string })[];
+export declare function unreadMap(seats: AcrossSeat[] | null | undefined): Map<string, number>;
+export declare function cacheFits(cache: unknown, viewer: string | null | undefined): cache is AcrossRead;
+export declare function toCache<T>(read: AcrossRead, current: T[]): AcrossRead;
+export declare function rebase(cache: AcrossRead | null, viewer: string): AcrossRead | null;
+export declare function chipName(name: string | null | undefined): string;

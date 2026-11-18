@@ -1,0 +1,49 @@
+/* AGENT-MEMORY: the Knowledge tab's rules and per-person notes, final approvers and the budget meter. */
+.stack { display: grid; gap: 16px; min-width: 0; }
+.title { display: inline-flex; align-items: center; gap: 8px; }
+.chip { display: inline-block; margin-right: 6px; padding: 0 8px; border-radius: 999px; background: var(--violet-soft, #efeafe); color: var(--violet, #6d4fd8); font-size: 12px; line-height: 20px; }
+.include { display: block; margin-top: 4px; font-size: 13px; color: var(--text-2, #555); }
+.person { margin-top: 12px; }
+.person h4 { margin: 0 0 6px; font-size: 14px; font-weight: 600; }
+.rowTools { display: inline-flex; gap: 4px; flex-shrink: 0; }
+.edit { display: grid; gap: 8px; flex: 1; min-width: 0; }
+.edit textarea { width: 100%; min-width: 0; font: inherit; padding: 8px 10px; border: 1px solid var(--line, #ddd); border-radius: 8px; resize: vertical; }
+.editTools { display: inline-flex; gap: 8px; }
+.addNote { display: grid; grid-template-columns: minmax(160px, 220px) minmax(0, 1fr) auto; gap: 8px; align-items: end; margin-bottom: 12px; }
+.addNote input { min-width: 0; font: inherit; padding: 8px 10px; border: 1px solid var(--line, #ddd); border-radius: 8px; }
+.approvers { display: grid; gap: 10px; }
+.approver { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 260px); gap: 12px; align-items: center; }
+.approver small { display: block; color: var(--text-2, #666); font-size: 12px; }
+.who { justify-self: start; }
+.budget { display: grid; gap: 8px; margin-bottom: 12px; }
+.budgetRow { display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(90px, 200px); gap: 12px; align-items: center; font-size: 14px; }
+.budgetRow > b { font-weight: 600; }
+.budgetRow > span[role="progressbar"] { height: 8px; margin: 0; }
+.budgetLeft { color: var(--theme-text-muted); font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
+.budgetWord { margin: 0; font-size: 14px; }
+.budget[data-level="warn"] .budgetWord { color: var(--amber-ink, #8a5a00); }
+.budget[data-level="out"] .budgetWord { color: var(--red-ink, #b42318); font-weight: 600; }
+.bar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 13px; color: var(--text-2, #555); border-top: 1px solid var(--line, #eee); min-width: 0; }
+.bar > span[role="progressbar"] { flex: 0 0 90px; }
+.barText { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar[data-level="warn"] { color: var(--amber-ink, #8a5a00); background: var(--amber-soft, #fff7e6); }
+.bar[data-level="out"] { color: var(--red-ink, #b42318); background: var(--red-soft, #fef3f2); }
+@media (max-width: 640px) {
+  /* A phone's chat has no room to spare: the bar shows there only when the budget matters (80% and over, or out). */
+  .bar[data-level="ok"] { display: none; }
+  .addNote { grid-template-columns: minmax(0, 1fr); }
+  .approver { grid-template-columns: minmax(0, 1fr); }
+  .budgetRow { grid-template-columns: 70px minmax(0, 1fr); }
+  .budgetLeft { grid-column: 1 / -1; text-align: left; }
+  .budgetRow { grid-template-columns: 90px minmax(0, 1fr); }
+  .budgetRow > span[role="progressbar"] { grid-column: 1 / -1; }
+  .barText { white-space: normal; }
+}
+
+/* UX-GAMIFY: the budget gauges side by side, wrapping on a phone. */
+.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+/* TOKENS-2: its rupees a month (admins and leadership). */
+.inrForm { display: grid; gap: 6px; max-width: 420px; }
+.inrForm label { display: grid; gap: 4px; font-size: 14px; font-weight: 600; }
+.inrForm input { min-width: 0; width: 100%; }
+.inrActions { display: flex; flex-wrap: wrap; gap: 8px; }

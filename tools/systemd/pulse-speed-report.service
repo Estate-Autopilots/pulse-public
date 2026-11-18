@@ -1,0 +1,11 @@
+[Unit]
+Description=Pulse daily speed report: worst screens and calls, and what got slower, per company (read-only)
+# SPEED-TELEMETRY (14 Nov 2026): PROPOSED, not installed or enabled. Reads production with the API login, every
+# transaction read-only; writes ~/ea-research/flow/reports/speed-daily/speed-<date>.md (screens, routes, counts only).
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/estate-autopilots/db/pulse.env
+ExecStart=/usr/bin/python3 /home/eadev/.local/lib/pulse-release/speed-report.py
+Nice=19
+CPUWeight=20
+TimeoutStartSec=600

@@ -1,0 +1,138 @@
+/* GAP-FOUNDER-VIEW: the layout of "All my companies". Buttons, chips, the ring, cards and the empty state are the game-feel
+   kit's (kit/game/game.module.css); this file places them on a 4px grid. One card per company, one under another: on a
+   wide screen (the list 900px or more) each card is one row (who · money · today · next and Open); narrower, its parts
+   stack. Status colours: green #16A34A, amber #D97706, rose #E11D48 (lighter in dark mode), as the kit's. */
+
+/* ------------------------------------------------------------------------------------------------ the summary strip */
+.overview { display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px; padding: 12px; border-radius: 16px; background: var(--theme-surface); border: 1px solid var(--theme-border); }
+.strip { display: flex; align-items: center; gap: 12px; padding: 4px 8px; flex: 0 1 auto; }
+.stripText { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 14px; line-height: 1.4; }
+.stripText > b { font-size: 15px; }
+.ringText { font-size: 13px; font-variant-numeric: tabular-nums; }
+.lateWord { color: #E11D48; font-weight: 700; }
+:global(:root[data-theme="dark"]) .lateWord { color: #FB7185; }
+
+/* "Do this first": the one thing across every company, right under the title. */
+.first { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px 10px; flex: 1 1 340px; min-width: 0; padding: 12px 16px; border-radius: 16px; border: 1px solid color-mix(in srgb, #6B4CF0 45%, var(--theme-border));
+  border-left: 4px solid #6B4CF0; background: color-mix(in srgb, #6B4CF0 16%, var(--theme-surface)); font-weight: 500; color: inherit; font: inherit; font-size: 15px; line-height: 1.45; text-align: left; cursor: pointer; overflow-wrap: break-word; }
+.first > svg { flex: none; margin-top: 2px; color: #6B4CF0; }
+.first:hover:not(:disabled) { background: color-mix(in srgb, #6B4CF0 12%, var(--theme-surface)); }
+.first:focus-visible { outline: 2px solid #6B4CF0; outline-offset: 2px; }
+:global(:root[data-theme="dark"]) .first { border-color: color-mix(in srgb, #A897FF 40%, var(--theme-border)); background: color-mix(in srgb, #A897FF 12%, var(--theme-surface)); }
+:global(:root[data-theme="dark"]) .first > svg { color: #A897FF; }
+
+/* ------------------------------------------------------------------------------------------------ the cards */
+.grid { display: flex; flex-direction: column; gap: 12px; min-width: 0; container-type: inline-size; }
+.card { position: relative; display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 16px 16px 16px 20px; border-radius: 16px;
+  background: var(--theme-surface); border: 1px solid var(--theme-border); box-shadow: 0 1px 2px rgb(30 27 46 / 6%), 0 4px 16px rgb(30 27 46 / 5%); overflow: hidden; }
+.card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: #16A34A; }
+.card[data-tone="warn"]::before { background: #D97706; }
+.card[data-tone="bad"]::before { background: #E11D48; }
+:global(:root[data-theme="dark"]) .card { box-shadow: 0 1px 2px rgb(0 0 0 / 30%); border-color: color-mix(in srgb, var(--theme-border) 70%, #ffffff); }
+:global(:root[data-theme="dark"]) .card::before { background: #4ADE80; }
+:global(:root[data-theme="dark"]) .card[data-tone="warn"]::before { background: #FBBF24; }
+:global(:root[data-theme="dark"]) .card[data-tone="bad"]::before { background: #FB7185; }
+
+/* Who: the logo, the name, your role, and "All clear" when nothing needs you. */
+.who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.mark { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; overflow: hidden; color: #fff; font-weight: 750; font-size: 15px; flex: none; }
+.mark img { width: 100%; height: 100%; object-fit: cover; }
+.whoText { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+.name { margin: 0; font-size: 18px; line-height: 1.3; font-weight: 750; overflow-wrap: break-word; }
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.clear { display: inline-flex; align-items: center; gap: 4px; min-height: 24px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap;
+  background: color-mix(in srgb, #16A34A 12%, var(--theme-surface)); color: #15803D; }
+:global(:root[data-theme="dark"]) .clear { color: #4ADE80; }
+
+/* Money: due in 7 days, and a solid pill when money is late. */
+.money { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+.moneyTop { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.big { font-size: 24px; line-height: 1.2; font-weight: 800; font-variant-numeric: tabular-nums; }
+.muted { color: var(--theme-text-muted); display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.risk { display: inline-flex; align-items: center; gap: 4px; min-height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap;
+  background: color-mix(in srgb, #E11D48 8%, var(--theme-surface)); color: #BE123C; border: 1px solid color-mix(in srgb, #E11D48 55%, transparent); }
+:global(:root[data-theme="dark"]) .risk { color: #FB7185; border-color: color-mix(in srgb, #FB7185 60%, transparent); background: color-mix(in srgb, #FB7185 10%, var(--theme-surface)); }
+
+/* Today: who is in, and only the counts that need you; the person who also works in another of your companies. */
+.today { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.counts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.counts li { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-height: 28px; padding: 4px 10px; border-radius: 999px; font-size: 13px; line-height: 1.3;
+  background: color-mix(in srgb, var(--theme-text) 5%, var(--theme-surface)); border: 1px solid transparent; }
+
+.counts li > svg { flex: none; color: var(--theme-text-muted); }
+.counts li[data-tone="warn"] { background: color-mix(in srgb, #D97706 12%, var(--theme-surface)); border-color: color-mix(in srgb, #D97706 35%, transparent); }
+.counts li[data-tone="warn"] > svg { color: #B45309; }
+.counts li[data-tone="bad"] { background: color-mix(in srgb, #E11D48 10%, var(--theme-surface)); border-color: color-mix(in srgb, #E11D48 35%, transparent); }
+.counts li[data-tone="bad"] > svg { color: #E11D48; }
+:global(:root[data-theme="dark"]) .counts li[data-tone="warn"] { background: color-mix(in srgb, #FBBF24 16%, var(--theme-surface)); border-color: color-mix(in srgb, #FBBF24 45%, transparent); }
+:global(:root[data-theme="dark"]) .counts li[data-tone="warn"] > svg { color: #FBBF24; }
+:global(:root[data-theme="dark"]) .counts li[data-tone="bad"] { background: color-mix(in srgb, #FB7185 16%, var(--theme-surface)); border-color: color-mix(in srgb, #FB7185 45%, transparent); }
+:global(:root[data-theme="dark"]) .counts li[data-tone="bad"] > svg { color: #FB7185; }
+
+.line, .next { display: flex; align-items: flex-start; gap: 8px; margin: 0; font-size: 14px; line-height: 1.45; min-width: 0; overflow-wrap: break-word; }
+.line > svg, .next > svg { flex: none; margin-top: 2px; color: var(--theme-text-muted); }
+.line[data-tone="good"] > svg { color: #16A34A; }
+.nextZone .line[data-tone="good"] { padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, #16A34A 10%, var(--theme-surface)); }
+:global(:root[data-theme="dark"]) .nextZone .line[data-tone="good"] { background: color-mix(in srgb, #4ADE80 12%, var(--theme-surface)); }
+:global(:root[data-theme="dark"]) .line[data-tone="good"] > svg { color: #4ADE80; }
+
+/* Next and Open: the one thing to do here, and the card's one primary button. */
+.nextZone, .openZone { display: flex; flex-direction: column; min-width: 0; }
+/* Every card reads the same way: name, money, today, the next step, Open. */
+.next { width: 100%; padding: 8px 12px; border: 1px dashed color-mix(in srgb, #6B4CF0 40%, var(--theme-border)); border-radius: 12px; background: color-mix(in srgb, #6B4CF0 5%, var(--theme-surface));
+  color: inherit; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.next > svg { color: #6B4CF0; }
+.next:hover:not(:disabled) { background: color-mix(in srgb, #6B4CF0 6%, var(--theme-surface)); }
+.next:focus-visible { outline: 2px solid #6B4CF0; outline-offset: 2px; }
+:global(:root[data-theme="dark"]) .next > svg { color: #A897FF; }
+.open { width: 100%; min-height: 44px; }
+
+/* A wide list: each card is one row, the four parts side by side and lined up from card to card. */
+@container (min-width: 900px) {
+  .card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(170px, 0.75fr) minmax(0, 1.5fr) minmax(0, 1.2fr); grid-template-rows: auto 1fr;
+    grid-template-areas: "who money today next" "who money today open"; align-items: start; gap: 12px 20px; padding: 20px 20px 20px 24px; }
+  .who { grid-area: who; } .money { grid-area: money; } .today { grid-area: today; } .nextZone { grid-area: next; } .openZone { grid-area: open; align-self: end; }
+}
+@media (max-width: 380px) { .big { font-size: 22px; } }
+
+.note { margin: 0; font-size: 13px; color: var(--theme-text-muted); }
+
+/* ------------------------------------------------------------------------------------------------ empty and error */
+/* A card no wider than its words, the picture on a round plate, and two buttons of one size side by side. */
+.narrow { width: 100%; max-width: 640px; }
+.art img { border-radius: 50%; }
+.art span { text-wrap: balance; }
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 0 8px; }
+.actions > * { flex: 1 1 200px; min-height: 44px; }
+
+/* Money nobody here may see: a sentence in the money column on a wide list, a small chip beside the role on a phone. */
+.hiddenLine { display: inline-flex; align-items: flex-start; gap: 6px; font-size: 14px; line-height: 1.4; color: var(--theme-text); }
+.hiddenLine > svg { flex: none; margin-top: 3px; color: var(--theme-text-muted); }
+.hiddenChip { display: inline-flex; align-items: center; gap: 4px; min-height: 24px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  background: color-mix(in srgb, var(--theme-text) 7%, var(--theme-surface)); color: var(--theme-text); }
+
+@container (min-width: 900px) {
+}
+/* A phone: tighter cards, so more than one company shows per screen. */
+@container (max-width: 599px) {
+  .card { gap: 8px; padding: 12px 12px 12px 16px; }
+  .today { gap: 6px; }
+  .counts li { min-height: 24px; padding: 2px 8px; font-size: 12px; }
+
+  .who { gap: 10px; }
+  .mark { width: 40px; height: 40px; }
+  .next { padding: 6px 10px; }
+  .open { min-height: 40px; }
+}
+/* The date: in the page header on a computer, in the overview's first line on a phone. */
+.phoneOnly { display: none; }
+@media (max-width: 899px) { .wideOnly { display: none; } .phoneOnly { display: inline; } }
+.bigMuted { display: inline-flex; align-items: center; gap: 6px; font-size: 20px; line-height: 1.2; font-weight: 700; color: var(--theme-text-muted); }
+:global(:root[data-theme="dark"]) .first { border-left-color: #A897FF; }
+
+/* "Do this first": its words, then a clear "Open" at the end. */
+.firstText { flex: 1 1 0; min-width: 0; }
+.go { flex: none; display: inline-flex; align-items: center; gap: 4px; margin-left: auto; color: #6B4CF0; font-size: 14px; font-weight: 700; }
+:global(:root[data-theme="dark"]) .go { color: #A897FF; }
+.lateBig { display: inline-flex; align-items: center; gap: 6px; color: #E11D48; }
+:global(:root[data-theme="dark"]) .lateBig { color: #FB7185; }

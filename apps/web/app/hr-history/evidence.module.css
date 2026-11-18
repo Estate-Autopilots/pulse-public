@@ -1,0 +1,6 @@
+.sources { display: grid; gap: 12px; margin-top: 8px; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.sources p { margin: 4px 0; }
+.fields { margin: 4px 0 8px; }
+.fields > div { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px; }
+.fields dt { color: var(--theme-text-muted); }
+.fields dd { margin: 0; }
