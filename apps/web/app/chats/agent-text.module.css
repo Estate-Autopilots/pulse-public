@@ -1,0 +1,25 @@
+/* AI-AGENTS-2: an AI employee's Markdown answer inside a chat bubble: compact, numbers and bullets hang outside the text
+   so a wrapped line lines up under its words (not under the number), nested lists step in once. */
+.md { overflow-wrap: anywhere; }
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p { margin: 0 0 6px; white-space: pre-wrap; }
+.md li > p { margin: 0; }
+.md .heading { margin: 8px 0 4px; font-weight: 700; }
+.md ol, .md ul { margin: 2px 0 6px; padding-left: 22px; }
+.md ol ol, .md ol ul, .md ul ol, .md ul ul { margin: 2px 0; padding-left: 18px; }
+.md li { margin: 2px 0; padding-left: 2px; }
+.md ol > li::marker { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--theme-text-muted); }
+.md ul > li::marker { color: var(--theme-text-muted); }
+.md strong { font-weight: 650; }
+.md code { padding: 0 4px; border-radius: 4px; font-size: 0.92em; background: color-mix(in srgb, var(--theme-text) 8%, transparent); }
+.md pre { margin: 4px 0 6px; padding: 8px 10px; border-radius: 8px; overflow-x: auto; background: color-mix(in srgb, var(--theme-text) 7%, transparent); font-size: 13px; }
+.md pre code { padding: 0; background: none; }
+.md blockquote { margin: 4px 0 6px; padding-left: 10px; border-left: 3px solid color-mix(in srgb, var(--theme-text) 20%, transparent); color: var(--theme-text-muted); }
+.md hr { margin: 8px 0; border: 0; border-top: 1px solid color-mix(in srgb, var(--theme-text) 14%, transparent); }
+.md a { color: var(--theme-action); text-decoration: underline; text-underline-offset: 2px; }
+.md mark { padding: 0 2px; border-radius: 4px; background: color-mix(in srgb, var(--theme-action) 16%, transparent); color: var(--theme-action); font-weight: 600; }
+.table { max-width: 100%; margin: 4px 0 6px; overflow-x: auto; }
+.table table { border-collapse: collapse; font-size: 13px; }
+.table th, .table td { padding: 3px 8px; border: 1px solid color-mix(in srgb, var(--theme-text) 14%, transparent); text-align: left; vertical-align: top; }
+.table th { font-weight: 650; }

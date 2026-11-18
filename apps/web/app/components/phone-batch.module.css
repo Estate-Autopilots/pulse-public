@@ -1,0 +1,4 @@
+/* UI-SWEEP: the phone's "Show N more" under a long list (phone-batch.tsx). */
+.box { display: contents; }
+.more { display: flex; justify-content: center; gap: 6px; width: 100%; min-height: 44px; margin-top: 10px; }
+.left { color: var(--theme-text-muted); font-weight: 400; }

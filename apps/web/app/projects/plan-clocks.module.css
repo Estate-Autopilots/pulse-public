@@ -1,0 +1,488 @@
+/* PM-BUILD-1 (17 Nov 2026): a project's plan on clocks (plan-clocks.tsx). Theme tokens only; light and dark follow them. */
+.wrap { display: grid; gap: 14px; min-width: 0; max-width: 100%; }
+.wrap > * { min-width: 0; }
+
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 3px 11px; border: 1px solid color-mix(in srgb, var(--theme-border) 80%, transparent); border-radius: 999px;
+  background: var(--theme-surface); color: var(--theme-text); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.chip svg { flex: none; color: var(--theme-text-muted); }
+.chip[data-tone="brand"] { border-color: color-mix(in srgb, var(--theme-action) 30%, transparent); background: var(--accent-soft); color: var(--theme-action); }
+.chip[data-tone="good"] { border-color: color-mix(in srgb, var(--theme-success) 30%, transparent); background: color-mix(in srgb, var(--theme-success) 10%, var(--theme-surface)); }
+.chip[data-tone="good"] svg { color: var(--theme-success); }
+.chip[data-tone="warn"] { border-color: color-mix(in srgb, var(--theme-danger) 25%, transparent); background: color-mix(in srgb, var(--theme-danger) 8%, var(--theme-surface)); color: color-mix(in srgb, var(--theme-danger) 80%, var(--theme-text)); }
+.chip[data-tone="warn"] svg { color: var(--theme-danger); }
+.headEnd { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-left: auto; min-width: 0; }
+.team { display: inline-flex; align-items: center; gap: 6px; min-width: 0; margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.team span { min-width: 0; }
+
+/* Before ads can go live: two numbered steps, each with its inputs and its one button. */
+.gate { display: grid; gap: 4px; padding: 14px 16px 12px; border: 1px solid color-mix(in srgb, var(--theme-border) 80%, transparent); border-radius: 16px; background: var(--theme-surface); }
+.gate[data-done] { border-color: color-mix(in srgb, var(--theme-success) 35%, transparent); }
+.gateHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.gateHead h3 { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; }
+.gateHead h3 svg { color: var(--theme-action); }
+.gateHead small { color: var(--theme-text-muted); font-size: 12.5px; }
+.gateSteps { display: grid; gap: 0; margin: 4px 0 0; padding: 0; list-style: none; }
+.gateStep { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px 12px; align-items: start; padding: 10px 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); }
+.gateStep:first-child { border-top: 0; }
+.gateNo { display: grid; place-items: center; width: 26px; height: 26px; margin-top: 1px; border-radius: 50%; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 13px; font-weight: 700; }
+.gateStep[data-state="now"] .gateNo { background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.gateStep[data-state="done"] .gateNo { background: color-mix(in srgb, var(--theme-success) 14%, transparent); color: var(--theme-success); }
+.gateMain { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 14px; align-items: start; min-width: 0; }
+.gateMain > .gateName { grid-column: 1; }
+.gateMain > .gateAct { grid-column: 2; grid-row: 1 / span 2; }
+.gateMain > .inputs, .gateMain > .gateDone { grid-column: 1; }
+.gateName { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin: 0; }
+.gateName b { font-size: 14.5px; }
+.gateName span { color: var(--theme-text-muted); font-size: 12.5px; }
+.gateStep[data-state="later"] .gateName b { color: var(--theme-text-muted); }
+.inputs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; min-width: 0; }
+.inputs li { min-width: 0; max-width: 100%; }
+.input { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-height: 30px; padding: 4px 10px; line-height: 1.3; border-radius: 10px; font-size: 12.5px; text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--theme-success) 30%, transparent); background: color-mix(in srgb, var(--theme-success) 10%, var(--theme-surface)); color: var(--theme-text); }
+.input b { flex: none; font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--theme-text-muted); }
+.input span { min-width: 0; overflow-wrap: anywhere; }
+.input em { flex: none; font-style: normal; font-weight: 700; color: var(--theme-success); }
+.input[data-state="running"] { border-color: color-mix(in srgb, var(--theme-info, var(--theme-action)) 30%, transparent); background: color-mix(in srgb, var(--theme-info, var(--theme-action)) 9%, var(--theme-surface)); }
+.input[data-state="running"] em { color: var(--theme-info, var(--theme-action)); font-weight: 600; }
+.input[data-state="open"] { border-color: color-mix(in srgb, var(--theme-danger) 35%, transparent); background: color-mix(in srgb, var(--theme-danger) 8%, var(--theme-surface)); }
+.input[data-state="open"] em { color: color-mix(in srgb, var(--theme-danger) 80%, var(--theme-text)); font-weight: 650; }
+.input[data-state="next"] { border-color: color-mix(in srgb, var(--theme-action) 30%, transparent); background: var(--accent-soft); }
+.input[data-state="next"] em { color: var(--theme-action); font-weight: 600; }
+.input:hover { border-color: var(--theme-border-strong, var(--theme-border)); }
+.gateAct { display: grid; justify-items: end; gap: 4px; align-self: start; }
+.gateWhy { padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--theme-danger) 12%, transparent); color: color-mix(in srgb, var(--theme-danger) 85%, var(--theme-text)); font-size: 12px; font-weight: 650; }
+.gateAct button[data-blocked] { border-color: color-mix(in srgb, var(--theme-text) 22%, var(--theme-border)); background: color-mix(in srgb, var(--theme-text) 7%, var(--theme-surface)); color: var(--theme-text); font-weight: 600; }
+.gateAct button[data-blocked] svg { color: var(--theme-text-muted); }
+.gateDone { display: inline-flex; align-items: center; gap: 6px; margin: 0; color: color-mix(in srgb, var(--theme-success) 80%, var(--theme-text)); font-size: 13px; font-weight: 600; }
+.input[data-state="done"] { border-color: color-mix(in srgb, var(--theme-border) 90%, transparent); background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.input[data-state="open"] { border-width: 1.5px; font-weight: 600; }
+.gateFoot { margin: 2px 0 0; color: color-mix(in srgb, var(--theme-text) 72%, var(--theme-text-muted)); font-size: 12.5px; }
+
+/* Steps: one band per phase with its ring; rows are code, step, who, when, status. */
+.steps { display: grid; gap: 8px; }
+.stepsHead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.stepsTools { display: inline-flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.stepsHead h3 { margin: 0; font-size: 16px; }
+.stepsHead small { color: var(--theme-text-muted); font-size: 12.5px; }
+.band { border: 1px solid color-mix(in srgb, var(--theme-border) 80%, transparent); border-radius: 14px; background: var(--theme-surface); overflow: hidden; }
+.band[data-state="now"] { border-color: color-mix(in srgb, var(--theme-action) 35%, var(--theme-border)); }
+.bandHead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 9px 14px; cursor: pointer; list-style: none; }
+.bandHead::-webkit-details-marker { display: none; }
+.bandHead:hover { background: color-mix(in srgb, var(--theme-surface-subtle) 60%, transparent); }
+.ringPct { font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bandName { display: inline-flex; flex: 1 1 0; align-items: center; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; min-width: 0; }
+.bandName b { font-size: 14.5px; }
+.bandName small { color: var(--theme-text-muted); font-size: 12.5px; }
+.pill { display: inline-flex; align-items: center; min-height: 22px; padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 650; white-space: nowrap; }
+.pill[data-tone="bad"] { background: color-mix(in srgb, var(--theme-danger) 12%, transparent); color: color-mix(in srgb, var(--theme-danger) 85%, var(--theme-text)); }
+.pill[data-tone="run"] { background: color-mix(in srgb, var(--theme-info, var(--theme-action)) 12%, transparent); color: color-mix(in srgb, var(--theme-info, var(--theme-action)) 85%, var(--theme-text)); }
+.pill[data-tone="now"] { background: var(--accent-soft); color: var(--theme-action); }
+.looseIcon { display: grid; place-items: center; width: 34px; height: 34px; color: var(--theme-text-muted); }
+
+.rows { display: grid; margin: 0; padding: 0 0 4px; list-style: none; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); container-type: inline-size; }
+.rowHead, .row { display: grid; grid-template-columns: 52px minmax(0, 1fr) minmax(120px, 170px) 104px 132px; gap: 12px; align-items: center; padding: 8px 14px; }
+.rowHead { padding-top: 7px; padding-bottom: 6px; color: var(--theme-text-muted); font-size: 11px; font-weight: 650; letter-spacing: .05em; text-transform: uppercase; }
+.row { border-top: 1px solid color-mix(in srgb, var(--theme-border) 45%, transparent); }
+.row:hover { background: color-mix(in srgb, var(--theme-surface-subtle) 55%, transparent); }
+.row[data-tone="bad"] { background: color-mix(in srgb, var(--theme-danger) 4%, transparent); }
+.code { justify-self: start; padding: 2px 6px; border-radius: 6px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stepMain { display: grid; gap: 1px; min-width: 0; }
+.stepTitle { overflow: hidden; color: var(--theme-text); font-size: 13.5px; font-weight: 550; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.stepTitle:hover { color: var(--theme-action); text-decoration: underline; }
+.stepMain small { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.who { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.who[data-none] { color: var(--theme-text-muted); }
+.when { color: var(--theme-text-muted); font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row[data-tone="bad"] .when { color: var(--theme-danger); font-weight: 600; }
+.status { display: inline-flex; align-items: center; gap: 5px; justify-self: start; max-width: 100%; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.status[data-tone="good"] { background: color-mix(in srgb, var(--theme-success) 13%, transparent); color: color-mix(in srgb, var(--theme-success) 85%, var(--theme-text)); }
+.status[data-tone="bad"] { background: color-mix(in srgb, var(--theme-danger) 12%, transparent); color: color-mix(in srgb, var(--theme-danger) 85%, var(--theme-text)); }
+.status[data-tone="warn"] { background: color-mix(in srgb, var(--theme-warning) 15%, transparent); color: color-mix(in srgb, var(--theme-warning) 70%, var(--theme-text)); }
+.status[data-tone="run"] { background: color-mix(in srgb, var(--theme-info, var(--theme-action)) 12%, transparent); color: color-mix(in srgb, var(--theme-info, var(--theme-action)) 85%, var(--theme-text)); }
+.status[data-tone="wait"] { background: transparent; border: 1px solid color-mix(in srgb, var(--theme-border) 90%, transparent); }
+.notMade { margin: 2px 2px 0; color: var(--theme-text-muted); font-size: 12.5px; }
+
+/* The clock dialog. */
+.clockForm { display: grid; gap: 10px; }
+.notYet { display: grid; gap: 6px; }
+.notYet p { margin: 0; }
+.notYet ul:not(.blockers) { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+.hint { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; }
+.problem { margin: 0; color: var(--theme-danger); font-size: 13px; }
+
+/* A narrow card (a phone): who and when go under the step; the status stays on the right. */
+@container (max-width: 640px) {
+  .rowHead { display: none; }
+  .row { grid-template-columns: 40px minmax(0, 1fr); grid-template-areas: "code main" "code meta" "code status"; gap: 3px 10px; padding: 10px 12px; }
+  .code { grid-area: code; align-self: start; margin-top: 2px; }
+  .stepMain { grid-area: main; }
+  .stepTitle { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .stepMain small { white-space: normal; }
+  .status { grid-area: status; }
+  .who { grid-area: meta; font-size: 12px; color: var(--theme-text-muted); white-space: normal; }
+  .when { display: none; }
+  .row .who::after { content: attr(data-when); }
+}
+@media (max-width: 720px) {
+  .headEnd { margin-left: 0; justify-content: flex-start; }
+  .team { display: none; }
+  .chip { min-height: 26px; padding: 2px 9px; font-size: 12.5px; }
+  .gateStep { grid-template-columns: 26px minmax(0, 1fr); }
+  .gateMain { grid-template-columns: minmax(0, 1fr); }
+  .gateMain > .gateAct { grid-column: 1; grid-row: auto; order: 3; justify-self: start; justify-items: start; }
+  .gateMain > .inputs, .gateMain > .gateDone { order: 2; }
+  .gateHead .chips { width: 100%; }
+  .wide { display: none; }
+  .gateMain > .gateAct, .gateMain > .gateAct button { width: 100%; }
+  .gateMain > .gateAct button { justify-content: center; }
+}
+/* The "Not yet" dialog: what blocks it, each a link to its step. */
+.blockers { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.blockers { width: 380px; max-width: calc(100vw - 96px); margin: 8px 0 !important; }
+.blockers li { width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid color-mix(in srgb, var(--theme-danger) 30%, transparent); border-radius: 10px;
+  background: color-mix(in srgb, var(--theme-danger) 7%, var(--theme-surface)); color: var(--theme-text); text-decoration: none; font-size: 13.5px; }
+.blockers b { flex: none; color: var(--theme-text-muted); font-size: 12px; }
+.blockers span { display: grid; gap: 1px; min-width: 0; }
+.blockers small { color: color-mix(in srgb, var(--theme-text) 75%, var(--theme-text-muted)); font-size: 12px; }
+
+/* A plan step on its task's page. */
+.card { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--theme-action) 22%, var(--theme-border)); border-radius: 16px; background: var(--theme-surface); }
+.cardHead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0; color: var(--theme-text-muted); font-size: 12.5px; font-weight: 650; letter-spacing: .02em; }
+.cardHead .code { font-size: 12.5px; color: var(--theme-text); }
+.cardLine { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin: 0; font-size: 13.5px; }
+.cardLine span { color: var(--theme-text-muted); }
+.cardFacts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; margin: 0; }
+.cardFacts div { display: grid; gap: 2px; min-width: 0; }
+.cardFacts dt { color: var(--theme-text-muted); font-size: 11px; font-weight: 650; letter-spacing: .05em; text-transform: uppercase; }
+.cardFacts dd { display: grid; gap: 1px; margin: 0; font-size: 14px; font-weight: 600; }
+.cardFacts dd small { color: var(--theme-text-muted); font-size: 12px; font-weight: 500; }
+.cardRefs { display: grid; gap: 6px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); }
+.cardRefs > p { margin: 0; color: color-mix(in srgb, var(--theme-text) 70%, var(--theme-text-muted)); font-size: 12px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+.cardNote { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; }
+.openStep, .openStep:hover { text-decoration: none; }
+.today { padding: 1px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--theme-action) !important; font-size: 12.5px; font-weight: 600; }
+.input[data-state="done"] em { color: var(--theme-success); }
+.waitsOn { max-width: 360px; overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.gateAct button[data-blocked] { border-style: solid; border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); }
+.gateAct button[data-blocked] svg { color: var(--theme-action); }
+.row[data-tone="bad"] { background: color-mix(in srgb, var(--theme-danger) 9%, transparent); box-shadow: inset 3px 0 0 var(--theme-danger); }
+.card { border-color: var(--theme-border-strong, var(--theme-border)) !important; }
+@media (max-width: 720px) { .waitsOn { max-width: none; white-space: normal; } .gateFoot { display: none; } }
+
+/* PM-BUILD-2 (18 Nov 2026; judge rounds 9-12 of PM-BUILD-1). A plan step's card says each fact once: phase and role with
+   today's day, where it sits on its clock, then what it waits on beside what it opens; the map link at its foot. */
+.card { gap: 9px; padding: 13px 16px 12px; }
+.cardTop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.cardTop .cardHead { flex: 1 1 auto; min-width: 0; }
+.cardHead { color: var(--theme-text); font-size: 13.5px; font-weight: 600; letter-spacing: 0; }
+.cardRole { display: inline-flex; gap: 5px; align-items: baseline; }
+.dim { color: var(--theme-text-muted); font-weight: 500; }
+.cardPlan { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0; font-size: 13.5px; }
+.cardPlan > svg { flex: none; color: var(--theme-action); }
+.pill[data-tone="wait"] { background: color-mix(in srgb, var(--theme-warning) 14%, transparent); color: color-mix(in srgb, var(--theme-warning) 70%, var(--theme-text)); }
+.cardLinks { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 18px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--theme-border) 55%, transparent); }
+.cardLinks .cardRefs { padding-top: 0; border-top: 0; align-content: start; }
+.cardMap { display: inline-flex; align-items: center; gap: 6px; justify-self: start; color: var(--theme-action); font-size: 13px; font-weight: 600; text-decoration: none; }
+.cardMap:hover { text-decoration: underline; }
+
+/* The locked go-live button is the one place that names what it waits on, and who has it. */
+.gateAct { max-width: 380px; }
+.gateAct button[data-blocked] { align-items: center; gap: 10px; height: auto; min-height: 48px; padding: 7px 12px; text-align: left; border-width: 1.5px; white-space: normal;
+  border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.waitsOn { display: grid; gap: 1px; min-width: 0; max-width: 320px; white-space: normal; }
+.waitsWhat { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 13.5px; font-weight: 550; line-height: 1.3; }
+.waitsWhat b { font-weight: 700; }
+.waitsOn small { color: color-mix(in srgb, var(--theme-text) 70%, var(--theme-text-muted)); font-size: 12px; font-weight: 550; }
+.gateMain > .inputs { grid-column: 1; }
+@media (max-width: 720px) {
+  .gateAct { max-width: none; }
+  .waitsOn { max-width: none; }
+  .gateMain > .gateAct { order: 2; }
+  .gateMain > .inputs { order: 3; }
+  .cardLinks { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* PM-BUILD-2 (2310): "What we promised" (KAZUK-PM-2 concept 1): a strong card first on the page, the sales-set numbers
+   large, the worked-out ones on one line under them. Empty, it is a quiet card with its one button. */
+.promise { display: grid; gap: 10px; padding: 14px 18px 14px; border-radius: 16px; color: #fff;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--theme-action) 82%, #140c2c), color-mix(in srgb, var(--theme-action) 52%, #0f0a22)); }
+.promise[data-empty] { color: var(--theme-text); background: var(--theme-surface); border: 1px dashed color-mix(in srgb, var(--theme-action) 40%, var(--theme-border)); }
+.promiseHead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.promiseHead h3 { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; }
+.promiseMark { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 650; }
+.promiseMark[data-tone="good"] { background: rgba(255, 255, 255, .16); color: #fff; }
+.promiseMark[data-tone="wait"] { background: #ffd98a; color: #4a3200; }
+.promiseAct { margin-left: auto; }
+.promise:not([data-empty]) .promiseAct button { border-color: rgba(255, 255, 255, .45); background: rgba(255, 255, 255, .1); color: #fff; }
+.promiseBig { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px 0; margin: 0; }
+.promiseBig > div { display: grid; gap: 2px; padding: 2px 14px; border-left: 1px solid rgba(255, 255, 255, .22); min-width: 0; }
+.promiseBig > div:first-child { padding-left: 0; border-left: 0; }
+.promiseBig dt { order: 2; font-size: 12.5px; opacity: .85; }
+.promiseBig dd { order: 1; margin: 0; font-size: 24px; font-weight: 750; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.promiseGoal { margin: 0; font-size: 13.5px; }
+.promiseGoal span { opacity: .8; }
+.promiseWorked { display: flex; flex-wrap: wrap; gap: 4px 0; margin: 0; padding-top: 9px; border-top: 1px solid rgba(255, 255, 255, .22); font-size: 13px; }
+.promiseWorked > span { padding: 0 12px; border-left: 1px solid rgba(255, 255, 255, .25); }
+.promiseWorked > span:first-child { padding-left: 0; border-left: 0; }
+.promiseWorked b { font-size: 14px; font-variant-numeric: tabular-nums; }
+.promiseWorked > span[data-tone="bad"] { color: #ffd0d0; }
+.promiseEmpty { margin: 0; color: var(--theme-text-muted); font-size: 13.5px; }
+.promisePending { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 9px 12px; border-radius: 12px; background: #fff3d6; color: #3d2a00; font-size: 13.5px; }
+.promisePending p { flex: 1 1 260px; margin: 0; }
+.promisePending small { color: #6b5216; font-size: 12.5px; }
+.promiseAnswer { display: inline-flex; gap: 8px; }
+.promiseForm { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+.promiseForm [data-wide] { grid-column: 1 / -1; }
+
+/* "Set up this project": who does what, the chats, what holds. Folds to one line when nothing is left to set. */
+.setup { border: 1px solid color-mix(in srgb, var(--theme-action) 28%, var(--theme-border)); border-radius: 16px; background: var(--theme-surface); }
+.setup:not([open]) { border-color: color-mix(in srgb, var(--theme-border) 80%, transparent); }
+.setupHead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 12px 16px; cursor: pointer; list-style: none; font-size: 15px; }
+.setupHead::-webkit-details-marker { display: none; }
+.setupHead > svg { color: var(--theme-action); }
+.setupHead small { margin-left: auto; color: var(--theme-text-muted); font-size: 12.5px; }
+.setupCount { display: inline-flex; align-items: center; gap: 5px; padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 650; }
+.setupCount[data-tone="now"] { background: var(--accent-soft); color: var(--theme-action); }
+.setupCount[data-tone="good"] { background: color-mix(in srgb, var(--theme-success) 13%, transparent); color: color-mix(in srgb, var(--theme-success) 85%, var(--theme-text)); }
+.setupBody { display: grid; gap: 14px; padding: 2px 16px 14px; }
+.setupPart { display: grid; gap: 7px; }
+.setupLabel { margin: 0; color: color-mix(in srgb, var(--theme-text) 72%, var(--theme-text-muted)); font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.setupLabel span { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.setupHint { margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.roleRows, .chatRows, .condRows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.roleRows { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 6px 14px; }
+.roleRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; padding: 6px 6px 6px 10px; border-radius: 10px; background: var(--theme-surface-subtle); }
+.roleRow[data-state="open"] { box-shadow: inset 3px 0 0 var(--theme-action); }
+.roleRow[data-state="none"] { opacity: .85; }
+.roleName { display: grid; min-width: 0; }
+.roleName b { font-size: 13.5px; overflow-wrap: anywhere; }
+.roleName small { color: var(--theme-text-muted); font-size: 12px; }
+.roleRow[data-state="open"] .roleName small { color: var(--theme-action); font-weight: 600; }
+.roleRow > :last-child { flex: 0 1 190px; min-width: 0; }
+.chatRows li { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.chatRows li[data-suggested] { justify-content: space-between; padding: 5px 6px 5px 10px; border-radius: 10px; border: 1px dashed color-mix(in srgb, var(--theme-action) 35%, var(--theme-border)); }
+.chatChip { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--theme-action); font-size: 13px; font-weight: 600; text-decoration: none; }
+.chatName { display: inline-flex; align-items: center; gap: 6px; min-width: 0; font-size: 13.5px; }
+.chatName > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chatName small { color: var(--theme-text-muted); font-size: 12px; white-space: nowrap; }
+.unlink { display: inline-grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: 8px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.unlink:hover { background: var(--theme-surface-subtle); color: var(--theme-danger); }
+.condRow { display: flex; align-items: center; gap: 10px; }
+.condRow > span { display: grid; min-width: 0; }
+.condRow b { font-size: 13.5px; }
+.condRow small { color: var(--theme-text-muted); font-size: 12px; }
+.notMade b { color: var(--theme-text); font-weight: 650; }
+@media (max-width: 720px) {
+  .promise { padding: 12px 14px; }
+  .promiseBig { grid-template-columns: 1fr 1fr; gap: 10px 0; }
+  .promiseBig > div { padding: 0 10px; }
+  .promiseBig > div:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .promiseBig dd { font-size: 20px; }
+  .promiseWorked > span { padding: 0 8px; }
+  .promiseForm { grid-template-columns: 1fr; }
+  .setupHead small { margin-left: 0; flex-basis: 100%; }
+  .roleRows { grid-template-columns: minmax(0, 1fr); }
+  .roleRow > :last-child { flex-basis: 160px; }
+}
+
+/* PM-BUILD-2, judge round 1. A calmer promise card (it was fighting the page's main button): a tinted card with the
+   numbers in the accent colour; who must act sits with the proposal. */
+.promise:not([data-empty]) { color: var(--theme-text); background: color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface));
+  border: 1px solid color-mix(in srgb, var(--theme-action) 30%, var(--theme-border)); }
+.promise:not([data-empty]) .promiseHead h3 svg { color: var(--theme-action); }
+.promise:not([data-empty]) .promiseAct button { border-color: color-mix(in srgb, var(--theme-action) 35%, var(--theme-border)); background: var(--theme-surface); color: var(--theme-text); }
+.promiseMark[data-tone="good"] { background: color-mix(in srgb, var(--theme-success) 13%, transparent); color: color-mix(in srgb, var(--theme-success) 85%, var(--theme-text)); }
+.promiseBig > div { border-left-color: color-mix(in srgb, var(--theme-action) 22%, var(--theme-border)); }
+.promiseBig dd { color: var(--theme-action); }
+.promiseBig dt { color: color-mix(in srgb, var(--theme-text) 75%, var(--theme-text-muted)); opacity: 1; }
+.promiseGoal span { color: var(--theme-text-muted); opacity: 1; }
+.promiseWorked { border-top-color: color-mix(in srgb, var(--theme-action) 18%, var(--theme-border)); color: color-mix(in srgb, var(--theme-text) 80%, var(--theme-text-muted)); }
+.promiseWorked > span { border-left-color: color-mix(in srgb, var(--theme-action) 18%, var(--theme-border)); }
+.promiseWorked b { color: var(--theme-text); }
+.promiseWorked > span[data-tone="bad"] { color: var(--theme-danger); }
+.promisePending { background: color-mix(in srgb, var(--theme-warning) 16%, var(--theme-surface)); color: var(--theme-text); border: 1px solid color-mix(in srgb, var(--theme-warning) 40%, transparent); }
+.promiseWho { flex: 0 0 auto; margin: 0; font-size: 13px; font-weight: 650; color: color-mix(in srgb, var(--theme-warning) 55%, var(--theme-text)); }
+
+/* The locked go-live button reads as a button: a lock in a round badge, a large chevron; running work and the done count
+   are one quiet line under it. */
+.lockDot { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; background: color-mix(in srgb, var(--theme-action) 14%, var(--theme-surface)); color: var(--theme-action); }
+.lockGo { flex: none; margin-left: auto; color: var(--theme-action); }
+.gateAct button[data-blocked] { box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 12%, transparent); }
+.gateAct button[data-blocked]:hover { background: color-mix(in srgb, var(--theme-action) 11%, var(--theme-surface)); }
+.gateQuiet { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; color: color-mix(in srgb, var(--theme-text) 70%, var(--theme-text-muted)); font-size: 12.5px; }
+.gateQuiet > * { display: inline-flex; align-items: center; gap: 5px; color: inherit; text-decoration: none; }
+.gateQuiet a:hover { color: var(--theme-action); }
+.gateQuiet svg { color: var(--theme-success); }
+.gateQuiet a svg { color: var(--theme-info, var(--theme-action)); }
+.gateMain > .gateQuiet { grid-column: 1; }
+
+/* The step card: the planned days lead, today's place in them beside; then one meta line; the links as aligned rows. */
+.cardDays { font-size: 15px; }
+.cardDays b { font-weight: 700; }
+.cue { padding: 3px 11px; border-radius: 999px; font-size: 13px; font-weight: 650; white-space: nowrap; }
+.cue[data-tone="now"] { background: var(--accent-soft); color: var(--theme-action); }
+.cue[data-tone="bad"] { background: color-mix(in srgb, var(--theme-danger) 12%, transparent); color: color-mix(in srgb, var(--theme-danger) 85%, var(--theme-text)); }
+.cue[data-tone="plain"] { background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.cardHead { color: var(--theme-text-muted); font-size: 13px; font-weight: 550; }
+.cardLinks .inputs { display: grid; gap: 6px; }
+.cardLinks .inputs li { width: 100%; }
+.cardLinks .input { display: flex; width: 100%; box-sizing: border-box; }
+.cardLinks .input em { margin-left: auto; }
+.cardLinks .input[data-state="done"] { background: var(--theme-surface); color: var(--theme-text); border-color: color-mix(in srgb, var(--theme-success) 30%, var(--theme-border)); }
+
+/* Who does what: every picker the same width at the same right edge; the warning under the role's name. */
+.roleRow { display: grid; grid-template-columns: minmax(0, 1fr) 180px; align-items: center; }
+.roleRow > :last-child { width: 100%; min-width: 0; }
+
+/* The "not yet" dialog's step: a calm violet row, the owner easy to read. */
+.blockers li { border-color: color-mix(in srgb, var(--theme-action) 30%, transparent); background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.blockers small { color: var(--theme-text); font-size: 13px; font-weight: 550; }
+
+@media (max-width: 720px) {
+  .promiseHead h3 { flex: 1 1 auto; }
+  .promiseAct { order: 2; }
+  .promiseMark { order: 3; }
+  .promiseWorked { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+  .promiseWorked > span, .promiseWorked > span:first-child { padding: 0; border-left: 0; }
+  .roleRow { grid-template-columns: minmax(0, 1fr) 150px; }
+  .cardTop { align-items: flex-start; }
+}
+
+/* PM-BUILD-2, judge round 2. */
+.promisePending { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.promisePending p { flex: none; }
+.promiseWho { padding: 3px 11px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--theme-warning) 55%, var(--theme-border)); background: var(--theme-surface); color: var(--theme-text); white-space: nowrap; }
+.workedLabel { color: var(--theme-text-muted); font-size: 12px; font-weight: 650; letter-spacing: .03em; text-transform: uppercase; }
+.promiseWorked > .workedLabel { padding-left: 0; border-left: 0; align-self: center; }
+.promiseWorked > .workedLabel + span { padding-left: 12px; border-left: 0; }
+.blockers { width: 100% !important; max-width: none; }
+.blockers small { font-weight: 500; }
+.doneLine { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; padding: 0; list-style: none; font-size: 13px; }
+.doneLine a { display: inline-flex; align-items: center; gap: 5px; color: var(--theme-text); text-decoration: none; }
+.doneLine a:hover { color: var(--theme-action); text-decoration: underline; }
+.doneLine svg { color: var(--theme-success); flex: none; }
+.unlink { width: auto; gap: 4px; padding: 0 8px; font-size: 12.5px; }
+.promiseForm { gap: 16px 14px; }
+.promiseForm textarea { resize: vertical; }
+@media (max-width: 720px) {
+  .waitsWhat { -webkit-line-clamp: 4; }
+  .pkgChip { display: none; }
+  .promiseBig > div { align-content: start; }
+  .promisePending { grid-template-columns: minmax(0, 1fr); }
+  .promiseWho { justify-self: start; white-space: normal; }
+  .promiseWorked > .workedLabel { grid-column: 1 / -1; }
+  .promiseWorked > .workedLabel + span { padding-left: 0; }
+}
+
+/* PM-BUILD-2, judge round 3. */
+.cardPlan .cue { font-size: 13.5px; }
+.cardDaysPlan { color: var(--theme-text-muted); }
+.cardDaysPlan b { color: var(--theme-text); font-weight: 600; }
+.cardHead { flex-wrap: wrap; }
+.refLines { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.refLines a { display: flex; align-items: center; gap: 7px; min-height: 30px; padding: 4px 10px; border-radius: 10px; color: var(--theme-text); font-size: 13px; text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--theme-border) 85%, transparent); background: var(--theme-surface); }
+.refLines a:hover { border-color: color-mix(in srgb, var(--theme-action) 40%, var(--theme-border)); }
+.refLines a > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.refLines a b { color: var(--theme-text-muted); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.refLines a em { margin-left: auto; flex: none; font-style: normal; font-weight: 650; color: var(--theme-action); }
+.refLines a svg { flex: none; color: var(--theme-text-muted); }
+.refLines a[data-state="done"] svg { color: var(--theme-success); }
+.refLines a[data-state="open"] em { color: color-mix(in srgb, var(--theme-danger) 80%, var(--theme-text)); }
+.waitsWhat { -webkit-line-clamp: 1; }
+.waitsOn small { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; font-size: 12.5px; }
+.chatRows li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.chatRows li > :first-child { justify-self: start; max-width: 100%; }
+.unlink { color: var(--theme-text-muted); font-weight: 550; }
+.roleRow > :last-child, .roleRow > :last-child * { font-size: 13px; }
+.blockers { width: auto !important; max-width: none; align-self: stretch; }
+@media (max-width: 720px) {
+  .waitsOn small { -webkit-line-clamp: 2; }
+  .promiseWorked > span:last-child:nth-child(even) { grid-column: 1 / -1; }
+}
+.cardLinks > *, .cardLinks .cardRefs, .refLines, .refLines li { min-width: 0; }
+.refLines a[data-next] em { color: var(--theme-action); }
+
+/* PM-BUILD-2, judge round 4. */
+.refLines a > span { white-space: normal; overflow: visible; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.roleRow > :last-child, .roleRow > :last-child > * { width: 100%; box-sizing: border-box; }
+.chatRows li:not([data-suggested]) { display: flex; justify-content: flex-start; gap: 2px; }
+.unlink { width: 26px; height: 26px; padding: 0; gap: 0; }
+.unlink span { display: none; }
+.promise:not([data-empty]) .promiseAct button { min-height: 30px; padding: 3px 10px; border-color: transparent; background: transparent; color: var(--theme-action); font-size: 13px; }
+.promise:not([data-empty]) .promiseAct button:hover { background: var(--accent-soft); }
+.changed { color: var(--theme-action); font-size: 12.5px; font-weight: 650; }
+
+/* PM-BUILD-2, judge round 5. */
+.roleRows { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+.cardLinks { grid-template-columns: minmax(0, 1fr); }
+.promisePending { background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); border-color: color-mix(in srgb, var(--theme-action) 25%, var(--theme-border)); }
+.promiseWho { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; color: color-mix(in srgb, var(--theme-text) 80%, var(--theme-text-muted)); font-weight: 600; }
+.promiseWho svg { color: var(--theme-action); }
+.unlink { width: auto; padding: 0 8px; gap: 4px; }
+.unlink span { display: inline; }
+.waitsWhat { font-weight: 500; }
+@media (max-width: 720px) {
+  .roleRows { grid-template-columns: minmax(0, 1fr); }
+  .promiseWorked > .workedLabel { grid-column: auto; }
+  .promiseWorked > span:last-child:nth-child(even) { grid-column: auto; }
+}
+
+/* PM-BUILD-2, judge round 6 (last in the file, so they win). */
+.waitsWhat { -webkit-line-clamp: 2; }
+.gateAct { max-width: 420px; }
+.chatChip a { display: inline-flex; align-items: center; gap: 6px; min-width: 0; color: inherit; text-decoration: none; }
+.chatChip { padding-right: 4px; }
+.chatChip .unlink { width: 22px; height: 22px; padding: 0; border-radius: 50%; color: var(--theme-action); opacity: .7; }
+.chatChip .unlink:hover { opacity: 1; background: color-mix(in srgb, var(--theme-action) 14%, transparent); color: var(--theme-danger); }
+.condRow { align-items: flex-start; }
+.condRow > :first-child { margin-top: 2px; }
+.cardPlan { flex-wrap: nowrap; }
+.cardPlan .cue, .cardPlan .cardDays { white-space: nowrap; }
+@media (max-width: 720px) {
+  .waitsWhat { -webkit-line-clamp: 3; }
+  .promiseWorked > .workedLabel { grid-column: 1 / -1; }
+  .promiseWorked > span:last-child:nth-child(even) { grid-column: 1 / -1; }
+}
+
+/* PM-BUILD-2, judge round 7. */
+.condRow { gap: 12px; }
+.chatRows li:not([data-suggested]) { display: block; }
+.chatRows li:not([data-suggested]) .chatChip { display: flex; width: 100%; box-sizing: border-box; justify-content: space-between; }
+.chatRows li:not([data-suggested]) .chatChip a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.setupBody { gap: 16px; padding-top: 6px; }
+.setupHead { padding-bottom: 10px; }
+@media (max-width: 720px) {
+  /* The numbered "Ads live" step below says it is not live yet; on a phone the chip would only repeat it. */
+  .liveNotYet { display: none; }
+  .promiseWorked { grid-template-columns: minmax(0, 1fr); gap: 3px; font-size: 13px; }
+  .promiseWorked > span:last-child:nth-child(even) { grid-column: auto; }
+  .gateMain > .gateAct { width: calc(100% + 38px); max-width: none; margin-left: -38px; }
+}
+
+/* PM-BUILD-2, judge round 8. */
+.promiseWaiting { grid-column: 1 / -1; margin: 0; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface)); font-size: 13px; }
+@media (max-width: 720px) {
+  .promiseWorked { grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+  .promiseWorked > span:last-child:nth-child(even) { grid-column: 1 / -1; }
+}
+
+/* PM-BUILD-2, judge round 9 (points that came back in several rounds). The kit dialog's text column grows only to its
+   content, so the step box takes that column's full width itself (440 dialog − 44 padding − 48 icon and gap). */
+.blockers { width: min(348px, calc(100vw - 124px)) !important; }
+.blockers b { color: var(--theme-text-muted); font-weight: 600; }
+.condRow > :first-child { flex: none; margin-right: 6px; }
+.code { color: color-mix(in srgb, var(--theme-text) 55%, var(--theme-text-muted)); font-weight: 600; }
+@media (max-width: 720px) {
+  .roleRow { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 8px 10px; }
+  .roleRow > :last-child { justify-self: stretch; }
+}
+@media (max-width: 599.98px) { .blockers { width: calc(100vw - 92px) !important; } }
+
+/* PM-BUILD-2, judge round 10. */
+.gateQuiet { font-size: 13.5px; }
+.chatChip .unlink { margin-left: 6px; flex: none; }
+.roleRow { background: var(--theme-surface); border: 1px solid color-mix(in srgb, var(--theme-border) 85%, transparent); }

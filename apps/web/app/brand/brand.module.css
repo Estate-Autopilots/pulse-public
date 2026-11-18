@@ -1,0 +1,69 @@
+/* The brand sheet: quiet cards on the canvas, light and dark swatches side by side. */
+.section { display: grid; gap: 12px; padding: 18px 20px; border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); }
+.heading { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
+.subheading { margin: 8px 0 0; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.lead { max-width: 72ch; margin: 0; color: var(--theme-text-muted); font-size: 14px; line-height: 1.5; }
+.art { display: inline-flex; }
+.art svg, .size svg { display: block; }
+.directions { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.direction { display: grid; align-content: start; gap: 10px; padding: 14px; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-canvas); }
+.direction[data-chosen] { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 14%, transparent); }
+.direction header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.direction h3 { margin: 0; font-size: 15px; font-weight: 650; }
+.chosen { padding: 2px 9px; border-radius: 999px; background: var(--theme-action); color: var(--theme-action-text); font-size: 12px; font-weight: 650; }
+.sizes { display: flex; align-items: flex-end; gap: 14px; }
+.size { display: inline-flex; }
+.monos { display: flex; gap: 8px; }
+.onLight, .onDark { display: inline-flex; align-items: center; justify-content: center; padding: 12px 16px; border-radius: 12px; }
+.onLight { background: #f6f6fa; box-shadow: inset 0 0 0 1px rgb(23 18 58 / 8%); }
+.onDark { background: #121219; }
+.idea { margin: 0; font-size: 14px; line-height: 1.45; }
+.verdict { margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.lockups { display: flex; flex-wrap: wrap; gap: 10px; }
+.ramp { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 18px; margin: 0; }
+.ramp figure, .pip, .icons figure { display: grid; justify-items: center; gap: 6px; margin: 0; }
+.ramp figcaption { color: var(--theme-text-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.swatches li { display: flex; align-items: center; gap: 8px; padding: 6px 10px 6px 6px; border: 1px solid var(--theme-border); border-radius: 10px; font-size: 13px; }
+.swatches li span { width: 22px; height: 22px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 8%); }
+.swatches code, .releases code { color: var(--theme-text-muted); font-size: 12px; }
+.stage { display: grid; gap: 10px; }
+.stageTools { display: flex; gap: 6px; }
+.tool { min-height: 32px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.tool[aria-pressed="true"] { border-color: var(--theme-action); color: var(--theme-action); }
+.tool:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.stage[data-still] :global(.pip), .stage[data-still] :global(.pip *) { animation: none !important; }
+.pips { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 12px; }
+.pip { align-content: start; padding: 10px 8px; border-radius: 14px; background: var(--theme-canvas); text-align: center; }
+.pip figcaption { display: grid; gap: 2px; font-size: 12px; }
+.pip figcaption b { font-size: 13px; }
+.pip figcaption span { color: var(--theme-text-muted); line-height: 1.35; }
+.pipSizes { display: flex; align-items: flex-end; gap: 16px; padding: 8px 0; }
+.icons { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-end; }
+.icons figcaption { display: grid; justify-items: center; gap: 2px; font-size: 12px; text-align: center; }
+.icons figcaption span { color: var(--theme-text-muted); }
+.dock { display: inline-flex; padding: 6px 10px; border-radius: 18px; background: color-mix(in srgb, var(--theme-text) 6%, transparent); }
+.ios { display: inline-flex; overflow: hidden; border-radius: 22px; }
+.round { display: inline-flex; overflow: hidden; border-radius: 50%; }
+.chrome { display: inline-flex; align-items: flex-end; gap: 10px; padding: 10px; border-radius: 10px; background: var(--theme-canvas); }
+.tab { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 10px 10px 0 0; background: var(--theme-canvas); font-size: 12px; }
+.tray { display: inline-flex; align-items: center; gap: 14px; height: 30px; padding: 0 12px; border-radius: 8px; background: #e8e6ef; }
+.releases { display: grid; gap: 8px; margin: 4px 0 0; }
+.releases div { display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 12px; font-size: 14px; }
+.releases dt { font-weight: 650; }
+.releases dd { margin: 0; color: var(--theme-text-muted); }
+@media (max-width: 899.98px) {
+  .section { padding: 14px; }
+  .releases div { grid-template-columns: 1fr; gap: 2px; }
+  .pips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* LAYOUT-SWEEP: the mark in use beside the five directions, and the recommendation in place. */
+.direction[data-live] { border-style: dashed; background: var(--theme-surface); }
+.inUse { padding: 2px 9px; border: 1px solid var(--theme-border); border-radius: 999px; color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+.inPlace { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+.pairPip { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 14px; background: var(--theme-canvas); }
+/* The size ramp (16 to 128 px) wraps inside its card instead of running into the next one. */
+.directions { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.direction { min-width: 0; }
+.sizes { flex-wrap: wrap; row-gap: 10px; }
+.direction header { flex-wrap: wrap; }

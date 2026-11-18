@@ -1,0 +1,18 @@
+export type Side = { org: string | null; orgName: string | null; orgHandle: string | null; orgKind: string | null; personal: boolean | null; account: string | null; name: string | null; handle: string | null };
+export type Agreement = { state: "signed" | "waiting" | "draft" | "none" | "ended"; contract?: string; title?: string; status?: string; host?: string; waitingFor?: string | null };
+export type ConnRow = { id: string; kind: string; status: string; source: string; aRole: string | null; bRole: string | null; note: string | null; since: string;
+  startedOn: string | null; mySide: "a" | "b" | null; a: Side; b: Side; agreement: Agreement; counts: { docs: number; tasks: number; chats: number };
+  contacts: { account: string; name: string; handle: string; in: string }[]; via?: { org: string; name: string; current: boolean }[]; from?: string | null };
+export type Tone = "good" | "warn" | "bad" | undefined;
+export function sideName(s: Side | null | undefined): string;
+export function isPersonSide(s: Side | null | undefined): boolean;
+export function otherSide(row: ConnRow): Side;
+export function mySide(row: ConnRow): Side;
+export function sentence(row: ConnRow | null | undefined, me?: string | null): string;
+export const KINDS: readonly (readonly [string, string])[];
+export function agreementBadge(ag: Agreement | null | undefined): { text: string; tone: Tone };
+export function nextStep(row: ConnRow | null | undefined): { key: "confirm" | "draft" | "review" | "give"; label: string; why: string } | null;
+export function filterRows(rows: readonly ConnRow[] | null | undefined, filter: string): ConnRow[];
+export type SeatTie = { person: string; name: string; account: string; handle: string; seat: string; side: string; role: string | null; agreement: string };
+export function tieSummary(t: { people: SeatTie[] } | null | undefined): { count: number; none: number; text: string };
+export function shortLine(row: ConnRow | null | undefined, me?: string | null): string;

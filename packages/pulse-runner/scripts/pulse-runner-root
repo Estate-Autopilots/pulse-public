@@ -1,0 +1,29 @@
+#!/bin/bash
+# AI-EMPLOYEE-POWER (6 Nov 2026): Pulse Runner's root helper. Install root-owned, mode 0755, at
+# /usr/local/sbin/pulse-runner-root, with one sudoers line for the runner's user:
+#   <runner-user> ALL=(root) NOPASSWD: /usr/local/sbin/pulse-runner-root
+# and set "allowRoot": true in the runner's local config. Pulse sends a root job only for an AI employee the
+# organisation's owner granted root on this server (typed GRANT ROOT), and only while "AI employees may use this
+# server" is on. The host switch is /etc/pulse-runner/root-enabled: remove it and every root job is refused here.
+#
+# Usage (by the runner only): sudo -n pulse-runner-root <time-limit-seconds> <job-id>   (the command line on stdin)
+set -uo pipefail
+LOG=/var/log/pulse-runner-root.log
+limit=${1:-}; job=${2:-}
+[[ $limit =~ ^[0-9]{1,4}$ ]] && (( limit >= 1 && limit <= 1800 )) || { echo "pulse-runner-root: time limit is 1 to 1800 seconds" >&2; exit 64; }
+[[ $job =~ ^job_[0-9a-f]{32}$ ]] || { echo "pulse-runner-root: job id is invalid" >&2; exit 64; }
+if [[ ! -f /etc/pulse-runner/root-enabled ]]; then
+  printf '%s %s refused (host switch off)\n' "$(date -u +%FT%TZ)" "$job" >> "$LOG"
+  echo "pulse-runner-root: root jobs are switched off on this server (/etc/pulse-runner/root-enabled is missing)" >&2; exit 77
+fi
+cmd=$(head -c 20001)
+[[ -n ${cmd//[[:space:]]/} ]] || { echo "pulse-runner-root: no command" >&2; exit 64; }
+(( ${#cmd} <= 20000 )) || { echo "pulse-runner-root: the command is over 20000 bytes" >&2; exit 64; }
+printf '%s %s start by=%s limit=%ss sha256=%s\n' "$(date -u +%FT%TZ)" "$job" "${SUDO_USER:-?}" "$limit" "$(printf '%s' "$cmd" | sha256sum | cut -c1-16)" >> "$LOG"
+cd /root || cd /
+export HOME=/root USER=root LOGNAME=root PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin LANG=C.UTF-8
+# Its own session and a hard kill after the limit: the runner's user cannot signal a root process, so this does.
+timeout --kill-after=10 "$limit" setsid bash -c "$cmd" < /dev/null
+rc=$?
+printf '%s %s exit=%s\n' "$(date -u +%FT%TZ)" "$job" "$rc" >> "$LOG"
+exit $rc

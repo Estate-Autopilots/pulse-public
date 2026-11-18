@@ -1,0 +1,102 @@
+name: Pulse phone emulator matrix
+# Android emulators across API levels and screen sizes: install the phone app, smoke the shell, prompt for and post
+# notifications, and check the app's lifecycle, with screens saved per cell. Evidence only: nothing publishes, and no
+# signing key or credential is used (unsigned validation build; QaSessionTest answers the shell's gateway in-process).
+# Nightly and on demand, separate from the merge gate. Source: tools/companion-public/templates/emulator-matrix.yml.
+on:
+  workflow_dispatch:
+    inputs:
+      phases:
+        description: QA-E2E phases per cell (apps/mobile/scripts/android-qa.sh)
+        type: string
+        default: 'permissions,notifications,lifecycle'
+  schedule:
+    - cron: '30 20 * * *'   # 02:00 IST
+  push:
+    branches: [main]
+    paths: ['.github/workflows/emulator-matrix.yml']
+permissions:
+  contents: read
+concurrency:
+  group: phone-emulator-matrix-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: version
+        run: echo "version=$(node -p "require('./apps/mobile/package.json').version")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '21' }
+      - uses: android-actions/setup-android@v3
+        with: { packages: 'platform-tools build-tools;36.0.0 platforms;android-36' }
+      - uses: gradle/actions/setup-gradle@v5
+        with: { gradle-version: '8.14.3' }
+      - run: corepack enable && pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/mobile sync android
+      - name: Build the unsigned validation APK and its instrumentation tests
+        working-directory: apps/mobile/android
+        run: gradle assembleRelease assembleReleaseAndroidTest --no-daemon --max-workers=2 -Dorg.gradle.parallel=false
+      - run: |
+          mkdir -p out
+          cp apps/mobile/android/app/build/outputs/apk/release/app-release*.apk "out/Pulse-${{ steps.version.outputs.version }}-android.apk"
+          cp apps/mobile/android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk "out/Pulse-${{ steps.version.outputs.version }}-android-tests.apk"
+      - uses: actions/upload-artifact@v7
+        with: { name: 'emulator-apk-${{ github.run_id }}', path: out/, if-no-files-found: error, retention-days: 7 }
+
+  cell:
+    needs: build
+    name: api${{ matrix.api }}-${{ matrix.size }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      # Leave room under the organisation's 20 concurrent jobs for the merge gate.
+      max-parallel: 6
+      matrix:
+        api: [29, 31, 33, 34, 35]
+        size: [small, phone, tablet]
+        include:
+          - { size: small, profile: 'Nexus S' }
+          - { size: phone, profile: pixel_7 }
+          - { size: tablet, profile: pixel_tablet }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
+        with: { name: 'emulator-apk-${{ github.run_id }}', path: apk }
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        env:
+          RESUME_MINUTES: '5'
+          PULSE_SIGNIN_TEXT: 'Username|Sign in to Pulse'
+        with:
+          api-level: ${{ matrix.api }}
+          emulator-build: 14788078
+          profile: ${{ matrix.profile }}
+          arch: x86_64
+          target: default
+          cores: 2
+          ram-size: 3072M
+          heap-size: 512M
+          disk-size: 6000M
+          emulator-boot-timeout: 900
+          emulator-options: -no-window -gpu lavapipe -feature -Vulkan -noaudio -no-boot-anim -no-snapshot
+          disable-animations: true
+          pre-emulator-launch-script: bash apps/mobile/scripts/log-emulator.sh
+          script: bash apps/mobile/scripts/android-qa.sh "apk/Pulse-${{ needs.build.outputs.version }}-android.apk" "apk/Pulse-${{ needs.build.outputs.version }}-android-tests.apk" "qa-${{ matrix.api }}-${{ matrix.size }}" "${{ inputs.phases || 'permissions,notifications,lifecycle' }}"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: emulator-api${{ matrix.api }}-${{ matrix.size }}-${{ github.run_id }}
+          path: qa-${{ matrix.api }}-${{ matrix.size }}/
+          if-no-files-found: ignore
+          retention-days: 14

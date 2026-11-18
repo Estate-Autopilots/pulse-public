@@ -1,0 +1,135 @@
+openapi: 3.1.0
+info: { title: Pulse shared-login delivery claims, version: 1.0.0 }
+paths:
+  /v1/deliveries/claimable:
+    get:
+      summary: List this editor's unclaimed shared-login deliveries for an ISO week
+      parameters:
+        - { name: week, in: query, required: true, schema: { type: string, pattern: '^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$' } }
+      responses:
+        '200':
+          description: Shared-login delivery metadata available to the signed-in person in their work projects
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [week, deliveries]
+                properties:
+                  week: { type: string }
+                  deliveries:
+                    type: array
+                    items: { $ref: '#/components/schemas/ClaimableDelivery' }
+        '400': { description: Invalid ISO week }
+        '403': { description: A personal employee account is required }
+  /v1/deliveries/claims:
+    get:
+      summary: List direct reports' delivery claims for manager review
+      description: Managers see their reports' claims; admins can see organisation claims. Personal data reads are access logged.
+      parameters:
+        - { name: week, in: query, required: true, schema: { type: string, pattern: '^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$' } }
+        - { name: status, in: query, required: false, schema: { type: string, enum: [pending, confirmed, rejected], default: pending } }
+      responses:
+        '200':
+          description: Claims in the requested week visible to the authenticated manager or admin
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [week, claims]
+                properties:
+                  week: { type: string }
+                  claims:
+                    type: array
+                    items: { $ref: '#/components/schemas/DeliveryClaimReview' }
+        '400': { description: Invalid ISO week or claim status }
+        '403': { description: Manager or admin access required }
+  /v1/deliveries/{id}/claim:
+    post:
+      summary: Claim a shared-login delivery for the authenticated person
+      parameters:
+        - { name: id, in: path, required: true, description: Opaque delivery file identifier, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: false }
+      responses:
+        '200':
+          description: The person's pending claim
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeliveryClaim' }
+        '400': { description: Invalid delivery identifier }
+        '403': { description: A personal employee account or project access is required }
+        '409': { description: Delivery is not available or already has an active claim }
+  /v1/deliveries/{id}/claim/decide:
+    post:
+      summary: Confirm or reject a report's pending delivery claim
+      parameters:
+        - { name: id, in: path, required: true, description: Opaque delivery file identifier, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [confirmed, rejected] }
+                reason: { type: string, minLength: 1, maxLength: 240 }
+      responses:
+        '200':
+          description: Updated claim. Confirmed responses carry creditedVia claim.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeliveryClaim' }
+        '400': { description: Invalid decision or reason }
+        '403': { description: Admin or the claimant's manager is required; self-decisions are not allowed }
+        '404': { description: Pending claim not visible to this reviewer }
+        '409': { description: Claim was decided concurrently }
+components:
+  schemas:
+    ClaimableDelivery:
+      type: object
+      additionalProperties: false
+      required: [id, projectName, fileName, kind, deliveredAt]
+      properties:
+        id: { type: string, description: Opaque delivery file identifier used in claim routes. }
+        projectName: { type: string }
+        fileName: { type: string }
+        kind: { type: string, enum: [draft, final] }
+        deliveredAt: { type: string, format: date-time }
+    DeliveryClaim:
+      type: object
+      additionalProperties: false
+      required: [id, deliveryId, personId, status, creditedVia, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        deliveryId: { type: string }
+        personId: { type: string, format: uuid }
+        status: { type: string, enum: [pending, confirmed, rejected] }
+        creditedVia: { type: string, enum: [claim] }
+        createdAt: { type: string, format: date-time }
+        decidedBy: { type: [string, 'null'], format: uuid }
+        decidedAt: { type: [string, 'null'], format: date-time }
+    DeliveryClaimReview:
+      type: object
+      additionalProperties: false
+      required: [id, deliveryId, personId, status, creditedVia, createdAt, personName, projectName, fileName, kind, deliveredAt]
+      properties:
+        id: { type: string, format: uuid }
+        deliveryId: { type: string }
+        personId: { type: string, format: uuid }
+        status: { type: string, enum: [pending, confirmed, rejected] }
+        creditedVia: { type: string, enum: [claim] }
+        createdAt: { type: string, format: date-time }
+        personName: { type: string }
+        projectName: { type: string }
+        fileName: { type: string }
+        kind: { type: string, enum: [draft, final] }
+        deliveredAt: { type: string, format: date-time }
+        decidedBy: { type: [string, 'null'], format: uuid }
+        decidedAt: { type: [string, 'null'], format: date-time }

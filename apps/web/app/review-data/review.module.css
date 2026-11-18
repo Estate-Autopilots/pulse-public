@@ -1,0 +1,115 @@
+.split { display: grid; grid-template-columns: minmax(300px, 340px) minmax(0, 1fr); gap: 16px; min-height: 0; }
+.types { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.types ul { margin: 0; padding: 6px; list-style: none; }
+/* EST-1201: more suggestion types than the window is tall (1366x768) scroll inside the list instead of the last ones
+   being cut off below the panel. */
+.types ul { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.progress { flex: none; height: 4px; margin: 12px 14px 4px; overflow: hidden; border-radius: 4px; background: var(--theme-surface-subtle); }
+.progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--theme-action), var(--theme-brand-2)); }
+.type { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 52px; padding: 8px 10px; border-radius: 10px; color: inherit; text-decoration: none; }
+.type:hover { background: var(--theme-surface-subtle); }
+.type[aria-current="true"] { background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-action) 22%, transparent); }
+.type > svg { color: var(--theme-action); }
+.type span { display: grid; gap: 1px; min-width: 0; }
+.type b { font-size: 14px; font-weight: 600; }
+.type small { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.more { flex: none; margin: 0; padding: 8px 16px 12px; color: var(--theme-text-muted); font-size: 12px; }
+.more a { color: var(--theme-action); font-weight: 600; }
+@media (max-width: 1179.98px), (max-height: 599.98px) { .split { grid-template-columns: minmax(0, 1fr); } }
+/* VISUAL-QA (round 3: the page was 13,800 px): where the page fits the window, the two columns take the height they are
+   given (a grid row grows to its content otherwise), so the suggestions scroll in their panel under the header and types. */
+@media (min-width: 1180px) and (min-height: 600px) {
+  .split { grid-template-rows: minmax(0, 1fr); }
+  .split > * { min-height: 0; }
+  .split > nav { overflow-y: auto; }
+}
+/* Suggestion cards, compact: title line, one line of explanation, then evidence and the decision on one row. */
+.split article { display: grid; gap: 6px; padding: 12px 14px; border-radius: 10px; }
+.split article > p { margin: 0; font-size: 13px; line-height: 1.45; }
+.split article > div:first-child { gap: 8px; }
+.split article details { font-size: 13px; }
+.split article details summary { cursor: pointer; color: var(--theme-text-muted); }
+.split article > div:last-child { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; }
+.split article select, .split label select { height: 32px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 7px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; }
+.split label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--theme-text-muted); }
+.split article { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.split article > div:first-child, .split article > p { grid-column: 1 / -1; }
+.split article > p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.split article > details { grid-column: 2; grid-row: 3; }
+.split article > details[open] { grid-column: 1 / -1; grid-row: 4; }
+.split article > div:last-child { grid-column: 1; grid-row: 3; }
+.split article details summary { display: inline-flex; align-items: center; min-height: 32px; }
+.split [data-pager] { flex: 1 1 0; min-height: 0; }
+.split [class*="__actions"] { flex-wrap: wrap; }
+/* PEOPLE-LIVE: groups of suggestions, decided in one click with a few items' evidence inline. */
+.groups { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 10px; padding: 10px 14px; }
+.group { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; min-width: 0; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); }
+.groupHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.groupHead b { font-weight: 600; }
+.groupHead select { height: 26px; padding: 0 6px; border: 1px solid var(--theme-border); border-radius: 7px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 12px; }
+.group > p { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.45; }
+.group ul { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; margin: 0; padding: 0 0 0 16px; font-size: 12.5px; }
+.group li { min-width: 0; }
+.group li small { display: block; overflow: hidden; color: var(--theme-text-muted); text-overflow: ellipsis; white-space: nowrap; }
+/* R55: Needs attention, one ranked list across every kind. */
+.attention { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 8px; margin: 0; padding: 10px 14px; list-style: none; }
+.attentionRow { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); }
+.attentionRow[data-done] { opacity: 0.55; }
+.rankNo { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* One column as wide as the row: an implicit column grew to a long model name in a choice and pushed a phone's page
+   14 px past its right edge. */
+.attentionBody { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; min-width: 0; }
+.attentionBody > b { font-weight: 600; font-size: 14px; }
+.attentionBody > p { margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+/* A long tag ("Decides who approves leave and corrections", 288 px) wraps inside the row on a 363 px phone. */
+.attentionBody .chips > * { flex: 0 1 auto; max-width: 100%; height: auto; min-height: 20px; white-space: normal; line-height: 1.3; }
+.attentionActions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.attentionActions select, .attentionActions input { height: 32px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 7px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; max-width: 100%; }
+.attentionActions input { flex: 1 1 200px; min-width: 0; }
+.showMore { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 4px 16px 6px; color: var(--theme-text-muted); font-size: 13px; }
+/* A phone: rows are not cards inside a card (that cost ~60 px of a 363 px screen); a hairline between them instead. */
+@media (max-width: 599.98px) {
+  .queue { padding: 12px 0; }
+  .queueHead { padding: 0 14px; }
+  .attention { gap: 0; padding: 0; }
+  .attentionRow { grid-template-columns: 24px minmax(0, 1fr); padding: 14px; border: 0; border-top: 1px solid var(--theme-border); border-radius: 0; background: transparent; }
+  .rankNo { width: 24px; height: 24px; }
+}
+
+/* SETTINGS-APPLE (owner, 13 Nov 2026, T1.3.3): one queue. The sure ones (a ring, one line, one button with Undo), then
+   the type chips, then what needs you, each row with your AI's reason and how sure it is. */
+.sure { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; padding: 16px 18px; border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-surface); box-shadow: 0 1px 2px rgb(15 23 42 / 4%); }
+.sureRing { display: grid; justify-items: center; line-height: 1.05; }
+.sureRing b { font-size: 17px; font-weight: 750; font-variant-numeric: tabular-nums; }
+.sureRing small { color: var(--theme-text-muted); font-size: 11px; font-weight: 600; }
+.sureText { display: grid; flex: 1 1 260px; gap: 3px; min-width: 0; }
+.sureText b { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+.sureText span { color: var(--theme-text-muted); font-size: 14px; line-height: 1.45; }
+.sureText .sureError { color: var(--theme-danger); }
+.sureGo { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 20px; border: 0; border-radius: 12px; background: var(--theme-action, #6b4cf0); color: var(--theme-action-text, #fff); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 18px color-mix(in srgb, var(--theme-action) 25%, transparent); }
+.sureGo:disabled { opacity: .7; cursor: progress; }
+/* As the kit's primary button in dark mode: the lightened action violet left white words at a washed-out contrast. */
+:global(:root[data-theme="dark"]) .sureGo:not(:disabled) { background: #6B4CF0; color: #fff; }
+.sureGo:focus-visible, .undo:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.sureCount { display: inline-flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 6px 0 16px; border-radius: 12px; background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); font-weight: 650; font-variant-numeric: tabular-nums; }
+.undo { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 1px solid color-mix(in srgb, var(--theme-action) 40%, var(--theme-border)); border-radius: 10px; background: var(--theme-surface); color: var(--theme-action); font: inherit; font-weight: 700; cursor: pointer; }
+@media (max-width: 600px) { .sureGo, .sureCount { width: 100%; } }
+.queue { display: grid; gap: 10px; min-width: 0; padding: 14px; border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-surface); }
+.queueHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; padding: 0 2px; }
+.queueHead b { font-size: 16px; font-weight: 700; }
+.queueLinks { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 13.5px; }
+.queueLinks a { color: var(--theme-action); font-weight: 600; text-decoration: none; }
+.queueLinks a:hover { text-decoration: underline; }
+.aiBy { color: var(--theme-action); font-weight: 650; }
+.sureIcon { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 18px; background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action); }
+/* SETTINGS-APPLE (judges: "no action leads", then "20 tinted buttons compete"): a row's own decision is named in violet
+   on a plain button; the page's one filled button stays "Accept the sure ones". */
+.attentionActions .lead:not(:disabled) { color: color-mix(in srgb, var(--theme-action) 85%, var(--theme-text)); font-weight: 650; }
+.moreLike { display: flex; justify-content: center; padding: 2px 0 4px; list-style: none; }
+@media (max-width: 599.98px) {
+  /* A row's chooser on its own line, its buttons together under it (judge: Dismiss dropped alone on a line). */
+  .attentionActions > span:has(> select), .attentionActions > input { flex: 1 1 100%; }
+}
+/* No row numbers (judge, twice: "the 1-20 numbers add noise"); one confidence colour rule: green from 90%, grey below. */
+.attentionRow { grid-template-columns: minmax(0, 1fr); }

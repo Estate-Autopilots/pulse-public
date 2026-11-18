@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pulse.invalid/schemas/config/targets.json",
+  "title": "Tenant targets configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "editors": { "$ref": "#/$defs/editorTargets" },
+    "designers": { "$ref": "#/$defs/designerTargets" },
+    "windows": {
+      "type": "object",
+      "propertyNames": { "enum": ["logo", "colour_palette", "brochure", "pitch_deck", "brand_identity"] },
+      "additionalProperties": { "$ref": "#/$defs/brandAssetWindow" }
+    },
+    "person_overrides": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" },
+      "additionalProperties": { "$ref": "#/$defs/editorTargets" }
+    }
+  },
+  "$defs": {
+    "weeklyTarget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["per_week", "placeholder"],
+      "properties": {
+        "per_week": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+        "placeholder": { "type": "boolean" }
+      }
+    },
+    "dailyTarget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["per_day", "placeholder"],
+      "properties": {
+        "per_day": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+        "placeholder": { "type": "boolean" }
+      }
+    },
+    "designerTargets": {
+      "type": "object", "additionalProperties": false,
+      "required": ["single_image"],
+      "properties": {
+        "roles": {
+          "type": "array", "uniqueItems": true, "maxItems": 20,
+          "items": { "type": "string", "minLength": 1, "maxLength": 80, "pattern": "\\S" }
+        },
+        "single_image": { "$ref": "#/$defs/dailyTarget" }
+      }
+    },
+    "brandAssetWindow": {
+      "type": "object", "additionalProperties": false,
+      "required": ["days", "placeholder"],
+      "properties": {
+        "days": {
+          "type": "object", "additionalProperties": false, "required": ["min", "max"],
+          "properties": {
+            "min": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+            "max": { "oneOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] }
+          }
+        },
+        "placeholder": { "type": "boolean" }
+      }
+    },
+    "editorTargets": {
+      "type": "object",
+      "propertyNames": { "enum": ["model_video", "vov", "founder_video", "testimonial", "walkthrough", "other"] },
+      "additionalProperties": { "$ref": "#/$defs/weeklyTarget" }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+/* FIX-DOCS-WORK (owner, 10 Nov 2026: Meetings "very poor UI; recording on by default; test it from a phone"): the start
+   of a meeting, phone first. Teammates fold under "Who else is here"; the consent notice and Start recording sit
+   together, Start the biggest thing on the page and, on a phone, kept in sight above the bottom bar. */
+.people { border: 0; border-radius: 0; background: none; }
+.people summary { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0; cursor: pointer; color: #6b4cf0; font-size: 14px; font-weight: 650; list-style: none; }
+.people summary::-webkit-details-marker { display: none; }
+.people summary::after { content: "▾"; color: var(--theme-text-muted); }
+.people[open] summary::after { content: "▴"; }
+.people summary em { color: var(--theme-text-muted); font-size: 13px; font-style: normal; font-weight: 500; }
+.people > div { margin: 4px 0 8px; }
+.go { display: flex; flex-direction: column; gap: 12px; margin-top: -2px; padding: 16px 0 0; border-top: 1px solid var(--theme-border); background: var(--theme-surface); }
+.notice { display: flex; align-items: flex-start; gap: 10px; margin: 0; color: var(--theme-text); font-size: 13.5px; line-height: 1.5; }
+.notice svg { flex: none; margin-top: 2px; color: #6b4cf0; }
+.record { width: 100%; min-height: 54px; justify-content: center; font-size: 16px !important; background: #6b4cf0 !important; border-color: #6b4cf0 !important; color: #fff !important; }
+.notes { align-self: center; display: inline-flex; white-space: nowrap; align-items: center; gap: 6px; min-height: 40px; padding: 0 10px; border: 0; background: none; color: var(--theme-text-muted);
+  font: inherit; font-size: 13.5px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.notes:hover { color: #6b4cf0; }
+@media (max-width: 899.98px) {
+  .go { position: sticky; bottom: calc(58px + env(safe-area-inset-bottom, 0px)); z-index: 5; padding-bottom: 8px; }
+}
+.unset { color: #8a8f9c !important; font-weight: 400 !important; font-size: 15px !important; }
+.cheer { margin: -2px 0 0; text-align: center; color: var(--theme-text-muted); font-size: 13px; }
+
+:global(:root[data-theme="dark"]) .notice svg { color: #c4b8ff; }
+
+:global(:root[data-theme="dark"]) .cheer, :global(:root[data-theme="dark"]) .notes, :global(:root[data-theme="dark"]) .people summary em { color: rgb(255 255 255 / 0.78) !important; }
+:global(:root[data-theme="dark"]) .unset { color: rgb(255 255 255 / 0.5) !important; }
+:global(:root[data-theme="dark"]) section:has(> .go) input, :global(:root[data-theme="dark"]) section:has(> .go) select { background-color: var(--theme-surface) !important; }
+:global(:root[data-theme="dark"]) .people summary { color: #c4b8ff; }
+/* The form reads as one card: on a phone the consent and Start sit flush at its foot (no card inside a card); on a
+   computer the form is a calm 680px column. */
+section:has(> .go) { max-width: 680px; }
+
+:global(:root[data-theme="dark"]) section:has(> .go) input::placeholder { color: rgb(255 255 255 / 0.62); }
+.after { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 8px; margin: 0; padding: 0; list-style: none; color: var(--theme-text-muted); font-size: 12.5px; font-weight: 600; }
+.after li:not([aria-hidden]) { padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, #6b4cf0 9%, var(--theme-surface)); color: color-mix(in srgb, #6b4cf0 75%, var(--theme-text)); }
+:global(:root[data-theme="dark"]) .after li:not([aria-hidden]) { background: rgb(143 123 255 / 0.2); color: #e4deff; }
+:global(:root[data-theme="dark"]) section:has(> .go) { border-color: rgb(255 255 255 / 0.28); }
+:global(:root[data-theme="dark"]) .go { border-top-color: rgb(255 255 255 / 0.24); }
+:global(:root[data-theme="dark"]) section:has(> .go) input, :global(:root[data-theme="dark"]) section:has(> .go) select { border-color: rgb(255 255 255 / 0.3) !important; }
+/* One field height, and a light chevron instead of the browser's heavy ▼. */
+.select { height: 42px !important; min-height: 42px; padding-right: 34px !important; appearance: none !important; -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%237a7f8e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important; background-position: right 12px center !important; background-size: 14px !important; }
+.after { flex-wrap: wrap; justify-content: center; gap: 6px 4px; padding: 0 6px; font-size: 12px; white-space: nowrap; }
+.after li:not([aria-hidden]) { padding: 3px 8px; }
+:global(:root[data-theme="dark"]) .after li:not([aria-hidden]) { background: rgb(143 123 255 / 0.4); color: #fff; }
+:global(:root[data-theme="dark"]) .after li[aria-hidden] { color: rgb(255 255 255 / 0.7); }
+.select { background-color: var(--theme-surface) !important; }
+.after { flex-wrap: nowrap !important; }
