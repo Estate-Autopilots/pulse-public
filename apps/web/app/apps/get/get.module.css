@@ -1,0 +1,33 @@
+.page { display: grid; gap: 28px; max-width: 1040px; margin: 0 auto; padding: 40px 16px 64px; }
+.hero { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
+.hero > div { flex: 1; min-width: 240px; }
+.logo { flex: none; width: 72px; height: 72px; border-radius: 18px; }
+.hero h1 { margin: 0 0 6px; font-size: 32px; font-weight: 720; letter-spacing: -.02em; }
+.lead { margin: 0; color: var(--theme-text-muted); font-size: 16px; line-height: 1.55; }
+.grid { display: grid; gap: 16px; }
+.card { display: grid; gap: 12px; padding: 20px; border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-surface); scroll-margin-top: 16px; }
+.card:target { border-color: var(--theme-action); }
+.cardHead { display: flex; align-items: center; gap: 12px; }
+.cardHead h2 { margin: 0; font-size: 20px; }
+.badgeIcon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: color-mix(in srgb, var(--theme-action) 12%, transparent); color: var(--theme-action); }
+.meta { margin: 2px 0 0; color: var(--theme-text-muted); font-size: 14px; font-weight: 600; }
+.what { margin: 0; font-size: 15px; line-height: 1.55; }
+.body { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+.actions { display: grid; gap: 10px; flex: 1; min-width: 240px; justify-items: start; }
+.button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: var(--theme-text); font-weight: 600; text-decoration: none; }
+.primary { border-color: transparent; background: var(--theme-action); color: var(--theme-action-text); }
+.steps { display: grid; gap: 8px; margin: 4px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.55; }
+.hash { margin: 0; max-width: 100%; color: var(--theme-text-muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; overflow-wrap: anywhere; }
+.hint { margin: 0; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--theme-action) 35%, var(--theme-border)); border-radius: 12px; background: color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface)); font-size: 14px; line-height: 1.5; }
+.qr { display: grid; gap: 6px; justify-items: center; margin: 0; padding: 12px; border-radius: 14px; background: #fff; color: #20202b; }
+.qr svg { display: block; }
+.qr figcaption { max-width: 160px; font-size: 12px; text-align: center; }
+.foot { margin: 0; color: var(--theme-text-muted); font-size: 14px; }
+@media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } .body { flex-direction: column; } .actions { min-width: 0; } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* WL-ONBOARD-FIX: on a phone the header is short, so the first card (and its Install button) is in view. */
+@media (max-width: 640px) {
+  .logo { width: 44px; height: 44px; }
+  .hero .lead { display: none; }
+  .qr { display: none; }
+}

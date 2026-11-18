@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "Pulse",
+  "version": "1.0.0",
+  "description": "Check in, take a break and check out in one click, with Pip, the Pulse bot. Optional work-context totals stay off unless you turn them on.",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "idle",
+    "identity",
+    "identity.email"
+  ],
+  "host_permissions": [
+    "https://pulse.estateautopilots.com/*"
+  ],
+  "optional_host_permissions": [
+    "https://drive.google.com/*",
+    "https://docs.google.com/*",
+    "https://mail.google.com/*",
+    "https://business.facebook.com/*",
+    "https://adsmanager.facebook.com/*",
+    "https://www.facebook.com/*",
+    "https://www.canva.com/*",
+    "https://canva.com/*",
+    "https://www.figma.com/*",
+    "https://figma.com/*",
+    "https://*.estateautopilots.com/*"
+  ],
+  "background": {
+    "service_worker": "worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Pulse",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "48": "icons/48.png"
+    }
+  },
+  "incognito": "not_allowed",
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  }
+}

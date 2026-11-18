@@ -1,0 +1,16 @@
+/* TASKS-4A: a project page. Its tasks take the main column in any view; discussion, people and what was finished
+   after what sit in a column beside them that scrolls on its own. */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 14px; min-width: 0; }
+.main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.progressRow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.progressRow h3 { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 15px; font-weight: 650; }
+.progressRow small { color: var(--theme-text-muted); font-size: 12.5px; }
+.progressRow > span { flex: 1 1 160px; max-width: 320px; }
+.tree { border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); overflow: hidden; }
+@media (max-width: 1179.98px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+@media (min-width: 1180px) and (min-height: 600px) {
+  .grid { flex: 1 1 0; min-height: 0; grid-template-rows: minmax(0, 1fr); }
+  .main { min-height: 0; }
+  .side { min-height: 0; overflow: auto; padding-right: 2px; }
+}

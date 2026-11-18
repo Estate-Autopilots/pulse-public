@@ -1,0 +1,9 @@
+# Build the web lane's newest pushed commit and restart pulse-dev-web if it builds (tools/pulse-dev/README.md).
+[Unit]
+Description=pulse-dev: build and serve the newest task/web/* head (else main)
+
+[Service]
+Type=oneshot
+ExecStart=%h/pulse-dev/bin/deploy.sh
+TimeoutStartSec=900
+Nice=10

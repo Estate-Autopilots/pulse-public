@@ -1,0 +1,246 @@
+/* IA-NAV: the sidebar's folding groups, pinned pages, Edit menu, and the All apps launcher. House style: the theme's
+   action colour, white cards on the canvas, a 4px grid, 16 / 24 px gutters. */
+
+/* ---------------------------------------------------------------- the sidebar's groups */
+.groups { display: flex; flex-direction: column; gap: 2px; min-height: 0; flex: 0 1 auto; overflow-y: auto; overscroll-behavior: contain; margin: 0 -4px 0; padding: 0 4px 12px; scrollbar-width: thin;
+  /* A long list scrolls inside its own box: its lower edge fades, so a row half out of view reads as "more below", not cut. */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); }
+.group { display: flex; flex-direction: column; }
+.groupHead { display: flex; align-items: center; gap: 8px; width: 100%; height: 32px; padding: 0 8px; border: 0; border-radius: 9px; background: transparent;
+  color: color-mix(in srgb, var(--theme-text) 62%, transparent); font: inherit; font-size: 12.5px; font-weight: 650; letter-spacing: .01em; text-align: left; cursor: pointer; }
+.groupHead:hover { background: color-mix(in srgb, var(--theme-text) 5%, transparent); color: var(--theme-text); }
+.groupHead:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; }
+.groupHead[data-active] { color: var(--theme-text); }
+.groupHead > svg:first-child { flex: none; color: color-mix(in srgb, var(--theme-text) 45%, transparent); }
+.groupHead[data-active] > svg:first-child { color: var(--theme-action); }
+.groupLabel { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chev { flex: none; transition: transform 160ms ease; color: color-mix(in srgb, var(--theme-text) 40%, transparent); }
+.groupHead[aria-expanded="false"] .chev { transform: rotate(-90deg); }
+.groupItems { display: flex; flex-direction: column; gap: 1px; margin: 0 0 6px; padding-left: 6px; }
+.item { position: relative; display: flex; align-items: center; }
+.item > a { flex: 1; min-width: 0; }
+.item[data-hidden] > a { opacity: .45; }
+.item > a[aria-current="page"]::before { content: ""; position: absolute; left: -4px; top: 7px; bottom: 7px; width: 3px; border-radius: 3px; background: var(--theme-action); }
+.editBtn { flex: none; display: grid; place-items: center; width: 26px; height: 26px; margin-left: 2px; border: 0; border-radius: 7px; background: transparent;
+  color: color-mix(in srgb, var(--theme-text) 50%, transparent); cursor: pointer; }
+.editBtn:hover { background: color-mix(in srgb, var(--theme-text) 7%, transparent); color: var(--theme-text); }
+.editBtn[aria-pressed="true"] { color: var(--theme-action); }
+.editBtn[aria-pressed="true"] svg { fill: currentColor; }
+.editBtn:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -1px; }
+.editBtn:disabled { opacity: .3; cursor: default; }
+.pinnedTitle { display: flex; align-items: center; gap: 6px; margin: 2px 0 2px; padding: 0 8px; color: color-mix(in srgb, var(--theme-text) 48%, transparent); font-size: 11.5px; font-weight: 650; }
+.pinnedTitle svg { color: #d99a00; fill: #f5b700; }
+.foot { display: flex; flex: none; align-items: center; gap: 6px; margin: 0 0 8px; padding: 8px 2px 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 80%, transparent); }
+.footBtn { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border: 1px solid transparent; border-radius: 8px; background: transparent;
+  color: color-mix(in srgb, var(--theme-text) 62%, transparent); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.footBtn:hover { background: color-mix(in srgb, var(--theme-text) 6%, transparent); color: var(--theme-text); }
+.footBtn:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -1px; }
+.footBtn[data-primary] { border-color: color-mix(in srgb, var(--theme-action) 35%, transparent); color: var(--theme-action); }
+.editHint { margin: 0 8px 6px; color: color-mix(in srgb, var(--theme-text) 55%, transparent); font-size: 12px; line-height: 1.4; }
+
+/* The rail's All apps button sits above Settings. */
+.appsBtn[data-open] { background: color-mix(in srgb, var(--theme-action) 14%, var(--theme-surface)); color: var(--theme-action); }
+
+/* ---------------------------------------------------------------- All apps */
+/* FIX-SHELL (owner, 10 Nov 2026): one clear grid. Groups with their own icon and hue, tiles of one height (icon, name,
+   one line), a group list on the left (a computer) or chips (a phone) that jump to a section. The chosen group is solid
+   violet with white words in light and dark (the theme's dark "action" is a pale violet: dark words on it were
+   unreadable). Header, search and chips never shrink (flex: none), so a long list cannot squash them. */
+.launcherBackdrop { position: fixed; z-index: 10000; inset: 0; display: grid; align-items: start; justify-items: center; padding: min(7vh, 56px) 24px 24px;
+  background: rgb(13 20 34 / 40%); backdrop-filter: blur(4px); animation: launcher-fade 140ms ease-out both; }
+.launcher { --l-violet: #6b4cf0; display: flex; flex-direction: column; width: min(1040px, 100%); height: min(720px, calc(100dvh - min(7vh, 56px) - 24px)); overflow: hidden;
+  border: 1px solid var(--theme-border); border-radius: 18px; background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 24px 70px rgb(15 27 51 / 22%);
+  animation: launcher-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.launcherHead { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px 12px; }
+.launcherTitle { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.launcherTitle h2 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+.launcherClose { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.launcherClose:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.launcherClose:focus-visible { outline: 2px solid var(--theme-focus); }
+.launcherSearch { flex: none; display: flex; align-items: center; gap: 10px; margin: 0 24px 14px; padding: 0 14px; height: 48px; border: 1.5px solid var(--theme-border);
+  border-radius: 12px; background: var(--theme-surface-subtle, var(--theme-surface)); color: var(--theme-text-muted); }
+.launcherSearch:focus-within { border-color: var(--l-violet); background: var(--theme-surface); box-shadow: 0 0 0 3px color-mix(in srgb, var(--l-violet) 16%, transparent); }
+.launcherSearch input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--theme-text); font: inherit; font-size: 15px; }
+.chips { flex: none; display: flex; gap: 8px; margin: 0; padding: 0 24px 10px; overflow-x: auto; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; height: 34px; padding: 0 14px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.chip:hover { border-color: color-mix(in srgb, var(--l-violet) 40%, var(--theme-border)); }
+.chip[aria-selected="true"] { border-color: var(--l-violet); background: var(--l-violet); color: #fff; }
+.chip:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.launcherMain { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 200px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); border-top: 1px solid var(--theme-border); }
+.launcherMain[data-searching], .launcher[data-sheet] .launcherMain { grid-template-columns: minmax(0, 1fr); }
+.groupList { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; padding: 12px 10px 16px 16px; border-right: 1px solid var(--theme-border); }
+.groupLink { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; color: var(--theme-text);
+  font: inherit; font-size: 14px; font-weight: 550; text-align: left; cursor: pointer; }
+.groupLink:hover { background: var(--theme-surface-subtle); }
+.groupLink[aria-current="true"] { background: color-mix(in srgb, var(--l-violet) 10%, var(--theme-surface)); color: var(--theme-text); font-weight: 650; }
+.groupLink:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; }
+.groupLink > span:nth-child(2) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.groupMark { flex: none; display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: hsl(var(--g-hue, 258) 70% 94%); color: hsl(var(--g-hue, 258) 55% 38%); }
+:global(:root[data-theme="dark"]) .groupMark { background: hsl(var(--g-hue, 258) 35% 24%); color: hsl(var(--g-hue, 258) 80% 80%); }
+.groupMark[data-pinned] { background: #fff4d6; color: #b07800; }
+.launcherBody { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px 24px 24px; scroll-padding-top: 8px; }
+.launcherGroup { margin: 0 0 20px; }
+.launcherGroup h3, .recentRow h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-size: 15px; font-weight: 700; color: var(--theme-text); }
+.launcherGroup h3 .groupMark { width: 28px; height: 28px; border-radius: 8px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; align-items: stretch; }
+.tile { position: relative; display: flex; min-width: 0; min-height: 72px; padding: 12px 34px 12px 12px; border: 1px solid var(--theme-border); border-radius: 12px;
+  background: var(--theme-surface); transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease; }
+.tile:hover { border-color: color-mix(in srgb, var(--l-violet) 40%, var(--theme-border)); box-shadow: 0 6px 18px rgb(15 27 51 / 8%); transform: translateY(-1px); }
+.tile[data-current] { border-color: var(--l-violet); box-shadow: inset 0 0 0 1px var(--l-violet); }
+.tileLink { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; color: inherit; text-decoration: none; border-radius: 8px; }
+.tileLink:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 3px; }
+.tileLink::after { content: ""; position: absolute; inset: 0; border-radius: 12px; }
+.tileIcon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 11px; background: hsl(var(--g-hue, 258) 70% 95%); color: hsl(var(--g-hue, 258) 55% 40%); }
+:global(:root[data-theme="dark"]) .tileIcon { background: hsl(var(--g-hue, 258) 35% 22%); color: hsl(var(--g-hue, 258) 80% 80%); }
+.tileText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tileName { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 14.5px; font-weight: 650; line-height: 1.3; }
+.tileNameText { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tileText small { display: -webkit-box; overflow: hidden; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.35; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+.pin { position: absolute; z-index: 1; top: 8px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 8px; background: transparent;
+  color: var(--theme-text-muted); cursor: pointer; opacity: 0; transition: opacity 120ms ease; }
+.tile:hover .pin, .tile:focus-within .pin, .pin[aria-pressed="true"], .launcher[data-sheet] .pin { opacity: 1; }
+.pin:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.pin[aria-pressed="true"] { color: #d99a00; }
+.pin[aria-pressed="true"] svg { fill: #f5b700; }
+.pin:focus-visible { outline: 2px solid var(--theme-focus); opacity: 1; }
+.recentRow { margin: 0 0 20px; }
+.recentChips { display: flex; flex-wrap: wrap; gap: 8px; }
+/* On a computer Recent is one row under the search, its label beside the chips (Codex concept 1). */
+.launcher:not([data-sheet]) > .recentRow { flex: none; display: flex; align-items: center; gap: 14px; margin: 0; padding: 0 24px 14px; overflow: hidden; }
+.launcher:not([data-sheet]) > .recentRow h3 { flex: none; margin: 0; color: var(--theme-text-muted); font-size: 13px; font-weight: 650; }
+.launcher:not([data-sheet]) > .recentRow .recentChips { flex-wrap: nowrap; min-width: 0; overflow: hidden; }
+.recentChip { display: inline-flex; align-items: center; gap: 7px; max-width: 240px; height: 34px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 999px;
+  background: var(--theme-surface); color: var(--theme-text); font-size: 13px; font-weight: 550; text-decoration: none; }
+.recentChip span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recentChip svg { flex: none; color: var(--theme-text-muted); }
+.recentChip:hover { border-color: color-mix(in srgb, var(--l-violet) 40%, var(--theme-border)); }
+.recentChip:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.launcherEmpty { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; color: var(--theme-text-muted); }
+.launcherEmpty p { margin: 0; font-size: 15px; }
+.launcherSearchAll { height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--l-violet); color: #fff; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+.launcherSearchAll:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+
+/* The phone's sheet: full height, 16px gutters, two columns of tiles with the icon on top. */
+.launcherBackdrop[data-sheet] { padding: 0; align-items: end; }
+.launcher[data-sheet] { width: 100%; height: auto; max-height: calc(100dvh - 24px - env(safe-area-inset-top)); border-radius: 18px 18px 0 0; padding-bottom: env(safe-area-inset-bottom); animation: launcher-up 240ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.launcher[data-sheet] .launcherHead { padding: 16px 16px 8px; }
+.launcher[data-sheet] .launcherSearch { margin: 0 16px 10px; }
+.launcher[data-sheet] .chips { padding: 0 16px 10px; }
+.launcher[data-sheet] .launcherMain { border-top: 0; }
+.launcher[data-sheet] .launcherBody { padding: 6px 16px 20px; }
+.launcher[data-sheet] .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.launcher[data-sheet] .tile { min-height: 96px; padding: 12px 28px 12px 12px; }
+.launcher[data-sheet] .tileLink { flex-direction: column; align-items: flex-start; gap: 8px; }
+.launcher[data-sheet] .tileIcon { width: 36px; height: 36px; }
+.launcher[data-sheet] .tileText small { -webkit-line-clamp: 2; }
+.launcher[data-sheet] .pin { top: 6px; right: 4px; }
+@media (max-width: 760px) { .launcherMain:not([data-searching]) { grid-template-columns: minmax(0, 1fr); } .groupList { display: none; } }
+@media (max-width: 520px) { .launcherBackdrop:not([data-sheet]) { padding: 12px; } .launcherHead, .chips, .launcherBody { padding-left: 16px; padding-right: 16px; } .launcherSearch { margin-left: 16px; margin-right: 16px; } }
+
+@keyframes launcher-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes launcher-in { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes launcher-up { from { transform: translateY(24px); opacity: .6; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .launcherBackdrop, .launcher, .launcher[data-sheet] { animation: none; } .tile, .chev, .pin { transition: none; } .tile:hover { transform: none; } }
+:global(html[data-fun="off"]) .launcher, :global(html[data-fun="off"]) .launcherBackdrop { animation: none; }
+.sheetOrg { color: var(--theme-text-muted); font-size: 12.5px; font-weight: 600; }
+.launcherActions { display: flex; align-items: center; gap: 4px; flex: none; }
+.launcherSearchBtn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface);
+  color: var(--theme-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.launcherSearchBtn:hover { border-color: color-mix(in srgb, var(--theme-action) 40%, var(--theme-border)); }
+.launcherSearchBtn:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+/* The phone bar's + New: the one filled button in the bar. */
+.newTab { color: var(--theme-action); }
+.newTabIcon { display: grid; place-items: center; width: 28px; height: 28px; margin: -5px 0 -4px; border-radius: 50%; background: var(--theme-action); color: var(--theme-action-text, #fff);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--theme-action) 35%, transparent); font-style: normal; }
+/* VISUAL-QA (owner, 10 Nov 2026): captions inside the Settings group (You, Company, Admin tools), quieter than the
+   group's own name and aligned with its rows' text, so personal settings and admin tools no longer read as one list. */
+.clusterTitle { margin: 8px 0 2px; padding: 0 10px; color: color-mix(in srgb, var(--theme-text) 64%, transparent); font-size: 11px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; }
+.clusterTitle:first-child { margin-top: 2px; }
+/* VISUAL-QA (13 Nov 2026): the list scrolls in its box; its edges fade while there is more (no overflow, no fade). */
+@supports (animation-timeline: scroll()) {
+  .groups { animation: navMore linear both; animation-timeline: scroll(self block); }
+  @keyframes navMore {
+    from { mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent); }
+    4%, 96% { mask-image: linear-gradient(to bottom, transparent, #000 20px, #000 calc(100% - 36px), transparent); }
+    to { mask-image: linear-gradient(to bottom, transparent, #000 20px); }
+  }
+}
+
+/* ---------------------------------------------------------------- SIDEBAR-HOVER: groups that open on hover */
+/* A group's pages fold open and shut: height (a grid row from 0fr to 1fr) and opacity, 200 ms, ease-out. */
+.fold { display: grid; grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows 200ms ease-out, opacity 200ms ease-out; }
+.fold[data-state="closed"] { grid-template-rows: 0fr; opacity: 0; }
+.foldInner { min-height: 0; overflow: hidden; }
+/* A group the pointer opened (not pinned by a click) wears a soft tint, so it reads as "just showing". */
+.group { border-radius: 10px; transition: background-color 200ms ease-out; }
+.group[data-peek] { background: color-mix(in srgb, var(--theme-action) 6%, transparent); }
+.group[data-peek] > .item > .groupHead { color: var(--theme-text); }
+/* A rail icon's group shows beside the icon, level with it (NAV-CONNECT: with the sidebar open too, over it). */
+.flyout { position: fixed; z-index: 9000; display: flex; flex-direction: column; width: 262px; max-height: calc(100dvh - 24px); padding: 8px; box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--theme-action) 22%, var(--theme-border)); border-radius: 16px; background: var(--theme-surface); color: var(--theme-text);
+  box-shadow: 0 24px 60px rgb(15 27 51 / 30%), 0 6px 14px rgb(15 27 51 / 14%), 0 0 0 4px color-mix(in srgb, var(--theme-action) 8%, transparent);
+  animation: flyout-in 200ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.flyout:not([data-placed]) { visibility: hidden; }
+/* Its pointer sits at the icon's middle, so the eye goes from the icon straight into the list. */
+.flyoutArrow { position: absolute; left: -8px; top: calc(var(--flyout-arrow, 22px) - 8px); width: 15px; height: 15px; box-sizing: border-box; transform: rotate(45deg);
+  border-left: 1.5px solid color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); border-bottom: 1.5px solid color-mix(in srgb, var(--theme-action) 45%, var(--theme-border));
+  background: var(--theme-surface); border-bottom-left-radius: 3px; }
+.flyoutHead { flex: none; display: flex; align-items: center; gap: 10px; margin: 0 0 6px; padding: 4px 6px 8px; border-bottom: 1px solid var(--theme-border); }
+.flyoutMark { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; color: var(--theme-action);
+  background: color-mix(in srgb, var(--theme-action) 12%, transparent); }
+.flyoutName { flex: 1; min-width: 0; margin: 0; color: var(--theme-text); font-size: 15px; font-weight: 700; letter-spacing: -.005em; }
+.flyoutNew { flex: none; padding: 2px 8px; border-radius: 999px; background: #E5484D; color: #fff; font-size: 11.5px; font-weight: 700; }
+.flyoutList { display: flex; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.flyoutLink { position: relative; display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 5px 8px; box-sizing: border-box; border-radius: 10px;
+  color: color-mix(in srgb, var(--theme-text) 86%, transparent); font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background-color 120ms ease-out; }
+.flyoutLink > svg { flex: none; color: color-mix(in srgb, var(--theme-text) 48%, transparent); }
+.flyoutText { flex: 1; display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.flyoutText > b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A page's one line wraps to a second line rather than being cut. */
+.flyoutText > small { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+.flyoutText > b { font-weight: inherit; }
+.flyoutText > small { color: color-mix(in srgb, var(--theme-text) 56%, transparent); font-size: 12px; font-weight: 450; }
+.flyoutLink:hover { background: color-mix(in srgb, var(--theme-action) 8%, transparent); color: var(--theme-text); }
+.flyoutLink:hover > svg { color: var(--theme-action); }
+.flyoutLink:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; }
+.flyoutLink[aria-current="page"] { background: color-mix(in srgb, var(--theme-action) 12%, transparent); color: var(--theme-action); font-weight: 700; }
+.flyoutLink[aria-current="page"] > svg { color: var(--theme-action); }
+/* The rail icon whose group shows: lit in the action colour, so the icon and its list read as one. */
+:global(#pulse-rail) [data-flyout-open], :global(#pulse-rail) [data-flyout-open]:hover, :global(#pulse-rail) [data-path-lit] { background: #6B4CF0; color: #fff; }
+/* While a group shows, everything right of the rail steps back under a light scrim (the rail stays bright), so the card
+   reads as floating over the sidebar and the page and no half-row peeks out beside it. It never takes the pointer. */
+.flyoutScrim { position: fixed; z-index: 8999; top: 0; right: 0; bottom: 0; background: rgb(18 14 38 / 24%); pointer-events: none; animation: scrim-in 160ms ease-out both; }
+:global(:root[data-theme="dark"]) .flyoutScrim { background: rgb(0 0 0 / 26%); }
+:global(:root[data-theme="dark"]) .flyout, :global(:root[data-theme="dark"]) .flyoutArrow { background: #241f38; }
+:global(:root[data-theme="dark"]) .flyoutText > small { color: rgb(255 255 255 / 70%); }
+:global(:root[data-theme="dark"]) .flyoutLink > svg { color: rgb(255 255 255 / 72%); }
+:global(:root[data-theme="dark"]) .flyoutCluster { color: rgb(255 255 255 / 70%); }
+:global(:root[data-theme="dark"]) .flyout { border-color: color-mix(in srgb, #8b74ff 45%, transparent); }
+:global(:root[data-theme="dark"]) .flyoutHead { border-bottom-color: rgb(255 255 255 / 14%); }
+@keyframes scrim-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .flyoutScrim { animation: none; } }
+/* The rail icon's name tip steps aside while its flyout (which names the group) shows. */
+:global(html[data-rail-flyout]) :global(.sidebar-tooltip-panel) { opacity: 0; }
+@keyframes flyout-in { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+/* Less motion: groups and the flyout open and shut at once. */
+@media (prefers-reduced-motion: reduce) { .fold, .group { transition: none; } .flyout { animation: none; } }
+.fold[data-instant], .group:has(> .fold[data-instant]) { transition: none; }
+.flyout[data-instant] { animation: none; }
+:global(html[data-fun="off"]) .fold, :global(html[data-fun="off"]) .group { transition: none; }
+:global(html[data-fun="off"]) .flyout { animation: none; }
+.flyoutCluster { margin: 8px 8px 2px; color: color-mix(in srgb, var(--theme-text) 52%, transparent); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.flyoutCluster:first-child { margin-top: 2px; }
+/* The sidebar's own rows fade under the card, so no half-row reads as part of it. */
+:global(#pulse-sidebar-panel) { transition: opacity 160ms ease-out; }
+:global(html[data-rail-flyout] #pulse-sidebar-panel) { opacity: .45; }
+/* A list whose rows have no second line (Settings) uses shorter rows, so a long list stays short. */
+.flyoutList[data-compact] .flyoutLink { min-height: 34px; padding-block: 3px; }
+/* A folded sidebar: the card lies over the page itself, so the scrim is lighter (a hover, not a dialog). */
+/* A one-page group: no card; its icon lights as a card's would while the pointer rests on it. */
+/* One page: the card is the one link, no header. */
+.flyout[data-bare] { width: auto; max-width: 262px; padding: 6px; }
+.flyout[data-bare] .flyoutText > small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flyout[data-bare] .flyoutHead { display: none; }
+.flyoutLink[data-bare] { min-height: 52px; gap: 12px; }
+.flyoutLink[data-bare] .flyoutText > b { font-size: 15px; font-weight: 700; }

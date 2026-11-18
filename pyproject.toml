@@ -1,0 +1,18 @@
+# uv workspace root for the Python side of the monorepo: services/ingest, services/workers, services/ml,
+# services/bot, collectors/* and packages/sdk-py share one lockfile (uv.lock, next to this file).
+# This is a virtual root: no [project] table, nothing to install here.
+#
+# uv refuses a member directory that has no pyproject.toml, so a package joins `members` in the same change that
+# creates its pyproject.toml (tools/ci.sh fails when the two disagree). Globs are only used where every matching
+# directory is a package; plain files such as collectors/README.md are ignored by uv.
+[tool.uv.workspace]
+members = [
+    "collectors/*",
+    "services/ml/pulse_identity",
+    "services/ml/pulse_rules",
+    "services/ingest",
+    "services/workers",
+    # "services/ml",
+    # "services/bot",
+    "packages/sdk-py",
+]

@@ -1,0 +1,40 @@
+export type CalKind = "post" | "meeting" | "leave" | "task" | "event" | "milestone" | "attendance";
+export type CalSource = "pulse" | "google" | "microsoft" | "linkedin";
+export type CalView = "month" | "week" | "day" | "list";
+/** One item on the one calendar. `start`/`end` are wall-clock text in the company's zone: "YYYY-MM-DD" (all day) or
+ *  "YYYY-MM-DDTHH:mm". All-day `end` is the last day (inclusive). */
+export type CalEvent = {
+  id: string; kind: CalKind; source: CalSource; title: string; start: string; end?: string; allDay: boolean;
+  href?: string; thumb?: string; meta?: string; status?: string; who?: string; note?: string; editable: boolean; externalId?: string;
+  /** A planned slot with nothing in it yet (drawn dashed). */ slot?: boolean;
+};
+export type CalInput = Partial<Omit<CalEvent, "id" | "editable">> & { id?: string; editable?: boolean };
+export const KINDS: CalKind[];
+export const KIND_WORDS: Record<CalKind, string>;
+export const KIND_ONE: Record<CalKind, string>;
+export const KIND_COLOR: Record<CalKind, string>;
+export const SOURCES: CalSource[];
+export const SOURCE_WORDS: Record<CalSource, string>;
+export const CAL_VIEWS: CalView[];
+export const CAL_VIEW_WORDS: Record<CalView, string>;
+export const FC_VIEW: Record<CalView, string>;
+export function isDay(s: unknown): boolean;
+export function isStamp(s: unknown): boolean;
+export function wallClock(instant: Date | string | number, timeZone: string): string | null;
+export function calEvent(e: unknown): CalEvent | null;
+export function lastDayToEnd(day: string): string | undefined;
+export function shown(events: readonly unknown[], kinds?: readonly CalKind[]): CalEvent[];
+export function countByKind(events: readonly unknown[]): Record<CalKind, number>;
+export function timeOf(e: Pick<CalEvent, "allDay" | "start"> | null | undefined): string;
+export function movedStart(e: Pick<CalEvent, "allDay" | "start">, toDay: string, toTime?: string | null): string | null;
+export function startView(chosen: unknown, narrow: boolean): CalView;
+export function dayWords(s: string): string;
+export function statusTone(status: unknown): "warn" | "good" | "";
+export function inRange(e: unknown, from: string, to: string): boolean;
+export const COMPANY_COLORS: string[];
+export function companyColors(companies: readonly { accent?: string | null }[]): string[];
+export function busyMinutes(items: readonly unknown[], day: string): number;
+export type CompanyRow = { org: string; name: string; color: string; byDay: Record<string, number>; minutes: number };
+export function companyHours(companies: readonly { org?: string; name?: string; accent?: string | null; items?: readonly unknown[] }[], days: readonly string[]): { rows: CompanyRow[]; total: number };
+export function hoursWords(minutes: number): string;
+export function weekOf(day: string): string[];

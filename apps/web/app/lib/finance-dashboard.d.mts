@@ -1,0 +1,21 @@
+// FIX-PEOPLE-MONEY C4: types for finance-dashboard.mjs (Finance Overview's six answers).
+import type { LiveModel } from "../finance/types";
+export type Cash = { known: boolean; amount: number | null; asOf: string | null; ageDays: number | null; stale: boolean };
+export type Bucket = { label: string; amount: number; count: number };
+export type LateClient = { client: string; amount: number; ageDays: number; invoices: number };
+export type Receivables = { amount: number; count: number; buckets: Bucket[]; late: number; veryLate: number; top: LateClient[]; confirmed: number };
+export type PayRow = { key: "salaries" | "renewals" | "gst"; label: string; amount: number | null; when: string | null; note: string };
+export type Payables = { rows: PayRow[]; amount: number };
+export type MonthLine = { label: string; amount: number; share: number };
+export type Month = { month: string; revenue: number; expenses: number; profit: number; margin: number | null; lines: MonthLine[]; people: number } | null;
+export type Burn = { burn: number; earning: number; avgCost: number | null; runway: number | null; note: string | null; series: { month: string; net: number }[] };
+export type TaxDue = { what: string; due: string; inDays: number };
+export type Tax = { list: TaxDue[]; next: TaxDue | null; late: string[]; missing: { label: string; due: string | null }[] };
+export type Dashboard = { cash: Cash; receivables: Receivables; payables: Payables; month: Month; burn: Burn; tax: Tax; certified: boolean; asOf: string | null };
+export declare function cashOf(m: LiveModel | null | undefined): Cash;
+export declare function receivablesOf(m: LiveModel | null | undefined): Receivables;
+export declare function payablesOf(m: LiveModel | null | undefined, today: string): Payables;
+export declare function monthOf(m: LiveModel | null | undefined): Month;
+export declare function burnOf(m: LiveModel | null | undefined): Burn;
+export declare function taxOf(m: LiveModel | null | undefined, today: string): Tax;
+export declare function dashboardOf(m: LiveModel | null | undefined, today: string): Dashboard;
