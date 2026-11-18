@@ -1,0 +1,148 @@
+{
+  "_": "AGENT-UI-CONTROL (7 Nov 2026): the screen actions an AI employee may send to the browser of the person it helps. One list for the API (v1 operations and MCP tools: services/api/src/v1-screen.ts), the browser (apps/web/app/agent-ui/actions.ts handles each name) and the database (pulse.agent_ui_action_level decides the level; tests/core/test_agent_ui_control.py checks they agree). Levels: view < act < admin; Settings and admin screens need admin. FIX-CHAT-AI (10 Nov 2026): screen.read (the page as a short map), element.click and field.fill (visible, with the AI cursor); a click whose words delete, send, pay or approve needs admin. AGENT-OPERATOR (13 Nov 2026): file.upload (a file shared in the chat goes into a file field on the page) and file.download (a file the page links to is attached in the chat), both act; a click whose words send, pay, delete or approve needs 'confirm': asked every time, and only the person whose screen it is says yes.",
+  "levels": [
+    {
+      "key": "off",
+      "label": "Off",
+      "says": "It never drives the screen."
+    },
+    {
+      "key": "view",
+      "label": "View",
+      "says": "It shows you things: opens pages and files beside the chat, and points at buttons."
+    },
+    {
+      "key": "act",
+      "label": "Act",
+      "says": "It also clicks, fills in forms and adds files for you. Sending, paying, deleting or approving always asks you first."
+    },
+    {
+      "key": "admin",
+      "label": "Admin",
+      "says": "It also opens Settings and admin screens, and forms that add people."
+    }
+  ],
+  "adminPaths": "^(https?://[^/]+)?/(settings|admin|platform)(/|\\?|#|$)",
+  "actions": [
+    {
+      "name": "page.open",
+      "level": "view",
+      "asks": "open {path}",
+      "did": "Opened {path}"
+    },
+    {
+      "name": "panel.open",
+      "level": "view",
+      "asks": "open {target} beside the chat",
+      "did": "Opened {target} beside the chat"
+    },
+    {
+      "name": "panel.close",
+      "level": "view",
+      "asks": "close the side panel",
+      "did": "Closed the side panel"
+    },
+    {
+      "name": "sidebar.set",
+      "level": "view",
+      "asks": "{open:open|close} the sidebar",
+      "did": "{open:Opened|Closed} the sidebar"
+    },
+    {
+      "name": "tab.open",
+      "level": "view",
+      "asks": "open {path} in a new tab",
+      "did": "Opened {path} in a new tab"
+    },
+    {
+      "name": "point.at",
+      "level": "view",
+      "asks": "point at “{text}”",
+      "did": "Pointed at “{text}”"
+    },
+    {
+      "name": "mic.stop",
+      "level": "view",
+      "asks": "stop the microphone",
+      "did": "Stopped the microphone"
+    },
+    {
+      "name": "composer.insert",
+      "level": "act",
+      "asks": "type in your message box",
+      "did": "Typed in your message box"
+    },
+    {
+      "name": "emoji.insert",
+      "level": "act",
+      "asks": "add {emoji} to your message",
+      "did": "Added {emoji} to your message"
+    },
+    {
+      "name": "form.open",
+      "level": "act",
+      "adminForms": [
+        "person",
+        "ai_employee"
+      ],
+      "asks": "open the {form} form",
+      "did": "Opened the {form} form"
+    },
+    {
+      "name": "file.pick",
+      "level": "act",
+      "asks": "ask you for a file: {purpose}",
+      "did": "Asked you for a file"
+    },
+    {
+      "name": "mic.start",
+      "level": "act",
+      "asks": "start the microphone",
+      "did": "Asked to start the microphone"
+    },
+    {
+      "name": "screen.read",
+      "level": "view",
+      "asks": "look at your screen",
+      "did": "Looked at your screen"
+    },
+    {
+      "name": "element.click",
+      "level": "act",
+      "asks": "click “{text}”",
+      "did": "Clicked “{text}”"
+    },
+    {
+      "name": "field.fill",
+      "level": "act",
+      "asks": "fill in “{field}”",
+      "did": "Filled in “{field}”"
+    },
+    {
+      "name": "file.upload",
+      "level": "act",
+      "asks": "add a file to the page",
+      "did": "Added a file to the page"
+    },
+    {
+      "name": "file.download",
+      "level": "act",
+      "asks": "download “{text}” into the chat",
+      "did": "Downloaded “{text}” into the chat"
+    }
+  ],
+  "forms": {
+    "task": "a new task",
+    "project": "a new project",
+    "client": "a new client",
+    "quote": "a new quotation",
+    "person": "a new team member",
+    "ai_employee": "a new AI employee"
+  },
+  "cards": {
+    "client.add": "Add a client",
+    "task.add": "Add a task",
+    "project.add": "Add a project",
+    "choice": "Pick one"
+  }
+}

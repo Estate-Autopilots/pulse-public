@@ -1,0 +1,16 @@
+/* FEATURES-1024: the one-time telemetry toast: a slim line at the top, clear of the phone's bottom bar and of Pip; it
+   leaves by itself after about 6 s. */
+.toast { position: fixed; z-index: 70; top: calc(env(safe-area-inset-top, 0px) + 60px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px;
+  width: max-content; max-width: min(620px, calc(100vw - 24px)); padding: 7px 8px 7px 12px; border: 1px solid var(--theme-border, rgb(0 0 0 / 10%)); border-radius: 14px;
+  background: var(--theme-surface, #fff); color: var(--theme-text, #111); box-shadow: var(--ds-elev-2, 0 10px 30px rgb(0 0 0 / 14%));
+  animation: toastIn 260ms var(--ds-ease, ease) both, toastOut 400ms ease 5.6s forwards; }
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, -8px); } }
+@keyframes toastOut { to { opacity: 0; transform: translate(-50%, -8px); } }
+.icon { flex: none; color: var(--theme-action, #4f46e5); }
+.toast p { margin: 0; color: var(--theme-text-muted, #555); font-size: 12.5px; line-height: 1.4; }
+.toast p b { color: var(--theme-text, #111); font-weight: 650; }
+.toast a { color: var(--theme-action, #4f46e5); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.x { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border: 0; border-radius: 8px; background: none; color: var(--theme-text-muted, #555); cursor: pointer; }
+.x:hover { background: var(--ds-hover, rgb(0 0 0 / 5%)); }
+.x:focus-visible, .toast a:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action, #4f46e5)); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }

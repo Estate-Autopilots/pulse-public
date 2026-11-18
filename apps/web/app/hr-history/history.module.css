@@ -1,0 +1,14 @@
+/* VISUAL-QA (D141, 13 Nov 2026): on a phone each month is one block (person and month, then the three counts with their
+   names, then where they came from); the six-column table put Coverage / source off the right edge behind a sideways
+   scroll with no cue, and each row stood ~110 px tall with only dashes showing. */
+@media (max-width: 700px) {
+  table.hist.hist { min-width: 0; }
+  table.hist.hist thead { display: none; }
+  table.hist.hist, table.hist.hist tbody { display: block; width: 100%; }
+  table.hist.hist tr { display: flex; flex-wrap: wrap; gap: 2px 14px; padding: 10px 12px; border-bottom: 1px solid var(--theme-border); }
+  table.hist.hist td { display: block; padding: 0; border: 0; max-width: none; }
+  table.hist.hist td:first-child { flex-basis: 100%; font-weight: 600; }
+  table.hist.hist td[data-label]::before { content: attr(data-label) " "; color: var(--theme-text-muted); font-size: 12px; }
+  table.hist.hist td:last-child { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; color: var(--theme-text-muted); font-size: 12.5px; }
+  table.hist.hist td:last-child > * { display: inline; margin: 0; }
+}

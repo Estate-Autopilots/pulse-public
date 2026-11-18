@@ -1,0 +1,332 @@
+#!/usr/bin/env node
+// pulse: Pulse from a terminal or a script. `pulse login` signs in as you in the browser; every Pulse API v1 operation
+// is a command (`pulse people search asha`, `pulse hr onboarding --stuck true`); `pulse api` calls any API path.
+import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { parse, one, type Spec } from './args.js';
+import { browserLogin, deviceLogin, logout, readTokenInput, saveCredential, session, type Session } from './auth.js';
+import { commandHelp, commands, GLOBAL, GROUPS, groupHelp, buildRequest, specFor, title, type Command } from './commands.js';
+import { findProfiles, hostOf, readStore, resolveHost, resolveProfile, storePath, withStoreLock, writeStore, DEFAULT_HOST } from './config.js';
+import { CliError, EXIT, redact, secret, usage } from './errors.js';
+import { call, refusal, VERSION } from './http.js';
+import { human, print, printJson, table } from './output.js';
+import { API_VERSION, OPERATIONS } from './operations.generated.js';
+
+const err = (line: string) => process.stderr.write(redact(line) + '\n');
+
+function mainHelp(list: Command[]): string {
+  const top = list.filter(c => !c.group);
+  const groups = [...new Set(list.map(c => c.group).filter((g): g is string => !!g && g !== 'op'))];
+  const rows: [string, string][] = [
+    ['login', 'Sign in with your Pulse account in the browser (--token to paste a token, --no-browser on a server)'],
+    ['logout', 'Sign out here and end this computer\'s connection to Pulse'],
+    ['auth status', 'The organisations and addresses you are signed in to here (auth login / auth logout also work)'],
+    ['org switch <name>', 'Send the next commands to another organisation you are signed in to (its name or address)'],
+    ...top.map(c => [c.name, c.op.summary] as [string, string]),
+    ...groups.map(g => [`${g} …`, GROUPS[g] ?? ''] as [string, string]),
+    ['ops', 'List every API v1 operation and its command'],
+    ['api <METHOD> <path>', 'Call any Pulse API path with your sign-in (raw JSON)'],
+  ];
+  const pad = Math.max(...rows.map(r => r[0].length));
+  return [`pulse ${VERSION}: Pulse from your terminal (API v${API_VERSION})`, '', 'Usage: pulse <command> [options]', '', 'Commands:',
+    ...rows.map(([a, b]) => `  ${a.padEnd(pad)}  ${b}`), '',
+    'Global options:', '  --host <url>  the Pulse address (or PULSE_HOST; default: your last login, else ' + DEFAULT_HOST + ')',
+    '  --org <name>  one of your organisations for this command (or PULSE_ORG; default: your last login or org switch)',
+    '  --json        print Pulse\'s answers as JSON for scripts', '  -h, --help    help for any command', '  --version     the CLI version', '',
+    'Scripts and CI: set PULSE_TOKEN to a token instead of signing in. Exit codes: 0 ok, 1 Pulse or network failed,',
+    '2 not signed in, 3 refused (role or scope), 4 wrong command or input, 5 rate limited.', '',
+    'Examples:', '  pulse login', '  pulse people search asha', '  pulse hr onboarding --stuck true',
+    '  pulse hr correct <personId> --field joinedOn --value 2026-08-01 --reason "Offer letter says so"',
+    '  pulse changes list --json', '  pulse api GET /api/v1/people/me'].join('\n');
+}
+
+/** Send one operation request with the sign-in; a 401 on a browser sign-in renews it once and retries. */
+async function send(s: Session, method: string, path: string, query: Record<string, string>, body: unknown, headers: Record<string, string>) {
+  const url = new URL(path, s.host);
+  for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
+  const attempt = (token: string) => call(url, { method, headers: { ...headers, authorization: `Bearer ${token}` }, ...(body === undefined ? {} : { json: body }) });
+  let reply = await attempt(s.token);
+  if (reply.status === 401 && s.refresh) reply = await attempt(await s.refresh());
+  if (reply.status < 200 || reply.status >= 300) throw refusal(reply);
+  if (reply.body === undefined && reply.text) return reply.text;
+  return reply.body;
+}
+
+async function login(rest: string[]) {
+  // A bare --token (last, or followed by another option) asks for the token without echoing it.
+  const tokens = rest.map((t, i) => t === '--token' && (i === rest.length - 1 || rest[i + 1].startsWith('--')) ? '--token=-' : t);
+  const spec: Spec = { values: new Set(['host', 'token', 'scopes', 'port']), booleans: new Set(['json', 'help', 'browser', 'device']) };
+  const p = parse(tokens, spec, 'pulse login');
+  if (p.booleans.get('help')) return print(['Sign in to Pulse. The CLI then acts as you, with your roles.', '',
+    'Usage: pulse login [--host <url>] [--device | --no-browser] [--token [<token>|-]] [--scopes "<scope> …"]', '',
+    '  (default)        opens Pulse\'s consent screen in your browser; choose Allow (OAuth 2.1 + PKCE, loopback on 127.0.0.1)',
+    '  --device         shows a code to approve at <host>/oauth/device on any device signed in to Pulse (servers, SSH)',
+    '  --no-browser     prints the link to open anywhere; paste back the address the browser ends on',
+    '  --token [value]  store a token you already have (personal token or app key); bare --token or - asks without echo,',
+    '                   or reads it from stdin when piped: echo "$TOKEN" | pulse login --token',
+    '  --scopes "…"     ask for fewer permissions (default: all; Pulse still checks your role on every call)',
+    '  --port <n>       the loopback port to listen on (default: any free port)',
+    '', `Sign-ins are kept in ${storePath()} (readable by you only).`].join('\n'));
+  if (p.positionals.length) usage(`Unexpected argument: ${p.positionals[0]}`);
+  const host = resolveHost(one(p, 'host'));
+  let token = one(p, 'token');
+  if (token !== undefined) {
+    if (token === '-') token = await readTokenInput();
+    if (!token || /\s/.test(token)) usage('That token is empty or has spaces');
+    secret(token);
+    const me = await send({ host, token, source: 'token' }, 'GET', '/api/v1/people/me', {}, undefined, {}) as { name?: string; username?: string; company?: string };
+    const profile = await saveCredential(host, { kind: 'token', token, savedAt: new Date().toISOString(), ...(me.company ? { org: me.company } : {}) });
+    if (p.booleans.get('json')) return printJson({ host, org: me.company ?? null, profile, signedIn: true, via: 'token', name: me.name, username: me.username });
+    return print(`Signed in to ${host}${me.company ? ` (${me.company})` : ''} as ${me.name ?? '?'}${me.username ? ` (@${me.username})` : ''} with a token.`);
+  }
+  const portRaw = one(p, 'port'), port = portRaw === undefined ? undefined : Number(portRaw);
+  if (port !== undefined && !(Number.isInteger(port) && port > 0 && port < 65536)) usage('--port must be a port number');
+  // AGENT-API: --device signs in with a code approved on any device (servers, SSH), without a loopback listener.
+  const credential = p.booleans.get('device')
+    ? await deviceLogin(host, { scopes: one(p, 'scopes'), log: err, browser: false })
+    : await browserLogin(host, { browser: p.booleans.get('browser') !== false, scopes: one(p, 'scopes'), port, log: err });
+  const me = await send({ host, token: credential.accessToken, source: 'oauth' }, 'GET', '/api/v1/people/me', {}, undefined, {}) as { name?: string; username?: string; roles?: string[]; company?: string };
+  const profile = await saveCredential(host, { ...credential, ...(me.company ? { org: me.company } : {}) });
+  if (p.booleans.get('json')) return printJson({ host, org: me.company ?? null, profile, signedIn: true, via: p.booleans.get('device') ? 'device' : 'browser', name: me.name, username: me.username, scope: credential.scope });
+  print(`Signed in to ${host}${me.company ? ` (${me.company})` : ''} as ${me.name ?? '?'}${me.username ? ` (@${me.username})` : ''}${me.roles?.length ? ` · ${me.roles.join(', ')}` : ''}.`);
+}
+
+async function rawApi(rest: string[]) {
+  const spec: Spec = { values: new Set(['host', 'org', 'data', 'query', 'idempotency-key']), booleans: new Set(['json', 'help']) };
+  const p = parse(rest, spec, 'pulse api');
+  if (p.booleans.get('help') || !p.positionals.length) return print(['Call any Pulse API path with your sign-in and print the JSON answer.', '',
+    'Usage: pulse api <METHOD> <path> [--query name=value …] [--data <json|@file|->] [--idempotency-key <uuid>]', '',
+    'Writes (POST, PUT, PATCH, DELETE) get a new Idempotency-Key unless you give one.', '',
+    'Examples:', '  pulse api GET /api/v1/people/me', '  pulse api GET /api/v1/people --query query=asha',
+    '  pulse api POST /api/v1/chats/groups --data \'{"name":"Launch","memberIds":[]}\''].join('\n'));
+  const [methodRaw, path, extra] = p.positionals;
+  const method = methodRaw.toUpperCase();
+  if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) usage(`Unknown method ${methodRaw}`, 'Use GET, POST, PUT, PATCH or DELETE.');
+  if (!path || extra) usage('Usage: pulse api <METHOD> <path>');
+  if (!/^\/api\/[A-Za-z0-9._~\-/{}:%]*(\?.*)?$/.test(path)) usage(`The path must start with /api/: ${path}`, 'Example: /api/v1/people/me');
+  const query: Record<string, string> = {};
+  for (const q of p.values.get('query') ?? []) {
+    const at = q.indexOf('=');
+    if (at < 1) usage(`--query takes name=value: ${q}`);
+    query[q.slice(0, at)] = q.slice(at + 1);
+  }
+  const dataRaw = one(p, 'data');
+  let body: unknown;
+  if (dataRaw !== undefined) {
+    const text = dataRaw === '-' ? readFileSync(0, 'utf8') : dataRaw.startsWith('@') ? readFileSync(dataRaw.slice(1), 'utf8') : dataRaw;
+    try { body = JSON.parse(text); } catch { usage('--data is not valid JSON'); }
+  }
+  const headers: Record<string, string> = method === 'GET' ? {} : { 'Idempotency-Key': one(p, 'idempotency-key') ?? randomUUID() };
+  const s = await session(resolveProfile(one(p, 'host'), one(p, 'org')));
+  const [bare, search] = path.split('?');
+  for (const [k, v] of new URLSearchParams(search ?? '')) query[k] ??= v;
+  printJson(await send(s, method, bare, query, body, headers));
+}
+
+// AC-PLAN-TOOLS (13 Nov 2026): a plan or a goal's tree printed as an outline a person can read at a glance.
+type TreeTask = { title: string; status: string; assignee?: string | null; dueOn?: string | null; key?: string | null; steps?: { label: string; done: boolean }[];
+  blockedBy?: { title: string }[]; subtasks?: TreeTask[] };
+type TreeProject = { name: string; key?: string | null; openTasks?: number; doneTasks?: number; brief?: { title: string } | null; tasks?: TreeTask[] };
+type TreeGoal = { title: string; status: string; targetOn?: string | null; key?: string | null; progress?: number; brief?: { title: string } | null; projects?: TreeProject[]; tasks?: TreeTask[];
+  decisions?: { kind: string; ref?: string | null; text: string; status: string }[] };
+const mark = (status: string) => ['done', 'accepted'].includes(status) ? '[x]' : status === 'blocked' ? '[!]' : status === 'cancelled' ? '[-]' : '[ ]';
+const tag = (key?: string | null) => key ? `  {${key}}` : '';
+function taskLines(t: TreeTask, pad: string, out: string[]) {
+  const who = [t.assignee, t.dueOn ? `due ${t.dueOn}` : ''].filter(Boolean).join(', ');
+  out.push(`${pad}${mark(t.status)} ${t.title}${who ? ` (${who})` : ''}${tag(t.key)}`);
+  for (const b of t.blockedBy ?? []) out.push(`${pad}      waits on: ${b.title}`);
+  for (const st of t.steps ?? []) out.push(`${pad}      ${st.done ? '✓' : '·'} ${st.label}`);
+  for (const sub of t.subtasks ?? []) taskLines(sub, `${pad}    `, out);
+}
+function projectLines(p: TreeProject, pad: string, out: string[]) {
+  out.push(`${pad}Project: ${p.name} (${p.openTasks ?? 0} open, ${p.doneTasks ?? 0} done)${tag(p.key)}`);
+  if (p.brief) out.push(`${pad}  Brief: ${p.brief.title}`);
+  for (const t of p.tasks ?? []) taskLines(t, `${pad}  `, out);
+}
+export function outline(goals: TreeGoal[], projects: TreeProject[] = []): string {
+  const out: string[] = [];
+  for (const g of goals) {
+    out.push(`Goal: ${g.title} (${g.status}${g.targetOn ? `, target ${g.targetOn}` : ''}, ${Math.round((g.progress ?? 0) * 100)}% done)${tag(g.key)}`);
+    if (g.brief) out.push(`  Brief: ${g.brief.title}`);
+    for (const p of g.projects ?? []) projectLines(p, '  ', out);
+    for (const t of g.tasks ?? []) taskLines(t, '  ', out);
+    for (const d of g.decisions ?? []) out.push(`  ${d.kind === 'decision' ? 'Decision' : 'Open question'} ${d.ref ?? ''}: ${d.text} (${d.status})`);
+  }
+  for (const p of projects) projectLines(p, '', out);
+  return out.join('\n');
+}
+
+/** `pulse docs import <file.md> [--folder "A/B"] [--link kind:id[:brief|related]] …`: one doc from a Markdown file, put in a
+ *  folder and linked to work, through apply_plan (one transaction; the same file sent again updates the same doc). */
+async function docsImport(rest: string[]) {
+  const spec: Spec = { values: new Set(['host', 'org', 'folder', 'link', 'title', 'category', 'tags', 'key', 'access', 'idempotency-key']), booleans: new Set(['json', 'help', 'dry-run']) };
+  const p = parse(rest, spec, 'pulse docs import');
+  if (p.booleans.get('help') || !p.positionals.length) return print(['Import a Markdown file as a doc, put it in a folder and link it to a goal, project or task.', '',
+    'Usage: pulse docs import <file.md> [--folder "A/B"] [--link project:<id>:brief …] [--title …] [--category "Meeting notes"] [--tags a,b] [--key …] [--access private|company] [--dry-run]', '',
+    'The folder path is made where missing. --link kind:id[:brief|related] (kind goal, project or task; related by default) can be given more than once.',
+    'The key (default: file:<file name>) makes a second import of the same file update the same doc. Front matter (title, tags, category) is read.'].join('\n'));
+  const [file, extra] = p.positionals;
+  if (extra) usage('Import one file at a time');
+  let text = '';
+  try { text = readFileSync(file, 'utf8'); } catch (e) { usage(`Cannot read ${file}: ${(e as Error).message}`); }
+  const front: Record<string, string> = {};
+  const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+  if (fm) { for (const line of fm[1].split(/\r?\n/)) { const m = line.match(/^(\w+):\s*(.*)$/); if (m) front[m[1].toLowerCase()] = m[2].trim().replace(/^["']|["']$/g, ''); } text = text.slice(fm[0].length); }
+  const base = file.split(/[\\/]/).pop() ?? file;
+  const title = one(p, 'title') ?? front.title ?? text.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? base.replace(/\.md$/i, '');
+  const tags = (one(p, 'tags') ?? front.tags?.replace(/^\[|\]$/g, '') ?? '').split(',').map(t => t.trim()).filter(Boolean);
+  const key = one(p, 'key') ?? `file:${base}`;
+  const doc: Record<string, unknown> = { key, title: title.slice(0, 200), markdown: text, ...(tags.length ? { tags } : {}) };
+  const category = one(p, 'category') ?? front.category; if (category) doc.category = category;
+  const folder = one(p, 'folder'); if (folder) doc.folder = folder;
+  const access = one(p, 'access'); if (access) { if (!['private', 'company'].includes(access)) usage('--access is private or company'); doc.access = access; }
+  const plan: Record<string, unknown[]> & { dryRun?: boolean; notify?: string } = { docs: [doc] };
+  for (const l of p.values.get('link') ?? []) {
+    const [kind, id, role = 'related'] = l.split(':');
+    if (!['goal', 'project', 'task'].includes(kind) || !/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(id ?? '') || !['brief', 'related'].includes(role)) usage(`--link is kind:id[:brief|related]: ${l}`, 'Example: --link project:157d0f8f-9a42-4259-aae5-c0660678aa63:brief');
+    const item = role === 'brief' ? { id, brief: key } : { id, docs: [key] };
+    const bucket = `${kind === 'goal' ? 'goals' : kind === 'project' ? 'projects' : 'tasks'}`;
+    (plan[bucket] ??= []).push(item);
+  }
+  if (p.booleans.get('dry-run')) plan.dryRun = true;
+  plan.notify = 'none';
+  const s = await session(resolveProfile(one(p, 'host'), one(p, 'org')));
+  const answer = await send(s, 'POST', '/api/v1/projects/plans', {}, plan, { 'Idempotency-Key': one(p, 'idempotency-key') ?? randomUUID() }) as { keys?: { kind: string; key: string; id: string }[]; dryRun?: boolean; counts?: Record<string, unknown> };
+  if (p.booleans.get('json')) return printJson(answer);
+  const id = answer.keys?.find(k => k.kind === 'doc' && k.key === key)?.id;
+  print(`${answer.dryRun ? 'Dry run (nothing kept): ' : ''}doc "${title}"${id ? ` ${id}` : ''}${folder ? ` in ${folder}` : ''}${(p.values.get('link') ?? []).length ? `, linked to ${(p.values.get('link') ?? []).join(', ')}` : ''}.`);
+}
+
+async function runCommand(c: Command, rest: string[]) {
+  const p = parse(rest, specFor(c.op), title(c));
+  if (p.booleans.get('help')) return print(commandHelp(c));
+  const req = buildRequest(c, p);
+  const s = await session(resolveProfile(one(p, 'host'), one(p, 'org'))), host = s.host;
+  const answer = await send(s, req.method, req.path, req.query, req.body, req.headers);
+  if (p.booleans.get('json')) return printJson(answer);
+  if (c.operationId === 'whoAmI') {
+    const me = answer as { name?: string; username?: string; roles?: string[]; app?: unknown; company?: unknown };
+    const via = s.source === 'env' ? 'PULSE_TOKEN' : s.source === 'oauth' ? 'browser sign-in' : 'stored token';
+    return print([`${me.name ?? '?'}${me.username ? ` (@${me.username})` : ''}`, human({ host, via, ...me })].join('\n\n'));
+  }
+  if (c.operationId === 'getGoalTree') return print(outline([(answer as { goal: TreeGoal }).goal]));
+  if (c.operationId === 'applyPlan') {
+    const a = answer as { dryRun: boolean; counts: Record<string, { created: number; updated: number; unchanged: number } | number>; warnings: string[]; goals: TreeGoal[]; projects: TreeProject[] };
+    const counts = Object.entries(a.counts).map(([k, v]) => typeof v === 'number' ? `${k} ${v}` : `${k} +${v.created} ~${v.updated} =${v.unchanged}`).join(', ');
+    return print([a.dryRun ? 'Dry run: this is what would happen (nothing was kept).' : 'Applied.', counts, ...a.warnings.map(w => `Note: ${w}`), '', outline(a.goals, a.projects)].join('\n'));
+  }
+  print(human(answer, c.columns));
+}
+
+function opsList(list: Command[], json: boolean) {
+  const rows = list.map(c => ({ command: title(c).slice(6), method: c.op.method, path: c.op.path, scope: c.op.scopes.join(','), operationId: c.op.operationId, summary: c.op.summary }));
+  if (json) return printJson(rows);
+  print(table(rows, ['command', 'method', 'path', 'scope', 'summary']));
+}
+
+/** AGENT-API (owner, 4 Nov 2026): `pulse auth login|logout|status`; (5 Nov 2026, "org switch"): each organisation is its
+ *  own sign-in, kept side by side even on one address, and `pulse org switch <name>` (or `orgs use`) picks the default. */
+async function authOrOrgs(argv: string[]): Promise<number | string[] | null> {
+  const [area, sub, ...rest] = argv;
+  if (area === 'auth' && (sub === 'login' || sub === 'logout')) return [sub, ...rest];
+  const json = rest.includes('--json') || sub === '--json';
+  if ((area === 'auth' && sub === 'status') || (area === 'org' && (sub === undefined || sub === 'list' || sub === '--json'))) {
+    const store = readStore();
+    const rows = Object.entries(store.hosts).map(([profile, c]) => ({ org: c.org ?? '', host: hostOf(profile), via: c.kind === 'token' ? 'token' : 'sign-in',
+      default: profile === store.defaultHost, savedAt: c.savedAt }));
+    if (process.env.PULSE_TOKEN) rows.unshift({ org: '', host: process.env.PULSE_HOST ?? '(PULSE_HOST)', via: 'PULSE_TOKEN', default: true, savedAt: '' });
+    if (json) printJson(rows); else print(rows.length ? table(rows, ['org', 'host', 'via', 'default', 'savedAt']) : 'Not signed in anywhere. Run `pulse login`.');
+    return 0;
+  }
+  if ((area === 'orgs' && (sub === 'use' || sub === 'switch')) || (area === 'org' && (sub === 'switch' || sub === 'use'))) {
+    const hostAt = rest.indexOf('--host'), hostRaw = hostAt >= 0 ? rest[hostAt + 1] : undefined;
+    const host = hostRaw ? resolveHost(hostRaw) : undefined;
+    const target = rest.filter((t, i) => !t.startsWith('-') && !(hostAt >= 0 && i === hostAt + 1)).join(' ');
+    if (!target) usage('Usage: pulse org switch <name or address>', 'Run `pulse auth status` to see the organisations you are signed in to.');
+    const picked = await withStoreLock(async () => {
+      const store = readStore();
+      const found = findProfiles(store, target, host);
+      if (found.length > 1) usage(`More than one sign-in matches ${target}`, 'Add --host <address> to say which.');
+      if (!found.length) throw new CliError(`Not signed in to ${target}`, EXIT.auth, 'Run `pulse login` (with --host for its address) while signed in to that company, then switch.');
+      store.defaultHost = found[0]; writeStore(store);
+      return { key: found[0], org: store.hosts[found[0]].org };
+    });
+    if (json) printJson({ defaultHost: hostOf(picked.key), org: picked.org ?? null });
+    else print(`Commands now go to ${picked.org ? `${picked.org} at ` : ''}${hostOf(picked.key)}.`);
+    return 0;
+  }
+  return null;
+}
+
+export async function main(argv: string[]): Promise<number> {
+  if (argv[0] === 'docs' && argv[1] === 'import') { await docsImport(argv.slice(2)); return 0; }
+  const routed = await authOrOrgs(argv);
+  if (typeof routed === 'number') return routed;
+  if (routed) argv = routed;
+  const list = commands(OPERATIONS);
+  // Find the command words; options may come first (`pulse --host … people search`).
+  const rest: string[] = [];
+  let resolved: Command | 'login' | 'logout' | 'api' | 'ops' | 'help' | 'version' | { group: string } | undefined;
+  for (let i = 0; i < argv.length; i++) {
+    const t = argv[i];
+    const done = resolved !== undefined && !(typeof resolved === 'object' && !('op' in resolved));
+    if (done || t.startsWith('-')) {
+      rest.push(t);
+      if (!done && (t === '--host' || t === '--org') && argv[i + 1] !== undefined) rest.push(argv[++i]);
+      continue;
+    }
+    if (resolved === undefined) {
+      if (['login', 'logout', 'api', 'ops', 'help', 'version'].includes(t)) { resolved = t as 'login'; continue; }
+      const top = list.find(c => !c.group && c.name === t);
+      if (top) { resolved = top; continue; }
+      if (t === 'op' || list.some(c => c.group === t)) { resolved = { group: t }; continue; }
+      usage(`Unknown command: ${t}`, 'Run `pulse --help` to see the commands.');
+    } else {
+      const group = (resolved as { group: string }).group;
+      const found = list.find(c => c.group === group && c.name === t) ?? (group === 'op' ? list.find(c => c.operationId === t) : undefined);
+      if (!found) usage(`Unknown command: pulse ${group} ${t}`, `Run \`pulse ${group} --help\` to see its commands.`);
+      resolved = found;
+    }
+  }
+  const global = () => parse(rest, GLOBAL);
+  if (resolved === undefined) {
+    const g = global();
+    if (g.booleans.get('version')) { print(VERSION); return 0; }
+    print(mainHelp(list)); return 0;
+  }
+  if (resolved === 'version') { print(VERSION); return 0; }
+  if (resolved === 'help') {
+    const target = rest.find(t => !t.startsWith('-'));
+    print(target && list.some(c => c.group === target) ? groupHelp(target, list) : mainHelp(list)); return 0;
+  }
+  if (resolved === 'login') { await login(rest); return 0; }
+  if (resolved === 'api') { await rawApi(rest); return 0; }
+  if (resolved === 'logout') {
+    const p = parse(rest, { values: new Set(['host', 'org']), booleans: new Set(['json', 'help']) }, 'pulse logout');
+    if (p.booleans.get('help')) { print('Sign out of a Pulse organisation: end the connection at Pulse and forget it here.\n\nUsage: pulse logout [--host <url>] [--org <name>]'); return 0; }
+    const profile = resolveProfile(one(p, 'host'), one(p, 'org'), process.env, readStore()), host = hostOf(profile);
+    const r = await logout(profile);
+    if (p.booleans.get('json')) printJson({ host, ...r });
+    else print(r.removed ? `Signed out of ${host}${r.revoked ? '' : ' here (Pulse could not be told; end it under Account → Connected apps)'}.` : `Not signed in to ${host}.`);
+    if (process.env.PULSE_TOKEN) err('Note: PULSE_TOKEN is still set in this shell.');
+    return 0;
+  }
+  if (resolved === 'ops') { const g = global(); if (g.booleans.get('help')) { print('List every Pulse API v1 operation and the command that calls it.\n\nUsage: pulse ops [--json]'); return 0; } opsList(list, !!g.booleans.get('json')); return 0; }
+  if (!('op' in resolved)) { global(); print(groupHelp(resolved.group, list)); return 0; }
+  await runCommand(resolved, rest);
+  return 0;
+}
+
+// Tests import main() with PULSE_CLI_NO_MAIN=1; everything else (the pulse bin, node dist/cli.js) runs it.
+if (process.env.PULSE_CLI_NO_MAIN !== '1') {
+  main(process.argv.slice(2)).then(code => { process.exitCode = code; }, (e: unknown) => {
+    if (e instanceof CliError) {
+      err(`pulse: ${e.message}`);
+      if (e.hint) err(e.hint);
+      process.exitCode = e.exitCode;
+    } else {
+      err(`pulse: unexpected error: ${(e as Error)?.stack ?? String(e)}`);
+      process.exitCode = EXIT.failed;
+    }
+  });
+}

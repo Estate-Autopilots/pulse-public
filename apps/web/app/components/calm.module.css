@@ -1,0 +1,112 @@
+/* UX-BILLING (5 Nov 2026): Work → My day's look, shared. Phone first (390 and 360 wide): one column, every control a
+   finger presses at least 44 px; the rail beside the main column from 1024 px. Theme tokens only; a stripe's colour is
+   its state's hue (--stripe-h), lighter in dark mode. */
+.calm { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding-bottom: 32px; color: var(--theme-text); }
+.calm *, .calm *::before, .calm *::after { box-sizing: border-box; }
+
+/* The stripe colour, in light and dark */
+.picks li, .row, .stat { --stripe: hsl(var(--stripe-h, 214) var(--stripe-s, 70%) 44%); }
+:global(:root[data-theme="dark"]) .picks li, :global(:root[data-theme="dark"]) .row { --stripe: hsl(var(--stripe-h, 214) var(--stripe-s, 70%) 64%); }
+
+/* ---------- Stat tiles ---------- */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; min-width: 0; }
+.stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 10px 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface);
+  color: var(--theme-text); text-decoration: none; }
+a.stat { min-height: 44px; transition: border-color 120ms ease; }
+a.stat:hover { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); }
+.statLabel { overflow: hidden; color: var(--theme-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.statValue { overflow: hidden; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+.statSub { overflow: hidden; color: var(--theme-text-muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+.stat[data-tone="bad"] .statValue { color: var(--theme-danger); }
+.stat[data-tone="good"] .statValue { color: var(--theme-success); }
+.stat[data-tone="warn"] .statValue { color: var(--theme-warning-text, var(--theme-warning)); }
+@media (max-width: 899.98px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- The main column and the rail ---------- */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; min-width: 0; }
+.main, .rail { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+@media (min-width: 1024px) {
+  .grid[data-rail] { grid-template-columns: minmax(0, 1fr) 340px; column-gap: 20px; }
+  .grid[data-rail="wide"] { grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr); }
+  .rail { position: sticky; top: 8px; }
+}
+
+/* ---------- Cards and their headings ---------- */
+.card { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 12px; border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); }
+.card[data-flat] { padding: 10px 6px 6px; }
+.card[data-flat] > .head { padding: 0 8px; }
+.head { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 28px; margin: 0; padding: 0 2px; color: var(--theme-text); font-size: 14px; font-weight: 650; }
+.head > svg { flex: none; color: var(--theme-text-muted); }
+.head[data-tone="danger"], .head[data-tone="danger"] > svg { color: var(--theme-danger); }
+.headTitle { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.headCount { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 12px; font-weight: 600;
+  display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+.headHint { margin-left: auto; overflow: hidden; color: var(--theme-text-muted); font-size: 12px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.headAction { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 550; }
+.headHint + .headAction { margin-left: 8px; }
+.headAction a { display: inline-flex; align-items: center; min-height: 44px; color: var(--theme-action); text-decoration: none; }
+@media (min-width: 1024px) and (pointer: fine) { .headAction a { min-height: 32px; } }
+
+/* ---------- Start with ---------- */
+.picks { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.picks li { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 10px; }
+.pickNo { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1.5px var(--stripe);
+  color: var(--stripe); font-size: 13px; font-weight: 700; }
+.pickOpen { all: unset; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 2px; min-width: 0; min-height: 48px; border-radius: 8px; color: var(--theme-text); cursor: pointer; }
+.pickOpen b { display: -webkit-box; overflow: hidden; font-size: 15px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.pickOpen small { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; color: var(--theme-text-muted); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap; }
+.pickOpen small svg { flex: none; color: var(--stripe); }
+@media (hover: hover) { .pickOpen:hover b { color: var(--theme-action); } }
+
+/* ---------- Stripe rows ---------- */
+.rows { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; min-width: 0; }
+.row { position: relative; display: flex; align-items: center; gap: 4px; min-width: 0; border-radius: 12px; }
+.row::before { content: ""; position: absolute; top: 10px; bottom: 10px; left: 0; width: 3px; border-radius: 2px; background: var(--stripe); }
+.row + .row { border-top: 1px solid var(--theme-border); border-top-left-radius: 0; border-top-right-radius: 0; }
+.rows[data-cards] { gap: 8px; }
+.rows[data-cards] .row { border: 1px solid var(--theme-border); background: var(--theme-surface); }
+.rows[data-cards] .row + .row { border-radius: 12px; }
+.row[data-current] { background: var(--theme-surface-subtle); }
+.rowOpen { all: unset; box-sizing: border-box; display: flex; flex: 1 1 auto; align-items: center; gap: 10px; min-width: 0; min-height: 56px; padding: 6px 8px 6px 14px; border-radius: 10px; color: var(--theme-text); cursor: pointer; }
+div.rowOpen { cursor: default; }
+@media (hover: hover) { a.rowOpen:hover, button.rowOpen:hover { background: var(--theme-surface-subtle); } }
+.rowLead { flex: none; display: grid; place-items: center; color: var(--theme-text-muted); }
+.rowMain { display: flex; flex: 1 1 auto; flex-direction: column; gap: 3px; min-width: 0; }
+.rowMain b { display: -webkit-box; overflow: hidden; font-size: 14.5px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.rowMain small { overflow: hidden; color: var(--theme-text-muted); font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap; }
+.rowEnd { display: flex; flex: none; flex-direction: column; align-items: flex-end; gap: 4px; max-width: 48%; }
+.rowEnd > b { font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rowControls { flex: none; display: inline-flex; align-items: center; gap: 6px; padding-right: 6px; }
+
+/* ---------- Empty, notice, facts ---------- */
+.empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 28px 16px; border: 1px dashed var(--theme-border-strong, var(--theme-border)); border-radius: 16px;
+  color: var(--theme-text-muted); font-size: 13.5px; line-height: 1.5; text-align: center; }
+.empty b { color: var(--theme-text); font-size: 16px; font-weight: 650; }
+.empty p { max-width: 46ch; margin: 0; }
+.emptyIcon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); color: var(--theme-action); }
+.emptyAction { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
+.calmNote { margin: 0; padding: 4px 2px 6px; color: var(--theme-text-muted); font-size: 13px; line-height: 1.5; }
+.notice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--tone, var(--theme-action)) 32%, var(--theme-border));
+  border-radius: 12px; background: color-mix(in srgb, var(--tone, var(--theme-action)) 7%, var(--theme-surface)); color: var(--theme-text); font-size: 13px; line-height: 1.5; }
+.notice p { flex: 1 1 240px; min-width: 0; margin: 0; }
+.notice[data-tone="warning"] { --tone: var(--theme-warning); }
+.notice[data-tone="danger"] { --tone: var(--theme-danger); }
+.notice[data-tone="success"] { --tone: var(--theme-success); }
+.noticeAction { flex: none; display: inline-flex; gap: 8px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px 14px; margin: 0; }
+.facts div { display: grid; gap: 2px; min-width: 0; }
+.facts dt { color: var(--theme-text-muted); font-size: 12px; }
+.facts dd { overflow: hidden; margin: 0; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+.facts [data-tone="bad"] dd { color: var(--theme-danger); }
+.facts [data-tone="good"] dd { color: var(--theme-success); }
+
+/* ---------- Keyboard focus ---------- */
+a.stat:focus-visible, .pickOpen:focus-visible, .rowOpen:focus-visible, .headAction a:focus-visible { outline: 2px solid var(--theme-focus, var(--theme-action)); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) { a.stat { transition: none; } }
+@media (max-width: 380px) { .rowEnd { max-width: 44%; } .rowOpen { gap: 8px; padding-left: 12px; } }
+
+/* A kit LineList inside a flat card: the card is the surface (no box in a box); a row that needs something carries the
+   warning stripe, as My day's cards do. */
+.card[data-flat] > [role="list"] { border: 0; border-radius: 0; background: transparent; }
+.card [role="list"] > [data-tone="needed"] { box-shadow: inset 3px 0 0 var(--theme-warning); }
