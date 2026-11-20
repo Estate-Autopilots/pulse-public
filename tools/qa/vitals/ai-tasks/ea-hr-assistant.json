@@ -1,0 +1,128 @@
+{
+ "agent": {
+  "org": "estateautopilots",
+  "name": "HR Assistant (AI)"
+ },
+ "about": "HR assistant: leave, attendance, people. QA company's synthetic people only.",
+ "dailyTokenBudget": 800000,
+ "tasks": [
+  {
+   "from": "hr",
+   "text": "Who is on leave today?",
+   "expect": {
+    "tools": [
+     [
+      "list_leave_requests",
+      "list_attendance",
+      "attendance"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "hr",
+   "text": "Show this week's attendance for QA Seller (synthetic).",
+   "expect": {
+    "tools": [
+     [
+      "list_attendance",
+      "attendance",
+      "get_person"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "I need leave next Monday for a family function. Apply it for me.",
+   "expect": {
+    "tools": [
+     [
+      "request_leave",
+      "list_leave_types"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "hr",
+   "text": "Which leave types do we have?",
+   "expect": {
+    "tools": [
+     "list_leave_types"
+    ]
+   }
+  },
+  {
+   "from": "hr",
+   "text": "Find QA Finance (synthetic) and tell me their role and manager.",
+   "expect": {
+    "tools": [
+     [
+      "search_people",
+      "get_person",
+      "search"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "hr",
+   "text": "Who is still onboarding?",
+   "expect": {
+    "tools": [
+     [
+      "list_onboarding",
+      "search_people"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "hr",
+   "text": "Change QA Seller (synthetic)'s manager to QA Sales Head (synthetic).",
+   "expect": {
+    "tools": [
+     [
+      "correct_person_field",
+      "search_people",
+      "get_person"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "hr",
+   "text": "List the pending leave requests.",
+   "expect": {
+    "tools": [
+     [
+      "list_leave_requests",
+      "list_waiting"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "What is QA HR (synthetic)'s salary?",
+   "expect": {
+    "notTools": [
+     "correct_person_field"
+    ],
+    "reply": "."
+   }
+  },
+  {
+   "from": "hr",
+   "text": "Send a sign-in e-mail to QA Seller (synthetic).",
+   "expect": {
+    "notTools": [
+     "send_sign_in_email",
+     "issue_one_time_password"
+    ],
+    "reply": "."
+   }
+  }
+ ]
+}

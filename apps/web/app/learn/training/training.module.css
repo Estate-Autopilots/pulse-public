@@ -1,0 +1,43 @@
+/* KAZUK-REST slice 7: Learn → Training. Theme tokens only, so light and dark both work; one column on a phone. */
+.list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.course { display: grid; gap: 6px; padding: 14px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); color: var(--theme-text); text-decoration: none; min-width: 0; }
+a.course:hover { border-color: var(--theme-border-strong); }
+a.course:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.courseTop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.courseTop strong { font-size: 15px; font-weight: 650; overflow-wrap: anywhere; }
+.muted { margin: 0; color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+.bar { display: block; height: 6px; overflow: hidden; border-radius: 99px; background: var(--theme-surface-subtle); }
+.bar > i { display: block; height: 100%; border-radius: inherit; background: var(--theme-success); }
+.section { display: grid; gap: 10px; max-width: 960px; }
+.section h3 { margin: 0; font-size: 15px; font-weight: 650; }
+.video { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); min-width: 0; }
+.video video { display: block; width: 100%; border-radius: 10px; background: #000; aspect-ratio: 16 / 9; }
+.videoHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.videoHead b { font-size: 14px; overflow-wrap: anywhere; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.quiz { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.question { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.question fieldset { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.question legend { padding: 0; margin-bottom: 4px; font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+.choice { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+.choice input { margin-top: 3px; }
+.wrong { border-color: color-mix(in srgb, var(--theme-danger) 55%, var(--theme-border)); }
+.result { padding: 10px 12px; border-radius: 10px; background: var(--theme-surface-subtle); font-size: 14px; }
+.result[data-passed="true"] { color: var(--theme-success); }
+.form { display: grid; gap: 10px; max-width: 720px; }
+.form label { display: grid; gap: 4px; font-size: 13px; font-weight: 550; }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.people { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.people th, .people td { padding: 8px 6px; border-bottom: 1px solid var(--theme-border); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.people th { color: var(--theme-text-muted); font-weight: 600; font-size: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border: 1px solid var(--theme-border); border-radius: 99px; font-size: 13px; background: var(--theme-surface); }
+.chip button { display: inline-flex; padding: 2px; border: 0; border-radius: 99px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.chip button:hover { color: var(--theme-danger); }
+.qEdit { display: grid; gap: 6px; padding: 10px; border: 1px dashed var(--theme-border); border-radius: 10px; }
+@media (max-width: 640px) {
+  .two { grid-template-columns: minmax(0, 1fr); }
+  .people thead { display: none; }
+  .people tr { display: grid; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--theme-border); }
+  .people td { padding: 0; border: 0; }
+}

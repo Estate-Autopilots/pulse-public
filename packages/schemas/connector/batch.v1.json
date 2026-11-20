@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pulse.estateautopilots.com/schemas/connector.v1/batch.json",
+  "title": "A signed batch from a company plugin (connector.v1, R52)",
+  "description": "POST /v1/connectors/batches on the ingest service, signed with the plugin's Ed25519 key (X-Pulse-Connector, X-Pulse-Timestamp, X-Pulse-Nonce, X-Pulse-Signature, the device-batch message format with the install id). The company is the one that installed the plugin; nothing here can name it. `source` is a root the company admin selected and approved; `batch` is the plugin's id for this batch (a replayed batch id is answered from the record and changes nothing); `cursor.from` must be the checkpoint Pulse holds for the root (null for the first batch), `cursor.to` becomes the new one. Each record's `key` is its idempotency key (one record per key per root, ever); Pulse builds the event itself (id, company, source, subject, purpose) from the registry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "manifestVersion", "source", "batch", "cursor", "records"],
+  "properties": {
+    "contract": { "const": "connector.v1" },
+    "manifestVersion": { "type": "string", "pattern": "^[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}$" },
+    "source": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,160}$" },
+    "batch": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,80}$" },
+    "cursor": {
+      "type": "object", "additionalProperties": false, "required": ["from", "to"],
+      "properties": {
+        "from": { "type": ["string", "null"], "minLength": 1, "maxLength": 500 },
+        "to": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "records": {
+      "type": "array", "maxItems": 500,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["key", "type", "schema", "time", "item", "data", "provenance"],
+        "properties": {
+          "key": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "type": { "type": "string", "pattern": "^[a-z][a-z0-9_.]{2,79}$" },
+          "schema": { "type": "integer", "minimum": 1, "maximum": 99 },
+          "time": { "type": "string", "format": "date-time" },
+          "item": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,160}$" },
+          "data": { "type": "object" },
+          "provenance": {
+            "type": "object", "additionalProperties": false, "required": ["system", "ref", "observedAt"],
+            "properties": {
+              "system": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,39}$" },
+              "ref": { "type": "string", "minLength": 1, "maxLength": 200 },
+              "observedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+[Unit]
+Description=QA-2: the QA bug ledger and the morning top 10 (from last night's Vitals QA)
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -I /home/eadev/work/pulse/strike/tools/qa/vitals/qa-ledger.py
+TimeoutStartSec=5min

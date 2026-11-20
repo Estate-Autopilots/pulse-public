@@ -1,0 +1,8 @@
+[Unit]
+Description=QA-2: Vitals production monitor (QA company, read only; browser on nivi; ea-notify on red)
+[Service]
+Type=oneshot
+Environment=PATH=/home/eadev/.local/opt/node/bin:/home/eadev/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 -I /home/eadev/work/pulse/strike/tools/qa/vitals/prod-monitor.py
+Nice=10
+TimeoutStartSec=12min

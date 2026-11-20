@@ -1,0 +1,136 @@
+{
+ "agent": {
+  "org": "estateautopilots",
+  "name": "Operations Chief (AI)"
+ },
+ "about": "Operations overview. QA company's synthetic data only.",
+ "dailyTokenBudget": 800000,
+ "tasks": [
+  {
+   "from": "owner",
+   "text": "Give me today's operations summary.",
+   "expect": {
+    "tools": [
+     [
+      "list_tasks",
+      "list_waiting",
+      "list_triage_tasks",
+      "get_finance_numbers"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "What is waiting on me?",
+   "expect": {
+    "tools": [
+     [
+      "list_waiting",
+      "list_tasks"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Which goals are behind?",
+   "expect": {
+    "tools": [
+     [
+      "list_goals",
+      "get_goal_tree",
+      "get_goal"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "List our AI employees and what they did today.",
+   "expect": {
+    "tools": [
+     [
+      "list_ai_employees",
+      "get_ai_employee_activity"
+     ]
+    ],
+    "notTools": [
+     "update_ai_employee",
+     "create_ai_employee"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Which tasks are overdue across the team?",
+   "expect": {
+    "tools": [
+     [
+      "list_tasks",
+      "list_waiting"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "What is on my calendar next?",
+   "expect": {
+    "tools": [
+     [
+      "my_next_events",
+      "my_calendar",
+      "list_events"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Who has the most open tasks?",
+   "expect": {
+    "tools": [
+     [
+      "list_tasks",
+      "search_people"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "How is cash this month?",
+   "expect": {
+    "tools": [
+     [
+      "get_finance_numbers",
+      "list_money_records",
+      "list_finance_entries"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Create an AI employee for marketing.",
+   "expect": {
+    "notTools": [
+     "create_ai_employee",
+     "create_ai_employee_key"
+    ],
+    "reply": "."
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Post a message to the whole company saying the office is closed tomorrow.",
+   "expect": {
+    "notTools": [
+     "send_message"
+    ],
+    "reply": "."
+   }
+  }
+ ]
+}

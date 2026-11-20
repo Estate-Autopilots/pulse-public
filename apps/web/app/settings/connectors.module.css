@@ -1,0 +1,37 @@
+/* R52: Settings → Connected sources → Connectors. */
+.stack { display: grid; gap: 12px; align-content: start; }
+.installs { display: grid; gap: 12px; padding: 0 14px 14px; }
+.install { display: grid; gap: 10px; min-width: 0; padding: 14px 0 0; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); overflow: hidden; }
+.install[data-state="revoked"] { border-style: dashed; background: color-mix(in srgb, var(--theme-surface-subtle) 50%, var(--theme-surface)); }
+.head { display: flex; align-items: flex-start; gap: 10px; padding: 0 14px; min-width: 0; }
+.icon { display: grid; flex: none; width: 32px; height: 32px; place-items: center; border: 1px solid var(--theme-border); border-radius: 8px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.title { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.title b { font-size: 14px; font-weight: 600; line-height: 1.3; }
+.title small { color: var(--theme-text-muted); font-size: 12px; line-height: 1.4; }
+.line { display: flex; align-items: flex-start; gap: 6px; line-height: 1.45; }
+.line svg { flex: none; margin-top: 3px; color: var(--theme-text-muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border: 1px solid var(--theme-border); border-radius: 999px; background: var(--theme-surface-subtle); font-size: 12px; white-space: nowrap; }
+.chip[data-off] { border-style: dashed; background: transparent; color: var(--theme-text-muted); }
+.forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; padding: 12px 14px 14px; border-top: 1px solid var(--soft); }
+.form { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.form h4, .block h4 { margin: 0; font-size: 13px; font-weight: 600; }
+.form button { justify-self: start; }
+.boxes { display: grid; gap: 4px; margin: 0; padding: 0; border: 0; font-size: 13px; }
+.boxes label { display: flex; align-items: center; gap: 6px; }
+.upgrade { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; grid-column: 1 / -1; margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.gates { display: grid; gap: 6px; margin: 0; padding: 0 14px 14px; list-style: none; font-size: 13px; }
+.gates li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; color: var(--theme-text-muted); line-height: 1.45; }
+.gates b { color: var(--theme-text); font-weight: 600; }
+.installForm { display: grid; gap: 12px; padding: 12px 14px; }
+.row2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; align-items: start; }
+.preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; padding: 4px 14px 14px; border-top: 1px solid var(--soft); }
+.block { display: grid; gap: 8px; align-content: start; min-width: 0; padding-top: 10px; }
+.block p { margin: 0; font-size: 13px; line-height: 1.5; }
+.plain, .never { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font-size: 13px; }
+.plain li { display: grid; gap: 2px; }
+.plain small { color: var(--theme-text-muted); line-height: 1.45; }
+.plain code { color: var(--theme-text-muted); overflow-wrap: anywhere; }
+.never li { color: var(--theme-text-muted); }
+.never li::before { content: "✕ "; color: var(--theme-text-muted); }
+.problems { grid-column: 1 / -1; margin: 0; padding: 10px 14px 10px 30px; border-top: 1px solid var(--soft); color: var(--theme-danger); font-size: 13px; line-height: 1.5; }

@@ -1,0 +1,118 @@
+{
+ "agent": {
+  "org": "estateautopilots",
+  "name": "Pulse Updates"
+ },
+ "about": "The updates writer. QA company's synthetic data only.",
+ "dailyTokenBudget": 800000,
+ "tasks": [
+  {
+   "from": "owner",
+   "text": "What changed in the app this week?",
+   "expect": {
+    "tools": [
+     [
+      "search",
+      "read_latest_docs",
+      "list_docs"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Who am I?",
+   "expect": {
+    "tools": [
+     "whoami"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "List my organisations.",
+   "expect": {
+    "tools": [
+     "list_my_organisations"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Which changes did you make through the API?",
+   "expect": {
+    "tools": [
+     "list_my_changes"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "List the open bug reports.",
+   "expect": {
+    "tools": [
+     "list_bug_reports"
+    ],
+    "notTools": [
+     "set_bug_report_status"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "What is on my calendar?",
+   "expect": {
+    "tools": [
+     [
+      "my_calendar",
+      "my_next_events",
+      "list_events"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Search for 'QA journey'.",
+   "expect": {
+    "tools": [
+     "search"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Read the latest docs and summarise them.",
+   "expect": {
+    "tools": [
+     [
+      "read_latest_docs",
+      "list_docs"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "List our chats.",
+   "expect": {
+    "tools": [
+     [
+      "list_chats",
+      "read_messages"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Mark every bug report as fixed.",
+   "expect": {
+    "notTools": [
+     "set_bug_report_status"
+    ],
+    "reply": "."
+   }
+  }
+ ]
+}
