@@ -1,0 +1,220 @@
+/* A single visual owner. Academy/platform appearance supplies semantic theme tokens. */
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 18px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--theme-transition-duration, 140ms) ease,
+    border-color var(--theme-transition-duration, 140ms) ease,
+    transform var(--theme-transition-duration, 140ms) ease;
+}
+.primary {
+  background: var(--theme-action);
+  color: var(--theme-action-text);
+}
+.primary:hover:not(:disabled) {
+  background: var(--theme-action-hover);
+}
+.secondary {
+  background: var(--theme-surface);
+  color: var(--theme-text);
+  border-color: var(--theme-border);
+}
+.secondary:hover:not(:disabled) {
+  background: var(--theme-surface-subtle);
+  border-color: var(--theme-border-strong);
+}
+.quiet,
+.icon {
+  color: var(--theme-text-muted);
+  background: transparent;
+}
+.quiet:hover:not(:disabled),
+.icon:hover:not(:disabled) {
+  background: var(--theme-surface-subtle);
+  color: var(--theme-text);
+}
+.icon {
+  width: 44px;
+  flex: 0 0 44px;
+  padding: 10px;
+}
+.action:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.action:disabled {
+  background: var(--theme-disabled-surface);
+  color: var(--theme-disabled-text);
+  border-color: transparent;
+  cursor: default;
+}
+.action:focus-visible,
+.choice:has(input:focus-visible) {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: 3px;
+}
+.action svg {
+  flex-shrink: 0;
+}
+.choice {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 14px 16px;
+  border: 1px solid var(--theme-border);
+  border-radius: 14px;
+  color: var(--theme-text);
+  background: var(--theme-surface);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition:
+    border-color var(--theme-transition-duration, 140ms) ease,
+    background-color var(--theme-transition-duration, 140ms) ease;
+}
+.choice input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.choiceMarker {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.choiceText {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.choiceCheck {
+  width: 18px;
+  font-size: 1rem;
+  color: var(--theme-action);
+}
+.choice:hover:not(:has(input:disabled)) {
+  border-color: var(--theme-border-strong);
+  background: var(--theme-surface-subtle);
+}
+.choice[data-selected="true"] {
+  border-color: var(--theme-action);
+  box-shadow: inset 0 0 0 1px var(--theme-action);
+  background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface));
+}
+.choice[data-selected="true"] .choiceMarker {
+  background: var(--theme-action);
+  color: var(--theme-action-text);
+  border-color: transparent;
+}
+.choice:has(input:disabled) {
+  cursor: default;
+}
+.session {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  color: var(--theme-text);
+  background: var(--theme-canvas);
+  font-family: var(--font-sans), sans-serif;
+  overflow: hidden;
+}
+.sessionHeader {
+  padding: max(12px, env(safe-area-inset-top))
+    max(24px, env(safe-area-inset-right)) 12px
+    max(24px, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--theme-border);
+  background: var(--theme-surface);
+}
+.sessionContent,
+.step {
+  min-height: 0;
+}
+.sessionContent > :not(.step) {
+  max-height: 100%;
+  overflow-y: auto;
+}
+.step {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
+}
+.stepBody {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding: clamp(20px, 4vh, 40px) max(24px, env(safe-area-inset-right)) 20px
+    max(24px, env(safe-area-inset-left));
+  scrollbar-gutter: stable both-edges;
+}
+.stepBody > * {
+  width: min(100%, 680px);
+  margin-inline: auto;
+}
+.stepFooter {
+  display: grid;
+  justify-items: center;
+  border-top: 1px solid var(--theme-border);
+  background: var(--theme-surface);
+  padding: 14px max(24px, env(safe-area-inset-right))
+    max(14px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+}
+.stepFooter > * {
+  width: min(100%, 680px);
+  margin-inline: auto;
+}
+@media (max-width: 600px) {
+  .sessionHeader {
+    padding-inline: max(16px, env(safe-area-inset-left))
+      max(16px, env(safe-area-inset-right));
+  }
+  .stepBody {
+    padding: 20px max(16px, env(safe-area-inset-right)) 16px
+      max(16px, env(safe-area-inset-left));
+    scrollbar-gutter: auto;
+  }
+  .stepFooter {
+    padding: 12px max(16px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+  }
+  .choice {
+    padding: 12px;
+    gap: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .action,
+  .choice {
+    transition: none;
+  }
+  .action:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+:global(html[data-reduced-motion="true"]) .action:active:not(:disabled),
+:global(html[data-motion="reduced"]) .action:active:not(:disabled) {
+  transform: none;
+}

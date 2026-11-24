@@ -1,0 +1,232 @@
+import "@pulse/design-system/tokens.css";
+import { isPractice, practiceWord, switcherOrder } from "./lib/companies.mjs";
+import "@pulse/design-system/scale.css";
+import { AppDs } from "./ds-provider";
+import "@pulse/ui-shell/styles.css";
+import "./globals.css";
+import "./round11.css";
+import "@pulse/companion/pip.css";
+import "@pulse/companion/panel.css";
+import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
+import { Suspense, type ReactNode } from "react";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { PulseShell, pathSwitchedOff } from "@pulse/ui-shell";
+import { portalApi } from "./portal/api";
+import { ClientLogin,ClientSignOut } from "./portal/login-form";
+import portalCss from "./portal/portal.module.css";
+import { LoginForm } from "./login/form";
+import { InsightsMenuItem, IntelligenceRail } from "./intelligence/rail";
+import { AppFeel } from "./fit";
+import { DataPulse } from "./data-pulse";
+import { BrowserPings } from "./browser-pings";
+import { CallHost } from "./calls/call-host";
+import { InboxBell } from "./inbox-bell";
+import { ReviewChip } from "./tasks/review-chip";
+import { PipIsland } from "./notify/island";
+import { UndoHereLayer } from "./kit/undo-here";
+import { CreateHost } from "./create";
+import { PresencePoller } from "./presence";
+import { CheckinChip } from "./checkin-chip";
+import { CommandPalette } from "./search/palette";
+import { KeyboardWatch } from "./keyboard";
+import { ShellBridge } from "./shell-bridge";
+import { Spotlight } from "./destinations/go";
+import { TaskCompanion } from "./tasks/companion";
+import { ChatDock } from "./chats/dock";
+import { ScreenHost, PolicyAcceptHost } from "./startup-hosts";
+import { shellFromUserAgent } from "./lib/native-shell";
+import { CF_ACCESS_EMAIL_HEADER, resolveAccountIdentity } from "./lib/account-identity";
+import { api, getMe, type Me } from "./lib/api";
+import { TwoStepGuide } from "./two-step-guide";
+import { accentCss, orgLogo } from "./lib/brand";
+import { readBrand } from "./lib/brand-server";
+import { OrgCodeProvider } from "./org-code";
+import { FALLBACK_ZONE } from "./lib/zone.mjs";
+import { hiddenRedirect, underBase } from "./lib/screens.mjs";
+import { navFor, roleLabelFor } from "./lib/nav";
+import { PlatformNotices } from "./platform-notices";
+import { NewDotsHost } from "./new-dots-host";
+import { BadgeArrival } from "./badge-arrival";
+import { HiddenGate } from "./hidden/gate";
+import { hostMode, requestHost } from "./lib/host-mode.mjs";
+import { platformBrand } from "./lib/host-families.mjs";
+import { getBranding } from "./lib/branding";
+import { organizationDisplayName } from "./lib/branding-name";
+import { newestUpdate } from "./updates/data";
+import { drawsCalmHome } from "./home/focus";
+import { OrgSwitcher, OrgsMenuItem } from "./orgs/switcher";
+import { TabBoot } from "./orgs/tab-boot";
+import { BootStart } from "./boot-start";
+import { EarlyClicks } from "./early-clicks";
+import { shellBootKeys } from "./lib/boot.mjs";
+import { TabChip, TabCompany } from "./orgs/tab-company";
+import { renderedOrg } from "./lib/tab-org.mjs";
+import { accessLabel } from "./orgs/labels";
+import { EmailGuard } from "./email-guard";
+import { TelemetryHost } from "./telemetry-host";
+import { ScreenCache } from "./screen-cache";
+// MAILBOX: "connect your mailbox" when this company cannot e-mail yet (admins and HR).
+import { MailboxNotice } from "./mailbox-notice";
+import { TelemetryNotice } from "./telemetry-notice";
+import { LearnMenuItem } from "./learn/how-do-i";
+import { telemetryRelease } from "./lib/telemetry-release";
+import { BugReportHost } from "./bug-report/reporter";
+import { ReportBugMenuItem } from "./bug-report/menu-item";
+import { GetAppMenuItem } from "./apps/get/menu-item";
+
+// RELEASE-5: Inter is preloaded with a size-matched fallback (next/font), so a first visit no longer re-wraps text when
+// the font arrives after the first paint (UX-5A's layout-shift gate measured up to 0.17 on phones). The stacks read
+// --font-inter (design-system tokens, the shell, the companion panel).
+const inter = localFont({ src: "./fonts/InterVariable.woff2", weight: "100 900", display: "swap", variable: "--font-inter", adjustFontFallback: "Arial" });
+
+// UX-TENANT: the title names the company whose address this is; on the install's own addresses, the signed-in
+// organisation or the install's name (EST-655), and plain "Pulse" for a bare install.
+export async function generateMetadata(): Promise<Metadata> {
+  if ((await headers()).get('x-pulse-path') === '/developers') return { title: 'Pulse Developers · API v1' };
+  const host = requestHost(await headers());
+  // LOGIN-OTP / LOGIN-VITALS: the platform's own addresses (every listed family: app., staging., dev.vitalsos.ai) are
+  // "Vitals OS", with its icon in the tab, never the install company's name or Pulse's icon.
+  const vitals = platformBrand(host);
+  const platform = !!vitals;
+  const own = (await hostMode(host)).name;
+  const signedIn = organizationDisplayName((await getMe()).data?.orgName);
+  const name = signedIn ?? (platform ? null : organizationDisplayName(own) ?? organizationDisplayName((await getBranding()).name));
+  // PULSE-APPS (owner, 6 Nov 2026): Add to Home Screen on an iPhone installs "Vitals OS", full screen, with its launch image.
+  const appleWebApp = { capable: true, title: "Vitals OS", statusBarStyle: "default" as const, startupImage: [{ url: "/splash/vitals-os-1290x2796.png", media: "(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" }, { url: "/splash/vitals-os-1179x2556.png", media: "(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" }, { url: "/splash/vitals-os-1170x2532.png", media: "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" }, { url: "/splash/vitals-os-1284x2778.png", media: "(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" }, { url: "/splash/vitals-os-1125x2436.png", media: "(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" }, { url: "/splash/vitals-os-828x1792.png", media: "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" }, { url: "/splash/vitals-os-750x1334.png", media: "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" }, { url: "/splash/vitals-os-1320x2868.png", media: "(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" }, { url: "/splash/vitals-os-1206x2622.png", media: "(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" }] };
+  const product = vitals?.product ?? "Pulse";
+  return {
+    appleWebApp,
+    title: name ? `${product} · ${name}` : product,
+    description: name ? `Deliveries, projects and people at ${name}, with the evidence behind each number.` : "Deliveries, projects and people, with the evidence behind each number.",
+    // Next leaves its file icons (icon.svg, apple-icon.png: Pulse's) out when a page names its own; /favicon.ico is
+    // rewritten to the same icon on these hosts (proxy.ts).
+    ...(vitals ? { icons: { icon: [{ url: vitals.icon, sizes: "192x192", type: "image/png" }], apple: [{ url: vitals.apple, sizes: "180x180", type: "image/png" }] } } : {}),
+  };
+}
+
+// Phones: draw under the status and navigation bars; the frame pads itself with the safe areas.
+// E2E-4P: an on-screen keyboard shrinks the page (Android Chrome), so composers and sheets stay above it (keyboard.tsx).
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", interactiveWidget: "resizes-content",
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f6f6fa" }, { media: "(prefers-color-scheme: dark)", color: "#121219" }] };
+
+/** Public install pages and the client portal work without a staff sign-in. */
+const OPEN = /^\/(apps|portal|accept|offer|developers)(\/|$)/;
+
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const path=(await headers()).get('x-pulse-path')??'';
+  // Public reference never loads company/session data or the authenticated shell's background requests.
+  if (path === '/developers') return <html lang="en" className={inter.variable}><body>{children}</body></html>;
+  // The Pulse phone app adds "PulseShell/<version>" to its user agent: phone-app styles render from the first paint.
+  const shellPlatform=shellFromUserAgent((await headers()).get('user-agent'))??undefined;
+  // ERP-INVOICE: a client's acceptance link is signed out and outside the staff shell; COMP-A: so is a person's offer link.
+  // PULSE-ID: Sign in with Pulse's consent screen and sign-up stand alone like the sign-in page.
+  const authPage=path.startsWith('/login')||path.startsWith('/oauth/')||path==='/signup'||path==='/start'||path==='/join'||path==='/team-setup'||path==='/invited'||path.startsWith('/accept/')||path.startsWith('/offer/')||['/portal/login','/portal/set-password','/portal/confirm-email'].includes(path);
+  // UX-TENANT: a company's own address signs in with Pulse passwords and wears its accent from the sign-in page on.
+  const mode = await hostMode(requestHost(await headers()));
+  const publicLogin = mode.signIn === "password";
+  // LOGIN-VITALS: the platform's own addresses wear Vitals OS in the shell too (top bar, the rail's tile without a company).
+  const vitals = platformBrand(requestHost(await headers()));
+  const product = vitals ? { name: vitals.product, icon: vitals.icon } : undefined;
+  const brand = await readBrand();
+  const accent = accentCss(brand?.accent);
+  // FLOAT-2: every page carries the e-mail guard (email-guard.tsx) with the accent, before React starts.
+  const accentStyle = <><EmailGuard />{accent ? <style dangerouslySetInnerHTML={{ __html: accent }} /> : null}</>;
+  if(authPage)return <html suppressHydrationWarning lang="en" className={inter.variable} data-shell={shellPlatform}><body>{accentStyle}<TabBoot org={null} /><PulseShell product={product} identity={null}>{children}</PulseShell><KeyboardWatch/>{/* BUG-REPORT: Ctrl+B and a shake report a bug signed out too. LOGIN-VITALS: the sign-in page itself has no corner
+  button: its "Trouble signing in?" list carries Report a problem. */}<BugReportHost release={telemetryRelease()} signedOut trigger={path!=='/login'}/></body></html>;
+  if((await cookies()).has('pulse_client_session')){
+    const client=await portalApi<{name:string;mustChange:boolean}>('/me');
+    return <html lang="en" className={inter.variable}><body><div className={portalCss.clientFrame}><header className={portalCss.clientBrand}><strong>Pulse · Client collaboration</strong><a href="/portal/account">Account / Security</a><span>{client.data?.name}<ClientSignOut/></span></header><main>{client.data?.mustChange?<ClientLogin change/>:client.data?children:<ClientLogin/>}</main></div></body></html>;
+  }
+  const requestHeaders = await headers();
+  const fromEmail = publicLogin ? null : resolveAccountIdentity(requestHeaders.get(CF_ACCESS_EMAIL_HEADER), process.env.NODE_ENV ?? "production");
+  // The person's record in Pulse names them and carries their photo; the e-mail is only how they signed in.
+  const read = (fromEmail && !fromEmail.isFixture) || (await cookies()).has("pulse_session") || publicLogin ? await getMe() : undefined;
+  const me = read?.data;
+  // LAYOUT-SWEEP: the organisation's own logo (Settings → Organisation) heads the rail and the phone's page list.
+  const org = me ? orgLogo(brand) : null;
+  const accountant = me?.role === 'accountant';
+  // ERP-INVOICE: the Accountant also reads ERP (invoices, catalog, exports), never writes.
+  // CA-ACCESS: and /join, so a CA who serves many companies accepts the next one's link while signed in.
+  if (accountant && !path.startsWith('/finance/desk') && !path.startsWith('/erp') && !path.startsWith('/account') && !path.startsWith('/login') && !path.startsWith('/join')) redirect('/finance/desk');
+  // ONBOARD-GATE (1195): after the password change, a profile with something missing opens only "Set up your profile"
+  // (/welcome), on a bare page; the API refuses everything else with profile_incomplete. Help stays reachable.
+  if (me?.profileGate?.blocked && !me.mustChange && me.person && !accountant) {
+    if (path !== '/welcome' && !OPEN.test(path) && !path.startsWith('/learn')) redirect('/welcome');
+    return <html suppressHydrationWarning lang="en" className={inter.variable} data-shell={shellPlatform}><body data-viewer={me.person}>{accentStyle}<TabBoot org={renderedOrg(me.account?.orgs)} /><PulseShell product={product} identity={null}>{children}</PulseShell><KeyboardWatch/><BugReportHost release={telemetryRelease()} trigger/>{/* STAFF-UX: usage events from the gate too (everyone held there sent none). */}<TelemetryHost release={telemetryRelease()} enabled={process.env.PULSE_TELEMETRY !== "0"} sample={Math.min(1, Math.max(0, Number(process.env.PULSE_TELEMETRY_SAMPLE ?? 1) || 0))} /></body></html>;
+  }
+  // Signed out (or the session ended): the sign-in page, then back to where the person was going. Never a page
+  // frame that only says "sign in".
+  if (publicLogin && !me && read && (read.status === 401 || !read.status && /^Sign in/.test(read.error ?? "")) && !OPEN.test(path))
+    redirect(`/login${path && path !== "/" && path !== "/dashboard" ? `?next=${encodeURIComponent(path + ((await headers()).get("x-pulse-search") ?? ""))}` : ""}`);
+  // E2E-4P: the account menu names the person and their own organisation (a client's seat showed "pulse:rila.villas" and
+  // "Member"); an account without an e-mail shows its @handle.
+  const seatOf = me?.side === "client" ? me.orgName ?? "" : null;
+  // MODULES-1024: a client works on shared tasks and chats; the API refuses them attendance, presence, Pip's day, the
+  // freshness and push polls and the intelligence rail, so those stay off for them (they cost ~7 refused requests a page).
+  // PRIVACY: a freelancer's seat is not a staff seat either (no presence, check-in, intelligence or company pulse).
+  const staffSeat = seatOf === null && me?.side !== "freelancer";
+  const homeOrg = seatOf !== null ? me?.account?.orgs?.find((o) => !o.current && o.kind === "staff") : null;
+  const handle = me?.account?.account?.handle ?? (me?.email?.startsWith("pulse:") ? me.email.slice(6) : null);
+  const shownEmail = me ? seatOf !== null ? [homeOrg?.name, `${roleLabelFor(me) === "Partner" ? "partner" : "client"} of ${seatOf || "this organisation"}`].filter(Boolean).join(" · ")
+    : me.email?.startsWith("pulse:") ? `@${handle}` : me.email : undefined;
+  const identified = me ? { displayName: me.name, email: shownEmail ?? "", roleLabel: roleLabelFor(me) } : fromEmail;
+  const identity = identified && me ? { ...identified, displayName: me.name || identified.displayName,
+    profileHref: accountant ? '/account' : me.person ? '/profile' : undefined,  // ACCOUNT-META: the one profile of the person, not their record in this company
+    recordHref: !accountant && me.person ? `/people/${me.person}` : undefined,  // EST-1420: their own record stays in Recents when Team is hidden
+    photoUrl: !accountant && me.person && me.photoAt ? `/photo/${me.person}?v=${Date.parse(me.photoAt)}` : undefined, signOut: publicLogin } : identified;
+  // UX-TASKS-2: the rail follows the business model (a product company's Products / Customers / Releases; none for an internal team).
+  // Switched-off modules leave the navigation; their route folders' layouts show the neutral page (module-off.tsx). The
+  // company's own switches, the business model's words, Network and the screens hidden from this role: lib/nav.ts.
+  const modulesOff = me?.modules?.off;
+  const hasUpdates = !!(me?.person && !accountant && !me.mustChange && await newestUpdate());
+  const { off, hiddenPaths, rename } = navFor(me, hasUpdates);
+  // EST-1420: a direct link to a hidden screen lands on /hidden before the page renders. A switched-off module keeps
+  // its own neutral page.
+  // ORG: a client of this organisation lands on the work shared with them (before E2E-4P's closed screens apply).
+  // PORTAL-2: that is their space (/client), which sends a seat without one on to their tasks.
+  if (me?.side === 'client' && (path === '/' || path === '/dashboard')) redirect('/client');
+  // PRIVACY: a freelancer starts on their work (Home carries company figures).
+  if (me?.side === 'freelancer' && (path === '/' || path === '/dashboard')) redirect('/tasks');
+  const away = hiddenRedirect(path, hiddenPaths, me?.person);
+  if (away && !pathSwitchedOff(path, modulesOff) && !underBase(path, Object.keys(off))) redirect(away);
+  // EST-2093: the calm home restyles the shell (rail, top bar); <html> carries it from the first paint, so nothing moves
+  // while the page loads. The home sets and clears it itself on client-side navigation.
+  // ORG: the Pulse account's organisations for the switcher (sidebar, rail tile, Ctrl+Shift+O).
+  const orgs = me?.account?.orgs?.length ? { handle: me.account.account?.handle ?? null, invites: me.account.invites?.length ?? 0,
+    // CONNECTIONS (2199): my space, the companies I am in, then test and demo companies (marked, never counted).
+    list: switcherOrder(me.account.orgs).map((o) => ({ id: o.id, name: o.name, handle: o.handle, role: isPractice(o) ? `${practiceWord(o.purpose)} · ${accessLabel(o.access, o.kind)}` : accessLabel(o.access, o.kind), current: o.current, mark: o.mark ?? null, color: o.accent ?? null,
+      // CA-ACCESS: what waits in each company: "12 to verify" for a CA, "2 questions from your CA" for the owner.
+      note: o.toVerify ? `${o.toVerify} to verify` : o.asked ? `${o.asked} ${o.asked === 1 ? 'question' : 'questions'} from your CA` : null,
+      // FIX-SHELL (1947): Focus and Funding link to the company that has them.
+      orgOnly: o.kind === "staff" ? o.orgOnly : undefined })) } : undefined;
+  const focus = drawsCalmHome(path, new URLSearchParams(requestHeaders.get("x-pulse-search") ?? ""), me);
+  const pipDocked = (await cookies()).get("pulse.pip.dock")?.value === "1";
+  // SPEED-NET: the start-up reads of the parts drawn below for this person, in one call from the first HTML
+  // (PULSE_BOOT=0 switches it off). SPEED-4: not the insights rail's read: the rail reads only when its drawer opens.
+  const boot = me?.person && !me.mustChange && !accountant && process.env.PULSE_BOOT !== "0"
+    ? <BootStart keys={shellBootKeys({ staff: staffSeat, admin: me.role === "admin", off: modulesOff ?? [] })} rail={false} /> : null;
+  // TELEMETRY: every movement and its timing for a signed-in person (PULSE_TELEMETRY=0 switches it off; PULSE_TELEMETRY_SAMPLE 0-1).
+  // FEATURES-1024: a one-time card says what is measured (Settings → Privacy has the full words).
+  const telemetryOn = process.env.PULSE_TELEMETRY !== "0";
+  const telemetry = me && !me.mustChange ? <><TelemetryHost release={telemetryRelease()} enabled={telemetryOn}
+    sample={Math.min(1, Math.max(0, Number(process.env.PULSE_TELEMETRY_SAMPLE ?? 1) || 0))} />
+    {telemetryOn && me.person ? <TelemetryNotice privacyHref="/settings?tab=privacy" /> : null}</> : null;
+  // CHAT-SHELL: a page opened in the chat's side panel (embed=1, or any page framed by Pulse itself) is the page alone:
+  // no rail, no top bar, no Pip island; "+ New" and the spotlight stay, so a coach can point inside it.
+  const embed = !!me && (/(?:^|[?&])embed=1(?:&|$)/.test(requestHeaders.get("x-pulse-search") ?? "") || requestHeaders.get("sec-fetch-dest") === "iframe");
+  if (embed && me) return (
+    <html suppressHydrationWarning lang="en" className={inter.variable} data-shell={shellPlatform} data-embed="">
+      <body data-viewer={me.person ?? undefined}>{accentStyle}<TabBoot org={renderedOrg(me.account?.orgs)} /><PulseShell product={product} identity={identity} rename={rename} org={org} orgName={me.orgName} modulesOff={modulesOff} embed>{me.mustChange ? <LoginForm change framed companyName={org?.name ?? me.orgName ?? "Pulse"}/> : <OrgCodeProvider code={brand?.code ?? ""} zone={brand?.timeZone ?? FALLBACK_ZONE} words={me?.vocabulary}><HiddenGate bases={hiddenPaths} person={me.person} admin={me.role === "admin"} client={seatOf} modulesOff={modulesOff} companyOff={Object.keys(off)}><AppDs>{children}</AppDs>{telemetry}{me?.person && !me.mustChange ? <PlatformNotices /> : null}</HiddenGate></OrgCodeProvider>}{me.person && !me.mustChange && !accountant ? <><CreateHost/><BugReportHost release={telemetryRelease()}/><Suspense fallback={null}><Spotlight/></Suspense></> : <BugReportHost release={telemetryRelease()} signedOut={!!me.mustChange} trigger={!!me.mustChange}/>}</PulseShell></body>
+    </html>
+  );
+  return (
+    <html suppressHydrationWarning lang="en" className={inter.variable} data-shell={shellPlatform} data-pulse-focus={focus ? "" : undefined} data-pip-docked={pipDocked ? "" : undefined} data-seat={seatOf !== null ? "client" : undefined}>
+      <body data-viewer={me?.person ?? undefined}>{me?.person && process.env.PULSE_TELEMETRY !== "0" ? <EarlyClicks /> : null}{accentStyle}<TabBoot org={renderedOrg(me?.account?.orgs)} />{boot}<PulseShell product={product} identity={identity} rename={rename} org={org} orgName={me?.orgName} modulesOff={modulesOff} orgs={orgs}
+        externalSearch={!!me && !me.mustChange} create={undefined} quickCreate={!!me?.person && !me.mustChange && !accountant && staffSeat && !modulesOff?.includes("tasks")}
+        account={me&&!me.mustChange&&!accountant?<>{staffSeat?<InsightsMenuItem/>:null}{me.person?<OrgsMenuItem/>:null}{staffSeat?<LearnMenuItem/>:null}{me.person?<ReportBugMenuItem narrate={staffSeat}/>:null}<GetAppMenuItem/></>:undefined}
+        utilities={me&&!me.mustChange?<>{me.person&&!accountant?<><TabChip orgs={me.account?.orgs}/>{modulesOff?.includes("tasks")?null:<ReviewChip/>}{modulesOff?.includes("hr")||!staffSeat?null:<CheckinChip personId={me.person}/>}</>:null}{/* POLISH-2: Pip after the chips: a chip appearing or changing width never moves it over them. */}<PipIsland personId={accountant?undefined:me.person??undefined} canAsk={!accountant&&staffSeat} staff={staffSeat}/>{/* HR-PEOPLE: the chat button's place (chats/dock.tsx), just before the bell. */}<span data-chat-slot="" style={{display:"contents"}}/>{me.person&&!accountant&&!modulesOff?.includes("chats")?<InboxBell/>:null}{accountant||!staffSeat?null:<Suspense fallback={null}><IntelligenceRail briefs={!modulesOff?.includes("briefs")}/></Suspense>}</>:undefined}>{me?.mustChange ? <LoginForm change framed companyName={org?.name ?? me.orgName ?? "Pulse"}/> : <OrgCodeProvider code={brand?.code ?? ""} zone={brand?.timeZone ?? FALLBACK_ZONE} words={me?.vocabulary}><HiddenGate bases={hiddenPaths} person={me?.person} admin={me?.role === "admin"} client={seatOf} modulesOff={modulesOff} companyOff={Object.keys(off)}><AppDs>{children}</AppDs>{telemetry}{me?.person && !me.mustChange ? <><PlatformNotices />{/* NEW-DOTS: red dots on changed pages, the "New: …" pill. */}<NewDotsHost /><Suspense fallback={null}><BadgeArrival /></Suspense>{staffSeat && !accountant && !modulesOff?.includes("hr") ? <PolicyAcceptHost name={me.name} person={me.person} /> : null}</> : null}{me?.person && !me.mustChange && staffSeat && (me.role === "admin" || me.role === "hr") ? <MailboxNotice admin={me.role === "admin"} /> : null}</HiddenGate></OrgCodeProvider>}{me?.person&&!me.mustChange&&!accountant?<><CreateHost/><BugReportHost release={telemetryRelease()}/>{staffSeat?<PresencePoller/>:null}{modulesOff?.includes("chats")?null:<ChatDock/>}<Suspense fallback={null}><Spotlight/>{modulesOff?.includes("tasks")||!staffSeat?null:<TaskCompanion role={identity?.roleLabel ?? "Member"} modulesOff={modulesOff}/>}</Suspense>{/* DOREVE-2 (AC card 7): "Done · Undo" beside the circle that was clicked. */}<UndoHereLayer/></>:!me?<BugReportHost release={telemetryRelease()} signedOut trigger/>:<BugReportHost release={telemetryRelease()} signedOut={!!me.mustChange} trigger={!!me.mustChange}/>}{me && !me.mustChange ? <CommandPalette role={identity?.roleLabel} modulesOff={modulesOff} rename={rename} hidden={hiddenPaths} person={accountant ? null : me.person ?? null} attendance={!modulesOff?.includes("hr")} /> : null}{me?.person&&!me.mustChange&&!accountant?<OrgSwitcher state={me.account}/>:null}{me?.person&&!me.mustChange?<TabCompany orgs={me.account?.orgs}/>:null}<Suspense fallback={null}><AppFeel /></Suspense>{/* REPLAY-FIXES #1/#2: a seen screen opens at once from its copy; a tap before the app or the page is ready is kept. */}{me?.person && !me.mustChange ? <Suspense fallback={null}><ScreenCache /></Suspense> : null}<KeyboardWatch/>{me?.person&&me.twoStepSetup&&!me.mustChange&&!accountant&&staffSeat?<TwoStepGuide org={me.orgName??'Your organisation'}/>:null}{me&&!me.mustChange&&!accountant&&staffSeat?<DataPulse/>:null}{me?.person&&!me.mustChange&&!accountant?<>{staffSeat?<BrowserPings/>:null}{/* UI-POLISH (R120): calls and browser pings are staff features; the API refuses them to a client seat. */}{/* CLIENT-PORTAL: a client rings and is rung by their team in the chats shared with them. */}{modulesOff?.includes("chats")?null:<CallHost person={me.person}/>}<ShellBridge person={me.person} via={me.via} staff={staffSeat}/>{/* AGENT-UI-CONTROL: AI employees work this person's screen (staff seats; never in a framed page). */}{staffSeat?<ScreenHost/>:null}</>:null}</PulseShell></body>
+    </html>
+  );
+}

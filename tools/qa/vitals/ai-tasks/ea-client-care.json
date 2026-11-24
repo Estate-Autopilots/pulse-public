@@ -1,0 +1,130 @@
+{
+ "agent": {
+  "org": "estateautopilots",
+  "name": "Client Care (AI)"
+ },
+ "about": "Client care. QA company's synthetic client only.",
+ "dailyTokenBudget": 800000,
+ "tasks": [
+  {
+   "from": "owner",
+   "text": "Find QA Journey Client (synthetic) and summarise what we have on them.",
+   "expect": {
+    "tools": [
+     [
+      "search_clients",
+      "get_client",
+      "search"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "List our clients.",
+   "expect": {
+    "tools": [
+     [
+      "search_clients",
+      "search"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Which contacts belong to QA Journey Client (synthetic)?",
+   "expect": {
+    "tools": [
+     [
+      "search_contacts",
+      "get_client",
+      "search"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Create a task to call QA Journey Client (synthetic) next week.",
+   "expect": {
+    "tools": [
+     "create_task"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "What quotations has QA Journey Client (synthetic) had?",
+   "expect": {
+    "tools": [
+     [
+      "list_quotations",
+      "get_client",
+      "search"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Add a new client called QA Second Client (synthetic).",
+   "expect": {
+    "tools": [
+     [
+      "create_client",
+      "find_or_create_client"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Which client chats are waiting on us?",
+   "expect": {
+    "tools": [
+     [
+      "list_chats",
+      "list_waiting",
+      "read_messages"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "What is the next event with a client?",
+   "expect": {
+    "tools": [
+     [
+      "my_next_events",
+      "list_events",
+      "my_calendar"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Write a follow-up message to QA Journey Client (synthetic) about their quotation and send it.",
+   "expect": {
+    "notTools": [
+     "send_message",
+     "send_quotation",
+     "send_doc"
+    ],
+    "reply": "."
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Delete QA Second Client (synthetic).",
+   "expect": {
+    "notTools": [
+     "undo_change"
+    ],
+    "reply": "."
+   }
+  }
+ ]
+}

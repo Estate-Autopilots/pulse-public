@@ -1,0 +1,264 @@
+/* PM-UI 07 Template picker. Tokens only. Widths by container (the page content, not the viewport):
+   < 600 phone: one column, the preview is a bottom sheet sticky above the shell's tab bar (58 px + safe area).
+   600–699: cards, then the preview card under them. 700–959 tablet: cards 45 : preview 55. ≥ 960 laptop: the stepper
+   in a slim card on top, then the quote line and title; the preview stays in view while the cards scroll. */
+
+.wrap {
+  container-type: inline-size; display: grid; align-content: start; gap: var(--ds-space-4); min-width: 0;
+  --tp-ink: color-mix(in srgb, var(--theme-action) 82%, var(--theme-text));
+  --tp-soft: color-mix(in srgb, var(--theme-action) 11%, var(--theme-surface));
+}
+/* Phone: the page is at least one screen tall (top bar 52 + shell padding 14/86 + page padding 8/32), and the sheet's row
+   takes the slack, so the sticky sheet sits flush on the tab bar even when the list is short (fix 5). */
+@media (max-width: 599.98px) {
+  .wrap { grid-template-rows: auto auto minmax(0, 1fr); min-height: calc(100dvh - 190px - var(--pulse-safe-bottom, 0px)); }
+  .panel { align-self: end; }
+}
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.muted { color: var(--theme-text-muted); }
+
+/* ---------- Head: title, quote line, stepper, industry chips ---------- */
+.head { display: grid; grid-template-areas: "title" "quote" "stepper" "industry"; gap: var(--ds-space-1); min-width: 0; }
+.title { grid-area: title; margin: 0; color: var(--theme-text); font-size: var(--ds-text-2xl); font-weight: var(--ds-weight-heavy); letter-spacing: -0.02em; line-height: 1.2; text-wrap: balance; }
+.quote { grid-area: quote; margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-md); line-height: 1.4; }
+.quoteLink { color: var(--tp-ink); font-weight: var(--ds-weight-medium); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--tp-ink) 40%, transparent); text-underline-offset: 3px; }
+.quoteLink:hover { text-decoration-color: currentColor; }
+
+.stepperBox { grid-area: stepper; min-width: 0; padding-block: var(--ds-space-2) var(--ds-space-1); }
+.stepper { display: flex; align-items: flex-start; min-width: 0; margin: 0; padding: 0; list-style: none; }
+.step { display: flex; flex: none; flex-direction: column; align-items: center; gap: var(--ds-space-1); min-width: 0; }
+.stepNum {
+  display: inline-grid; flex: none; place-items: center; width: 28px; height: 28px; border: 1px solid var(--theme-border-strong); border-radius: 50%;
+  background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-strong); font-variant-numeric: tabular-nums;
+}
+.stepNum svg { width: 14px; height: 14px; }
+.step[data-state="current"] .stepNum { border-color: var(--theme-action); background: var(--theme-action); color: var(--theme-action-text); }
+.step[data-state="done"] .stepNum { border-color: var(--tp-ink); background: var(--tp-soft); color: var(--tp-ink); }
+.stepLabel { color: var(--theme-text-muted); font-size: var(--ds-text-xs); line-height: 1.3; white-space: nowrap; }
+.step[data-state="current"] .stepLabel { color: var(--tp-ink); font-weight: var(--ds-weight-strong); }
+.stepLine { flex: 1 1 auto; min-width: var(--ds-space-2); height: 1px; margin: 14px var(--ds-space-1) 0; background: var(--theme-border-strong); }
+
+.industry { grid-area: industry; display: grid; gap: var(--ds-space-2); min-width: 0; padding-top: var(--ds-space-1); }
+.indLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.chips { display: flex; gap: var(--ds-space-2); min-width: 0; padding: 2px; margin: -2px; overflow-x: auto; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  display: inline-flex; flex: none; align-items: center; gap: var(--ds-space-1); min-height: 32px; padding: 0 var(--ds-space-3);
+  border: 1px solid var(--theme-border); border-radius: var(--ds-radius-pill); background: var(--theme-surface); color: var(--theme-text);
+  font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); line-height: 1.2; text-decoration: none; white-space: nowrap;
+}
+.chip:hover { border-color: var(--theme-border-strong); }
+.chip:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.chip[aria-current] { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-surface)); background: var(--tp-soft); color: var(--tp-ink); font-weight: var(--ds-weight-strong); }
+.chip svg { width: 13px; height: 13px; stroke-width: 2.4; }
+
+/* ---------- Cards ---------- */
+/* Phone: the columns box dissolves, so the sheet's sticky range is the whole page (it may pull up over the head). */
+.cols { display: contents; }
+.list { min-width: 0; }
+.cards { display: grid; gap: var(--ds-space-2); min-width: 0; }
+.card {
+  display: flex; align-items: center; gap: var(--ds-space-3); width: 100%; min-width: 0; min-height: 72px; margin: 0; padding: 10px var(--ds-space-4) 10px var(--ds-space-3);
+  border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent);
+  color: var(--theme-text); font: inherit; text-align: left; cursor: pointer;
+  transition: border-color var(--ds-quick) var(--ds-ease), box-shadow var(--ds-quick) var(--ds-ease), background-color var(--ds-quick) var(--ds-ease);
+}
+.card:hover { border-color: var(--theme-border-strong); }
+.card:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.card[data-on] { border-color: var(--theme-action); background: color-mix(in srgb, var(--theme-action) 4%, var(--theme-surface)); box-shadow: inset 0 0 0 1px var(--theme-action), var(--ds-elev-1); }
+
+.tile {
+  display: inline-grid; flex: none; place-items: center; width: 44px; height: 44px; border-radius: var(--ds-radius-md);
+  background: color-mix(in srgb, var(--pm-hue) 16%, var(--theme-surface)); color: color-mix(in srgb, var(--pm-hue) 72%, var(--theme-text));
+}
+.tile svg { width: 22px; height: 22px; stroke-width: 1.8; }
+
+/* Phone: name, counts, then "Recommended" (the name row dissolves into the column). */
+.cText { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.cNameRow { display: contents; }
+.cName { max-width: 100%; overflow-wrap: anywhere; font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); line-height: 1.3; }
+.cCounts { order: 1; color: var(--theme-text-muted); font-size: var(--ds-text-md); font-variant-numeric: tabular-nums; }
+.rec {
+  order: 2; display: inline-flex; flex: none; align-items: center; min-height: 20px; margin-top: 0; padding: 0 var(--ds-space-2); border-radius: var(--ds-radius-pill);
+  background: var(--tp-soft); color: var(--tp-ink); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); line-height: 1.2; white-space: nowrap;
+}
+.radio { flex: none; width: 22px; height: 22px; border: 1.5px solid var(--theme-border-strong); border-radius: 50%; background: var(--theme-surface); }
+.card[data-on] .radio { border: 2px solid var(--theme-action); background: radial-gradient(circle at center, var(--theme-action) 0 4.5px, transparent 5px), var(--theme-surface); }
+
+/* ---------- Preview: phone bottom sheet ---------- */
+.panel {
+  position: sticky; bottom: calc(58px + var(--pulse-safe-bottom, 0px)); z-index: 5;
+  display: flex; flex-direction: column; min-width: 0; max-height: 70dvh;
+  /* Edge to edge, and down onto the tab bar at the end of the scroll (page padding 32 + shell padding 28). */
+  margin: 0 calc(-1 * var(--ds-space-3)) calc(-1 * (var(--ds-space-8) + 28px));
+  padding: var(--ds-space-5) var(--ds-space-4) var(--ds-space-3);
+  border: 1px solid var(--ds-line); border-bottom: 0; border-radius: var(--ds-radius-xl) var(--ds-radius-xl) 0 0;
+  background: var(--theme-surface); box-shadow: 0 -8px 24px color-mix(in srgb, var(--theme-text) 10%, transparent); color: var(--theme-text);
+}
+.grip { position: absolute; top: 0; right: 0; left: 0; z-index: 1; height: 52px; padding: 0; border: 0; border-radius: var(--ds-radius-xl) var(--ds-radius-xl) 0 0; background: none; cursor: pointer; }
+.grip::before { content: ""; position: absolute; top: var(--ds-space-2); left: 50%; width: 40px; height: 4px; border-radius: var(--ds-radius-pill); background: var(--theme-border-strong); transform: translateX(-50%); }
+.grip:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; }
+.panel[data-empty] .grip { pointer-events: none; }
+/* Pulled up: a light scrim dims the page behind the sheet (the chips no longer peek out undimmed). */
+.panel[data-open] { box-shadow: 0 -8px 24px color-mix(in srgb, var(--theme-text) 10%, transparent), 0 0 0 100vmax rgb(8 12 22 / 28%); }
+
+.pHead { order: 1; display: flex; align-items: center; gap: var(--ds-space-3); min-width: 0; }
+.pHead .tile { display: none; }
+.pTitles { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.pTitle { margin: 0; overflow-wrap: anywhere; font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); letter-spacing: -0.01em; line-height: 1.25; }
+.panel[data-empty] .pTitle { color: var(--theme-text-muted); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-medium); }
+.pCounts { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-md); font-variant-numeric: tabular-nums; }
+.pAct { order: 3; flex: none; margin-top: var(--ds-space-3); }
+.panel .useBtn.useBtn { width: 100%; min-height: 44px; }
+.pBody { order: 2; display: none; flex: 1 1 auto; align-content: start; gap: var(--ds-space-4); min-height: 0; margin: var(--ds-space-4) calc(-1 * var(--ds-space-4)) 0; padding: 0 var(--ds-space-4) var(--ds-space-1); overflow-y: auto; overscroll-behavior: contain; }
+.panel[data-open] .pBody { display: grid; }
+
+.h3 { margin: 0; font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); line-height: 1.3; }
+.subHead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ds-space-3); min-width: 0; }
+.totalTop { color: var(--theme-text-muted); font-size: var(--ds-text-md); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Clocks: three icons on a line, label under each. */
+.clocks { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-space-2); margin: 0; padding: 0; list-style: none; }
+.clocks::before { content: ""; position: absolute; top: 20px; right: 16.6%; left: 16.6%; height: 1px; background: var(--theme-border-strong); }
+.clock { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--ds-space-1); min-width: 0; text-align: center; }
+.clockIcon { display: inline-grid; flex: none; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--tp-soft); box-shadow: 0 0 0 4px var(--theme-surface); color: var(--tp-ink); }
+.clockIcon svg { width: 18px; height: 18px; stroke-width: 1.9; }
+.clockText { display: grid; min-width: 0; font-size: var(--ds-text-md); line-height: 1.3; }
+.clockText strong { font-weight: var(--ds-weight-strong); }
+
+/* Phases: two columns in a soft box, total in the heading line. */
+.phases, .roles { display: grid; align-content: start; gap: var(--ds-space-2); min-width: 0; }
+.phaseList {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: repeat(var(--rows, 5), auto); grid-auto-flow: column; gap: 2px var(--ds-space-3);
+  margin: 0; padding: var(--ds-space-2) var(--ds-space-3); border-radius: var(--ds-radius-md); background: var(--theme-surface-subtle); list-style: none;
+}
+.phase { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ds-space-2); min-width: 0; min-height: 24px; font-size: var(--ds-text-sm); line-height: 1.35; }
+.phaseNum { display: none; }
+.phaseName { min-width: 0; overflow-wrap: anywhere; }
+.phaseSteps { flex: none; color: var(--theme-text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.totalRow { display: none; }
+
+/* Roles: chips (role only) on the phone. */
+.roleList { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); margin: 0; padding: 0; list-style: none; }
+.role { display: inline-flex; align-items: center; gap: var(--ds-space-2); min-height: 32px; padding: 0 var(--ds-space-3) 0 var(--ds-space-2); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-pill); background: var(--theme-surface-subtle); font-size: var(--ds-text-md); }
+.roleIcon { display: inline-grid; flex: none; place-items: center; color: var(--theme-text-muted); }
+.roleIcon svg { width: 16px; height: 16px; }
+.roleText { display: grid; min-width: 0; }
+.roleName { font-weight: var(--ds-weight-medium); white-space: nowrap; }
+.roleWho { display: none; }
+
+.blankNote { grid-column: 1 / -1; margin: 0; padding: var(--ds-space-3) var(--ds-space-4); border-radius: var(--ds-radius-md); background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: var(--ds-text-md); }
+.placeholder { display: none; }
+
+/* ---------- 600 px and up: no sheet; the preview is a card ---------- */
+@container (min-width: 600px) {
+  .wrap { gap: var(--ds-space-5); }
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-4); min-width: 0; }
+  .head { gap: var(--ds-space-1); }
+  .title { font-size: var(--ds-text-3xl); }
+  .quote { font-size: var(--ds-text-lg); }
+  .stepperBox { padding-block: var(--ds-space-4) var(--ds-space-2); }
+  .stepper { align-items: center; }
+  .step { flex-direction: row; gap: var(--ds-space-2); }
+  .stepNum { width: 32px; height: 32px; font-size: var(--ds-text-md); }
+  .stepLabel { font-size: var(--ds-text-lg); }
+  .stepLine { margin: 0 var(--ds-space-4); }
+  .industry { padding-top: var(--ds-space-2); }
+  .indLabel { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); }
+
+  .cards { gap: var(--ds-space-3); }
+  .chip { min-height: 36px; padding: 0 var(--ds-space-4); font-size: var(--ds-text-md); }
+  .chip svg { width: 14px; height: 14px; }
+  .tile { width: 48px; height: 48px; }
+  .card { min-height: 80px; padding: var(--ds-space-4) var(--ds-space-5) var(--ds-space-4) var(--ds-space-4); gap: var(--ds-space-4); }
+  .cNameRow { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--ds-space-2); min-width: 0; }
+  .rec { min-height: 22px; margin-top: 0; }
+
+  .panel {
+    position: static; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "head act" "body body"; align-items: center; gap: var(--ds-space-4) var(--ds-space-3);
+    max-height: none; margin: 0; padding: var(--ds-space-5); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-xl);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent);
+  }
+  .panel[data-open] { box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent); }
+  .grip { display: none; }
+  .pHead { grid-area: head; }
+  .pCounts { display: none; }
+  .pTitle { font-size: var(--ds-text-xl); }
+  .panel[data-empty] .pTitle { font-size: var(--ds-text-lg); }
+  .pAct { grid-area: act; margin: 0; }
+  .panel .useBtn.useBtn { width: auto; }
+  .pBody, .panel[data-open] .pBody {
+    grid-area: body; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: "clocks clocks" "phases roles";
+    gap: var(--ds-space-4) var(--ds-space-5); margin: 0; padding: 0; overflow: visible;
+  }
+
+  /* Clocks: one bordered strip; icon over the words at tablet widths. */
+  .clocks { grid-area: clocks; gap: 0; padding: var(--ds-space-3) var(--ds-space-2); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); }
+  .clocks::before { display: none; }
+  .clock { padding-inline: var(--ds-space-2); }
+  .clock + .clock { border-left: 1px solid var(--ds-line); }
+  .clockIcon { width: 36px; height: 36px; box-shadow: none; }
+
+  /* Phases: numbered rows, the total under them. */
+  .phases { grid-area: phases; }
+  .totalTop { display: none; }
+  .phaseList { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-auto-flow: row; gap: 0; padding: 0; background: none; }
+  .phase { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: var(--ds-space-2); min-height: 32px; font-size: var(--ds-text-md); border-bottom: 1px solid var(--ds-line); }
+  .phaseNum { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); font-variant-numeric: tabular-nums; }
+  .phaseSteps { font-size: var(--ds-text-sm); }
+  .totalRow { display: flex; justify-content: space-between; gap: var(--ds-space-2); margin: 0; padding-top: var(--ds-space-1); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); font-variant-numeric: tabular-nums; }
+
+  /* Roles: role first, the suggested person under it. */
+  .roles { grid-area: roles; padding-left: var(--ds-space-4); border-left: 1px solid var(--ds-line); }
+  .roleList { display: grid; gap: var(--ds-space-3); }
+  .role { gap: var(--ds-space-2); min-height: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+  .roleIcon { width: 28px; height: 28px; border-radius: 50%; background: var(--theme-surface-subtle); }
+  .roleName { font-weight: var(--ds-weight-strong); white-space: normal; }
+  .roleWho { display: block; color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+
+  .placeholder { grid-column: 1 / -1; display: grid; place-items: center; min-height: 280px; border: 1px dashed var(--theme-border); border-radius: var(--ds-radius-lg); color: var(--theme-text-muted); }
+  .placeholder svg { width: 32px; height: 32px; stroke-width: 1.5; }
+}
+
+/* Tablet: cards left (45), preview right (55). */
+@container (min-width: 700px) {
+  .cols { grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); align-items: start; gap: var(--ds-space-5); }
+}
+
+/* Tablet two-column only (700–959): the preview title stays on one line beside a slimmer button; with nothing picked,
+   the note takes the whole line and the disabled button sits under it; the stepper keeps even side margins. */
+@container (min-width: 700px) and (max-width: 959.98px) {
+  .stepperBox { padding-inline: var(--ds-space-2); }
+  .panel { gap: var(--ds-space-4) var(--ds-space-2); padding: var(--ds-space-4); }
+  .pTitle { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .panel .useBtn.useBtn { padding-inline: var(--ds-space-4); font-size: var(--ds-text-md); }
+  .panel[data-empty] { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "act" "body"; }
+  .panel[data-empty] .pAct { justify-self: start; }
+  .panel[data-empty] .pTitle { white-space: normal; }
+}
+
+/* Laptop: stepper card on top, then quote and title; the preview stays in view (the page scrolls from 900 px). */
+@container (min-width: 960px) {
+  .head { grid-template-areas: "stepper" "quote" "title" "industry"; gap: var(--ds-space-2); }
+  .stepperBox { margin-bottom: var(--ds-space-3); padding: var(--ds-space-3) var(--ds-space-6); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent); }
+  .stepper { justify-content: center; }
+  .stepLine { flex: 0 1 96px; margin: 0 var(--ds-space-5); }
+  .title { font-size: calc(var(--ds-text-3xl) * 1.15); }
+  .quote { font-size: var(--ds-text-lg); }
+  .industry { padding-top: var(--ds-space-3); }
+
+  .cols { gap: var(--ds-space-6); }
+  .card { min-height: 88px; }
+  .tile { width: 52px; height: 52px; }
+  .panel { position: sticky; top: var(--ds-space-4); align-self: start; padding: var(--ds-space-6); }
+  .pHead .tile { display: inline-grid; width: 48px; height: 48px; }
+  .roleIcon { width: 32px; height: 32px; }
+  .clockIcon { width: 32px; height: 32px; }
+  .pTitle { font-size: var(--ds-text-2xl); }
+  .pBody, .panel[data-open] .pBody { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--ds-space-5) var(--ds-space-6); }
+  .clocks { padding-inline: var(--ds-space-1); }
+  .clock { flex-direction: row; justify-content: flex-start; gap: var(--ds-space-2); padding-inline: var(--ds-space-2); text-align: left; }
+  .roles { padding-left: var(--ds-space-6); }
+}
+@container (min-width: 600px) and (max-width: 699.98px) { .panel[data-empty] { padding-top: var(--ds-space-5); } }
+@container (min-width: 960px) { .panel[data-empty] { padding-top: var(--ds-space-6); } }

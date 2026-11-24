@@ -1,0 +1,115 @@
+/* PM-UI 01 Projects home. Tokens only. Widths by container: < 600 phone (1 column), 600–959 tablet (2), ≥ 960 laptop (3).
+   (A 1440 laptop gives the page about 1064px beside the side menu; 834 gives about 800px.) */
+
+.wrap { container-type: inline-size; display: grid; align-self: start; align-content: start; gap: var(--ds-space-3); min-width: 0; }
+
+/* ---------- Header: title + "+ New project"; search full width on a phone, one row from 600 ---------- */
+.header { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title action" "search search"; align-items: center; gap: var(--ds-space-3); min-width: 0; }
+.title { grid-area: title; margin: 0; color: var(--theme-text); font-size: var(--ds-text-3xl); font-weight: var(--ds-weight-heavy); letter-spacing: -0.02em; line-height: 1.15; }
+.action { grid-area: action; display: flex; }
+.newBtn { min-height: 44px; }
+.search { grid-area: search; position: relative; display: flex; align-items: center; min-width: 0; }
+.search svg { position: absolute; left: var(--ds-space-3); width: var(--ds-icon-sm); height: var(--ds-icon-sm); color: var(--theme-text-muted); pointer-events: none; }
+.search input {
+  width: 100%; min-width: 0; height: 44px; padding: 0 var(--ds-space-3) 0 calc(var(--ds-space-3) + var(--ds-icon-sm) + var(--ds-space-2));
+  border: 1px solid var(--theme-border); border-radius: var(--ds-radius-md); background: var(--theme-surface); color: var(--theme-text);
+  font: inherit; font-size: var(--ds-text-md);
+}
+.search input::placeholder { color: var(--theme-text-muted); }
+.search input:hover { border-color: var(--theme-border-strong); }
+.search input:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; border-color: var(--theme-action); }
+@container (min-width: 600px) {
+  .header { grid-template-columns: minmax(0, 1fr) minmax(200px, 280px) auto; grid-template-areas: "title search action"; gap: var(--ds-space-4); }
+}
+@container (min-width: 960px) { .header { grid-template-columns: minmax(0, 1fr) minmax(220px, 320px) auto; } }
+
+/* ---------- Filter chips: one row; scrolls sideways inside itself on a phone ---------- */
+.chips { display: flex; align-items: center; gap: var(--ds-space-2); min-width: 0; margin-inline: calc(-1 * var(--ds-space-1)); padding: 2px var(--ds-space-1); overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.chips::-webkit-scrollbar { display: none; }
+.filter {
+  flex: none; display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--ds-space-4);
+  border: 1px solid var(--theme-border); border-radius: var(--ds-radius-pill); background: var(--theme-surface); color: var(--theme-text);
+  font: inherit; font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); white-space: nowrap; cursor: pointer;
+}
+.filter:hover { border-color: var(--theme-border-strong); background: var(--ds-hover); }
+.filter:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+/* Selected: a soft tint of the accent, never the solid fill (the one solid violet is "+ New project"). */
+.filter[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface));
+  color: var(--theme-action); font-weight: var(--ds-weight-strong);
+}
+@container (min-width: 600px) { .filter { min-height: 36px; } }
+@media (pointer: coarse) { .filter { min-height: 44px; } }
+
+/* ---------- Cards grid ---------- */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-3); margin: var(--ds-space-1) 0 0; padding: 0; list-style: none; }
+@container (min-width: 600px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-space-4); } }
+@container (min-width: 960px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* Cards are about 340px wide: the strip takes the full width and its label sits on its own line (laptop pick). */
+  .grid .body > [data-variant="compact"] > :first-child { flex-basis: 100%; }
+}
+
+/* ---------- The project card (ProjectCard; used by other screens too, so not scoped to .grid) ---------- */
+li.card, div.card, article.card { display: flex; flex-direction: column; min-width: 0; }
+/* The card's content is the link itself (its own box is the whole card inside the padding: one big tap target). */
+.body { flex: 1 1 auto; display: flex; flex-direction: column; gap: var(--ds-space-3); min-width: 0; min-height: 44px; color: inherit; text-decoration: none; }
+.card { transition: border-color var(--ds-quick) var(--ds-ease), box-shadow var(--ds-quick) var(--ds-ease); }
+/* The kit chip is a flex row with a gap, which reads "Late : …" and would trim the " · " of Waiting on client: draw it inline. */
+.body > [data-health] { display: inline-block; align-self: flex-start; padding-block: 3px; }
+.card:hover { border-color: var(--theme-border-strong); box-shadow: var(--ds-elev-2); }
+.card:has(.body:focus-visible) { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+
+.head { display: flex; align-items: center; gap: var(--ds-space-3); min-width: 0; }
+.tileBox { display: inline-flex; flex: none; }
+.tileBox > span { width: 44px; height: 44px; border-radius: var(--ds-radius-md); }
+@container (min-width: 600px) { .tileBox > span { width: 48px; height: 48px; } }
+.titles { display: grid; gap: 2px; min-width: 0; }
+.name { margin: 0; color: var(--theme-text); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); letter-spacing: -0.01em; line-height: 1.25; overflow-wrap: anywhere; }
+.card .body:focus-visible { outline: none; }
+.client { margin: 0; overflow: hidden; color: var(--theme-text-muted); font-size: var(--ds-text-sm); text-overflow: ellipsis; white-space: nowrap; }
+
+.next { display: grid; gap: var(--ds-space-1); min-width: 0; }
+.nextStep { margin: 0; color: var(--theme-text); font-size: var(--ds-text-md); line-height: 1.35; overflow-wrap: anywhere; }
+.nextStep b { font-weight: var(--ds-weight-strong); }
+.muted { color: var(--theme-text-muted); }
+.nextMeta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-1) var(--ds-space-2); min-height: 24px; margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+.owner { font-size: var(--ds-text-sm); }
+/* The date and its late word never part. */
+.due { display: inline-flex; flex: none; align-items: center; gap: var(--ds-space-2); white-space: nowrap; }
+.due::before { content: "·"; color: var(--theme-text-muted); }
+.date { color: var(--theme-text); font-variant-numeric: tabular-nums; }
+.late { color: var(--tone-problem); font-weight: var(--ds-weight-strong); }
+.late[data-tone="action"] { color: var(--tone-action); }
+.noOwner { display: inline-flex; align-items: center; gap: var(--ds-space-2); color: var(--theme-text-muted); font-weight: var(--ds-weight-medium); }
+.noOwnerMark { display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1px dashed var(--theme-border-strong); border-radius: 50%; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.noOwnerMark svg { width: 13px; height: 13px; }
+
+.foot { margin-top: auto; padding-top: var(--ds-space-3); border-top: 1px solid var(--ds-line); }
+
+/* ---------- Loading: a stand-in card whose text and colours become grey bones (same rows, same height) ---------- */
+.skel { pointer-events: none; --bone: var(--theme-surface-subtle); }
+.skel.skel * { border-color: transparent; box-shadow: none; color: transparent; text-decoration: none; }
+.skel svg, .skel img { visibility: hidden; }
+.skel.skel .nextMeta * { background: none; }
+.skel.skel .nextMeta > * > * { visibility: hidden; }
+.skel.skel [role="img"] > i { box-shadow: none; }
+.skel.skel > :first-child, .skel.skel .tileBox > span, .skel.skel [data-health], .skel.skel [role="img"] > i,
+.skel.skel [data-variant="compact"] > :last-child, .skel.skel .nameText, .skel.skel .client, .skel.skel .nextStep, .skel.skel .nextMeta > *, .skel.skel .foot > * {
+  border-radius: var(--ds-radius-xs); background: var(--bone); animation: pulse 1.4s var(--ds-ease) infinite alternate;
+}
+.skel.skel .tileBox > span { border-radius: var(--ds-radius-md); }
+.skel .client, .skel .nextStep { justify-self: start; }
+.skel .due::before { content: none; }
+.skel:hover { border-color: var(--ds-line); box-shadow: none; }
+@keyframes pulse { from { opacity: 1; } to { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .skel * { animation: none; } }
+
+/* ---------- Empty states ---------- */
+.empty { margin-top: var(--ds-space-1); justify-items: center; gap: var(--ds-space-2); padding: var(--ds-space-8) var(--ds-space-4); text-align: center; }
+.emptyIcon { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.emptyIcon svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.emptyTitle { margin: 0; color: var(--theme-text); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); overflow-wrap: anywhere; }
+.emptyText { max-width: 40ch; margin: 0 0 var(--ds-space-2); color: var(--theme-text-muted); }
+.emptyLink { text-decoration: underline; text-underline-offset: 3px; }
+

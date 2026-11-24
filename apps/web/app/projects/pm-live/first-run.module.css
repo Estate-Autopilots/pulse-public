@@ -1,0 +1,5 @@
+/* PM-BUILD-4: while First run is the page, its "Start your first project" is the one filled button, as judged (screen 19);
+   Work's own "New project" in the page header (the same form) steps aside. It stays mounted: it opens the form for
+   ?newProject=1, which the screen's button and template cards link to. The wrapper adds no box of its own. */
+.mount { display: contents; }
+:global(body):has(.mount) :global([data-new-project]) { display: none; }

@@ -1,0 +1,257 @@
+/* PM-UI: the project page (PICKS 02). Tokens only. Layout follows the content width (container queries), so it reads
+   the same in the phone shell at 834 px as it would beside a rail: one column under 720 px, two columns from 720 px. */
+
+.root { container: pd / inline-size; display: grid; align-content: start; gap: var(--ds-space-4); min-width: 0; }
+@container pd (max-width: 599.98px) { .root > * { min-width: 0; } }
+@media (max-width: 599.98px) { .root { gap: var(--ds-space-3); } }
+
+.muted { color: var(--theme-text-muted); font-size: var(--ds-text-sm); margin: 0; }
+.reason { font-weight: var(--ds-weight-regular); }
+.srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* ---------- B: header ---------- */
+.root .head {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "tile name more" "tile client client" "tile health health" "lead lead lead";
+  align-items: start; gap: var(--ds-space-1) var(--ds-space-3);
+}
+.tile { grid-area: tile; display: flex; }
+.name { grid-area: name; margin: 0; align-self: center; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); letter-spacing: var(--ds-tracking-tight); line-height: 1.25; overflow-wrap: anywhere; }
+.client { grid-area: client; margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+.health { grid-area: health; display: flex; min-width: 0; margin-top: var(--ds-space-1); }
+.lead { grid-area: lead; display: flex; align-items: center; gap: var(--ds-space-2); min-width: 0; margin-top: var(--ds-space-2); }
+.leadText { display: flex; align-items: baseline; gap: var(--ds-space-1); min-width: 0; font-size: var(--ds-text-md); }
+.leadWord { color: var(--theme-text-muted); }
+.leadWord::after { content: ":"; }
+.leadName { color: var(--theme-text); font-weight: var(--ds-weight-strong); }
+.more { grid-area: more; display: flex; margin: calc(-1 * var(--ds-space-2)) calc(-1 * var(--ds-space-2)) 0 0; }
+.moreBtn {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid transparent; border-radius: var(--ds-radius-md);
+  background: none; color: var(--theme-text-muted); cursor: pointer;
+}
+.moreBtn svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.moreBtn:hover { background: var(--ds-hover); color: var(--theme-text); }
+.moreBtn:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+
+@container pd (min-width: 600px) {
+  .root .head {
+    grid-template-columns: auto minmax(0, max-content) minmax(0, 1fr) auto auto;
+    grid-template-areas: "tile name health lead more" "tile client health lead more";
+    align-items: center; column-gap: var(--ds-space-4); row-gap: 2px;
+  }
+  .name { align-self: end; font-size: var(--ds-text-2xl); }
+  .client { align-self: start; font-size: var(--ds-text-md); }
+  .health { align-self: center; margin: 0; }
+  .lead { margin: 0; padding-left: var(--ds-space-5); border-left: 1px solid var(--ds-line); }
+  .leadText { flex-direction: column-reverse; align-items: flex-start; gap: 0; line-height: 1.3; }
+  .leadWord { font-size: var(--ds-text-sm); }
+  .leadWord::after { content: none; }
+  .more { margin: 0; }
+  .moreBtn { border-color: var(--theme-border); }
+}
+
+/* ---------- Columns ---------- */
+.cols { display: grid; gap: var(--ds-space-4); min-width: 0; }
+.main, .side { display: grid; align-content: start; gap: var(--ds-space-4); min-width: 0; }
+@media (max-width: 599.98px) { .cols, .main, .side { gap: var(--ds-space-3); } }
+@container pd (min-width: 720px) {
+  .cols { grid-template-columns: minmax(0, 1fr) 240px; align-items: start; }
+}
+@container pd (min-width: 1000px) {
+  .cols { grid-template-columns: minmax(0, 1fr) minmax(260px, 28%); }
+}
+
+/* ---------- D: phase strip card ---------- */
+.stripCard {
+  display: grid; gap: var(--ds-space-3); min-width: 0; padding: var(--ds-space-4); overflow: hidden;
+  border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent);
+}
+.clockSlot { display: grid; min-width: 0; }
+.clockSlot > span { display: grid; min-width: 0; }
+.clockSlot > span > span { color: var(--theme-text); font-weight: var(--ds-weight-medium); }
+.clockSlot > .clockShort { display: none; }
+@media (max-width: 599.98px) { .stripCard { padding: var(--ds-space-3) var(--ds-space-4); } .stripCard nav { margin-inline: calc(-1 * var(--ds-space-2)); padding-inline: var(--ds-space-2); } }
+/* The strip (drawn in project-detail-client.tsx): bar, marker, name per segment. Done = green tick, current = FILLED
+   violet dot ("you are here"), later = grey number dot, the gate (Ads live) = a small diamond. A name breaks only
+   between words. The grey box marks a tapped filter only, never the current phase. */
+.strip { min-width: 0; overflow-x: auto; scrollbar-width: thin; scroll-snap-type: x proximity; }
+.segs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(72px, 1fr); margin: 0; padding: 0; list-style: none; }
+.segs > li { display: flex; min-width: 0; scroll-snap-align: start; }
+.seg {
+  position: relative; display: grid; flex: 1; justify-items: center; align-content: start; gap: 6px; min-width: 0; min-height: 44px; padding: 0 2px var(--ds-space-2);
+  border-radius: var(--ds-radius-sm); color: var(--theme-text-muted); text-align: center; text-decoration: none;
+}
+.seg:hover { background: var(--ds-hover); }
+.seg[data-selected] { background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1px var(--theme-border); }
+.segBar { justify-self: stretch; height: 6px; border-radius: 3px; background: var(--pm-faint); }
+.seg[data-state="done"] .segBar, .seg[data-state="current"] .segBar { background: var(--pm-solid); }
+.seg[data-state="late"] .segBar { background: var(--tone-problem-mark); }
+.segMark {
+  display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1.5px solid var(--theme-border-strong); border-radius: var(--ds-radius-pill);
+  background: var(--theme-surface); color: var(--theme-text-muted); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); line-height: 1; font-variant-numeric: tabular-nums;
+}
+.segMark svg { width: 14px; height: 14px; stroke-width: 3; }
+.seg[data-state="done"] .segMark { border-color: transparent; background: var(--tone-done-soft); color: var(--tone-done-mark); }
+.seg[data-state="current"] .segMark { border-color: var(--theme-action); background: var(--theme-action); color: var(--theme-action-text); font-weight: var(--ds-weight-strong); }
+.seg[data-state="late"] .segMark { border-color: var(--tone-problem-mark); color: var(--tone-problem); }
+.segMark[data-gate] { border: 0; background: none; }
+.diamond { display: block; width: 12px; height: 12px; border: 1.5px solid var(--theme-border-strong); border-radius: 2px; background: var(--theme-surface); transform: rotate(45deg); }
+.segName { font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); line-height: 1.3; overflow-wrap: break-word; }
+.seg[data-state="current"] { color: var(--theme-action); }
+.seg[data-state="current"] .segName { font-weight: var(--ds-weight-strong); }
+.seg[data-state="late"] { color: var(--tone-problem); }
+.segNum { display: none; }
+/* Phone (one column, under 720 px of content): nine small nodes on one connected line, all nine across the card, no
+   scrolling (PICKS 02 phone-R). Each column is the link (44 px+ tall): node (done = tick, current = filled number,
+   later = hollow), its number, then a small name of up to two lines. The line runs node to node: solid up to the
+   current phase, faint after it. */
+@container pd (max-width: 719.98px) {
+  .strip { container: strip / inline-size; overflow: visible; }
+  .stripCard nav { margin-inline: -10px; padding-inline: 0; }
+  .clockSlot:has(> .clockShort) > .clockFull { display: none; }
+  .clockSlot > .clockShort { display: grid; }
+  /* Each column is at least its longest word plus 2 px a side (never two names touching); the rest is shared evenly. */
+  .segs { grid-auto-columns: minmax(min-content, 1fr); }
+  .segs > li { position: relative; }
+  .segs > li::before {
+    content: ""; position: absolute; top: 12px; left: 0; right: 0; height: 2px; background: var(--pm-faint); pointer-events: none;
+  }
+  .segs > li:first-child::before { left: 50%; }
+  .segs > li:last-child::before { right: 50%; }
+  .segs > li:has(> [data-state="done"])::before { background: var(--pm-solid); }
+  .segs > li:has(> [data-state="current"])::before { background: linear-gradient(to right, var(--pm-solid) 50%, var(--pm-faint) 50%); }
+  .segs > li:first-child:has(> [data-state="current"])::before { background: var(--pm-faint); }
+  .seg { gap: 2px; min-height: 64px; padding: 4px 2px var(--ds-space-2); }
+  .segBar { display: none; }
+  .segMark { width: 18px; height: 18px; border-width: 1.5px; font-size: 10px; }
+  .segMark svg { width: 12px; height: 12px; }
+  .seg[data-state="later"] .segMark, .seg[data-state="late"] .segMark { font-size: 0; }
+  .seg[data-state="done"] .segMark { background: var(--tone-done-mark); color: var(--theme-surface); }
+  .diamond { width: 10px; height: 10px; }
+  .segNum { display: block; margin-top: 2px; font-size: 10px; font-weight: var(--ds-weight-medium); line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .segName { font-size: 10px; line-height: 1.2; letter-spacing: -0.02em; overflow-wrap: normal; }
+}
+@container strip (min-width: 380px) { .segNum, .segName { font-size: 11px; } }
+/* Two columns: all nine segments fit without scrolling. */
+@container pd (min-width: 720px) {
+  .stripCard { padding-inline: var(--ds-space-3); }
+  .segs { grid-auto-columns: minmax(0, 1fr); }
+  .seg { padding-inline: 1px; }
+}
+
+/* ---------- C: next step card ---------- */
+.next {
+  container: nx / inline-size; min-width: 0; padding: var(--ds-space-4);
+  border: 1px solid color-mix(in srgb, var(--theme-action) 22%, var(--ds-line)); border-radius: var(--ds-radius-lg);
+  background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent);
+}
+@media (max-width: 599.98px) { .next { padding: var(--ds-space-3) var(--ds-space-4); } }
+/* The card is the container; its inner grid switches to "text | button + Open" once the card is wide enough. */
+.nextIn { display: grid; gap: var(--ds-space-4); min-width: 0; }
+.nextText { display: grid; gap: var(--ds-space-1); min-width: 0; }
+.eyebrow { margin: 0; color: var(--theme-action); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); }
+.nextTitle { margin: 0; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); letter-spacing: var(--ds-tracking-tight); line-height: 1.25; overflow-wrap: anywhere; }
+.nextMeta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2) var(--ds-space-3); margin-top: var(--ds-space-1); }
+.who { display: inline-flex; align-items: center; gap: var(--ds-space-2); min-width: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+.who b { color: var(--theme-text); font-weight: var(--ds-weight-medium); }
+.nextActions { display: grid; justify-items: center; gap: var(--ds-space-1); }
+.next .nextPrimary { width: 100%; }
+.openLink {
+  display: inline-flex; align-items: center; min-height: 44px; padding-inline: var(--ds-space-2); color: var(--theme-action); font-weight: var(--ds-weight-medium);
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--theme-action) 40%, transparent);
+}
+.openLink:hover { text-decoration-color: currentColor; }
+@container nx (min-width: 500px) {
+  .nextIn { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .nextActions { grid-auto-flow: column; align-items: center; gap: var(--ds-space-3); }
+  .next .nextPrimary { width: auto; min-width: 140px; }
+}
+
+.listSlot { display: grid; min-width: 0; }
+
+/* ---------- E: step list ---------- */
+.listCard { container: steps / inline-size; }
+.listCard > header { flex-wrap: wrap; row-gap: var(--ds-space-1); }
+.listMeta { color: var(--theme-text-muted); font-weight: var(--ds-weight-regular); }
+.views { display: flex; gap: 2px; }
+.views a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 var(--ds-space-2); border-radius: var(--ds-radius-sm); color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); text-decoration: none; }
+.views a:hover { background: var(--ds-hover); color: var(--theme-text); }
+.views a[aria-current] { background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); }
+@media (max-width: 899.98px), (pointer: coarse) { .views a { min-height: 40px; } }
+
+@container pd (max-width: 599.98px) { .views { display: none; } }
+
+/* Each row is a small grid; the link covers the whole row (subgrid, so its parts line up with the row's columns) and
+   the owner's own action sits on top of it in its own cell, outside the link. Only a row WITH an action gives it room. */
+.rows { display: grid; margin: 0; padding: 0; list-style: none; }
+.row {
+  position: relative; display: grid; grid-template-columns: 4px 20px minmax(0, 1fr) auto 4px; align-items: center; column-gap: var(--ds-space-3);
+  border-top: 1px solid var(--ds-line);
+}
+.row:hover { background: var(--theme-surface-subtle); }
+.row[data-next], .row[data-next]:hover { background: color-mix(in srgb, var(--theme-action) 9%, var(--theme-surface)); }
+.rowLink {
+  grid-column: 1 / -1; grid-row: 1; display: grid; grid-template-columns: subgrid; grid-template-rows: auto auto; align-items: center; row-gap: 2px;
+  min-height: 56px; padding-block: var(--ds-space-2); color: inherit; text-decoration: none;
+}
+.rowLink:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: -2px; border-radius: var(--ds-radius-xs); }
+.mark { grid-column: 2; grid-row: 1; width: 20px; height: 20px; color: var(--theme-border-strong); }
+.mark[data-done] { color: var(--tone-done-mark); }
+.rowTitle { grid-column: 3; grid-row: 1; min-width: 0; color: var(--theme-text); font-weight: var(--ds-weight-medium); overflow-wrap: anywhere; }
+.row[data-next] .rowTitle { font-weight: var(--ds-weight-strong); }
+.rowMeta { grid-column: 3; grid-row: 2; display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-1) var(--ds-space-2); min-width: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+.ownerName { white-space: nowrap; }
+.ownerName::after, .due::after { content: "\00B7"; margin-left: var(--ds-space-2); }
+.owner { display: none; min-width: 0; }
+.due { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.state { display: inline-flex; min-width: 0; }
+.act { position: relative; z-index: 1; grid-column: 4; grid-row: 1; display: flex; }
+.empty { margin: 0; padding: var(--ds-space-3) var(--ds-space-4); color: var(--theme-text-muted); }
+.seeAll { display: flex; align-items: center; min-height: 44px; padding: 0 var(--ds-space-4); border-top: 1px solid var(--ds-line); color: var(--theme-action); font-weight: var(--ds-weight-medium); text-decoration: none; }
+.seeAll:hover { text-decoration: underline; }
+
+
+/* One line per step once the list is wide enough: tick, title, owner, state, date. The action sits at the end of the
+   state cell, so the title keeps its width and the date stays at the card edge on every row. */
+@container steps (min-width: 480px) {
+  .row { grid-template-columns: 4px 20px minmax(0, 1fr) 76px 152px 48px 4px; column-gap: var(--ds-space-2); }
+  .rowLink { grid-template-rows: auto; min-height: 52px; }
+  .rowMeta { display: contents; }
+  .ownerName { display: none; }
+  .owner { display: flex; grid-column: 4; grid-row: 1; font-size: var(--ds-text-sm); }
+  .state { grid-column: 5; grid-row: 1; }
+  .due { grid-column: 6; grid-row: 1; justify-self: end; color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+  .due::after { content: none; }
+  .act { grid-column: 5; justify-self: end; }
+}
+@container steps (min-width: 640px) {
+  .row { grid-template-columns: 4px 20px minmax(0, 1fr) 104px 252px 56px 4px; column-gap: var(--ds-space-3); }
+  .rowLink { min-height: 48px; padding-block: 6px; }
+}
+
+/* ---------- Needs setup ---------- */
+.root .setup { grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-3); padding: var(--ds-space-5); }
+.setupIcon { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: var(--ds-radius-md); background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); }
+.setupIcon svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.setupText { display: grid; gap: var(--ds-space-1); min-width: 0; }
+.setupTitle { margin: 0; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); line-height: 1.25; }
+.root .setupBtn { width: 100%; }
+@container pd (min-width: 600px) {
+  .root .setup { justify-items: start; padding: var(--ds-space-6); }
+  .root .setupBtn { width: auto; min-width: 160px; }
+}
+
+.root .noNext { padding: var(--ds-space-4); }
+
+/* ---------- F, G: side cards ---------- */
+.team { display: grid; margin: 0; padding: 0; list-style: none; }
+.team > li { display: flex; align-items: center; gap: var(--ds-space-3); min-height: 52px; padding: var(--ds-space-2) 0; border-top: 1px solid var(--ds-line); }
+.team > li:first-child { border-top: 0; }
+.teamText { display: grid; min-width: 0; line-height: 1.3; }
+.teamText b { color: var(--theme-text); font-weight: var(--ds-weight-medium); }
+
+/* Clocks: the label link fills the row height (44 px+ tap target); an unset clock's "Not set" sits on the label line. */
+.clocks li > a { align-self: stretch; display: flex; align-items: center; min-height: 44px; }
+.clocks li > span:empty { display: none; }
+.clocks li:has(> span:empty) > span:last-child { grid-area: auto; grid-column: 3; grid-row: 1 / span 2; align-self: center; }

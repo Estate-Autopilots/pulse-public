@@ -1,0 +1,12 @@
+/* PM-BUILD-4: My day's "From your chats" (step cards). */
+.box { display: grid; gap: 8px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--theme-border); border-radius: 12px; background: var(--theme-surface); }
+.top { display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 4px 12px; }
+.head { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 15px; color: var(--theme-text); }
+.head small { padding: 0 7px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: 12px; font-weight: 600; }
+.list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.list > li { display: grid; gap: 2px; }
+.list > li > div { justify-self: stretch; width: auto; max-width: none; margin: 0; }
+.where { margin: 0; color: var(--theme-text-muted); font-size: 12.5px; overflow-wrap: anywhere; }
+.where a { color: var(--theme-text); font-weight: 600; }
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px 8px; margin: -2px 0 0; color: var(--theme-text-muted); font-size: 12.5px; }
+.sub { margin: -4px 0 0; color: var(--theme-text-muted); font-size: 12.5px; }

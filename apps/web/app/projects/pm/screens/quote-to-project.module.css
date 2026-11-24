@@ -1,0 +1,194 @@
+/* PM-UI 14 Quote to project. Tokens only. Widths by container (content width, not viewport):
+   < 600 phone: separate blocks, count under each name, chips at the right two per line, full-width button.
+   ≥ 600 tablet/laptop: one card holding band · lines · total · lead · note + button; count in a right column.
+   (834 gives about 800 px of content, a 1440 laptop about 1064 px beside the side menu.) */
+
+.wrap { container-type: inline-size; display: grid; align-content: start; gap: var(--ds-space-3); min-width: 0; }
+.muted { color: var(--theme-text-muted); font-weight: var(--ds-weight-regular); }
+
+/* ---------- 1. Title row ---------- */
+.titleRow { display: flex; align-items: flex-start; gap: var(--ds-space-1); min-width: 0; }
+.backBtn {
+  display: inline-grid; flex: none; place-items: center; width: 44px; height: 44px; margin: -6px 0 0 -10px;
+  border-radius: var(--ds-radius-md); color: var(--theme-text); text-decoration: none;
+}
+.backBtn:hover { background: var(--ds-hover); }
+.backBtn svg { width: var(--ds-icon-md); height: var(--ds-icon-md); stroke-width: 2; }
+.title { margin: 0; min-width: 0; color: var(--theme-text); font-size: var(--ds-text-2xl); font-weight: var(--ds-weight-heavy); letter-spacing: var(--ds-tracking-tight); line-height: 1.2; overflow-wrap: anywhere; text-wrap: balance; }
+
+/* ---------- The card (phone: a plain stack of blocks) ---------- */
+.card { display: grid; align-content: start; gap: var(--ds-space-3); min-width: 0; }
+.skel { display: grid; gap: var(--ds-space-3); min-width: 0; }
+
+/* ---------- 2. Quote band (soft project tint) ---------- */
+.band {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--ds-space-3);
+  min-height: 80px; padding: var(--ds-space-3); border: 1px solid color-mix(in srgb, var(--pm-hue) 22%, var(--theme-surface));
+  border-radius: var(--ds-radius-lg); background: var(--pm-soft);
+}
+.band > span:first-child { width: 48px; height: 48px; border-radius: var(--ds-radius-md); }
+.band > span:first-child svg { width: var(--ds-icon-lg); height: var(--ds-icon-lg); }
+.bandText { display: grid; gap: 2px; min-width: 0; }
+.pkg { display: block; color: var(--theme-text); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); line-height: 1.3; overflow-wrap: anywhere; }
+.client { display: block; color: var(--theme-text-muted); font-size: var(--ds-text-md); line-height: 1.35; overflow-wrap: anywhere; }
+.accepted { display: inline-flex; align-self: center; }
+.accepted > span { min-height: 26px; padding-inline: var(--ds-space-3); border-radius: var(--ds-radius-pill); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-strong); }
+/* Light: on the teal band the kit's faint green fill disappears; a firmer soft green pill with a thin green hairline. */
+:global(:root[data-theme="light"]) .accepted > span {
+  background: color-mix(in srgb, var(--theme-success) 18%, var(--theme-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-success) 40%, var(--theme-surface));
+  color: var(--tone-done);
+}
+
+/* ---------- Already made: a quiet band above the lines ---------- */
+.exists {
+  display: flex; align-items: center; gap: var(--ds-space-2); margin: 0; padding: var(--ds-space-2) var(--ds-space-3);
+  border-radius: var(--ds-radius-md); background: var(--theme-surface-subtle); color: var(--theme-text-muted); font-size: var(--ds-text-md);
+}
+.exists svg { flex: none; width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+
+/* ---------- 3. Lines ---------- */
+.lines {
+  display: grid; margin: 0; padding: 0 var(--ds-space-3); list-style: none;
+  border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent);
+}
+.row {
+  display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; grid-template-areas: "icon name side" "icon sub side";
+  align-items: center; column-gap: var(--ds-space-2); row-gap: 2px; min-height: 64px; padding-block: var(--ds-space-3);
+  border-top: 1px solid var(--ds-line);
+}
+.row:first-child { border-top: 0; }
+.lIcon { grid-area: icon; align-self: stretch; display: flex; align-items: center; height: 100%; min-height: 36px; border-right: 1px solid var(--ds-line); color: var(--theme-text); }
+.lIcon svg { width: var(--ds-icon-md); height: var(--ds-icon-md); stroke-width: 1.8; }
+.lName { grid-area: name; align-self: end; display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-1) var(--ds-space-2); min-width: 0; color: var(--theme-text); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); line-height: 1.3; overflow-wrap: anywhere; }
+.sub { grid-area: sub; align-self: start; color: var(--theme-text-muted); font-size: var(--ds-text-md); line-height: 1.35; font-variant-numeric: tabular-nums; }
+.arrow { display: none; }
+.count { display: none; }
+
+/* Chips: plain grey pills, not pressable. Phone: at most two per line, at the right. */
+.blocks { grid-area: side; align-self: center; display: grid; grid-template-columns: repeat(2, auto); justify-content: end; justify-items: end; gap: var(--ds-space-1) var(--ds-space-1); margin: 0; padding: 0; list-style: none; min-width: 0; }
+/* Phone chips are a step smaller and lighter (22 px, no outline) so a name like "Meta ads × 4 months" keeps one line. */
+.block, .tag {
+  display: inline-flex; align-items: center; min-height: 22px; padding: 1px 6px; border-radius: var(--ds-radius-pill);
+  background: var(--theme-surface-subtle); color: var(--theme-text); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); line-height: 1.3; white-space: nowrap;
+}
+.tagInline { display: none; }
+.tagSide { grid-area: side; align-self: center; justify-self: end; }
+
+/* ---------- 4. Total band (soft accent tint) ---------- */
+.total {
+  display: flex; align-items: center; gap: var(--ds-space-2); margin: 0; min-height: 48px; padding: var(--ds-space-2) var(--ds-space-4);
+  border-radius: var(--ds-radius-md); background: color-mix(in srgb, var(--theme-action) 11%, var(--theme-surface));
+  color: color-mix(in srgb, var(--theme-action) 82%, var(--theme-text)); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong);
+}
+.total svg { flex: none; width: var(--ds-icon-md); height: var(--ds-icon-md); }
+
+/* ---------- 5. Lead line ---------- */
+.lead {
+  display: flex; align-items: center; gap: var(--ds-space-3); margin: 0; min-height: 52px; padding: var(--ds-space-2) var(--ds-space-4);
+  border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); color: var(--theme-text); font-size: var(--ds-text-lg);
+}
+.lead svg { flex: none; width: var(--ds-icon-md); height: var(--ds-icon-md); color: var(--theme-action); }
+.lead b { font-weight: var(--ds-weight-strong); }
+
+/* ---------- 6–7. Note + action ---------- */
+.foot { display: grid; gap: var(--ds-space-3); min-width: 0; }
+.note { display: flex; align-items: center; gap: var(--ds-space-2); margin: 0; padding-inline: var(--ds-space-1); color: var(--theme-text-muted); font-size: var(--ds-text-md); }
+.note svg { flex: none; width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+.foot .action.action { width: 100%; min-height: 48px; }
+.foot .busy:disabled { border-color: var(--theme-action); background: var(--theme-action); color: var(--theme-action-text); opacity: 0.72; cursor: progress; }
+.busy svg { animation: qp-spin 900ms linear infinite; }
+@keyframes qp-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .busy svg { animation: none; } }
+
+/* Created: a quiet green line, then the one filled "Open draft". */
+.made { display: grid; gap: var(--ds-space-3); min-width: 0; }
+.madeLine { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-1) var(--ds-space-2); margin: 0; padding-inline: var(--ds-space-1); color: var(--tone-done); font-size: var(--ds-text-md); line-height: 1.4; }
+.madeIcon { flex: none; width: var(--ds-icon-sm); height: var(--ds-icon-sm); color: var(--tone-done-mark); }
+.madeText strong { font-weight: var(--ds-weight-strong); }
+.madeState { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2); }
+
+/* ---------- Loading: bones at the final heights ---------- */
+.bone { display: block; border-radius: var(--ds-radius-xs); background: color-mix(in srgb, var(--theme-text) 8%, var(--theme-surface)); animation: qp-pulse 1.4s var(--ds-ease) infinite alternate; }
+.bandSkel { --pm-hue: var(--ds-hue-slate); --pm-soft: var(--theme-surface-subtle); grid-template-columns: auto minmax(0, 1fr); }
+.tileBone { width: 48px; height: 48px; border-radius: var(--ds-radius-md); }
+i.pkg, i.client, i.sub, .nameBone { height: 1.3em; }
+i.pkg { width: 40%; } i.client { width: 28%; }
+.nameBone { flex: none; width: 55%; } .nameBone[data-w="70"] { width: 70%; }
+i.sub { width: 30%; }
+.iconBone { width: 20px; height: 20px; }
+.blockBone { width: 52px; height: 22px; border-radius: var(--ds-radius-pill); }
+.tagBone { width: 48px; height: 22px; border-radius: var(--ds-radius-pill); }
+.skel .tagInline { display: none; }
+.skel .tagSide { display: block; }
+.countBone { width: 64px; height: 1.3em; }
+.totalSkel { background: var(--theme-surface-subtle); }
+.lineBone { height: 1.3em; width: 40%; }
+.lineBone[data-w="25"] { width: 25%; }
+.lineBone[data-w="45"] { width: 45%; }
+.noteBone { height: 20px; }
+.btnBone { width: 100%; height: 48px; border-radius: var(--ds-radius-md); }
+@keyframes qp-pulse { from { opacity: 1; } to { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .bone { animation: none; } }
+
+/* ================= Tablet and laptop: one card ================= */
+@container (min-width: 600px) {
+  .wrap { gap: var(--ds-space-4); }
+  .titleRow { align-items: center; gap: var(--ds-space-2); }
+  .backBtn { margin: 0 0 0 -10px; }
+  .title { font-size: var(--ds-text-3xl); text-wrap: wrap; }
+
+  .card {
+    gap: var(--ds-space-4); padding: var(--ds-space-4); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-xl);
+    background: var(--theme-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent);
+  }
+  .skel { gap: var(--ds-space-4); }
+  .band { min-height: 96px; padding: var(--ds-space-4) var(--ds-space-5); gap: var(--ds-space-4); }
+  .band > span:first-child, .tileBone { width: 56px; height: 56px; border-radius: var(--ds-radius-lg); }
+  .band > span:first-child svg { width: 28px; height: 28px; }
+  .pkg { font-size: var(--ds-text-xl); }
+  .client { font-size: var(--ds-text-lg); }
+
+  .lines { padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+  .row {
+    grid-template-columns: 32px minmax(0, 15rem) 20px minmax(0, 1fr) auto; grid-template-areas: "icon name arrow side count";
+    column-gap: var(--ds-space-4); min-height: 56px; padding: var(--ds-space-2) var(--ds-space-2);
+  }
+  .lIcon { justify-content: center; border-right: 0; }
+  .lName { align-self: center; flex-wrap: nowrap; }
+  .sub { display: none; }
+  .arrow { grid-area: arrow; display: block; width: 20px; height: 20px; color: var(--theme-text-muted); stroke-width: 1.8; }
+  .blocks { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: var(--ds-space-2); }
+  .block, .tag { min-height: 26px; padding: 2px var(--ds-space-2); box-shadow: inset 0 0 0 1px var(--ds-line); font-size: var(--ds-text-sm); }
+  .tagInline { display: inline-flex; flex: none; }
+  .tagSide { display: none; }
+  .count {
+    grid-area: count; align-self: stretch; display: flex; align-items: center; justify-content: flex-end; min-width: 104px;
+    padding-left: var(--ds-space-4); border-left: 1px solid var(--ds-line); color: var(--theme-text); font-size: var(--ds-text-lg);
+    font-weight: var(--ds-weight-medium); white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .blockBone { width: 60px; height: 26px; }
+  .tagBone { height: 26px; }
+  .skel .tagInline { display: block; flex: none; }
+  .skel .tagSide { display: none; }
+  .noteBone { height: 22px; }
+  .btnBone { width: 220px; height: 44px; }
+
+  .total { min-height: 52px; padding-inline: var(--ds-space-5); }
+  .lead { min-height: 44px; padding: 0 var(--ds-space-5) var(--ds-space-4); border: 0; border-bottom: 1px solid var(--ds-line); border-radius: 0; background: none; }
+
+  .foot { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--ds-space-3) var(--ds-space-4); padding-inline: var(--ds-space-5) 0; }
+  .note { padding-inline: 0; font-size: var(--ds-text-lg); color: var(--theme-text); }
+  .note svg { width: var(--ds-icon-md); height: var(--ds-icon-md); color: var(--theme-text-muted); }
+  .foot .action.action { width: auto; min-width: 220px; min-height: 44px; }
+  .foot[data-created] { grid-template-columns: minmax(0, 1fr); }
+  .made { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--ds-space-4); }
+  .madeLine { padding-inline: 0; font-size: var(--ds-text-lg); }
+}
+
+@container (min-width: 960px) {
+  .card { padding: var(--ds-space-5); }
+  .row { grid-template-columns: 32px minmax(0, 17rem) 20px minmax(0, 1fr) auto; min-height: 54px; }
+  .count { min-width: 120px; }
+}

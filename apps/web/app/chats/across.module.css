@@ -1,0 +1,45 @@
+/* CHAT-ALL: the switch at the top of the chat list (one line: All companies or this company, a menu for the rest), the company
+   tag on a row, and "which company?". Each company has its own colour (--org-hue: lib/chat-across.mjs hueOf), the same on its
+   logo, tag and menu row. */
+.bar { flex: none; margin: 2px 12px 8px; }
+.trigger { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; height: 40px; padding: 0 10px 0 8px; border: 1px solid var(--ds-line, var(--theme-border)); border-radius: 12px;
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: 14px; font-weight: 650; white-space: nowrap; text-align: left; cursor: pointer;
+  transition: border-color var(--ds-fast, 140ms) ease, background-color var(--ds-fast, 140ms) ease; }
+.trigger:hover { border-color: color-mix(in srgb, var(--theme-action) 45%, var(--theme-border)); }
+.trigger[aria-expanded="true"] { border-color: var(--theme-action); background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); }
+.trigger:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+/* The name comes first: "N unread elsewhere" gives way to it on a narrow list. */
+.name { flex: 0 0 auto; max-width: 70%; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.chev { flex: none; margin-left: auto; color: var(--theme-text-muted); }
+.elsewhere { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; margin-left: auto; padding: 2px 8px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text); font-size: 12px; font-weight: 600; }
+.elsewhere ~ .chev { margin-left: 0; }
+.count { flex: none; display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--theme-action); color: var(--theme-action-text);
+  font-size: var(--ds-text-xs, 12px); font-style: normal; font-weight: 700; }
+.allIcon { flex: none; display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: color-mix(in srgb, var(--theme-action) 15%, var(--theme-surface)); color: var(--theme-action); }
+/* A menu row: the name and its unread on one line (the hint below is the kit's). */
+.item { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: 600; }
+.item > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item > i, .item > svg { margin-left: auto; }
+
+.mark { flex: none; display: inline-grid; place-items: center; border-radius: 6px; object-fit: cover; letter-spacing: 0; line-height: 1; font-weight: 750;
+  background: hsl(var(--org-hue, 250) 48% 38%); color: #fff; }
+
+/* The company tag sits before the preview on the row's second line (its own flex item: same centre line, a clear gap). */
+.tag { flex: 0 1 auto; display: inline-flex; align-items: center; gap: 5px; max-width: 50%; min-width: 0; height: 20px; padding: 0 7px 0 2px; border-radius: 6px;
+  background: color-mix(in srgb, hsl(var(--org-hue, 250) 48% 45%) 18%, var(--theme-surface)); color: var(--theme-text); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.tag > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tag .mark { border-radius: 4px; }
+
+.pick { width: min(420px, 100%); }
+.pickList { display: grid; gap: 8px; max-height: min(60vh, 420px); overflow-y: auto; margin: 2px -4px 0; padding: 4px; }
+.pickRow { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 62px; padding: 10px 12px; border: 1px solid var(--ds-line, var(--theme-border)); border-radius: 12px;
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+.pickRow:hover, .pickRow:focus-visible { border-color: var(--theme-action); outline: none; background: color-mix(in srgb, var(--theme-action) 6%, var(--theme-surface)); }
+.pickRow[data-here] { border-color: color-mix(in srgb, var(--theme-action) 55%, var(--theme-border)); }
+.pickRow .mark { border-radius: 9px; }
+.pickText { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pickText b { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; font-size: 15px; font-weight: 650; line-height: 1.3; }
+.pickText small { color: var(--theme-text-muted); font-size: 12.5px; }
+.pickGo { flex: none; color: var(--theme-text-muted); }
+.pickRow[data-here] .pickGo { color: var(--theme-action); }
+.pickRow:disabled { cursor: progress; opacity: .7; }

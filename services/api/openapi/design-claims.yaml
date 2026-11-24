@@ -1,0 +1,110 @@
+openapi: 3.1.0
+info: { title: Pulse shared-login design claims, version: 1.0.0 }
+paths:
+  /v1/designs/claimable:
+    get:
+      summary: List claimable shared-login design exports and the authenticated designer's pending claims for an ISO week
+      description: Only active staff whose role is configured in the designers targets may read this queue. Pending claims are visible only to their claimant; records omit uploader and other claimant identity.
+      parameters:
+        - { name: week, in: query, required: true, schema: { type: string, pattern: '^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$' } }
+      responses:
+        '200':
+          description: Unclaimed shared-login design exports and this designer's pending claims
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [week, designs]
+                properties:
+                  week: { type: string }
+                  designs:
+                    type: array
+                    items: { $ref: '#/components/schemas/ClaimableDesign' }
+        '400': { description: Invalid ISO week }
+        '403': { description: Active designer role required }
+  /v1/designs/{id}/claim:
+    post:
+      summary: Claim a shared-login design export for the authenticated designer
+      parameters:
+        - { name: id, in: path, required: true, description: Opaque indexed Drive file identifier, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: false }
+      responses:
+        '200':
+          description: The designer's pending claim
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DesignClaim' }
+        '400': { description: Invalid design identifier or non-empty body }
+        '403': { description: Active designer role required }
+        '409': { description: Design export is not available or already has an active claim }
+  /v1/designs/claims:
+    get:
+      summary: List visible design claims for manager review
+      description: Admins see organisation claims and managers see claims allowed by the delivery_claim_visible row policy. Personal data reads are access logged per claimant.
+      parameters:
+        - { name: week, in: query, required: true, schema: { type: string, pattern: '^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$' } }
+        - { name: status, in: query, required: false, schema: { type: string, enum: [pending, confirmed, rejected], default: pending } }
+      responses:
+        '200':
+          description: Design claims visible to the authenticated admin or manager
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [week, claims]
+                properties:
+                  week: { type: string }
+                  claims:
+                    type: array
+                    items: { $ref: '#/components/schemas/DesignClaimReview' }
+        '400': { description: Invalid ISO week or claim status }
+        '403': { description: Manager or admin access required }
+components:
+  schemas:
+    DesignType:
+      type: string
+      enum: [single_image_ad, carousel, brochure, logo, pitch_deck, other]
+    ClaimableDesign:
+      type: object
+      additionalProperties: false
+      required: [id, projectName, fileName, type, uploadedAt, status]
+      properties:
+        id: { type: string, description: Opaque indexed Drive file identifier used by design claim routes. }
+        projectName: { type: string }
+        fileName: { type: string }
+        type: { $ref: '#/components/schemas/DesignType' }
+        uploadedAt: { type: string, format: date-time }
+        status: { type: string, enum: [claimable, pending] }
+    DesignClaim:
+      type: object
+      additionalProperties: false
+      required: [id, designId, personId, status, creditedVia, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        designId: { type: string }
+        personId: { type: string, format: uuid }
+        status: { type: string, enum: [pending, confirmed, rejected] }
+        creditedVia: { type: string, enum: [claim] }
+        createdAt: { type: string, format: date-time }
+    DesignClaimReview:
+      type: object
+      additionalProperties: false
+      required: [id, designId, personId, status, creditedVia, createdAt, personName, projectName, fileName, type, uploadedAt]
+      properties:
+        id: { type: string, format: uuid }
+        designId: { type: string }
+        personId: { type: string, format: uuid }
+        status: { type: string, enum: [pending, confirmed, rejected] }
+        creditedVia: { type: string, enum: [claim] }
+        createdAt: { type: string, format: date-time }
+        personName: { type: string }
+        projectName: { type: string }
+        fileName: { type: string }
+        type: { $ref: '#/components/schemas/DesignType' }
+        uploadedAt: { type: string, format: date-time }

@@ -1,0 +1,203 @@
+/* PM-UI Client inputs (sheets/client-inputs.md). Tokens only. Phone: one column, ring centred, journey as a list.
+   From 600 px of column (container "ci"): ring at the left of the title, journey as a row of four. The column is about
+   720 px on a tablet and 880 px on a laptop, centred; nothing in the side space. */
+
+/* ---------- Page: the client top bar over the centred column (container `cb` = the page width, as client-view's `cv`) ---------- */
+.root { container: cb / inline-size; display: grid; align-content: start; gap: var(--ds-space-4); width: 100%; max-width: 1200px; min-width: 0; margin-inline: auto; }
+@media (max-width: 599.98px) { .root { gap: var(--ds-space-3); } }
+
+/* ---------- Client top bar: a copy of client-view's (same order, sizes, tile, links and breakpoints) ----------
+   Phone: two lines (mark + agency … avatar; then the project tile + name as the page title). From 600 px: one line,
+   with Project · Chat · Files before the contact and the contact's full name. */
+.bar {
+  position: sticky; top: calc(-1 * var(--ds-space-1)); z-index: var(--ds-z-sticky);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "agency contact" "project project";
+  align-items: center; gap: var(--ds-space-2) var(--ds-space-3); min-width: 0; min-height: 56px; padding: var(--ds-space-2) var(--ds-space-4);
+  border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface);
+}
+.agency { grid-area: agency; display: inline-flex; align-items: center; gap: var(--ds-space-2); min-width: 0; color: var(--theme-text); font-size: var(--ds-text-lg); }
+.agency strong { min-width: 0; overflow: hidden; font-weight: var(--ds-weight-strong); letter-spacing: var(--ds-tracking-tight); text-overflow: ellipsis; white-space: nowrap; }
+.agencyMark { display: inline-grid; flex: none; place-items: center; width: 28px; height: 28px; border-radius: var(--ds-radius-sm); background: var(--theme-text); color: var(--theme-surface); }
+.agencyMark svg { width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+.project { grid-area: project; display: flex; align-items: center; gap: var(--ds-space-3); min-width: 0; }
+.projectName {
+  min-width: 0; margin: 0; overflow: hidden; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong);
+  letter-spacing: var(--ds-tracking-tight); line-height: 1.25; text-overflow: ellipsis; white-space: nowrap;
+}
+.nav { display: none; }
+.contact { grid-area: contact; display: inline-flex; align-items: center; gap: var(--ds-space-2); min-width: 0; color: var(--theme-text); font-weight: var(--ds-weight-medium); }
+.contactName { display: none; white-space: nowrap; }
+@container cb (min-width: 600px) {
+  .bar { display: flex; flex-wrap: nowrap; gap: var(--ds-space-3); padding-block: var(--ds-space-1); }
+  .agency { flex: none; font-size: var(--ds-text-md); }
+  .project { flex: 0 1 auto; gap: var(--ds-space-2); padding-left: var(--ds-space-3); border-left: 1px solid var(--theme-border); }
+  .project > span { width: 32px; height: 32px; border-radius: var(--ds-radius-sm); }
+  .projectName { font-size: var(--ds-text-md); }
+  .nav { display: flex; flex: none; align-items: stretch; margin-left: auto; }
+  .navLink {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--ds-space-2); border-bottom: 2px solid transparent;
+    color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); text-decoration: none; white-space: nowrap;
+  }
+  .navLink:hover { color: var(--theme-text); }
+  .navLink[aria-current="page"] { border-bottom-color: var(--theme-action); color: var(--theme-text); font-weight: var(--ds-weight-strong); }
+  .contact { flex: none; font-size: var(--ds-text-sm); }
+  .contactName { display: inline; }
+}
+@container cb (min-width: 960px) {
+  .bar { gap: var(--ds-space-4); padding-inline: var(--ds-space-5); }
+  .agency { font-size: var(--ds-text-lg); }
+  .project { gap: var(--ds-space-3); padding-left: var(--ds-space-4); }
+  .project > span { width: 40px; height: 40px; border-radius: var(--ds-radius-md); }
+  .projectName { font-size: var(--ds-text-lg); }
+  .navLink { padding-inline: var(--ds-space-3); font-size: var(--ds-text-md); }
+  .contact { font-size: var(--ds-text-md); }
+}
+
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.nowrap { white-space: nowrap; }
+
+/* ---------- Column ---------- */
+.col { container: ci / inline-size; display: grid; gap: var(--ds-space-4); width: 100%; max-width: 880px; min-width: 0; margin-inline: auto; }
+@media (max-width: 1099.98px) { .col { max-width: 720px; } }
+@media (max-width: 599.98px) { .col { gap: var(--ds-space-3); } }
+
+.needCard, .journeyCard, .teamCard { gap: var(--ds-space-3); }
+
+/* ---------- Card 1: We need from you ---------- */
+.head { display: grid; gap: var(--ds-space-4); grid-template-areas: "text" "ring"; }
+.headText { grid-area: text; display: grid; gap: var(--ds-space-1); min-width: 0; }
+.title { margin: 0; font-size: var(--ds-text-2xl); font-weight: var(--ds-weight-heavy); letter-spacing: var(--ds-tracking-tight); line-height: 1.2; overflow-wrap: anywhere; }
+.dotSep { display: inline-block; margin-inline: 0.3em; color: var(--theme-text-muted); font-weight: var(--ds-weight-strong); letter-spacing: 0; }
+.lede { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-lg); line-height: 1.35; }
+
+.ring { grid-area: ring; position: relative; justify-self: center; width: 140px; height: 140px; margin-bottom: var(--ds-space-1); }
+.ring svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.track, .arc { fill: none; stroke-width: 9; }
+.track { stroke: color-mix(in srgb, var(--theme-action) 16%, var(--theme-surface)); }
+.arc { stroke: var(--theme-action); stroke-linecap: round; }
+.ringText { position: absolute; inset: 0; display: grid; place-items: center; font-size: var(--ds-text-3xl); font-weight: var(--ds-weight-heavy); letter-spacing: var(--ds-tracking-tight); font-variant-numeric: tabular-nums; }
+
+.rows { display: grid; margin: 0; padding: 0; list-style: none; }
+.row {
+  display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; grid-template-areas: "icon name chip";
+  align-items: center; column-gap: var(--ds-space-3); row-gap: var(--ds-space-1);
+  min-height: 52px; padding: var(--ds-space-2) 0; border-top: 1px solid var(--ds-line);
+}
+.row[data-state="needed"] { grid-template-areas: "icon name btn" "icon sub btn" "icon err err"; row-gap: 0; min-height: 60px; }
+.row[data-state="needed"] .sub, .row[data-state="needed"] .failed { margin-top: var(--ds-space-1); }
+.rowIcon { grid-area: icon; width: 22px; height: 22px; color: var(--theme-text); stroke-width: 1.6; }
+.rowName { grid-area: name; min-width: 0; font-size: var(--ds-text-lg); font-weight: var(--ds-weight-medium); line-height: 1.3; overflow-wrap: anywhere; }
+.row[data-state="needed"] .rowName { align-self: end; }
+.sub { grid-area: sub; align-self: start; display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-1) var(--ds-space-2); min-width: 0; }
+.chip { grid-area: chip; display: inline-flex; justify-self: end; }
+.sub .chip { justify-self: start; }
+.due { color: var(--theme-text-muted); font-size: var(--ds-text-sm); white-space: nowrap; }
+.failed { grid-area: err; color: var(--tone-problem); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
+.btn { grid-area: btn; display: inline-flex; justify-self: end; }
+.btn > * { min-width: 104px; }
+@container ci (max-width: 599.98px) { .btn svg { display: none; } }
+
+/* ---------- Card 2: Your journey ---------- */
+.cardTitle { margin: 0; font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); letter-spacing: var(--ds-tracking-tight); line-height: 1.25; }
+.journey { display: grid; margin: 0; padding: 0; list-style: none; }
+.jStep { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: start; align-content: start; column-gap: var(--ds-space-3); padding-bottom: var(--ds-space-4); }
+.jStep:last-child { padding-bottom: 0; }
+.jStep:not(:last-child)::before { content: ""; position: absolute; top: 24px; bottom: 0; left: 11px; width: 2px; background: var(--theme-border); }
+.jStep[data-state="done"]:not(:last-child)::before { background: var(--tone-done-mark); }
+.dot { position: relative; z-index: 1; display: grid; place-items: center; width: 24px; height: 24px; box-sizing: border-box; border: 2px solid var(--theme-border-strong); border-radius: 50%; background: var(--theme-surface); color: var(--theme-text-muted); }
+.dotIcon { display: none; width: 20px; height: 20px; stroke-width: 1.7; }
+.tick { width: 14px; height: 14px; stroke-width: 3; color: var(--tone-done); }
+.jStep[data-state="current"] .dot { border: 3px solid var(--theme-action); box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 16%, transparent); color: var(--theme-action); }
+.jStep[data-state="done"] .dot { border-color: var(--tone-done-mark); background: var(--tone-done-soft); }
+.jText { display: grid; gap: 2px; min-width: 0; padding-top: 1px; }
+.jLabel { color: var(--theme-text-muted); font-size: var(--ds-text-lg); line-height: 22px; }
+.jStep[data-state="current"] .jLabel { color: var(--theme-action); font-weight: var(--ds-weight-strong); }
+.jStep[data-state="done"] .jLabel { color: var(--theme-text); }
+.jStep:last-child .jLabel { color: var(--theme-text); font-weight: var(--ds-weight-medium); }
+.jDate { white-space: nowrap; }
+.jNote { color: var(--theme-text); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
+.jLeft { color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+
+/* ---------- Card 3: Your team ---------- */
+.teamCard { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; column-gap: var(--ds-space-3); }
+.teamText { display: grid; gap: 2px; min-width: 0; }
+.teamName { margin: 0; font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); line-height: 1.3; overflow-wrap: anywhere; }
+.teamRole { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-md); }
+.chat { min-width: 96px; }
+
+/* ---------- Tablet and laptop column (600 px and up) ---------- */
+@container ci (min-width: 600px) {
+  .needCard[data-pad], .journeyCard[data-pad], .teamCard[data-pad] { padding: var(--ds-space-5) var(--ds-space-6); }
+  .head { grid-template-columns: 96px minmax(0, 1fr); grid-template-areas: "ring text"; align-items: center; gap: var(--ds-space-5); padding-bottom: var(--ds-space-2); }
+  .headText { align-self: stretch; align-content: center; padding-left: var(--ds-space-5); border-left: 1px solid var(--ds-line); }
+  .title { font-size: var(--ds-text-3xl); }
+  .ring { width: 96px; height: 96px; margin: 0; }
+  .track, .arc { stroke-width: 8; }
+  .ringText { font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); }
+
+  .row { min-height: 60px; column-gap: var(--ds-space-4); padding: var(--ds-space-2) var(--ds-space-1); }
+  .row[data-state="needed"] { grid-template-columns: 24px minmax(0, 1fr) auto auto; grid-template-areas: "icon name chip btn" "icon due chip btn" "icon err chip btn"; row-gap: 0; min-height: 68px; }
+  .sub { display: contents; }
+  .sub .chip { grid-area: chip; justify-self: end; margin-right: var(--ds-space-4); }
+  .due { grid-area: due; align-self: start; margin-top: 2px; }
+  .failed { grid-area: err; align-self: start; margin-top: 2px; }
+
+  .cardTitle { font-size: var(--ds-text-2xl); }
+  .journey { grid-template-columns: repeat(4, minmax(0, 1fr)); padding-top: var(--ds-space-2); }
+  .jStep { grid-template-columns: minmax(0, 1fr); justify-items: center; row-gap: var(--ds-space-2); padding: 0 var(--ds-space-1); text-align: center; }
+  .jStep:not(:last-child)::before { top: 11px; bottom: auto; left: calc(50% + 18px); right: calc(-50% + 18px); width: auto; height: 2px; }
+  .jText { justify-items: center; padding-top: 0; }
+  .jDate { display: block; color: var(--theme-text-muted); font-size: var(--ds-text-md); font-weight: var(--ds-weight-regular); }
+  .jSep { display: none; }
+  .jLeft { justify-self: center; padding: 1px var(--ds-space-2); border-radius: var(--ds-radius-pill); background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-text); }
+
+  .teamCard { column-gap: var(--ds-space-4); }
+  .teamName { font-size: var(--ds-text-xl); }
+  .teamRole { font-size: var(--ds-text-lg); }
+}
+/* Wide column (laptop): journey circles carry the step's icon. */
+@container ci (min-width: 820px) {
+  .jStep .dot { width: 48px; height: 48px; }
+  .jStep:not(:last-child)::before { top: 23px; left: calc(50% + 30px); right: calc(-50% + 30px); }
+  .dotIcon { display: block; }
+  .tick { width: 20px; height: 20px; }
+  .jStep[data-state="current"] .dot { background: color-mix(in srgb, var(--theme-action) 10%, var(--theme-surface)); }
+  .row { min-height: 64px; }
+  /* The state word carries the row: the same chip as at 834 (about 13.5 px text, 28 px high), and the one Upload /
+     Try again at the full 44 px, as in laptop-R. */
+  .chip > span { min-height: 28px; padding: 3px 10px; font-size: var(--ds-text-md); }
+  .chip > span svg { width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+  .btn > a, .btn > button { min-height: 44px; padding-inline: var(--ds-space-5); font-size: var(--ds-text-lg); }
+  .btn > * { min-width: 120px; }
+  .rowName { font-size: var(--ds-text-xl); }
+  .due, .failed { font-size: var(--ds-text-md); }
+  .jLabel { font-size: var(--ds-text-xl); line-height: 26px; }
+  .jDate, .jNote, .jLeft { font-size: var(--ds-text-md); }
+}
+
+/* ---------- Upload sheet: bottom sheet on a phone, small centred dialog from 600 px ---------- */
+.backdrop { position: fixed; inset: 0; z-index: var(--ds-z-sheet); display: flex; align-items: flex-end; justify-content: center; background: color-mix(in srgb, var(--theme-canvas) 30%, color-mix(in srgb, var(--theme-text) 45%, transparent)); }
+.dialog { display: grid; outline: none; width: 100%; max-height: 92dvh; overflow: auto; border-radius: var(--ds-radius-xl) var(--ds-radius-xl) 0 0; background: var(--theme-surface); box-shadow: var(--ds-elev-3); color: var(--theme-text); font-size: var(--ds-text-md); line-height: 1.45; padding-bottom: env(safe-area-inset-bottom, 0px); }
+.grip { justify-self: center; width: 40px; height: 4px; margin-top: var(--ds-space-2); border-radius: var(--ds-radius-pill); background: var(--theme-border-strong); }
+.dHead { display: flex; align-items: center; gap: var(--ds-space-3); padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-2); }
+.dIcon { display: inline-grid; flex: none; place-items: center; width: 40px; height: 40px; border-radius: var(--ds-radius-md); background: var(--theme-surface-subtle); color: var(--theme-text); }
+.dIcon svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.dTitle { margin: 0; font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); letter-spacing: var(--ds-tracking-tight); line-height: 1.25; }
+.dBody { display: grid; gap: var(--ds-space-2); padding: var(--ds-space-2) var(--ds-space-4) var(--ds-space-4); }
+.pick {
+  display: flex; align-items: center; gap: var(--ds-space-3); min-height: 48px; padding: 0 var(--ds-space-4);
+  border: 1px solid var(--theme-border-strong); border-radius: var(--ds-radius-md); background: var(--theme-surface);
+  color: var(--theme-text); font: inherit; font-size: var(--ds-text-lg); font-weight: var(--ds-weight-medium); text-align: left; cursor: pointer;
+}
+.pick svg { flex: none; width: var(--ds-icon-md); height: var(--ds-icon-md); color: var(--theme-text-muted); }
+.pick:hover { border-color: var(--theme-action); background: color-mix(in srgb, var(--theme-action) 7%, var(--theme-surface)); }
+.pick:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+/* The panel itself never shows a ring (a plain border and shadow); focus opens on the first option. */
+.backdrop .dialog:focus, .backdrop .dialog:focus-visible { outline: none; }
+.cancel { margin-top: var(--ds-space-1); }
+@media (min-width: 600px) {
+  .backdrop { align-items: center; padding: var(--ds-space-4); }
+  .dialog { width: min(400px, 100%); border-radius: var(--ds-radius-xl); }
+  .grip { display: none; }
+  .dHead { padding-top: var(--ds-space-5); }
+}

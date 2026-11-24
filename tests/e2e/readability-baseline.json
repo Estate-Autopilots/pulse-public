@@ -1,0 +1,372 @@
+{
+ "note": "Readability Gate baseline (QA-1): certain findings known on the day and the screen-states looked at; only new ones block. Shrink it, never grow it by hand.",
+ "updated": "2026-11-19",
+ "screens": [
+  "/chats | 1440-dark",
+  "/chats | 1440-light",
+  "/chats | 363-dark",
+  "/chats | 363-light",
+  "/dashboard | 1440-dark",
+  "/dashboard | 1440-light",
+  "/dashboard | 363-dark",
+  "/dashboard | 363-light",
+  "/people | 1440-dark",
+  "/people | 1440-light",
+  "/people | 363-dark",
+  "/people | 363-light",
+  "/settings | 1440-dark",
+  "/settings | 1440-light",
+  "/settings | 363-dark",
+  "/settings | 363-light",
+  "/tasks | 1440-dark",
+  "/tasks | 1440-light",
+  "/tasks | 363-dark",
+  "/tasks | 363-light"
+ ],
+ "findings": {
+  "/chats | 1440-dark | R7 | h# \"AI HELPERS YOU CAN ASK\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 1440-dark | R7 | i \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/chats | 1440-dark | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "10px text"
+  },
+  "/chats | 1440-dark | R7 | span \"# <date>\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 1440-dark | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/chats | 1440-dark | R7 | span \"AI\"": {
+   "rule": "R7",
+   "detail": "8px text"
+  },
+  "/chats | 1440-dark | R7 | span \"Late\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 1440-dark | R7 | span \"Only the people in a conversation can re\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 1440-light | R7 | h# \"AI HELPERS YOU CAN ASK\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 1440-light | R7 | i \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/chats | 1440-light | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "10px text"
+  },
+  "/chats | 1440-light | R7 | span \"# <date>\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 1440-light | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/chats | 1440-light | R7 | span \"AI\"": {
+   "rule": "R7",
+   "detail": "8px text"
+  },
+  "/chats | 1440-light | R7 | span \"Late\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 1440-light | R7 | span \"Only the people in a conversation can re\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 363-dark | R7 | h# \"AI HELPERS YOU CAN ASK\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 363-dark | R7 | span \"AI\"": {
+   "rule": "R7",
+   "detail": "8px text"
+  },
+  "/chats | 363-light | R7 | h# \"AI HELPERS YOU CAN ASK\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/chats | 363-light | R7 | span \"AI\"": {
+   "rule": "R7",
+   "detail": "8px text"
+  },
+  "/dashboard | 1440-dark | R13 | a \"Focus · F\"": {
+   "rule": "R13",
+   "detail": "text the colour of its background (1.00:1)"
+  },
+  "/dashboard | 1440-dark | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/dashboard | 1440-dark | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "9.5px text"
+  },
+  "/dashboard | 1440-dark | R7 | span \"Recents\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/dashboard | 1440-light | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/dashboard | 1440-light | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "9.5px text"
+  },
+  "/dashboard | 1440-light | R7 | span \"Recents\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/dashboard | 363-dark | R13 | a \"Focus · F\"": {
+   "rule": "R13",
+   "detail": "text the colour of its background (1.00:1)"
+  },
+  "/people | 1440-dark | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/people | 1440-dark | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/people | 1440-dark | R7 | span \"AI employee · VQL-AI-#\"": {
+   "rule": "R7",
+   "detail": "10px text"
+  },
+  "/people | 1440-dark | R7 | span \"AI\"": {
+   "rule": "R7",
+   "detail": "8px text"
+  },
+  "/people | 1440-dark | R7 | span \"Employee ID\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/people | 1440-dark | R7 | span \"Recents\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/people | 1440-light | R4 | .people-module__card.people-module__tight[data-status=\"active\"]:nth-child(#) > .ui-module__avatarBox > .ui-module__avatar[aria-hidden=\"true\"]": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 4.06 (foreground color: #51842a, background color: #ebf8df, font size: 12.5pt (16.72px), font weight:"
+  },
+  "/people | 1440-light | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/people | 1440-light | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/people | 1440-light | R7 | span \"AI employee · VQL-AI-#\"": {
+   "rule": "R7",
+   "detail": "10px text"
+  },
+  "/people | 1440-light | R7 | span \"AI\"": {
+   "rule": "R7",
+   "detail": "8px text"
+  },
+  "/people | 1440-light | R7 | span \"Employee ID\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/people | 1440-light | R7 | span \"Recents\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/people | 363-dark | R7 | span \"AI employee · VQL-AI-#\"": {
+   "rule": "R7",
+   "detail": "10px text"
+  },
+  "/people | 363-dark | R7 | span \"AI\"": {
+   "rule": "R7",
+   "detail": "8px text"
+  },
+  "/people | 363-dark | R7 | span \"Employee ID\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/people | 363-light | R4 | .people-module__card.people-module__tight[data-status=\"active\"]:nth-child(#) > .ui-module__avatarBox > .ui-module__avatar[aria-hidden=\"true\"]": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 4.18 (foreground color: #36842a, background color: #e4f8df, font size: 12.5pt (16.72px), font weight:"
+  },
+  "/people | 363-light | R7 | span \"AI employee · VQL-AI-#\"": {
+   "rule": "R7",
+   "detail": "10px text"
+  },
+  "/people | 363-light | R7 | span \"AI\"": {
+   "rule": "R7",
+   "detail": "8px text"
+  },
+  "/people | 363-light | R7 | span \"Employee ID\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/settings | 1440-dark | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-dark | R7 | p \"ADMIN TOOLS\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-dark | R7 | p \"COMPANY\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-dark | R7 | p \"YOU\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-dark | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-dark | R7 | span \"Recents\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/settings | 1440-light | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-light | R7 | p \"ADMIN TOOLS\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-light | R7 | p \"COMPANY\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-light | R7 | p \"YOU\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-light | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/settings | 1440-light | R7 | span \"Recents\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/settings | 363-dark | R4 | i[aria-label=\"New: #\"]": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 2.46 (foreground color: #ffffff, background color: #e38e8e, font size: 7.5pt (10px), font weight: bol"
+  },
+  "/tasks | 1440-dark | R4 | .work#-module__lenses > button[type=\"button\"]:nth-child(#) > span": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 4.38 (foreground color: #868798, background color: #23232f, font size: 9.4pt (12.5px), font weight: n"
+  },
+  "/tasks | 1440-dark | R5 | h# \"Up next most urgent first\"": {
+   "rule": "R5",
+   "detail": "text over an image or gradient: worst pixel 2.03:1"
+  },
+  "/tasks | 1440-dark | R7 | button \"LATER #\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/tasks | 1440-dark | R7 | button \"OVERDUE #\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/tasks | 1440-dark | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/tasks | 1440-dark | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/tasks | 1440-dark | R7 | span \"Recents\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/tasks | 1440-light | R4 | .work#-module__lenses > button[type=\"button\"]:nth-child(#) > span": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 2.97 (foreground color: #888a9c, background color: #efeff6, font size: 9.4pt (12.5px), font weight: n"
+  },
+  "/tasks | 1440-light | R4 | li:nth-child(#) > a > .ui-module__avatar[aria-hidden=\"true\"]": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 4.21 (foreground color: #248439, background color: #dff8e3, font size: 9.0pt (12px), font weight: nor"
+  },
+  "/tasks | 1440-light | R5 | h# \"Up next most urgent first\"": {
+   "rule": "R5",
+   "detail": "text over an image or gradient: worst pixel 2.66:1"
+  },
+  "/tasks | 1440-light | R7 | button \"LATER #\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/tasks | 1440-light | R7 | button \"OVERDUE #\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/tasks | 1440-light | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/tasks | 1440-light | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "11px text"
+  },
+  "/tasks | 1440-light | R7 | span \"Recents\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/tasks | 363-dark | R4 | .work#-module__lenses > button[type=\"button\"]:nth-child(#) > span": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 4.38 (foreground color: #868798, background color: #23232f, font size: 9.0pt (12px), font weight: nor"
+  },
+  "/tasks | 363-dark | R4 | i[aria-label=\"New: #\"]": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 2.46 (foreground color: #ffffff, background color: #e38e8e, font size: 7.5pt (10px), font weight: bol"
+  },
+  "/tasks | 363-dark | R7 | button \"LATER #\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/tasks | 363-dark | R7 | button \"OVERDUE #\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/tasks | 363-dark | R7 | i \"New: #\"": {
+   "rule": "R7",
+   "detail": "10px text"
+  },
+  "/tasks | 363-dark | R7 | span \"#\"": {
+   "rule": "R7",
+   "detail": "10px text"
+  },
+  "/tasks | 363-light | R4 | .work#-module__lenses > button[type=\"button\"]:nth-child(#) > span": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 2.97 (foreground color: #888a9c, background color: #efeff6, font size: 9.0pt (12px), font weight: nor"
+  },
+  "/tasks | 363-light | R4 | li:nth-child(#) > a > .ui-module__avatar[aria-hidden=\"true\"]": {
+   "rule": "R4",
+   "detail": "color-contrast: Element has insufficient color contrast of 4.21 (foreground color: #248439, background color: #dff8e3, font size: 9.0pt (12px), font weight: nor"
+  },
+  "/tasks | 363-light | R7 | button \"LATER #\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  },
+  "/tasks | 363-light | R7 | button \"OVERDUE #\"": {
+   "rule": "R7",
+   "detail": "11.5px text"
+  }
+ }
+}

@@ -1,0 +1,25 @@
+/* REPLAY-FIXES #1: the screen's copy over main while the real page comes (screen-cache.tsx). Below the top bar's menus
+   (z 30-60) and the search palette; above the page. */
+.copy { position: fixed; z-index: 25; overflow: hidden; cursor: progress; contain: layout paint; }
+.copy > * { box-sizing: border-box; width: 100% !important; max-width: none !important; min-height: 100%; margin: 0 !important; overflow: hidden !important; }
+.copy * { animation: none !important; transition: none !important; }
+
+.note { position: fixed; z-index: 26; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 12px; border: 1px solid var(--lx-line, rgb(0 0 0 / 10%)); border-radius: var(--lx-radius-pill, 999px);
+  background: var(--lx-surface, #fff); color: var(--lx-ink, #1f1d2b); box-shadow: var(--lx-shadow-1, 0 2px 8px rgb(0 0 0 / 12%));
+  font: 600 12.5px/1.3 var(--lx-font-ui, system-ui, sans-serif); pointer-events: none; white-space: nowrap; }
+.note::before { content: ""; width: 10px; height: 10px; border: 2px solid var(--lx-line-strong, rgb(0 0 0 / 25%)); border-top-color: var(--lx-teal, #0f766e);
+  border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+/* A first visit (no copy yet): a thin bar under the top bar says the tapped screen is on its way. */
+/* It appears only after 150 ms, so a page that opens at once (a prefetched outline) never flashes it. */
+.bar { position: fixed; z-index: 61; top: 0; left: 0; height: 3px; width: 100%; background: linear-gradient(90deg, transparent, var(--lx-teal, #0f766e) 40%, transparent);
+  background-size: 50% 100%; background-repeat: no-repeat; opacity: 0; animation: appear 1ms linear 150ms forwards, slide 1.1s ease-in-out 150ms infinite; pointer-events: none; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes appear { to { opacity: 1; } }
+@keyframes slide { from { background-position: -50% 0; } to { background-position: 150% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .note::before { animation: none; }
+  .bar { animation: appear 1ms linear 150ms forwards; background: var(--lx-teal, #0f766e); }
+}

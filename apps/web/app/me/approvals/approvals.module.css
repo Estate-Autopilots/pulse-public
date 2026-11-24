@@ -1,0 +1,9 @@
+/* VITALS-SHIP (24 Nov 2026): pay decisions waiting for a founder, on Approvals. */
+.payList { display: grid; margin: 0; padding: 0; list-style: none; }
+.payList li { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 14px; border-top: 1px solid var(--theme-border); }
+.payList li:first-child { border-top: 0; }
+.payList li > svg { flex: none; color: var(--theme-text-muted); }
+.payWho { display: grid; flex: 1 1 auto; min-width: 0; gap: 2px; }
+.payWho b { overflow: hidden; font-size: 15px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.payWho small { color: var(--theme-text-muted); font-size: 13px; }
+.payList li > a { flex: none; }

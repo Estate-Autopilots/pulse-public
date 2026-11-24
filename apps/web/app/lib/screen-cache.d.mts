@@ -1,0 +1,16 @@
+export declare const SCREEN_MAX: number;
+export declare const SCREEN_MAX_AGE_MS: number;
+export declare const SCREEN_MAX_NODES: number;
+export declare const SCREEN_GIVE_UP_MS: number;
+export declare const SCREEN_ARRIVED_MS: number;
+export declare const TAP_KEEP_MS: number;
+export declare function screenKey(href: string, base?: string): string | null;
+export declare function linkTarget(link: { href: string; button: number; mods: boolean; target?: string | null; download?: boolean } | null, location: { href: string }): string | null;
+export type ScreenCache<T> = { put(key: string | null, value: T, now?: number): void; get(key: string | null, now?: number): { value: T; at: number } | null; drop(key: string): void; clear(): void; keys(): string[]; readonly size: number };
+export declare function createScreenCache<T = unknown>(opts?: { max?: number; maxAgeMs?: number }): ScreenCache<T>;
+export declare function pageReady(p: { here: string | null; target: string | null; busy?: number[]; visible?: number }): boolean;
+export type Tap = { tag: string; role: string; testid: string; nav: string; href: string; label: string; nth: number };
+export type Control = { tag?: string; role?: string; testid?: string; nav?: string; href?: string; label?: string | null; nth?: number };
+export declare function tapOf(el: Control | null | undefined): Tap;
+export declare function matchTap(tap: Tap | null, candidates: Array<Control | null>, count?: number): number;
+export declare function moveKind(m: { target: string | null; current: string | null; type?: string }): "screen" | "view" | null;

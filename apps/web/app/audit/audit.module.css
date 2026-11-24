@@ -1,0 +1,11 @@
+/* VITALS-SWEEP (22 Nov 2026; judge: on a phone six unlabelled filter fields filled the first screen and left under two
+   events in view): the filters sit behind one Filter button (open when a filter is set); fields are full width on a phone. */
+.filters { margin: 0 0 8px; }
+.filters > summary { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font-size: 14px; font-weight: 600; cursor: pointer; }
+.filters[open] > summary { margin-bottom: 8px; }
+.filters label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--theme-text-muted); }
+@media (max-width: 759.98px) {
+  .filters form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .filters form > *, .filters label > * { width: 100%; min-height: 44px; box-sizing: border-box; }
+  .filters label { display: grid; gap: 4px; }
+}

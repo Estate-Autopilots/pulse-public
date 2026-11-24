@@ -1,0 +1,184 @@
+/* PM-UI 04 My day. Phone (< 600 px of page): one column, two-line rows, group headings above their card.
+   From 600 px: header row with the week card on the right, hero in one row, each group one card with one-line rows whose
+   chip and button columns line up down the whole page. Tokens only. */
+
+.screen {
+  --md-line: var(--ds-line, var(--theme-border));
+  --md-state: 156px; --md-act: 104px;
+  display: grid; gap: var(--ds-space-4); width: 100%; max-width: 1150px; min-width: 0; margin-inline: auto;
+}
+
+/* ---------- Greeting + week ---------- */
+.top { display: grid; gap: var(--ds-space-3); min-width: 0; }
+.hello { display: grid; gap: var(--ds-space-1); min-width: 0; }
+.h1 { margin: 0; color: var(--theme-text); font-size: var(--ds-text-2xl); font-weight: var(--ds-weight-heavy); letter-spacing: -0.02em; line-height: 1.15; overflow-wrap: anywhere; }
+.date { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-medium); }
+
+.week { display: grid; gap: var(--ds-space-2); min-width: 0; padding: var(--ds-space-3) var(--ds-space-4); border: 1px solid var(--md-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent); }
+.weekLine { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--ds-space-1) var(--ds-space-3); margin: 0; color: var(--theme-text); font-size: var(--ds-text-md); }
+.weekLine b { font-size: var(--ds-text-lg); font-weight: var(--ds-weight-heavy); }
+.weekNote { color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
+.weekNote[data-over] { color: var(--tone-problem); font-weight: var(--ds-weight-strong); }
+.bar { display: block; height: 8px; overflow: hidden; border-radius: var(--ds-radius-pill); background: var(--theme-surface-subtle); box-shadow: inset 0 0 0 1px var(--md-line); }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--tone-info-mark); }
+.bar[data-over] i { background: var(--tone-problem-mark); }
+
+/* ---------- Hero ---------- */
+.hero {
+  display: grid; gap: var(--ds-space-3); min-width: 0; padding: var(--ds-space-4);
+  border: 1px solid var(--md-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); box-shadow: var(--ds-elev-1);
+}
+.eyebrow { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-strong); }
+.heroMain { display: flex; align-items: flex-start; gap: var(--ds-space-3); min-width: 0; }
+.heroTile { display: inline-flex; flex: none; }
+.heroText { display: grid; gap: 2px; min-width: 0; }
+.heroTitle { margin: 0; font-size: var(--ds-text-xl); font-weight: var(--ds-weight-heavy); letter-spacing: -0.01em; line-height: 1.25; overflow-wrap: anywhere; }
+.heroTitle a { color: var(--theme-text); text-decoration: none; }
+.heroTitle a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.heroProject { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-md); }
+.heroMeta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2) var(--ds-space-3); margin-top: var(--ds-space-2); min-width: 0; }
+.heroMeta > * { white-space: normal; }
+.owner { display: inline-flex; align-items: center; gap: var(--ds-space-1); color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+.owner svg { width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+/* Phone: full-width Start, then the swipe hint (two short lines) on the left and "Need help" on the right. */
+.heroActions { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--ds-space-2) var(--ds-space-3); min-width: 0; }
+.heroBtn { grid-column: 1 / -1; width: 100%; }
+.hint { display: grid; gap: 2px; min-width: 0; margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-xs); line-height: 1.35; }
+.hint span { display: inline-flex; align-items: center; gap: var(--ds-space-1); }
+.hint svg { flex: none; width: 14px; height: 14px; }
+.helpLink {
+  justify-self: end; min-height: 44px; padding: 0 var(--ds-space-2); border: 0; background: none; cursor: pointer; white-space: nowrap;
+  color: var(--theme-action); font: inherit; font-size: var(--ds-text-md); font-weight: var(--ds-weight-medium);
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--theme-action) 40%, transparent);
+}
+.helpLink:hover { text-decoration-color: currentColor; }
+.helpLink:focus-visible, .more:focus-visible, .menuItem:focus-visible, .title:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: var(--ds-radius-xs); }
+.helped { color: var(--tone-info); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-strong); }
+.sentHero { display: inline-flex; align-items: center; min-height: 44px; color: var(--theme-text-muted); font-weight: var(--ds-weight-medium); }
+
+/* ---------- Groups and rows ---------- */
+.group { display: grid; gap: var(--ds-space-2); min-width: 0; }
+.groupTitle { margin: var(--ds-space-1) 0 0; color: var(--theme-text); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); line-height: 1.3; }
+.count { color: var(--theme-text-muted); font-weight: var(--ds-weight-medium); }
+.rows {
+  display: grid; min-width: 0; margin: 0; padding: 0; list-style: none;
+  border: 1px solid var(--md-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent);
+}
+.row {
+  position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "tile main act";
+  align-items: center; gap: var(--ds-space-3); min-width: 0; padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-3) var(--ds-space-4);
+}
+.row + .row { border-top: 1px solid var(--md-line); }
+.tileCell { grid-area: tile; display: inline-flex; align-self: center; }
+/* The row link: line one = title (truncates) + chip, line two = "project · due" across the whole block. */
+.main {
+  grid-area: main; display: grid; grid-template-columns: minmax(0, max-content) auto minmax(0, 1fr);
+  grid-template-areas: "title state ." "meta meta meta"; align-items: center; gap: 2px var(--ds-space-2);
+  min-width: 0; min-height: 44px; align-content: center; color: inherit; text-decoration: none; border-radius: var(--ds-radius-sm);
+}
+.main:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.main:hover .title { text-decoration: underline; text-underline-offset: 3px; }
+.title { grid-area: title; min-width: 0; overflow: hidden; color: var(--theme-text); font-size: var(--ds-text-md); font-weight: var(--ds-weight-strong); line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+.heroTitle a { display: inline-block; padding-block: 6px; margin-block: -6px; }
+.stateCell { grid-area: state; display: inline-flex; min-width: 0; white-space: nowrap; }
+.metaLong, .metaShort { grid-area: meta; display: flex; align-items: baseline; min-width: 0; overflow: hidden; color: var(--theme-text-muted); font-size: var(--ds-text-sm); line-height: 1.4; white-space: nowrap; }
+.metaShort { display: none; }
+.metaPart { flex: none; }
+/* The project name gives way first (ellipsis); a dot is never alone at a line end because the line never wraps. */
+.metaPart:first-child { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.dot { margin-inline: 6px; }
+.nowrap { white-space: nowrap; }
+.actCell { grid-area: act; display: inline-flex; justify-content: flex-end; }
+.rowBtn { min-width: 84px; }
+.sent { display: inline-flex; align-items: center; justify-content: center; min-width: 84px; min-height: 32px; color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
+.moreCell { display: none; position: relative; grid-area: more; }
+.more {
+  display: inline-grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: var(--ds-radius-sm);
+  background: none; color: var(--theme-text-muted); cursor: pointer;
+}
+.more:hover, .more[aria-expanded="true"] { background: var(--ds-hover, var(--theme-surface-subtle)); color: var(--theme-text); }
+.more svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.menu {
+  position: absolute; z-index: 5; top: calc(100% + var(--ds-space-1)); right: 0; display: grid; min-width: 168px; padding: var(--ds-space-1);
+  border: 1px solid var(--md-line); border-radius: var(--ds-radius-md); background: var(--theme-surface); box-shadow: var(--ds-elev-2);
+}
+.menuItem {
+  display: flex; align-items: center; min-height: 40px; padding: 0 var(--ds-space-3); border: 0; border-radius: var(--ds-radius-sm);
+  background: none; color: var(--theme-text); font: inherit; font-size: var(--ds-text-md); text-align: left; text-decoration: none; cursor: pointer;
+}
+.menuItem:hover:not(:disabled) { background: var(--ds-hover, var(--theme-surface-subtle)); }
+.menuItem:disabled { color: var(--theme-text-muted); cursor: default; }
+
+/* ---------- Empty ---------- */
+.empty {
+  display: grid; justify-items: center; gap: var(--ds-space-2); padding: var(--ds-space-8) var(--ds-space-4); text-align: center;
+  border: 1px solid var(--md-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface);
+}
+.emptyIcon { display: inline-grid; place-items: center; width: 48px; height: 48px; margin-bottom: var(--ds-space-1); border-radius: var(--ds-radius-pill); background: var(--tone-done-soft); color: var(--tone-done); }
+.emptyIcon svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.emptyTitle { margin: 0; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); }
+.emptyText { max-width: 40ch; margin: 0 0 var(--ds-space-2); color: var(--theme-text-muted); }
+
+/* ---------- Phone ---------- */
+@media (max-width: 599.98px) {
+  .screen { gap: var(--ds-space-3); }
+  .top { gap: var(--ds-space-3); }
+  .week { padding: var(--ds-space-3); }
+  .hero { gap: var(--ds-space-3); padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-1); }
+  .heroMeta { margin-top: var(--ds-space-1); }
+  /* Narrow screens: a 32 px tile and a snug button leave room for the title and its chip on one line. */
+  .row { gap: var(--ds-space-2); padding: var(--ds-space-3); }
+  .tileCell > span { width: 32px; height: 32px; border-radius: var(--ds-radius-sm); }
+  .tileCell > span svg { width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+  .row { padding-inline: var(--ds-space-3) 10px; }
+  .rowBtn { min-width: 56px; min-height: 44px; padding-inline: var(--ds-space-2); }
+  /* Every row exactly two lines: short meta ("Sunpeak Residences · Ira · Mon, 23 Nov"), tighter type so less truncates. */
+  .title { font-size: var(--ds-text-sm); letter-spacing: 0; }
+  .metaShort { font-size: var(--ds-text-xs); letter-spacing: 0; }
+  .main { column-gap: 6px; }
+  .dot { margin-inline: 5px; }
+  .metaLong { display: none; }
+  .metaShort { display: flex; }
+}
+
+/* ---------- Tablet and up ---------- */
+@media (min-width: 600px) {
+  .screen { gap: var(--ds-space-4); }
+  .top { grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); align-items: start; gap: var(--ds-space-4); }
+  .h1 { font-size: var(--ds-text-3xl); }
+
+  .hero { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--ds-space-3) var(--ds-space-5); padding: var(--ds-space-4) var(--ds-space-5); }
+  .eyebrow { grid-column: 1 / -1; }
+  .heroMain { align-items: center; gap: var(--ds-space-5); }
+  .heroTile { padding-right: var(--ds-space-5); border-right: 1px solid var(--md-line); }
+  .heroTitle { font-size: var(--ds-text-2xl); }
+  .heroActions { grid-template-columns: auto auto; align-items: center; gap: var(--ds-space-4); }
+  .heroBtn { grid-column: auto; width: auto; min-width: 128px; }
+  .hint { display: none; }
+
+  /* Each group is one card with its heading inside. */
+  .group { gap: 0; padding: var(--ds-space-3) var(--ds-space-2) var(--ds-space-1); border: 1px solid var(--md-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent); }
+  .groupTitle { margin: 0 0 var(--ds-space-1); padding-inline: var(--ds-space-3); }
+  .rows { border: 0; border-radius: 0; box-shadow: none; background: none; }
+  .row {
+    grid-template-columns: auto minmax(0, 1fr) var(--md-act) 36px;
+    grid-template-areas: "tile main act more";
+    gap: 0 var(--ds-space-4); padding: var(--ds-space-2) var(--ds-space-3);
+  }
+  /* Inside the link: title over meta, the chip in a fixed column (lines up down the page). */
+  .main { grid-template-columns: minmax(0, 1fr) var(--md-state); grid-template-areas: "title state" "meta state"; gap: 2px var(--ds-space-4); }
+  .title { white-space: normal; overflow-wrap: anywhere; }
+  .stateCell { align-self: center; }
+  .tileCell { padding-right: var(--ds-space-4); border-right: 1px solid var(--md-line); }
+  .moreCell { display: inline-flex; align-self: center; }
+  .rowBtn { width: 100%; }
+}
+
+/* Rail / side-menu shells give the page no side gutter: add our own so cards never touch the menu or the edge. */
+/* Laptop: all four groups fit in one 900 px tall view. */
+@media (min-width: 1100px) {
+  .screen { --md-state: 220px; --md-act: 112px; gap: var(--ds-space-3); }
+  .hero { gap: var(--ds-space-2) var(--ds-space-5); padding: var(--ds-space-4) var(--ds-space-6); }
+  .group { padding: var(--ds-space-2) var(--ds-space-3) var(--ds-space-1); }
+  .row { padding-block: 6px; }
+}

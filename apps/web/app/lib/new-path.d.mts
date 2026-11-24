@@ -1,0 +1,14 @@
+import type { AnchorRegistry } from "./new-trail.mjs";
+export type PathStep = { kind: "rail"; group: string; label: string } | { kind: "menu"; group: string; href: string; label: string; last?: boolean } | { kind: "thing"; anchor: string } | { kind: "page"; label: string } | { kind: "note"; label: string };
+export type NavPath = { route: string; href: string; text: string; anchor: string; inferred: boolean; steps: PathStep[]; i: number; at: number };
+export declare const PATH_KEY: string;
+export declare const PATH_MS: number;
+export declare function inferAnchor(item: { route: string; anchor?: string; text?: string } | null | undefined, registry: AnchorRegistry): string;
+export declare function pathPlan(p: { route: string; anchor?: string; here: string; spot: { group: string; groupLabel: string; href: string; label: string } | null; rail: boolean }): PathStep[];
+export declare function stepWords(i: number, n: number): string;
+export declare const LAND_MS: number;
+export type PathOpened = { step: string; from: string; at: number; there: boolean };
+export type PathGo = { go: "open"; href: string; opened: PathOpened } | { go: "there" } | { go: "here"; route: string } | { go: "end" };
+export declare function pathGo(p: { path: Pick<NavPath, "route" | "href" | "steps" | "i" | "at"> | null; here: string; opened: PathOpened | null; now?: number }): PathGo | null;
+export declare function pathFrom(x: unknown, now?: number): NavPath | null;
+export declare function opensFirst(p: { route: string; here: string; steps: { kind: string }[] }): boolean;

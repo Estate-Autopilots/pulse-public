@@ -1,0 +1,126 @@
+/* PM-UI 15 Goals. Tokens only. Widths by container (the page content, not the viewport): < 700 one column (phone),
+   700–959 three columns of ~250px (tablet; titles and project chips wrap), ≥ 960 three columns of ~340px (laptop;
+   project chips stack one per row). From 700 the cards share their rows (subgrid), so the bars, chips, owners and
+   project chips line up across the three cards whatever the title lengths. */
+
+.wrap { container-type: inline-size; display: grid; align-self: start; align-content: start; gap: var(--ds-space-4); min-width: 0; }
+
+/* ---------- Header ---------- */
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ds-space-3); min-width: 0; }
+.heading { display: grid; gap: 2px; min-width: 0; }
+.h1 { margin: 0; color: var(--theme-text); font-size: var(--ds-text-3xl); font-weight: var(--ds-weight-heavy); letter-spacing: -0.02em; line-height: 1.15; }
+.sub { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-lg); }
+.addBtn { flex: none; min-height: 44px; }
+
+/* ---------- Cards ---------- */
+.list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-3); margin: 0; padding: 0; list-style: none; }
+
+/* Phone: the icon tile beside the title, the number and the bar; the chip under the bar; owner and projects full width. */
+.list > li.goal {
+  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-areas: "icon title" "icon num" "icon bar" ". health" "owner owner" "proj proj";
+  align-items: start; column-gap: var(--ds-space-3); row-gap: var(--ds-space-2); padding: var(--ds-space-4);
+}
+.icon { grid-area: icon; display: grid; place-items: center; width: 52px; height: 52px; border-radius: var(--ds-radius-lg); background: color-mix(in srgb, var(--theme-text) 6%, var(--theme-surface)); color: var(--theme-text); }
+.icon svg { width: var(--ds-icon-lg); height: var(--ds-icon-lg); stroke-width: 1.75; }
+.title { grid-area: title; margin: 0; min-width: 0; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); letter-spacing: -0.01em; line-height: 1.3; overflow-wrap: break-word; }
+.num { grid-area: num; margin: 0; min-width: 0; color: var(--theme-text-muted); font-size: var(--ds-text-lg); font-variant-numeric: tabular-nums; line-height: 1.35; overflow-wrap: break-word; }
+.bar { grid-area: bar; display: block; align-self: center; height: 8px; margin-block: var(--ds-space-1); overflow: hidden; border-radius: var(--ds-radius-pill); background: color-mix(in srgb, var(--theme-text) 10%, var(--theme-surface)); }
+.bar > i { display: block; height: 100%; border-radius: inherit; background: color-mix(in srgb, var(--theme-text-muted) 85%, var(--theme-surface)); }
+/* A goal in days has no bar; its row keeps the height so the chips line up across cards. */
+.bar[data-none] { background: none; }
+.health { grid-area: health; display: flex; min-width: 0; margin-top: var(--ds-space-1); }
+/* The kit chip, a little larger (the pick's chips read at the size of the number line). Inline, so "Late: …" keeps its
+   punctuation tight; it wraps inside itself if a reason is long. */
+.health > [data-health] { display: inline-block; min-height: 28px; padding: 4px var(--ds-space-3); border-radius: var(--ds-radius-pill); font-size: var(--ds-text-md); line-height: 1.45; letter-spacing: -0.01em; }
+.owner { grid-area: owner; display: flex; align-items: center; gap: var(--ds-space-2); min-width: 0; margin: var(--ds-space-2) 0 0; color: var(--theme-text-muted); font-size: var(--ds-text-lg); }
+.owner svg { flex: none; width: 18px; height: 18px; }
+.owner b { color: var(--theme-text); font-weight: var(--ds-weight-medium); }
+
+/* Project chips: soft fill of the project's colour, its icon and FULL name in the colour's ink. A chip sizes to its
+   name and wraps only between words (never mid-word); normal tracking keeps the names compact. */
+.projects { grid-area: proj; display: flex; flex-wrap: wrap; gap: var(--ds-space-2); min-width: 0; margin: var(--ds-space-1) 0 0; padding: 0; list-style: none; }
+.proj { display: flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; min-height: 36px; padding: 6px var(--ds-space-3); border-radius: var(--ds-radius-md); background: var(--pm-soft); color: var(--pm-ink); font-size: var(--ds-text-md); font-weight: var(--ds-weight-strong); letter-spacing: -0.01em; line-height: 1.25; overflow-wrap: break-word; word-break: normal; }
+.proj svg { flex: none; width: 18px; height: 18px; stroke-width: 1.9; }
+
+/* Tablet and laptop: three columns; every card spans the same six shared rows. */
+@container (min-width: 700px) {
+  .list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-space-4); }
+  .list > li.goal { grid-row: span 6; grid-template-rows: subgrid; grid-template-columns: 48px minmax(0, 1fr); grid-template-areas: none; row-gap: 0; column-gap: var(--ds-space-3); padding: var(--ds-space-4); }
+  .icon { grid-row: 1; grid-column: 1; width: 48px; height: 48px; align-self: start; }
+  .title { grid-row: 1; grid-column: 2; align-self: start; padding-top: 2px; }
+  .num { grid-row: 2; grid-column: 1 / -1; margin-top: var(--ds-space-4); }
+  .bar { grid-row: 3; grid-column: 1 / -1; margin-block: var(--ds-space-3) 0; }
+  .health { grid-row: 4; grid-column: 1 / -1; margin-top: var(--ds-space-4); }
+  .owner { grid-row: 5; grid-column: 1 / -1; margin-top: var(--ds-space-4); }
+  /* ~224px inside a 250px card: no two full names fit side by side, so every card stacks its chips one per row at
+     full width (one line each); the chip rows are then the same height in all three cards. */
+  .projects { grid-row: 6; grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; margin-top: var(--ds-space-4); }
+  .proj { padding-inline: var(--ds-space-3); }
+}
+@container (min-width: 960px) {
+  .list > li.goal { grid-template-columns: 56px minmax(0, 1fr); padding: var(--ds-space-5); }
+  .icon { width: 56px; height: 56px; }
+  .projects { grid-template-columns: minmax(0, 1fr); padding-top: var(--ds-space-4); border-top: 1px solid var(--ds-line); }
+  .proj { min-height: 40px; padding-inline: var(--ds-space-3); }
+}
+
+/* ---------- Loading: stand-in cards whose text and colours become grey bones (same rows, same heights) ---------- */
+.skel { pointer-events: none; --bone: color-mix(in srgb, var(--theme-text) 8%, var(--theme-surface)); }
+.skel.skel * { color: transparent; }
+.skel svg { visibility: hidden; }
+.skel.skel .icon, .skel.skel .title > span, .skel.skel .num > span, .skel.skel .bar, .skel.skel [data-health], .skel.skel .owner > span, .skel.skel .owner b, .skel.skel .proj {
+  border-radius: var(--ds-radius-xs); background: var(--bone); animation: pulse 1.4s var(--ds-ease) infinite alternate;
+}
+.skel.skel .icon { border-radius: var(--ds-radius-lg); }
+.skel.skel .bar { border-radius: var(--ds-radius-pill); }
+.skel .bar > i { display: none; }
+.skel .title > span, .skel .num > span { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.skel.skel .owner b { animation: none; background: none; }
+@keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) { .skel * { animation: none; } }
+
+/* ---------- Empty ---------- */
+.wrap > div.empty { justify-items: center; gap: var(--ds-space-2); padding: var(--ds-space-8) var(--ds-space-4); text-align: center; }
+.emptyIcon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: color-mix(in srgb, var(--theme-text) 6%, var(--theme-surface)); color: var(--theme-text-muted); }
+.emptyIcon svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.emptyTitle { margin: var(--ds-space-1) 0 0; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); }
+.emptyText { max-width: 40ch; margin: 0 0 var(--ds-space-3); color: var(--theme-text-muted); font-size: var(--ds-text-lg); }
+
+/* ---------- Add-goal sheet: bottom sheet on a phone (the kit's), a centred dialog from 600 px ---------- */
+.form { display: grid; gap: var(--ds-space-4); min-width: 0; }
+.field { display: grid; gap: var(--ds-space-1); min-width: 0; margin: 0; padding: 0; border: 0; }
+.label { padding: 0; color: var(--theme-text); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-strong); }
+.optional { color: var(--theme-text-muted); font-weight: var(--ds-weight-regular); }
+.input {
+  width: 100%; min-width: 0; height: 44px; padding: 0 var(--ds-space-3); border: 1px solid var(--theme-border); border-radius: var(--ds-radius-md);
+  background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: var(--ds-text-md);
+}
+.input::placeholder { color: var(--theme-text-muted); }
+.input:hover { border-color: var(--theme-border-strong); }
+.input:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; border-color: var(--theme-action); }
+.input[aria-invalid="true"] { border-color: var(--tone-problem); }
+.error { margin: 0; color: var(--tone-problem); font-size: var(--ds-text-sm); }
+.field > button { width: 100%; min-height: 44px; }
+/* Project options: one per row on a phone, a steady two-column grid in the dialog. */
+.pickRow { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-2); }
+@media (min-width: 600px) { .pickRow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pick {
+  display: flex; align-items: center; justify-content: flex-start; width: 100%; min-width: 0; text-align: left; gap: var(--ds-space-2); min-height: 44px; padding: 0 var(--ds-space-3); border: 1px solid var(--theme-border);
+  border-radius: var(--ds-radius-md); background: var(--theme-surface); color: var(--theme-text); font: inherit; font-size: var(--ds-text-md); font-weight: var(--ds-weight-medium); cursor: pointer;
+}
+.pick > span { min-width: 0; overflow-wrap: break-word; }
+.pick svg { flex: none; width: 16px; height: 16px; color: var(--pm-ink); }
+.pick:hover { border-color: var(--theme-border-strong); }
+.pick:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.pick[aria-pressed="true"] { border-color: color-mix(in srgb, var(--pm-hue) 55%, var(--theme-border)); background: var(--pm-soft); color: var(--pm-ink); font-weight: var(--ds-weight-strong); }
+@media (min-width: 900px) and (pointer: fine) { .pick, .input, .field > button { min-height: 40px; height: auto; } .input { height: 40px; } }
+
+.layer { display: contents; }
+@media (min-width: 600px) {
+  .layer > div { align-items: center; justify-content: center; padding: var(--ds-space-6); }
+  .layer > div > [role="dialog"] { width: min(520px, 100%); height: auto; max-height: min(720px, calc(100dvh - 48px)); border-radius: var(--ds-radius-xl); }
+  .layer > div > [role="dialog"] > span:first-child { display: none; }
+  .layer > div > [role="dialog"] > header { padding-top: var(--ds-space-5); }
+  .layer footer > * { flex: 0 0 auto; }
+}

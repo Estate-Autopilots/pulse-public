@@ -1,0 +1,36 @@
+{
+  "exclude": [
+    "client",
+    "references?",
+    "refs?",
+    "from builder",
+    "input",
+    "raw"
+  ],
+  "folder_path": [
+    {
+      "match": "(?:single[\\s._,-]+(?:image|img)|s[.][\\s._,-]*(?:image|img))(?:[\\s,._/-]+(?:ads?|content|creatives?))?",
+      "type": "single_image_ad"
+    },
+    {
+      "match": "(?:carousels?(?:[\\s,._/-]+image)?|c[.][\\s,._/-]*(?:img|image))(?:[\\s,._/-]+(?:ads?|content|creatives?))?",
+      "type": "carousel"
+    },
+    {
+      "match": "(?:image|img)[\\s,._/-]+(?:ads?|content|creatives?)",
+      "type": "single_image_ad"
+    },
+    {
+      "match": "brochures?",
+      "type": "brochure"
+    },
+    {
+      "match": "logos?",
+      "type": "logo"
+    },
+    {
+      "match": "(?:sales[\\s,._/-]+)?pitch[\\s,._/-]+decks?",
+      "type": "pitch_deck"
+    }
+  ]
+}

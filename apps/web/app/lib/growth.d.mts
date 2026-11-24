@@ -1,0 +1,17 @@
+export type GrowthSource = "chat" | "quote" | "contract" | "portal";
+export type GrowthRef = { via: string; source: GrowthSource; at: number };
+export const SOURCES: GrowthSource[];
+export const REF_KEY: string;
+export const VISITOR_KEY: string;
+export const DISMISS_KEY: string;
+export const DISMISS_DAYS: number;
+export const REF_HOURS: number;
+export function poweredBy(company?: string | null): string;
+export function pitch(company?: string | null): string;
+export function cleanVia(x: unknown): string | null;
+export function startHref(o: { signedIn: boolean; via?: string | null; source?: GrowthSource; name?: string | null }): string;
+export function readStart(search?: string | null): { via: string | null; source: GrowthSource | null; name: string } | null;
+export function readRef(raw: string | null, now?: number): GrowthRef | null;
+export function stillDismissed(at: unknown, now?: number): boolean;
+export function newVisitorId(random?: (n: number) => Uint8Array): string;
+export function explainer(url?: string | null): { kind: "none" | "file" | "embed" | "link"; url: string | null };

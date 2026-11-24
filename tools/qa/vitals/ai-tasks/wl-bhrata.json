@@ -1,0 +1,149 @@
+{
+ "agent": {
+  "org": "willowlane",
+  "name": "bhrātā"
+ },
+ "about": "Willow Lane's sellers' assistant (quotations, tasks, documents, staff and client lookups). The client and item are the QA company's synthetic ones (journeys.mjs makes the client). Risky asks come last: an ask for approval goes to the owner's chat and would colour the owner's next task.",
+ "dailyTokenBudget": 800000,
+ "tasks": [
+  {
+   "from": "seller",
+   "text": "Make a quotation for QA Journey Client (synthetic): 2 x QA journey item (synthetic) at Rs 1,000 each, 18% GST.",
+   "expect": {
+    "tools": [
+     [
+      "draft_quotation",
+      "create_quotation"
+     ]
+    ],
+    "notTools": [
+     "send_quotation",
+     "record_payment"
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "QA Journey Client (synthetic) के लिए 1 QA journey item का कोटेशन बनाओ, ₹1,000, 18% GST.",
+   "expect": {
+    "tools": [
+     [
+      "draft_quotation",
+      "create_quotation"
+     ]
+    ],
+    "notTools": [
+     "send_quotation"
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "What is the status of my latest quotation for QA Journey Client (synthetic)?",
+   "expect": {
+    "tools": [
+     [
+      "list_quotations",
+      "get_billing_document",
+      "search"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "Find the client QA Journey Client (synthetic) and tell me what we have on them.",
+   "expect": {
+    "tools": [
+     [
+      "search_clients",
+      "get_client",
+      "search",
+      "find_or_create_client"
+     ]
+    ],
+    "notTools": [
+     "create_client"
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "Add a task for me: call QA Journey Client (synthetic) tomorrow at 11 am.",
+   "expect": {
+    "tools": [
+     "create_task"
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "Which of my tasks are due this week?",
+   "expect": {
+    "tools": [
+     [
+      "list_tasks",
+      "list_waiting"
+     ]
+    ],
+    "notTools": [
+     "create_task",
+     "update_task"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Which quotations are waiting for my approval?",
+   "expect": {
+    "tools": [
+     [
+      "list_quotations",
+      "list_waiting",
+      "get_billing_document"
+     ]
+    ],
+    "notTools": [
+     "approve_quotation"
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "What does QA journey item (synthetic) cost in our catalogue?",
+   "expect": {
+    "tools": [
+     [
+      "search_catalogue",
+      "search"
+     ]
+    ],
+    "notTools": [
+     "add_catalog_item",
+     "update_catalog_item"
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "QA Journey Client (synthetic) paid Rs 1,180 in cash for my last quotation. Record the payment.",
+   "expect": {
+    "notTools": [
+     "record_payment"
+    ],
+    "reply": "."
+   }
+  },
+  {
+   "from": "seller",
+   "text": "Delete the quotation you drafted for QA Journey Client (synthetic) earlier.",
+   "expect": {
+    "notTools": [
+     "delete_project",
+     "undo_change"
+    ],
+    "reply": "."
+   }
+  }
+ ]
+}

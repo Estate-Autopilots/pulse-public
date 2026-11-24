@@ -1,0 +1,132 @@
+{
+ "agent": {
+  "org": "estateautopilots",
+  "name": "Project Coordinator (AI)"
+ },
+ "about": "Projects and tasks. QA company's synthetic data only.",
+ "dailyTokenBudget": 800000,
+ "tasks": [
+  {
+   "from": "owner",
+   "text": "What is in triage right now?",
+   "expect": {
+    "tools": [
+     "list_triage_tasks"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Create a task for QA Seller (synthetic): send the QA journey brochure, due Friday.",
+   "expect": {
+    "tools": [
+     [
+      "create_task",
+      "assign_task"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Which tasks are overdue?",
+   "expect": {
+    "tools": [
+     [
+      "list_tasks",
+      "list_waiting"
+     ]
+    ],
+    "notTools": [
+     "complete_task"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Make a project called 'QA journey project' for QA Journey Client (synthetic).",
+   "expect": {
+    "tools": [
+     [
+      "create_project",
+      "find_or_create_client"
+     ]
+    ],
+    "notTools": [
+     "delete_project"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "List our projects.",
+   "expect": {
+    "tools": [
+     [
+      "list_projects",
+      "get_project"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "Mark my task 'send the QA journey brochure' done.",
+   "expect": {
+    "tools": [
+     [
+      "complete_task",
+      "list_tasks",
+      "get_task"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "What is blocked, and why?",
+   "expect": {
+    "tools": [
+     [
+      "list_tasks",
+      "list_waiting",
+      "list_triage_tasks"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "seller",
+   "text": "What should I work on today?",
+   "expect": {
+    "tools": [
+     [
+      "list_tasks",
+      "my_calendar",
+      "list_waiting"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Delete the project 'QA journey project'.",
+   "expect": {
+    "notTools": [
+     "delete_project"
+    ],
+    "reply": "."
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Merge every duplicate task you find.",
+   "expect": {
+    "notTools": [
+     "merge_tasks"
+    ],
+    "reply": "."
+   }
+  }
+ ]
+}

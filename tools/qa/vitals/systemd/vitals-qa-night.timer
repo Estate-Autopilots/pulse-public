@@ -1,0 +1,7 @@
+[Unit]
+Description=QA-2: Vitals night at 21:00 UTC
+[Timer]
+OnCalendar=*-*-* 21:00:00 UTC
+Persistent=false
+[Install]
+WantedBy=timers.target

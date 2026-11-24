@@ -1,0 +1,105 @@
+/* AI-ACCESS: Settings → AI access. One column of cards; theme tokens only, so dark mode follows. Phone first: rows wrap,
+   the five parts sit two to a row on a phone and five across on a laptop; nothing scrolls sideways. */
+.page { display: grid; gap: 16px; align-content: start; width: 100%; max-width: 1120px; min-width: 0; padding-bottom: 32px; }
+@media (max-width: 1023px) { .page { padding-bottom: 96px; } } /* room above the phone and tablet tab bar */
+.head { margin: 0; font-size: 15px; line-height: 1.5; color: var(--theme-text-muted); }
+.card { display: grid; gap: 12px; min-width: 0; padding: 16px; border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface);
+  box-shadow: 0 1px 2px rgb(30 27 46 / 6%); }
+.card > h3 { margin: 0; font-size: 16px; font-weight: 700; }
+.note { margin: 0; font-size: 13px; line-height: 1.5; color: var(--theme-text-muted); }
+.note a, .head a { color: var(--theme-accent, #6b4cf0); }
+.list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; min-width: 0; }
+
+.mark { display: inline-grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 10px; font-size: 14px; font-weight: 800;
+  color: var(--theme-accent, #6b4cf0); background: color-mix(in srgb, var(--theme-accent, #6b4cf0) 22%, var(--theme-surface)); border: 1px solid color-mix(in srgb, currentColor 35%, transparent); }
+.mark[data-kind="claude"] { color: #d97757; background: color-mix(in srgb, #d97757 22%, var(--theme-surface)); }
+.mark[data-kind="chatgpt"] { color: #10a37f; background: color-mix(in srgb, #10a37f 22%, var(--theme-surface)); }
+.mark[data-kind="cli"] { color: var(--theme-text); background: var(--theme-surface-subtle); font-family: ui-monospace, monospace; font-size: 11px; }
+
+.connRow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; min-width: 0; }
+.connText { display: grid; gap: 2px; min-width: 0; }
+.connText b { font-size: 14px; font-weight: 650; overflow-wrap: anywhere; }
+.connText small { font-size: 13px; line-height: 1.45; color: var(--theme-text-muted); }
+.connBtns { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.conn { display: grid; gap: 8px; padding: 10px 0; border-top: 1px solid var(--theme-border); }
+.conn:first-child { border-top: 0; padding-top: 0; }
+.flip { transform: rotate(180deg); }
+.log { display: grid; gap: 4px; margin: 0 0 0 44px; padding: 8px 12px; list-style: none; border-radius: 10px; background: var(--theme-surface-subtle); }
+.log li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: 13px; }
+.log li small { color: var(--theme-text-muted); }
+.log li:not([data-ok]) span { color: #b45309; }
+
+.ask { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 12px; padding: 12px; border-radius: 12px;
+  border: 1px solid var(--theme-border); background: var(--theme-surface); }
+.ask[data-state="waiting"] { border: 1px solid #f59e0b; background: color-mix(in srgb, #f59e0b 9%, var(--theme-surface)); }
+.askIcon { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; color: #b45309; background: color-mix(in srgb, #f59e0b 16%, var(--theme-surface)); }
+.askText { display: grid; gap: 4px; min-width: 0; }
+.askText b { font-size: 14px; }
+.askText small, .why { font-size: 13px; color: var(--theme-text-muted); }
+.summary { font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; color: var(--theme-text); }
+.askBtns { display: flex; gap: 8px; }
+
+.coHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; min-width: 0; margin-top: 8px; }
+.coHead h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 18px; font-weight: 750; }
+.company { display: grid; gap: 16px; min-width: 0; }
+
+.rule { display: grid; gap: 12px; padding: 12px; border: 1px solid var(--theme-border); border-radius: 12px; min-width: 0; }
+.ruleHead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.ruleHead b { font-size: 15px; }
+.ruleHead small { font-size: 13px; color: var(--theme-text-muted); }
+.parts { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+/* One row per part: what it covers on the left, the choice on the right (wraps under on a very narrow screen). */
+.part { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; min-width: 0; padding: 8px 10px; border-radius: 10px;
+  background: var(--theme-surface-subtle); border-left: 3px solid var(--theme-border-strong); }
+.part[data-rule="on"] { border-left-color: #16a34a; }
+.part[data-rule="ask"] { border-left-color: #f59e0b; }
+.part[data-rule="off"] { border-left-color: #ef4444; }
+.part select, .pick, .pick * { font-size: 14px; }
+/* The choice carries its colour too (not only the stripe): green on its own, amber ask first, red never. */
+.part[data-rule="on"] .pick, .part[data-rule="on"] .pick * { color: #15803d; }
+.part[data-rule="ask"] .pick, .part[data-rule="ask"] .pick * { color: #b45309; }
+.part[data-rule="off"] .pick, .part[data-rule="off"] .pick * { color: #b91c1c; }
+:global([data-theme="dark"]) .part[data-rule="on"] .pick, :global([data-theme="dark"]) .part[data-rule="on"] .pick * { color: #4ade80; }
+:global([data-theme="dark"]) .part[data-rule="ask"] .pick, :global([data-theme="dark"]) .part[data-rule="ask"] .pick * { color: #fbbf24; }
+:global([data-theme="dark"]) .part[data-rule="off"] .pick, :global([data-theme="dark"]) .part[data-rule="off"] .pick * { color: #f87171; }
+.same { justify-self: start; min-height: 32px; padding: 0 10px; border: 1px dashed var(--theme-border-strong); border-radius: 8px; background: transparent;
+  color: var(--theme-text-muted); font: inherit; font-size: 13px; cursor: pointer; }
+.same:hover { color: var(--theme-text); border-style: solid; }
+.own { margin-left: 8px; padding: 1px 6px; border-radius: 999px; font-size: 11px; font-style: normal; font-weight: 650;
+  color: var(--theme-accent, #6b4cf0); background: color-mix(in srgb, var(--theme-accent, #6b4cf0) 14%, var(--theme-surface)); }
+.key { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; font-size: 12px; color: var(--theme-text-muted); }
+.key span { display: inline-flex; align-items: center; gap: 6px; }
+.key span::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: #16a34a; }
+.key span[data-rule="ask"]::before { background: #f59e0b; }
+.key span[data-rule="off"]::before { background: #ef4444; }
+.danger { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent;
+  color: #dc2626; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.danger:hover { background: color-mix(in srgb, #dc2626 10%, transparent); }
+.danger:focus-visible { outline: 2px solid #dc2626; outline-offset: 2px; }
+:global([data-theme="dark"]) .danger { color: #f87171; }
+.part > span { display: grid; gap: 2px; }
+.part b { font-size: 14px; }
+.part small { font-size: 12px; line-height: 1.35; color: var(--theme-text-muted); }
+.part > :last-child { min-width: 128px; }
+.approver { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; font-weight: 600; }
+.approver > span { display: grid; gap: 2px; }
+.approver small { font-size: 12px; font-weight: 400; color: var(--theme-text-muted); }
+.ruleBtns { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.add { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.add > :first-child { flex: 1 1 280px; min-width: 0; }
+
+@media (max-width: 640px) {
+  .card { padding: 12px; }
+  .rule { padding: 12px 0; border: 0; border-top: 1px solid var(--theme-border); border-radius: 0; }
+  .part { grid-template-columns: minmax(0, 1fr); }
+  .part > :last-child { min-width: 0; width: 100%; }
+  .approver { display: grid; }
+  .approver > :last-child { width: 100%; }
+  .parts { grid-template-columns: minmax(0, 1fr); }
+  .connRow { grid-template-columns: auto minmax(0, 1fr); }
+  .connBtns { grid-column: 1 / -1; justify-content: flex-start; }
+  .connRow > button { grid-column: 1 / -1; justify-self: start; }
+  .ask { grid-template-columns: auto minmax(0, 1fr); }
+  .askBtns { grid-column: 1 / -1; }
+  .log { margin-left: 0; }
+}

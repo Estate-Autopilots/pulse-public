@@ -1,0 +1,35 @@
+/* PM-BUILD-3: Team workload (the Mac's screen 09): people × days, one suggestion. */
+.suggest { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin: 0 0 14px; padding: 14px 16px; border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--theme-action) 25%, var(--theme-border)); background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); }
+.suggest p { margin: 0; flex: 1 1 320px; font-size: 14.5px; color: var(--theme-text); }
+.weeks { display: inline-flex; padding: 3px; margin: 0 0 12px; border-radius: 10px; background: var(--theme-surface-subtle); }
+.weeks a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--theme-text-muted); text-decoration: none; }
+.weeks a[aria-current="page"] { background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 1px 2px rgba(20, 16, 60, 0.08); }
+.grid { display: grid; gap: 0; border: 1px solid var(--theme-border); border-radius: 14px; background: var(--theme-surface); overflow-x: auto; }
+.row { display: grid; grid-template-columns: minmax(130px, 1.4fr) repeat(var(--n), minmax(38px, 1fr)) minmax(86px, 1fr); align-items: center; gap: 4px; padding: 8px 10px; border-top: 1px solid var(--theme-border); min-width: 0; }
+.row[data-head] { border-top: 0; font-size: 12.5px; color: var(--theme-text-muted); font-weight: 600; }
+.who { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.who b { display: block; font-size: 14px; color: var(--theme-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who small { display: block; font-size: 12px; color: var(--theme-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who > span { min-width: 0; }
+.dayHead { display: grid; justify-items: center; text-align: center; }
+.dayHead small { font-weight: 400; }
+.dayHead[data-today] { color: var(--theme-action); }
+.cell { display: grid; place-items: center; height: 34px; border-radius: 8px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--theme-text); background: var(--theme-surface-subtle); }
+.cell[data-tone="ok"] { background: color-mix(in srgb, var(--theme-success, #2e7d32) 14%, var(--theme-surface)); }
+.cell[data-tone="high"] { background: color-mix(in srgb, #d98a00 22%, var(--theme-surface)); }
+.cell[data-tone="over"] { background: color-mix(in srgb, var(--theme-danger, #c62828) 22%, var(--theme-surface)); color: var(--theme-danger, #c62828); }
+.total { display: grid; justify-items: end; font-size: 13px; color: var(--theme-text-muted); text-align: right; }
+.total b { color: var(--theme-text); font-size: 14px; }
+.total em { font-style: normal; font-size: 12px; font-weight: 600; color: var(--theme-danger, #c62828); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 12px 0 0; font-size: 13px; color: var(--theme-text-muted); }
+.legend span[data-tone]::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 3px; vertical-align: -1px; }
+.legend [data-tone="ok"]::before { background: color-mix(in srgb, var(--theme-success, #2e7d32) 40%, var(--theme-surface)); }
+.legend [data-tone="high"]::before { background: color-mix(in srgb, #d98a00 55%, var(--theme-surface)); }
+.legend [data-tone="over"]::before { background: color-mix(in srgb, var(--theme-danger, #c62828) 55%, var(--theme-surface)); }
+.note { flex-basis: 100%; font-size: 12.5px; }
+.empty { padding: 30px 16px; border: 1px dashed var(--theme-border); border-radius: 14px; text-align: center; color: var(--theme-text-muted); }
+@media (max-width: 600px) { .row { grid-template-columns: minmax(96px, 1.2fr) repeat(var(--n), minmax(30px, 1fr)) minmax(58px, 0.9fr); padding: 8px 6px; gap: 3px; } .who > span small { display: none; } .total small { display: none; } }
+.first { display: none; }
+@media (max-width: 600px) { .full { display: none; } .first { display: inline; } .who :global(img), .who > span:first-child[aria-hidden] { display: none; } }
+@media (max-width: 600px) { .dayDate { display: none; } }

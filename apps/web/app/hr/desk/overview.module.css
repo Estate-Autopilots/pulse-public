@@ -1,0 +1,120 @@
+/* UI-SWEEP (owner, 10 Nov 2026): the HR desk's overview, summary first (Codex concept "Summary first" with concept 2's
+   segmented "Who is out" and inline decisions). One slim alert strip, the day as four tiles, then two columns. */
+.overview { display: grid; gap: 14px; min-width: 0; }
+
+/* The strip: one line per thing to look at, its link at the line's end (round 2: three alerts in one line read as one). */
+.strip { display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px 14px; border-radius: 12px; min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--theme-warning) 35%, var(--theme-border)); background: color-mix(in srgb, var(--theme-warning) 9%, var(--theme-surface)); font-size: 13.5px; line-height: 1.4; }
+.alert { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.alert > span { flex: 1 1 auto; min-width: 0; text-wrap: pretty; }
+.alert > svg { flex: none; color: var(--theme-warning); }
+.alert b { font-weight: 650; }
+.alertLink, .alertMore { color: var(--theme-action); font-weight: 600; text-decoration: none; white-space: nowrap; }
+
+.alertLink:hover, .alertMore:hover { text-decoration: underline; }
+.alertTool { align-self: flex-start; }
+
+/* The day: a title row with the shift and the day picker, then the tiles. */
+.dayHead { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-width: 0; }
+.dayHead h2 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.dayHead > :last-child { margin-left: auto; }
+.overview dl[aria-label] { margin: 0; }
+.quiet { display: flex; align-items: center; gap: 8px; margin: 0; padding: 0 2px; color: var(--theme-text-muted); font-size: 13px; }
+.quiet > svg { flex: none; }
+
+/* Two columns: what waits for a decision, and who is out. Each scrolls inside its own card when long. */
+.cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; align-items: stretch; }
+.cols[data-one] { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.col { min-width: 0; }
+@media (max-width: 999.98px) { .cols, .cols[data-one] { grid-template-columns: minmax(0, 1fr); } }
+
+/* A waiting request: one line; the reason and the balance open under it. */
+.asks { display: grid; margin: 0; padding: 0; list-style: none; }
+.ask { border-top: 1px solid color-mix(in srgb, var(--theme-border) 70%, transparent); }
+.ask:first-child { border-top: 0; }
+.askLine { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 0; min-width: 0; }
+.askToggle { display: grid; flex: none; place-items: center; width: 28px; height: 28px; margin-left: -4px; border: 0; border-radius: 8px; background: transparent; color: var(--theme-text-muted); cursor: pointer; }
+.askToggle svg { transition: transform 160ms ease; transform: rotate(-90deg); }
+.ask[data-open] .askToggle svg { transform: none; }
+.askToggle:hover { background: var(--theme-surface-subtle); color: var(--theme-text); }
+.askToggle:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.askWho { display: grid; flex: 1 1 auto; gap: 1px; min-width: 0; }
+.askName { overflow-wrap: anywhere; color: var(--theme-text); font-weight: 600; font-size: 14px; line-height: 1.3; text-decoration: none; }
+.askName:hover { text-decoration: underline; }
+.askMeta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; color: var(--theme-text-muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.askWhat { padding: 1px 7px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text); font-size: 12px; white-space: nowrap; }
+.askDo { flex: none; }
+.askOwn { color: var(--theme-text-muted); font-size: 12.5px; }
+.askMore { display: grid; gap: 4px; margin: 0 0 10px 72px; padding: 10px 12px; border-radius: 10px; background: var(--theme-surface-subtle); font-size: 13px; line-height: 1.45; }
+.askMore p { margin: 0; }
+.askReason { color: var(--theme-text); }
+.askImpact { color: var(--theme-text-muted); }
+.askImpact[data-over] { color: var(--theme-danger); font-weight: 600; }
+.askAgo { color: var(--theme-text-muted); font-size: 12px; }
+@media (max-width: 599.98px) {
+  .askLine { flex-wrap: wrap; }
+  .askWho { flex-basis: calc(100% - 80px); }
+  /* Approve and Reject share the row's full width: two equal 44 px presses under the request. */
+  .askDo { width: 100%; padding-left: 0; }
+  .askDo > span { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .askDo button { justify-content: center; width: 100%; min-height: 44px; }
+  .askMore { margin-left: 0; }
+}
+
+/* Who is out: segmented tabs with counts, then five people and "Show all" (the full list scrolls in the card). */
+.out { display: grid; gap: 8px; min-width: 0; }
+.outList { display: grid; margin: 0; padding: 0; list-style: none; }
+/* HR-PEOPLE: "Show all" opens the whole list in the page (one scroll), not a scroll box inside a scrolling page. */
+.outList[data-all] { max-height: none; }
+.outRow { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 4px 0; border-top: 1px solid color-mix(in srgb, var(--theme-border) 60%, transparent); min-width: 0; }
+.outRow:first-child { border-top: 0; }
+.outMain { display: grid; flex: 1 1 auto; justify-items: start; gap: 1px; min-width: 0; }
+.outName { max-width: 100%; color: var(--theme-text); font-weight: 550; font-size: 14px; line-height: 1.3; text-decoration: none; }
+.outName:hover { text-decoration: underline; }
+.outWhat { max-width: 100%; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.outNone { display: flex; align-items: center; gap: 8px; margin: 6px 0; color: var(--theme-text-muted); font-size: 13.5px; }
+.outNone > svg { color: var(--theme-success); }
+.showAll { justify-self: start; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 2px; border: 0; background: transparent; color: var(--theme-action); font: 600 13.5px/1 inherit; cursor: pointer; }
+.showAll svg[data-open] { transform: rotate(-90deg); }
+.showAll:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; border-radius: 6px; }
+.coming { margin-top: 6px; }
+.comingList { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.comingList li { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.comingMain { display: grid; min-width: 0; }
+.comingMain small { color: var(--theme-text-muted); font-size: 12px; }
+.comingTitle { display: inline-flex; align-items: center; gap: 4px; color: var(--theme-text); font-weight: 550; font-size: 13.5px; text-decoration: none; }
+/* On a phone the app's round + button and the assistant float above the tab bar: the overview ends with room for them,
+   so "Show all" and the last row can always be scrolled clear of them. */
+/* (The phone's floats step aside while scrolling down, shell-bridge.tsx: no padding is kept for them.) */
+/* Round 2 (judge): Who is out runs down the right; Waiting for you and Coming up share the left, so neither column
+   ends in a big empty gap. One column on narrow screens: Waiting, Who is out, then Coming up. */
+.cols:not([data-one]) > .outCol { grid-column: 2; }
+.cols:not([data-one]):has(> .comingCol) > .outCol { grid-row: 1 / span 2; }
+@media (max-width: 999.98px) {
+  .cols:not([data-one]) > .outCol { grid-column: auto; grid-row: auto; }
+  .comingCol { order: 1; }
+}
+/* On a phone each warning takes its own line, its link at the line's end. */
+@media (max-width: 599.98px) {
+  .strip { flex-direction: column; align-items: stretch; gap: 8px; }
+  .alert { display: flex; align-items: flex-start; }
+  .alert > span { flex: 1 1 auto; }
+  .alertLink::before { content: none; }
+  .alertTool { margin-left: 0; }
+}
+/* On a computer each link follows its sentence (at the far right it was a long way from what it acts on). */
+@media (min-width: 600px) { .alert > span { flex: 0 1 auto; } .alertLink { margin-left: 4px; } }
+/* Round 4: on a phone the day picker stays on the "Today" line (it took a row of its own). */
+@media (max-width: 599.98px) { .dayHead { flex-wrap: nowrap; } }
+/* Round 6: amber on a dark surface read as muddy brown; in dark mode the strip is a plain card with an amber edge and icons. */
+:global(:root[data-theme="dark"]) .strip { background: var(--theme-surface); border-color: color-mix(in srgb, var(--theme-warning) 45%, var(--theme-border)); }
+
+/* HR-PEOPLE (screenshot judge, 13 Nov 2026): on a phone what needs a decision comes first: the warnings, then Waiting for
+   you, then the day's tiles and the rest (the four tiles pushed the approvals below the first screen). */
+@media (max-width: 599.98px) {
+  .cols { display: contents; }
+  .strip { order: -2; }
+  .cols > .col:first-child { order: -1; }
+}
+/* VITALS-SWEEP (22 Nov 2026; measured: the alert's Review link was 19 px tall): a 44 px tap on touch screens. */
+@media (pointer: coarse) { .alertLink { display: inline-flex; align-items: center; min-height: 44px; } }

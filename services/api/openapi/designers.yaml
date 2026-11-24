@@ -1,0 +1,174 @@
+openapi: 3.1.0
+info: { title: Pulse designers reports, version: 1.1.0 }
+paths:
+  /api/v0/design-deliveries/summary:
+    get:
+      summary: Read team design delivery totals and aggregate credit methods
+      description: Admins and managers see only their permitted scope. Confirmed shared-login design claims count toward the claimant and confirmation method; pending and rejected claims remain shared-login credit.
+      responses:
+        '200':
+          description: Design delivery totals and aggregate attribution for the last 30 days
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DesignDeliveriesSummary' }
+        '403': { description: Only admins or managers can view team design delivery totals }
+  /api/v0/designers:
+    get:
+      summary: Read visible designers' weekly delivery counts by type and single-image progress
+      description: Admins and leadership see active staff, managers see their team, and staff see only themselves. Shared logins are combined into one labelled row. Only tenant-configured designer roles receive a single-image target. Weekly expectations count the tenant's workdays, exclude non-optional holidays, and for the current week include dates only through today.
+      parameters:
+        - { name: week, in: query, required: false, schema: { type: string, pattern: '^\d{4}-W(0[1-9]|[1-4][0-9]|5[0-3])$' }, description: Defaults to the current ISO week. }
+      responses:
+        '200':
+          description: Weekly per-person counts, sorted by name
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [week, designers]
+                properties:
+                  week: { type: string, pattern: '^\d{4}-W(0[1-9]|[1-4][0-9]|5[0-3])$' }
+                  designers:
+                    type: array
+                    items: { $ref: '#/components/schemas/DesignerCount' }
+        '400': { description: Invalid or incomplete week }
+        '403': { description: HR-only accounts cannot access work data }
+  /api/v0/designers/{person}:
+    get:
+      summary: Read daily design counts and single-image progress for the signed-in person
+      description: Only a person's own daily detail is available. Managers cannot read daily detail, including their own.
+      parameters:
+        - { name: person, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: week, in: query, required: false, schema: { type: string, pattern: '^\d{4}-W(0[1-9]|[1-4][0-9]|5[0-3])$' }, description: Defaults to the current ISO week. }
+      responses:
+        '200':
+          description: Seven daily per-type counts and single-image progress for the person's own week
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [week, singleImage, days]
+                properties:
+                  week: { type: string, pattern: '^\d{4}-W(0[1-9]|[1-4][0-9]|5[0-3])$' }
+                  singleImage: { $ref: '#/components/schemas/SingleImageProgress' }
+                  days:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      required: [day, types, claimed, singleImage]
+                      properties:
+                        day: { type: string, format: date }
+                        types: { $ref: '#/components/schemas/DesignTypeCounts' }
+                        claimed: { $ref: '#/components/schemas/DesignTypeCounts' }
+                        singleImage: { $ref: '#/components/schemas/SingleImageProgress' }
+        '400': { description: Invalid person identifier or incomplete week }
+        '403': { description: Daily detail is self-only and unavailable to managers }
+  /api/v0/designers/brand-projects/open:
+    get:
+      summary: Read open brand asset work and tenant completion windows
+      description: Admins and leadership see organisation work, managers see their team, and staff see only work assigned to themselves. Project names and task titles are omitted.
+      responses:
+        '200':
+          description: Open brand asset projects with elapsed days and their configured windows
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [brandProjects]
+                properties:
+                  brandProjects:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: false
+                      required: [personId, projectId, brandAsset, openedOn, daysOpen, window]
+                      properties:
+                        personId: { type: string, format: uuid }
+                        projectId: { type: string, format: uuid }
+                        brandAsset: { type: string, enum: [logo, colour_palette, brochure, pitch_deck, brand_identity] }
+                        openedOn: { type: [string, 'null'], format: date, description: Earliest task assignment or planned phase start date. }
+                        daysOpen: { type: [integer, 'null'], minimum: 0, description: Calendar days since openedOn in Asia/Kolkata; null when no start date is recorded. }
+                        window:
+                          type: object
+                          additionalProperties: false
+                          required: [days, placeholder]
+                          properties:
+                            days:
+                              type: object
+                              additionalProperties: false
+                              required: [min, max]
+                              properties:
+                                min: { type: [integer, 'null'], minimum: 0 }
+                                max: { type: [integer, 'null'], minimum: 0 }
+                            placeholder: { type: boolean }
+        '403': { description: HR-only accounts cannot access work data }
+components:
+  schemas:
+    DesignerCount:
+      type: object
+      additionalProperties: false
+      required: [personId, name, sharedLogin, types, claimed, singleImage]
+      properties:
+        personId: { type: [string, 'null'], format: uuid }
+        name: { type: string, description: Visible staff display name or the literal shared login label. }
+        sharedLogin: { type: boolean }
+        types: { $ref: '#/components/schemas/DesignTypeCounts' }
+        claimed: { $ref: '#/components/schemas/DesignTypeCounts' }
+        singleImage: { $ref: '#/components/schemas/SingleImageProgress' }
+    DesignTypeCounts:
+      type: object
+      additionalProperties: false
+      propertyNames: { enum: [single_image_ad, carousel, brochure, logo, pitch_deck, other] }
+      required: [single_image_ad, carousel, brochure, logo, pitch_deck, other]
+      properties:
+        single_image_ad: { type: integer, minimum: 0 }
+        carousel: { type: integer, minimum: 0 }
+        brochure: { type: integer, minimum: 0 }
+        logo: { type: integer, minimum: 0 }
+        pitch_deck: { type: integer, minimum: 0 }
+        other: { type: integer, minimum: 0 }
+    DesignDeliveriesSummary:
+      type: object
+      additionalProperties: false
+      required: [window_days, total, unmatched_count, types, attribution]
+      properties:
+        window_days: { type: integer, const: 30 }
+        total: { type: integer, minimum: 0 }
+        unmatched_count: { type: integer, minimum: 0 }
+        types: { $ref: '#/components/schemas/DesignTypeCounts' }
+        attribution: { $ref: '#/components/schemas/DesignDeliveryAttributionSummary' }
+    DesignDeliveryAttributionSummary:
+      type: object
+      additionalProperties: false
+      required: [total_deliveries, credited_to_person, shared_login, unresolved, by_method]
+      properties:
+        total_deliveries: { type: integer, minimum: 0 }
+        credited_to_person: { type: integer, minimum: 0 }
+        shared_login: { type: integer, minimum: 0 }
+        unresolved: { type: integer, minimum: 0 }
+        by_method: { $ref: '#/components/schemas/DesignDeliveryAttributionMethods' }
+    DesignDeliveryAttributionMethods:
+      type: object
+      additionalProperties: false
+      required: [account_map, confirmation, fingerprint, folder_owner, shared, unresolved]
+      properties:
+        account_map: { type: integer, minimum: 0 }
+        confirmation: { type: integer, minimum: 0 }
+        fingerprint: { type: integer, minimum: 0 }
+        folder_owner: { type: integer, minimum: 0 }
+        shared: { type: integer, minimum: 0 }
+        unresolved: { type: integer, minimum: 0 }
+    SingleImageProgress:
+      type: object
+      additionalProperties: false
+      required: [perDay, expected, delivered, gap, placeholder]
+      properties:
+        perDay: { type: [integer, 'null'], minimum: 0 }
+        expected: { type: [integer, 'null'], minimum: 0 }
+        delivered: { type: integer, minimum: 0 }
+        gap: { type: [integer, 'null'], minimum: 0 }
+        placeholder: { type: boolean }

@@ -1,0 +1,13 @@
+/* GROUP-ACCESS: Client groups, and a client group read without being a member (browse.tsx). */
+.note { margin: 8px 16px 6px; color: var(--theme-text-muted); font-size: 12.5px; line-height: 1.45; }
+.tag { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }   /* with the list's own tag look (.rowTop em) */
+.bar { flex: none; display: flex; align-items: center; gap: 12px; margin: 0; padding: 12px 16px; border-top: 1px solid var(--theme-border); background: var(--theme-surface); color: var(--theme-text-muted); font-size: 13px; line-height: 1.45; }
+.bar > span { flex: 1; min-width: 0; }
+.bar b { color: var(--theme-text); font-weight: 600; }
+.eye { flex: none; }
+.error { color: var(--theme-danger); font-size: 12.5px; }
+@media (max-width: 640px) {
+  .bar { flex-wrap: wrap; padding: 10px 12px; }
+  .bar > span { flex-basis: calc(100% - 30px); padding-right: 48px; }   /* clear of the floating "scroll to latest" button */
+  .bar > button { flex: 1; }
+}

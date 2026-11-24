@@ -1,0 +1,130 @@
+{
+ "agent": {
+  "org": "estateautopilots",
+  "name": "Creative Strategist (AI)"
+ },
+ "about": "Creative and PR. QA company's synthetic data only.",
+ "dailyTokenBudget": 800000,
+ "tasks": [
+  {
+   "from": "owner",
+   "text": "List our PR audiences.",
+   "expect": {
+    "tools": [
+     "list_pr_audiences"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Draft a short LinkedIn post about our QA journey project.",
+   "expect": {
+    "tools": [
+     [
+      "create_pr_draft",
+      "write_pr_brief"
+     ]
+    ],
+    "notTools": [
+     "send_message"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Show the PR drafts waiting.",
+   "expect": {
+    "tools": [
+     [
+      "list_pr_drafts",
+      "list_pr_briefs"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Write a brief for a brochure for QA Journey Client (synthetic).",
+   "expect": {
+    "tools": [
+     [
+      "write_pr_brief",
+      "create_doc"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "What did we post recently?",
+   "expect": {
+    "tools": [
+     [
+      "list_pr_story",
+      "list_pr_drafts"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "List our docs about marketing.",
+   "expect": {
+    "tools": [
+     [
+      "list_docs",
+      "search",
+      "read_latest_docs"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Make a doc with three campaign ideas for QA Journey Client (synthetic).",
+   "expect": {
+    "tools": [
+     [
+      "create_doc",
+      "write_pr_brief"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Which skills can you run?",
+   "expect": {
+    "tools": [
+     [
+      "list_skills",
+      "run_skill"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Who is our audience for the QA journey project?",
+   "expect": {
+    "tools": [
+     [
+      "list_pr_audiences",
+      "search"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Publish the latest draft now.",
+   "expect": {
+    "notTools": [
+     "send_message",
+     "send_doc"
+    ],
+    "reply": "."
+   }
+  }
+ ]
+}

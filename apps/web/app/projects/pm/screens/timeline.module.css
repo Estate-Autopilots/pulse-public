@@ -1,0 +1,201 @@
+/* PM-UI 18 Timeline. Tokens only; dark mode follows the tokens. Layout by the page's own width (container queries):
+   phone < 600 px (clock row + phase list) · tablet 600–959 (Gantt with fixed Phase and Status columns, two-line date
+   heads; may scroll sideways inside its card when narrow) · laptop ≥ 960 (wider columns, "Week N" heads, all 8 weeks fit). */
+
+.root { container: tl / inline-size; display: grid; align-content: start; gap: var(--ds-space-3); min-width: 0; }
+.root :focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+
+/* ---------- Header ---------- */
+.phoneTitle { margin: 0; color: var(--theme-text); font-size: var(--ds-text-2xl); font-weight: var(--ds-weight-strong); letter-spacing: -0.015em; line-height: 1.2; }
+.head { display: grid; gap: var(--ds-space-3); min-width: 0; padding: var(--ds-space-3) var(--ds-space-4); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent); }
+.headRow { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "tile text" "tile chip"; align-items: center; column-gap: var(--ds-space-3); row-gap: var(--ds-space-1); min-width: 0; }
+.headRow > :first-child { grid-area: tile; }
+.headText { grid-area: text; display: grid; gap: 2px; min-width: 0; align-self: end; }
+.title { margin: 0; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); letter-spacing: -0.015em; line-height: 1.25; overflow-wrap: anywhere; }
+.sub { display: none; margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-md); }
+/* The kit chip has real spaces; the UI font sets them narrow, so the header chip gets a little word spacing. */
+.headChip { grid-area: chip; display: flex; align-self: start; min-width: 0; word-spacing: 0.12em; }
+.actions { display: none; }
+
+/* The view switch: phone = three equal segments in a card; tablet/laptop = underlined tabs inside the header card. */
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-space-1); padding: var(--ds-space-1); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); }
+.tabs { display: none; }
+.view { display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-2); min-height: 44px; padding: 0 var(--ds-space-3); border-radius: var(--ds-radius-md); color: var(--theme-text-muted); font-size: var(--ds-text-md); font-weight: var(--ds-weight-medium); text-decoration: none; white-space: nowrap; }
+.view svg { flex: none; width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+.view:hover { background: var(--ds-hover); color: var(--theme-text); }
+.view[aria-current="page"] { background: color-mix(in srgb, var(--theme-action) 12%, var(--theme-surface)); color: var(--theme-action); font-weight: var(--ds-weight-strong); }
+
+/* ---------- Phone: clocks + phase list ---------- */
+.phone { display: grid; gap: var(--ds-space-2); min-width: 0; }
+.clockCard { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content; gap: var(--ds-space-3); margin-bottom: var(--ds-space-1); padding: var(--ds-space-3); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); }
+.clockCell { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: var(--ds-space-2); min-width: 0; }
+.clockDone, .clockGate, .skelDot { width: 18px; height: 18px; margin-top: 1px; }
+.clockDone { color: var(--tone-done-mark); }
+.clockGate { color: var(--theme-action); stroke-width: 2.2; }
+.clockText { display: grid; gap: 2px; min-width: 0; }
+.clockLabel { color: var(--theme-text); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-strong); line-height: 1.25; overflow-wrap: anywhere; }
+.clockDate { color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-variant-numeric: tabular-nums; }
+
+.list { display: grid; gap: var(--ds-space-2); margin: 0; padding: 0; list-style: none; }
+.item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--ds-space-3); width: 100%; min-height: 58px; padding: var(--ds-space-2) var(--ds-space-3); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); color: var(--theme-text); font: inherit; text-align: left; cursor: pointer; }
+.item:hover { border-color: var(--theme-border-strong); }
+.item[data-current] { border-color: color-mix(in srgb, var(--theme-action) 35%, var(--theme-border)); box-shadow: inset 3px 0 0 var(--theme-action); }
+.item[aria-expanded="true"] { border-color: var(--theme-action); }
+.item[data-skeleton] { cursor: default; }
+.itemIcon { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: var(--ds-radius-md); background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.itemIcon svg { width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+.itemText { display: grid; gap: 2px; min-width: 0; }
+.itemName { color: var(--theme-text); font-size: var(--ds-text-md); font-weight: var(--ds-weight-strong); line-height: 1.3; overflow-wrap: anywhere; }
+.itemDate { color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-variant-numeric: tabular-nums; }
+.bigger { justify-self: center; display: inline-flex; align-items: center; min-height: 44px; color: var(--theme-action); font-size: var(--ds-text-md); font-weight: var(--ds-weight-medium); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--theme-action) 40%, transparent); }
+.sheetLine { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2) var(--ds-space-3); margin: 0; color: var(--theme-text); font-size: var(--ds-text-md); font-variant-numeric: tabular-nums; }
+
+/* Skeletons keep the real rows' heights. */
+.skel { display: block; height: 12px; border-radius: var(--ds-radius-xs); background: var(--theme-surface-subtle); animation: pulse 1.4s ease-in-out infinite; }
+.skel[data-w="m"] { width: 70%; height: 14px; }
+.skel[data-w="s"] { width: 40%; }
+.skel[data-w="chip"] { width: 64px; height: 24px; }
+.skelDot { display: block; border-radius: 50%; background: var(--theme-surface-subtle); }
+@keyframes pulse { 50% { opacity: 0.55; } }
+
+/* ---------- Tablet / laptop: the Gantt ---------- */
+.chartCard { display: none; }
+.scroll { min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.gantt {
+  --nameW: 124px; --statusW: 118px; --left: calc(var(--nameW) + var(--statusW)); --rowH: 56px; --headH: 48px; --marksH: 82px; --tag: 56px;
+  --line: var(--ds-line); --elbow: color-mix(in srgb, var(--theme-text-muted) 75%, transparent);
+  position: relative; min-width: calc(var(--left) + var(--weeks) * 60px);
+}
+.gHead, .gMarks, .gRow { display: grid; grid-template-columns: var(--left) minmax(0, 1fr); min-width: 0; }
+.gHead { height: var(--headH); border-bottom: 1px solid var(--line); }
+.corner { display: grid; grid-template-columns: var(--nameW) var(--statusW); align-items: end; padding: 0 0 var(--ds-space-2); color: var(--theme-text); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-strong); }
+.weeks { display: grid; grid-template-columns: repeat(var(--weeks), minmax(0, 1fr)); min-width: 0; }
+/* Week heads: tablet = "11 Nov" over "– 17 Nov" (all eight the same shape); laptop = "Week 1" over "11–17 Nov".
+   A date never breaks inside itself. */
+.week { display: grid; align-content: end; justify-items: center; gap: 1px; min-width: 0; padding: 0 6px var(--ds-space-2); border-left: 1px solid var(--line); color: var(--theme-text); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); line-height: 1.3; text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.week b { display: none; font-size: var(--ds-text-sm); font-weight: var(--ds-weight-strong); }
+.wRange { display: none; }
+.wTo { color: var(--theme-text-muted); }
+.gMarks { height: var(--marksH); }
+
+.track { position: relative; min-width: 0; background-image: linear-gradient(to right, var(--line) 1px, transparent 1px); background-size: calc(100% / var(--weeks)) 100%; }
+
+/* Clock markers: label and date on top, a dot (done) or a hollow diamond (planned) under, the Today tag below. */
+.mark { position: absolute; top: var(--ds-space-1); display: grid; margin-left: -5px; white-space: nowrap; color: var(--theme-text-muted); font-size: var(--ds-text-xs); line-height: 1.3; font-variant-numeric: tabular-nums; }
+.mark b { color: var(--theme-text); font-weight: var(--ds-weight-strong); }
+.mark[data-end] { margin: 0 -2px 0 0; text-align: right; }
+.markDot { position: absolute; top: 40px; width: 10px; height: 10px; border-radius: 50%; background: var(--theme-action); transform: translateX(-50%); }
+.markDot[data-planned] { width: 10px; height: 10px; border: 2px solid var(--theme-action); border-radius: 2px; background: var(--theme-surface); transform: translateX(-50%) rotate(45deg); }
+.todayTag { position: absolute; top: var(--tag); z-index: 3; display: inline-flex; align-items: center; height: 22px; padding: 0 var(--ds-space-2); border-radius: var(--ds-radius-xs); background: var(--theme-action); color: var(--theme-action-text); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-strong); white-space: nowrap; transform: translateX(-1px); }
+.todayLine { position: absolute; top: calc(var(--headH) + var(--tag)); bottom: 0; left: calc(var(--left) + (100% - var(--left)) * var(--x)); z-index: 0; width: 2px; margin-left: -1px; background: var(--theme-action); pointer-events: none; }
+
+.gRows { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+/* One line per phase: number + name, its status chip beside it, then the bar. */
+.gRow { position: relative; grid-template-columns: var(--nameW) var(--statusW) minmax(0, 1fr); grid-template-areas: "name status track"; align-items: center; height: var(--rowH); border-bottom: 1px solid var(--line); }
+.gName { grid-area: name; min-width: 0; padding-right: var(--ds-space-2); overflow: hidden; color: var(--theme-text); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+.gNo { color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.gStatus { grid-area: status; display: flex; min-width: 0; }
+.gRow > .track { grid-area: track; align-self: stretch; }
+
+
+/* Bars: the dates inside, or just beside the bar when it is too short (container query on the bar itself). */
+.bar { container: bar / inline-size; position: absolute; top: 50%; z-index: 1; height: 32px; margin-top: -16px; padding: 0; border: 0; border-radius: 6px; background: var(--fill); color: var(--ink); font: inherit; cursor: pointer; }
+.bar::before { content: ""; position: absolute; inset: -2px 0; }
+.bar[data-status="done"], .swatch[data-status="done"] { --fill: var(--tone-done-mark); --ink: var(--theme-surface); }
+.bar[data-status="doing"], .swatch[data-status="doing"] { --fill: var(--tone-info-mark); --ink: var(--theme-surface); }
+.bar[data-status="late"], .swatch[data-status="late"] { --fill: var(--tone-problem-mark); --ink: var(--theme-surface); }
+.bar[data-status="todo"], .swatch[data-status="todo"] { --fill: color-mix(in srgb, var(--theme-border-strong) 72%, var(--theme-surface)); --ink: var(--theme-text); }
+.bar[data-status="waiting_client"], .swatch[data-status="waiting_client"] {
+  --ink: var(--theme-text);
+  --fill: repeating-linear-gradient(135deg, color-mix(in srgb, var(--theme-border-strong) 80%, var(--theme-surface)) 0 5px, var(--theme-surface-subtle) 5px 10px);
+  box-shadow: inset 0 0 0 1px var(--theme-border-strong);
+}
+.bar:hover { filter: brightness(1.06); }
+/* The open phase: a ring drawn above the Today line (a thin surface gap, then the violet ring). */
+.bar[aria-expanded="true"] { --nudge: 5px; z-index: 2; box-shadow: 0 0 0 2px var(--theme-surface), 0 0 0 4px var(--theme-action); }
+.barText { display: block; padding: 0 var(--ds-space-2); font-size: calc(var(--ds-text-xs) - 1px); font-weight: var(--ds-weight-strong); line-height: 32px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.barText > span { white-space: nowrap; }
+.bar[data-status="waiting_client"] .barText { text-shadow: 0 0 3px var(--theme-surface), 0 0 2px var(--theme-surface); }
+
+/* Too short for its dates with 8 px padding: the dates go just beside the bar (no background, so the Today line is never
+   blanked; labels are placed so they never reach it). A bar that ends just before Today puts them on two lines: inside
+   when they fit, else beside it. Thresholds per length class (a <= 8 chars, b = 9, c >= 10). */
+@container bar (max-width: 65.98px) { .bar[data-len="a"]:not([data-near]) .barText { position: absolute; top: 0; left: calc(100% + 3px + var(--nudge, 0px)); padding: 0; color: var(--theme-text-muted); text-shadow: none; } }
+@container bar (max-width: 75.98px) { .bar[data-len="b"]:not([data-near]) .barText { position: absolute; top: 0; left: calc(100% + 3px + var(--nudge, 0px)); padding: 0; color: var(--theme-text-muted); text-shadow: none; } }
+@container bar (max-width: 93.98px) { .bar[data-len="c"]:not([data-near]) .barText { position: absolute; top: 0; left: calc(100% + 3px + var(--nudge, 0px)); padding: 0; color: var(--theme-text-muted); text-shadow: none; } }
+@container bar (max-width: 93.98px) {
+  .bar[data-side="left"][data-len]:not([data-near]) .barText { left: auto; right: calc(100% + 14px + var(--nudge, 0px)); } /* clear of the elbow arrow */
+}
+@container bar (max-width: 75.98px) {
+  .bar[data-near] .barText { padding-block: 3px; line-height: 13px; }
+  .bar[data-near] .barText > span { display: block; }
+}
+@container bar (max-width: 51.98px) {
+  .bar[data-near] .barText { position: absolute; top: 0; left: calc(100% + 3px + var(--nudge, 0px)); padding-inline: 0; color: var(--theme-text-muted); text-align: left; text-shadow: none; }
+}
+
+/* Thin elbow from one phase down to the next (ends with a small arrow at the next bar). */
+.elbow { position: absolute; top: calc(var(--rowH) / -2 + 16px); width: 9px; height: calc(var(--rowH) - 16px); margin-left: -10px; border-bottom: 1.5px solid var(--elbow); border-left: 1.5px solid var(--elbow); border-bottom-left-radius: 4px; pointer-events: none; }
+.elbow::after { content: ""; position: absolute; right: -2px; bottom: -4.75px; border: 4px solid transparent; border-right: 0; border-left-color: var(--elbow); }
+.elbow[data-gate] { margin-left: -24px; width: 11px; }
+
+/* The gate: one hollow diamond on its day, its name and date to its left. */
+.gate { position: absolute; top: 50%; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--ds-radius-sm); background: none; color: var(--theme-action); font: inherit; cursor: pointer; transform: translate(-50%, -50%); }
+.gate svg { width: 18px; height: 18px; stroke-width: 2.4; fill: var(--theme-surface); }
+.gate:hover, .gate[aria-expanded="true"] { background: color-mix(in srgb, var(--theme-action) 10%, transparent); }
+.gateText { position: absolute; right: calc(100% + 12px); color: var(--theme-text); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-strong); white-space: nowrap; }
+
+/* The open phase: a small popover by its bar. */
+.pop { position: absolute; top: calc(50% + 20px); z-index: 5; display: grid; justify-items: start; gap: var(--ds-space-2); width: 248px; padding: var(--ds-space-3); border: 1px solid var(--theme-border); border-radius: var(--ds-radius-md); background: var(--theme-surface); box-shadow: var(--ds-elev-2); }
+.pop[data-up] { top: auto; bottom: calc(50% + 20px); }
+.popHead { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-2); width: 100%; }
+.popTitle { margin: 0; color: var(--theme-text); font-size: var(--ds-text-md); font-weight: var(--ds-weight-strong); }
+.popClose { display: inline-grid; flex: none; place-items: center; width: 32px; height: 32px; margin: -6px -6px -6px 0; padding: 0; border: 0; border-radius: var(--ds-radius-sm); background: none; color: var(--theme-text-muted); cursor: pointer; }
+.popClose:hover { background: var(--ds-hover); color: var(--theme-text); }
+.popClose svg { width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+.popLine { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2); margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-variant-numeric: tabular-nums; }
+@media (max-width: 899.98px), (pointer: coarse) { .popClose { width: 44px; height: 44px; margin: -10px -10px -10px 0; } }
+
+/* Legend: a swatch and a word each. */
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2) var(--ds-space-5); margin: 0; padding: var(--ds-space-3) 0 0; border-top: 1px solid var(--line); list-style: none; color: var(--theme-text); font-size: var(--ds-text-sm); }
+.legend li { display: inline-flex; align-items: center; gap: var(--ds-space-2); }
+.swatch { display: inline-block; width: 22px; height: 12px; border-radius: 3px; background: var(--fill); }
+.legendGate svg { width: 16px; height: 16px; color: var(--theme-action); stroke-width: 2.4; }
+
+/* ---------- Tablet: from 600 px of page width ---------- */
+@container tl (min-width: 600px) {
+  .phoneTitle, .seg, .phone { display: none; }
+  .head { gap: var(--ds-space-2); padding: var(--ds-space-4) var(--ds-space-5) 0; }
+  .headRow { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "tile text actions" "tile chip actions"; column-gap: var(--ds-space-4); }
+  .title { font-size: var(--ds-text-2xl); }
+  .sub { display: block; }
+  .actions { grid-area: actions; display: flex; align-items: center; gap: var(--ds-space-2); }
+  .tabs { display: flex; gap: var(--ds-space-1); margin-inline: calc(var(--ds-space-2) * -1); }
+  .tabs .view { border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0; padding: 0 var(--ds-space-3); }
+  .tabs .view[aria-current="page"] { background: none; box-shadow: inset 0 -2px 0 var(--theme-action); }
+  .chartCard { display: grid; gap: var(--ds-space-3); min-width: 0; padding: var(--ds-space-4) var(--ds-space-3); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent); }
+}
+
+/* Tablet only: two clock markers a week apart (Invoice paid, Day 0): the first label ends at its dot, the next starts at
+   its own, so there is a clear gap between them. */
+@container tl (min-width: 600px) and (max-width: 959.98px) {
+  .mark[data-tight] { margin-left: 5px; text-align: right; transform: translateX(-100%); }
+}
+
+/* ---------- Laptop: from 960 px of page width ---------- */
+@container tl (min-width: 960px) {
+  .headRow { display: flex; align-items: center; gap: var(--ds-space-4); }
+  .headChip { align-self: center; padding-left: var(--ds-space-4); border-left: 1px solid var(--theme-border); }
+  .actions { margin-left: auto; }
+  .chartCard { padding: var(--ds-space-4) var(--ds-space-5); }
+  .gantt { --nameW: 168px; --statusW: 148px; --rowH: 46px; --headH: 54px; }
+  .gName { font-size: var(--ds-text-md); }
+  .week b, .wRange { display: block; }
+  .wFrom, .wTo { display: none; }
+  .wRange { color: var(--theme-text-muted); font-size: calc(var(--ds-text-xs) - 1px); letter-spacing: -0.02em; }
+  /* Laptop bars are wide enough: a near-Today label stays on one line (just beside a short bar, well clear of the line). */
+  .bar[data-near] .barText { padding-block: 0; line-height: 32px; letter-spacing: -0.02em; left: calc(100% + 2px + var(--nudge, 0px)); }
+  .bar[data-near] .barText > span { display: inline; }
+}
+
+@media (prefers-reduced-motion: reduce) { .skel { animation: none; } }

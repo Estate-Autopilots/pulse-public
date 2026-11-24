@@ -1,0 +1,304 @@
+/* PM-UI: Approvals. Phone (< 600 px): one column of cards + a bottom detail sheet. From 600 px: list + sticky detail
+   pane; the list rows grow a "Requested by / Due" column when the list is 560 px+ (laptop). Tokens only. */
+
+.screen { display: grid; align-content: start; gap: var(--ds-space-4); min-width: 0; }
+.muted { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); line-height: 1.45; }
+
+/* ---------- Head and tabs ---------- */
+.head { display: grid; align-content: start; gap: var(--ds-space-3); min-width: 0; }
+.h1 { margin: 0; color: var(--theme-text); font-size: var(--ds-text-3xl); font-weight: var(--ds-weight-strong); letter-spacing: var(--ds-tracking-tight); line-height: 1.15; }
+.tabs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ds-space-1); padding: var(--ds-space-1); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); }
+.tab {
+  min-width: 0; min-height: 44px; padding: 0 var(--ds-space-3); border: 0; border-radius: var(--ds-radius-md); background: none;
+  color: var(--theme-text); font: inherit; font-size: var(--ds-text-lg); font-weight: var(--ds-weight-medium); line-height: 1.2; white-space: nowrap; cursor: pointer;
+}
+.tab:hover:not([aria-selected="true"]) { background: var(--ds-hover); }
+.tab[aria-selected="true"] { background: color-mix(in srgb, var(--theme-action) 13%, var(--theme-surface)); color: var(--theme-action); font-weight: var(--ds-weight-strong); }
+.tab:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.helper { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); line-height: 1.45; }
+.notice { margin: 0; padding: var(--ds-space-2) var(--ds-space-3); border-radius: var(--ds-radius-md); background: var(--tone-done-soft); color: var(--tone-done); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
+.notice:empty { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); }
+@media (min-width: 600px) {
+  .tabs { justify-self: start; grid-template-columns: auto auto; }
+  .tab { padding: 0 var(--ds-space-5); }
+}
+@media (max-width: 379.98px) { .tab { padding: 0 var(--ds-space-2); font-size: var(--ds-text-md); } }
+
+.panel { min-width: 0; }
+
+/* ---------- Split: list + detail ---------- */
+.split { display: grid; gap: var(--ds-space-4); align-items: start; min-width: 0; }
+/* Tablet: list ~58 %, detail ~42 %. Laptop (content ~1016 px at 1440): the detail card is capped at 400 px so the list
+   keeps ~596 px and its rows get the laptop columns. */
+@media (min-width: 600px) { .split { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
+@media (min-width: 1100px) { .split { grid-template-columns: minmax(0, 1fr) minmax(340px, 400px); gap: var(--ds-space-5); } }
+
+.list { container: aplist / inline-size; display: grid; gap: var(--ds-space-3); min-width: 0; margin: 0; padding: 0; list-style: none; }
+.li { min-width: 0; list-style: none; }
+
+/* ---------- Rows (phone first) ---------- */
+.row {
+  position: relative; display: grid; align-items: start; column-gap: var(--ds-space-3); row-gap: 2px; width: 100%; min-width: 0;
+  padding: var(--ds-space-3); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent);
+  color: var(--theme-text); font: inherit; font-size: var(--ds-text-sm); line-height: 1.4; text-align: left;
+  transition: border-color var(--ds-quick) var(--ds-ease), background-color var(--ds-quick) var(--ds-ease);
+}
+button.row { cursor: pointer; }
+.row:hover { border-color: var(--theme-border-strong); }
+button.row:focus-visible, .hit:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+
+/* Client rows: one invisible button covers the card (select); Remind client sits above it. */
+.hit { position: absolute; inset: 0; z-index: 0; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; }
+.row[data-kind="client"] > :not(.hit) { position: relative; pointer-events: none; }
+.remind { pointer-events: auto; position: relative; z-index: 1; }
+
+.tileCell { grid-area: tile; display: flex; }
+.thumb { grid-area: thumb; }
+.title { grid-area: title; display: block; min-width: 0; color: var(--theme-text); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); line-height: 1.3; overflow-wrap: anywhere; text-wrap: pretty; }
+.chipFloat { float: right; margin: 0 0 var(--ds-space-1) var(--ds-space-2); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-regular); line-height: 1; }
+.chipCell { grid-area: chip; display: inline-flex; justify-self: end; }
+.chipCell > span { white-space: normal; }
+/* Only inside list rows: in the detail pane / sheet a stray grid-area would add implicit grid lines and break the layout. */
+.row > .pill { grid-area: tag; margin-block: 2px; }
+.round { grid-area: round; color: var(--theme-text-muted); font-variant-numeric: tabular-nums; }
+.who { grid-area: who; min-width: 0; color: var(--theme-text-muted); overflow-wrap: anywhere; }
+.who b { color: var(--theme-text); font-weight: var(--ds-weight-strong); }
+.due { grid-area: due; color: var(--theme-text-muted); white-space: nowrap; }
+.due[data-late] { color: var(--tone-problem); }
+/* Requested by + Due: a plain pass-through on phone/tablet (each keeps its own grid area); one stacked column on laptop. */
+.mid { display: contents; }
+.chev { position: absolute; top: 50%; right: var(--ds-space-2); width: var(--ds-icon-sm); height: var(--ds-icon-sm); transform: translateY(-50%); color: var(--theme-text-muted); }
+.foot { grid-area: foot; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-2); min-width: 0; margin-top: var(--ds-space-2); }
+
+/* Phone team card: tile · thumb · text. The title runs to the card's right padding with the chip floated into the true
+   top-right corner; the chevron sits over the right padding, so the lines below the title keep clear of it. */
+.row[data-kind="team"] {
+  grid-template-columns: 36px 64px minmax(0, 1fr);
+  grid-template-areas: "tile thumb title" "tile thumb tag" "tile thumb round" "tile thumb who" "tile thumb due";
+}
+.row[data-kind="team"] .chipCell { display: none; }
+@media (max-width: 599.98px) {
+  .row { column-gap: var(--ds-space-2); row-gap: 0; line-height: 1.3; }
+  .title { font-size: var(--ds-text-md); line-height: 1.25; }
+  .row[data-kind="team"] .title { margin-bottom: var(--ds-space-1); }
+  .row[data-kind="team"] > .pill, .row[data-kind="team"] .round, .row[data-kind="team"] .who, .row[data-kind="team"] .due { margin-inline-end: var(--ds-space-5); }
+}
+/* Phone client card: text beside the thumb, then the chip and Remind client across the card. */
+.row[data-kind="client"] {
+  grid-template-columns: 36px 64px minmax(0, 1fr);
+  grid-template-areas: "tile thumb title" "tile thumb tag" "tile thumb round" "tile thumb who" "foot foot foot";
+}
+.tileCell > span { width: 36px; height: 36px; }
+
+/* Tablet (list beside the pane): no chevron, chip + due on the right. */
+@media (min-width: 600px) {
+  .row[aria-current="true"] { border-color: var(--theme-action); box-shadow: 0 0 0 1px var(--theme-action); background: color-mix(in srgb, var(--theme-action) 5%, var(--theme-surface)); }
+  .chev, .chipFloat { display: none; }
+  .row[data-kind="team"] .chipCell { display: inline-flex; }
+  .tileCell { align-self: center; }
+  /* The chip sits on the title line only; Due shares the tag line on the right, so it never narrows the title. */
+  .row[data-kind="team"] {
+    column-gap: 10px;
+    grid-template-columns: 36px 72px minmax(0, 1fr) auto;
+    grid-template-areas: "tile thumb title chip" "tile thumb tag tag" "tile thumb round round" "tile thumb who who";
+  }
+  .row[data-kind="team"] .due { grid-area: tag; justify-self: end; align-self: center; }
+  .row[data-kind="team"] .chipCell { align-self: start; }
+  .row[data-kind="client"] {
+    column-gap: 10px;
+    grid-template-columns: 36px 72px minmax(0, 1fr);
+    grid-template-areas: "tile thumb title" "tile thumb tag" "tile thumb round" "tile thumb who" "foot foot foot";
+  }
+  .row[data-kind="client"] .foot { margin-top: var(--ds-space-2); }
+  .thumb { align-self: center; }
+}
+
+/* Laptop (list 560 px+): a middle "Requested by / Due" column, chip at the far right. */
+@container aplist (min-width: 560px) {
+  /* Fixed middle and chip columns, so "Requested by / Due" lines up down the list and the title keeps ~210 px. */
+  .row[data-kind="team"] {
+    grid-template-columns: 36px 80px minmax(0, 1fr) 88px 112px;
+    grid-template-areas: "tile thumb title mid chip" "tile thumb tag mid chip" "tile thumb round mid chip";
+    column-gap: 10px;
+  }
+  .row[data-kind="team"] .mid { grid-area: mid; display: grid; align-content: center; align-self: stretch; gap: 2px; min-width: 0; }
+  .row[data-kind="team"] .who b { display: block; font-weight: var(--ds-weight-medium); }
+  .row[data-kind="team"] .who, .row[data-kind="team"] .due { grid-area: auto; justify-self: start; align-self: auto; }
+  .row[data-kind="team"] .chipCell { align-self: center; }
+  .row[data-kind="team"] .chipCell > span { white-space: nowrap; }
+  .row[data-kind="client"] {
+    grid-template-columns: 36px 80px minmax(0, 1fr) auto;
+    grid-template-areas: "tile thumb title foot" "tile thumb tag foot" "tile thumb round foot" "tile thumb who foot";
+    column-gap: 10px;
+  }
+  .row[data-kind="client"] .foot { flex-direction: column; align-items: flex-end; justify-content: center; align-self: center; margin: 0; }
+}
+
+/* ---------- Media placeholders (CSS art in the project's colour) ---------- */
+.thumb, .stage { position: relative; display: block; overflow: hidden; background: linear-gradient(180deg, var(--pm-soft) 0%, var(--pm-faint) 100%); }
+.thumb { width: 64px; height: 72px; border-radius: var(--ds-radius-md); }
+@media (min-width: 600px) { .thumb { width: 72px; height: 60px; } }
+@container aplist (min-width: 560px) { .thumb { width: 80px; height: 60px; } }
+.thumb[data-kind="pdf"], .stage[data-kind="pdf"] { background: var(--pm-soft); }
+
+/* A skyline: five towers on a ground strip. */
+.art { position: absolute; inset: 0; }
+.art::before {
+  content: ""; position: absolute; right: 6%; bottom: 14%; left: 6%; height: 70%; opacity: 0.88;
+  background:
+    linear-gradient(var(--pm-solid), var(--pm-solid)) 4% 100% / 15% 60% no-repeat,
+    linear-gradient(var(--pm-solid), var(--pm-solid)) 26% 100% / 17% 100% no-repeat,
+    linear-gradient(var(--pm-solid), var(--pm-solid)) 48% 100% / 12% 46% no-repeat,
+    linear-gradient(var(--pm-solid), var(--pm-solid)) 70% 100% / 17% 84% no-repeat,
+    linear-gradient(var(--pm-solid), var(--pm-solid)) 96% 100% / 13% 56% no-repeat;
+  /* Floors: thin gaps every few px so the blocks read as towers, not a bar chart. */
+  -webkit-mask-image: repeating-linear-gradient(to top, var(--theme-text) 0 6px, color-mix(in srgb, var(--theme-text) 55%, transparent) 6px 8px);
+  mask-image: repeating-linear-gradient(to top, var(--theme-text) 0 6px, color-mix(in srgb, var(--theme-text) 55%, transparent) 6px 8px);
+}
+.art::after { content: ""; position: absolute; inset: auto 0 0; height: 14%; background: color-mix(in srgb, var(--pm-hue) 45%, var(--theme-surface)); }
+
+.badge {
+  position: absolute; bottom: var(--ds-space-1); left: var(--ds-space-1); z-index: 1; display: inline-flex; align-items: center; gap: 2px;
+  padding: 1px var(--ds-space-1); border-radius: var(--ds-radius-xs); background: color-mix(in srgb, var(--theme-surface) 90%, transparent);
+  color: var(--theme-text); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); line-height: 1.3; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.badge svg { width: 12px; height: 12px; fill: currentColor; }
+
+/* A document page with a title bar and text lines. */
+.page {
+  position: absolute; top: 12%; right: 20%; bottom: 26%; left: 20%; border-radius: 3px; box-shadow: 0 1px 3px color-mix(in srgb, var(--theme-text) 18%, transparent);
+  background:
+    linear-gradient(var(--pm-faint), var(--pm-faint)) 50% 52% / 70% 3px no-repeat,
+    linear-gradient(var(--pm-faint), var(--pm-faint)) 50% 66% / 70% 3px no-repeat,
+    linear-gradient(var(--pm-faint), var(--pm-faint)) 26% 80% / 46% 3px no-repeat,
+    var(--theme-surface);
+}
+.page b { position: absolute; top: 3px; left: 4px; color: var(--pm-ink); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-heavy); line-height: 1.2; }
+
+.player { display: grid; margin: 0; min-width: 0; overflow: hidden; border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface-subtle); }
+.stage { aspect-ratio: 16 / 9; }
+.bigPlay {
+  position: absolute; top: 50%; left: 50%; display: grid; place-items: center; width: 56px; height: 56px; transform: translate(-50%, -50%);
+  border-radius: var(--ds-radius-pill); background: color-mix(in srgb, var(--theme-surface) 92%, transparent); color: var(--pm-ink); box-shadow: var(--ds-elev-2);
+}
+.bigPlay svg { width: var(--ds-icon-lg); height: var(--ds-icon-lg); margin-left: 3px; fill: currentColor; }
+.bigPage {
+  position: absolute; top: 10%; bottom: 0; left: 50%; display: flex; flex-direction: column; gap: var(--ds-space-1); width: min(46%, 220px); transform: translateX(-50%);
+  padding: var(--ds-space-3); border-radius: var(--ds-radius-sm) var(--ds-radius-sm) 0 0; box-shadow: var(--ds-elev-2); color: var(--pm-ink);
+  background:
+    linear-gradient(var(--pm-faint), var(--pm-faint)) 50% 46% / 78% 5px no-repeat,
+    linear-gradient(var(--pm-faint), var(--pm-faint)) 50% 58% / 78% 5px no-repeat,
+    linear-gradient(var(--pm-faint), var(--pm-faint)) 50% 70% / 78% 5px no-repeat,
+    linear-gradient(var(--pm-faint), var(--pm-faint)) 30% 82% / 52% 5px no-repeat,
+    var(--theme-surface);
+}
+.bigPage svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.bigPage b { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-heavy); }
+.controls { display: flex; align-items: center; gap: var(--ds-space-3); min-height: 44px; padding: 0 var(--ds-space-3); border-top: 1px solid var(--ds-line); color: var(--theme-text-muted); font-size: var(--ds-text-sm); font-variant-numeric: tabular-nums; }
+.controls svg { flex: none; width: var(--ds-icon-sm); height: var(--ds-icon-sm); }
+.time { flex: none; white-space: nowrap; }
+.track { flex: 1; height: 4px; min-width: 40px; overflow: hidden; border-radius: var(--ds-radius-pill); background: var(--theme-border); }
+.track i { display: block; width: 6%; height: 100%; background: var(--theme-text-muted); }
+.spacer { flex: 1; }
+
+/* ---------- Project tag ---------- */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; justify-self: start; max-width: 100%; min-height: 24px; padding: 2px var(--ds-space-2);
+  border-radius: var(--ds-radius-xs); background: var(--pm-soft); color: var(--theme-text); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); line-height: 1.3;
+}
+.pill::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: var(--ds-radius-pill); background: var(--pm-solid); }
+.pill > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- Detail pane (600 px+) ---------- */
+.pane { display: none; }
+@media (min-width: 600px) {
+  .pane {
+    position: sticky; top: var(--ds-space-4); display: grid; align-content: start; gap: var(--ds-space-3); min-width: 0; padding: var(--ds-space-4);
+    border: 1px solid var(--ds-line); border-radius: var(--ds-radius-xl); background: var(--theme-surface); box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 4%, transparent);
+  }
+}
+@media (min-width: 1100px) { .pane { padding: var(--ds-space-5); } }
+.dHead { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ds-space-3); min-width: 0; }
+.dHead > span { flex: none; }
+.dTitle { margin: 0; min-width: 0; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); letter-spacing: var(--ds-tracking-tight); line-height: 1.25; overflow-wrap: anywhere; }
+@media (min-width: 1100px) { .pane .dTitle { font-size: var(--ds-text-2xl); } }
+.dMeta { margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); line-height: 1.45; }
+.dMeta > span { white-space: nowrap; }
+.dHeadSheet { display: grid; gap: var(--ds-space-2); }
+.tagRow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2); }
+
+/* Pinned comments */
+.pinned { display: grid; gap: var(--ds-space-2); min-width: 0; }
+.h3 { display: flex; align-items: center; gap: var(--ds-space-2); margin: 0; color: var(--theme-text); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-strong); line-height: 1.3; }
+.h3 svg { flex: none; width: var(--ds-icon-sm); height: var(--ds-icon-sm); color: var(--theme-text-muted); }
+.comments { display: grid; gap: var(--ds-space-2); margin: 0; padding: 0; list-style: none; }
+.comment { display: grid; gap: var(--ds-space-1); min-width: 0; padding: var(--ds-space-2) var(--ds-space-3); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md); background: var(--theme-surface); }
+.comment p { margin: 0 0 0 36px; color: var(--theme-text); font-size: var(--ds-text-md); line-height: 1.45; overflow-wrap: anywhere; }
+
+/* Changes asked: locked until a new version (SPEC §1.8) */
+.locked { display: flex; align-items: flex-start; gap: var(--ds-space-3); padding: var(--ds-space-3); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md); background: var(--tone-waiting-soft); }
+.locked > svg { flex: none; width: var(--ds-icon-sm); height: var(--ds-icon-sm); margin-top: 2px; color: var(--tone-waiting); }
+.locked > div { display: grid; gap: var(--ds-space-1); min-width: 0; }
+.lockedTitle { margin: 0; color: var(--theme-text); font-size: var(--ds-text-md); font-weight: var(--ds-weight-strong); }
+.quote { margin: 0; color: var(--theme-text); font-size: var(--ds-text-md); line-height: 1.45; overflow-wrap: anywhere; }
+
+/* Decision */
+.decision { display: grid; gap: var(--ds-space-2); min-width: 0; }
+.decision[data-where="pane"] { margin-top: var(--ds-space-1); }
+.actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ds-space-3); min-width: 0; }
+.actions > * { width: 100%; min-width: 0; }
+.actions[data-compose] { grid-template-columns: minmax(0, 1fr) auto; }
+.actions[data-compose] > .cancel { width: auto; }
+.pane > .actions { grid-template-columns: auto; justify-content: start; }
+/* Detail card: Request changes is the longer label, so it gets the larger share; below 1100 px the card is ~330 px wide,
+   so the button icons go and the labels keep normal side padding. */
+.pane .decision > .actions:not([data-compose]) { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+@media (max-width: 1099.98px) { .pane .decision > .actions svg { display: none; } }
+/* Comment box open: shorter preview without its control bar, one-line pinned comments, so the box and Send request
+   stay above the fold. */
+[data-compose] .stage { aspect-ratio: 12 / 5; }
+[data-compose] .controls { display: none; }
+.pane[data-compose] .comment p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 379.98px) { .actions:not([data-compose]) { grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-2); } }
+.why { display: flex; align-items: center; gap: var(--ds-space-2); margin: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); }
+.why svg { flex: none; width: var(--ds-icon-xs); height: var(--ds-icon-xs); }
+.label { color: var(--theme-text); font-size: var(--ds-text-md); font-weight: var(--ds-weight-strong); }
+.textarea {
+  display: block; width: 100%; min-height: 76px; padding: var(--ds-space-2) var(--ds-space-3); resize: vertical;
+  border: 1px solid var(--theme-border-strong); border-radius: var(--ds-radius-md); background: var(--theme-surface); color: var(--theme-text);
+  font: inherit; font-size: max(16px, var(--ds-text-md)); line-height: 1.45;
+}
+.textarea::placeholder { color: var(--theme-text-muted); }
+.textarea:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 1px; }
+.textarea[aria-invalid="true"] { border-color: var(--tone-problem-mark); }
+.error { margin: 0; color: var(--tone-problem); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
+.cancel {
+  min-height: 44px; padding: 0 var(--ds-space-3); border: 0; border-radius: var(--ds-radius-md); background: none; color: var(--theme-action);
+  font: inherit; font-size: var(--ds-text-md); font-weight: var(--ds-weight-medium); text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.cancel:hover { background: var(--ds-hover); }
+.cancel:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+
+/* ---------- Phone detail sheet (hidden from 600 px, where the pane shows) ---------- */
+.layer {
+  position: fixed; inset: 0; z-index: var(--ds-z-sheet, 80); display: flex; align-items: flex-end;
+  background: color-mix(in srgb, var(--theme-canvas) 30%, color-mix(in srgb, var(--theme-text) 45%, transparent));
+}
+@media (min-width: 600px) { .layer { display: none; } }
+.sheet { display: flex; flex-direction: column; width: 100%; height: 92dvh; overflow: hidden; border-radius: var(--ds-radius-xl) var(--ds-radius-xl) 0 0; background: var(--theme-surface); box-shadow: var(--ds-elev-3); color: var(--theme-text); }
+.grip { flex: none; width: 40px; height: 4px; margin: var(--ds-space-2) auto 0; border-radius: var(--ds-radius-pill); background: var(--theme-border-strong); }
+.sheetScroll { display: grid; flex: 1; align-content: start; gap: var(--ds-space-3); min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--ds-space-2) var(--ds-space-4) var(--ds-space-4); }
+.sheetTop { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ds-space-2); }
+.close { display: grid; flex: none; place-items: center; width: 44px; height: 44px; margin: -8px -10px 0 0; border: 0; border-radius: var(--ds-radius-md); background: none; color: var(--theme-text-muted); cursor: pointer; }
+.close:hover { background: var(--ds-hover); color: var(--theme-text); }
+.close:focus-visible { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.close svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.sheetFoot { flex: none; padding: var(--ds-space-3) var(--ds-space-4) calc(var(--ds-space-3) + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--ds-line); background: var(--theme-surface); box-shadow: 0 -4px 12px color-mix(in srgb, var(--theme-text) 6%, transparent); }
+
+/* ---------- Empty ---------- */
+.empty { display: grid; justify-items: center; gap: var(--ds-space-2); padding: var(--ds-space-8) var(--ds-space-5); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface); text-align: center; }
+.empty > button, .empty > a { margin-top: var(--ds-space-2); }
+.emptyIcon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--ds-radius-pill); background: var(--theme-surface-subtle); color: var(--theme-text-muted); }
+.emptyIcon svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.emptyTitle { margin: 0; color: var(--theme-text); font-size: var(--ds-text-xl); font-weight: var(--ds-weight-strong); }

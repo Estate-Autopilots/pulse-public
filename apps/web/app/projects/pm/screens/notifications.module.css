@@ -1,0 +1,134 @@
+/* PM-UI 16 Notifications (Activity). Phone (< 600 px of content): one card per row; tile left, title (wraps) with the time
+   at the top right, the project line under it, then the chip left and the button right. From 600 px: one card per day,
+   one-line rows with hairlines; time, chip and button in fixed columns that line up down the page. From 960 px: the
+   whole feed inside one page card. Container queries on .wrap (content width, not viewport). Tokens only. */
+
+.wrap { container-type: inline-size; min-width: 0; }
+
+.screen {
+  --ac-line: var(--ds-line, var(--theme-border));
+  --ac-bone: color-mix(in srgb, var(--theme-text) 8%, var(--theme-surface));
+  display: grid; gap: var(--ds-space-3); width: 100%; max-width: 1150px; min-width: 0; margin-inline: auto; align-content: start;
+}
+
+/* ---------- Header ---------- */
+.head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ds-space-1) var(--ds-space-3); min-width: 0; }
+.h1 { margin: 0; color: var(--theme-text); font-size: var(--ds-text-2xl); font-weight: var(--ds-weight-heavy); letter-spacing: -0.02em; line-height: 1.15; }
+.unread { color: var(--theme-text-muted); font-size: var(--ds-text-md); font-weight: var(--ds-weight-medium); white-space: nowrap; }
+.markAll {
+  align-self: baseline; margin-left: auto; min-height: 44px; padding: 0 var(--ds-space-1); border: 0; background: none; cursor: pointer; white-space: nowrap;
+  color: var(--theme-action); font: inherit; font-size: var(--ds-text-md); font-weight: var(--ds-weight-medium);
+}
+.markAll:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
+.markAll:disabled { color: var(--theme-text-muted); opacity: 0.6; cursor: default; }
+
+/* ---------- Groups ---------- */
+.group { display: grid; gap: var(--ds-space-2); min-width: 0; }
+.groupTitle { margin: var(--ds-space-1) 0 0; color: var(--theme-text-muted); font-size: var(--ds-text-md); font-weight: var(--ds-weight-strong); line-height: 1.3; }
+.rows { display: grid; gap: var(--ds-space-3); min-width: 0; margin: 0; padding: 0; list-style: none; }
+
+/* ---------- Row (phone: its own card) ---------- */
+.row {
+  position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto;
+  /* Phone: the text block spans under the time (the project line uses the full width); the title keeps clear of it. */
+  grid-template-areas: "tile text text" ". foot foot";
+  align-items: start; gap: 2px var(--ds-space-3); min-width: 0;
+  padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-3) var(--ds-space-6);
+  border: 1px solid var(--ac-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 5%, transparent);
+}
+/* Unread dot at the far left edge; read rows keep the space (text never jumps). */
+.dot { position: absolute; left: 9px; top: calc(var(--ds-space-3) + 16px); width: 8px; height: 8px; border-radius: var(--ds-radius-pill); background: var(--theme-action); visibility: hidden; }
+.row[data-unread] .dot { visibility: visible; }
+.tile { grid-area: tile; display: inline-flex; }
+/* The project tile's icon is white in both themes (the kit's tile ink is the surface colour, dark in dark mode). */
+:global(:root[data-theme="dark"]) .tile > span:not([data-soft]) { color: var(--theme-text); }
+/* The text block (title + project line) is the link: at least 32px tall, and its ::after makes the whole row the link. */
+.text { grid-area: text; display: grid; align-content: start; gap: 2px; min-width: 0; min-height: 32px; color: inherit; text-decoration: none; }
+.title {
+  min-width: 0; color: var(--theme-text); font-size: var(--ds-text-md); font-weight: var(--ds-weight-strong);
+  line-height: 1.3; overflow-wrap: anywhere; text-wrap: pretty; padding-right: calc(5ch + var(--ds-space-2));
+}
+.text::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.row .text:focus-visible { outline: none; }
+.row:has(.text:focus-visible) { outline: 2px solid var(--theme-focus); outline-offset: 2px; }
+.row:has(.text:hover) { background: color-mix(in srgb, var(--theme-text) 3%, var(--theme-surface)); }
+.row:has(.text:hover) .titleText { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); }
+.meta { min-width: 0; color: var(--theme-text-muted); font-size: var(--ds-text-sm); line-height: 1.4; overflow-wrap: anywhere; }
+.time { grid-area: 1 / 3; padding-top: 2px; color: var(--theme-text-muted); font-size: var(--ds-text-xs); line-height: 1.3; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.foot { grid-area: foot; display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-2); min-width: 0; margin-top: var(--ds-space-2); }
+.chipCell { display: inline-flex; min-width: 0; }
+.actCell { position: relative; z-index: 1; display: inline-flex; justify-content: flex-end; }
+.btn { min-width: 104px; }
+
+.srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* ---------- Skeleton (same parts, same heights) ---------- */
+.row[data-ghost] { pointer-events: none; animation: pulse 1.6s ease-in-out infinite; }
+.row[data-ghost] :is(.titleText, .metaText, .timeText) {
+  color: transparent; background: var(--ac-bone); border-radius: var(--ds-radius-xs);
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.row[data-ghost] .tile > span { background: var(--ac-bone); }
+.row[data-ghost] .tile > span svg { visibility: hidden; }
+.row[data-ghost] .chipCell > span { color: transparent; background: var(--ac-bone); box-shadow: none; }
+.row[data-ghost] .actCell .btn { border-color: transparent; background: var(--ac-bone); color: transparent; }
+@keyframes pulse { 50% { opacity: 0.6; } }
+@media (prefers-reduced-motion: reduce) { .row[data-ghost] { animation: none; } }
+
+/* ---------- Empty ---------- */
+.empty {
+  display: grid; justify-items: center; gap: var(--ds-space-3); padding: var(--ds-space-8) var(--ds-space-4); text-align: center;
+  border: 1px solid var(--ac-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface);
+}
+.emptyIcon { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: var(--ds-radius-pill); background: var(--tone-waiting-soft); color: var(--tone-waiting); }
+.emptyIcon svg { width: var(--ds-icon-md); height: var(--ds-icon-md); }
+.emptyText { max-width: 36ch; margin: 0 0 var(--ds-space-1); color: var(--theme-text-muted); font-size: var(--ds-text-md); }
+
+/* ---------- Tablet: one card per day, one-line rows ---------- */
+@container (min-width: 600px) {
+  /* Buttons about 200 px wide; chip column just fits "Date moved"; 12 px gaps keep every title on one line at 834. */
+  .screen { --ac-time: 44px; --ac-chip: 100px; --ac-act: 192px; gap: var(--ds-space-4); }
+  .h1 { font-size: var(--ds-text-3xl); }
+  .rows {
+    gap: 0; overflow: hidden; border: 1px solid var(--ac-line); border-radius: var(--ds-radius-lg); background: var(--theme-surface);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-text) 5%, transparent);
+  }
+  .row {
+    grid-template-columns: 40px minmax(0, 1fr) var(--ac-time) var(--ac-chip) var(--ac-act);
+    grid-template-areas: "tile text time chip act";
+    align-items: center; gap: 2px var(--ds-space-3);
+    padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-3) var(--ds-space-8);
+    border: 0; border-radius: 0; box-shadow: none; background: none;
+  }
+  .row + .row { border-top: 1px solid var(--ac-line); }
+  .row:has(.text:focus-visible) { outline-offset: -2px; }
+  .dot { left: 12px; top: 50%; translate: 0 -50%; }
+  .tile { align-self: center; }
+  .text { align-self: center; align-content: center; }
+  .title { padding-right: 0; }
+  .time { grid-area: time; align-self: center; padding-top: 0; text-align: right; }
+  .foot { display: contents; }
+  .chipCell { grid-area: chip; align-self: center; }
+  .actCell { grid-area: act; align-self: center; }
+  .btn { width: 100%; min-width: 0; }
+}
+
+/* ---------- Laptop: the whole feed in one page card ---------- */
+@container (min-width: 960px) {
+  .screen {
+    --ac-time: 48px; --ac-chip: 152px; --ac-act: 200px; gap: var(--ds-space-3);
+    padding: var(--ds-space-6) var(--ds-space-8) var(--ds-space-4);
+    border: 1px solid var(--ac-line); border-radius: var(--ds-radius-xl); background: var(--theme-surface); box-shadow: var(--ds-elev-1);
+  }
+  .head { margin-bottom: var(--ds-space-1); }
+  .group + .group { padding-top: var(--ds-space-3); border-top: 1px solid var(--ac-line); }
+  .groupTitle { margin: 0; font-size: var(--ds-text-lg); }
+  .rows { overflow: visible; border: 0; border-radius: 0; box-shadow: none; background: none; }
+  /* No radius: the hairline between rows (border-top) must stay straight to its ends. */
+  .row { padding: var(--ds-space-4) 0 var(--ds-space-4) var(--ds-space-6); gap: 2px var(--ds-space-5); border-radius: 0; }
+  .row:has(.text:focus-visible) { outline-offset: 2px; }
+  .dot { left: 6px; }
+  .title { font-size: var(--ds-text-lg); }
+  .empty { border: 0; padding-block: var(--ds-space-8); }
+}

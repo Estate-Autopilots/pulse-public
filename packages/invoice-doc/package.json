@@ -1,0 +1,43 @@
+{
+  "name": "@pulse/invoice-doc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ERP-INVOICE: GST arithmetic and the invoice/quotation/credit-note document renderer (PDF and DOCX) shared by the live preview in the browser and the API's issue and export.",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./browser": {
+      "types": "./src/browser.d.ts",
+      "default": "./src/browser.js"
+    },
+    "./gst": {
+      "types": "./src/gst.d.ts",
+      "default": "./src/gst.js"
+    },
+    "./qty-dims": {
+      "types": "./src/qty-dims.d.ts",
+      "default": "./src/qty-dims.js"
+    },
+    "./quote-phases": {
+      "types": "./src/quote-phases.d.ts",
+      "default": "./src/quote-phases.js"
+    },
+    "./fonts/*": "./fonts/*"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=2 test/*.test.js",
+    "lint": "node --check src/index.js && node --check src/browser.js && node --check src/gst.js && node --check src/model.js && node --check src/qty-dims.js && node --check src/quote-phases.js && node --check src/sample.js && node --check src/pdf.js && node --check src/docx.js && node --check src/letter.js && node --check src/letter-docx.js && node --check src/agreement.js && node --check src/agreement-text.js && node --check src/doc-export.js && node --check src/contract-source.js && node --check src/contract-pdf.js && node --check src/signature-script.js && node --check src/signature-script-data.js && node --check src/signature-vector.js"
+  },
+  "dependencies": {
+    "@pdf-lib/fontkit": "1.1.1",
+    "docx": "9.8.1",
+    "pdf-lib": "1.17.1"
+  },
+  "devDependencies": {
+    "jszip": "3.10.2"
+  },
+  "sideEffects": false
+}

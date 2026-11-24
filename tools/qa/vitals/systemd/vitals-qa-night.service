@@ -1,0 +1,7 @@
+[Unit]
+Description=QA-2: Vitals night on dev (role walk, journeys, night matrix until 01:00 UTC; browser on nivi)
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /home/eadev/work/pulse/strike/tools/qa/vitals/night.sh
+Nice=10
+TimeoutStartSec=4h30min

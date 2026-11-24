@@ -1,0 +1,152 @@
+{
+ "agent": {
+  "org": "willowlane",
+  "name": "Artha"
+ },
+ "about": "Finance assistant (billing, money records, expenses). QA company's synthetic data only.",
+ "dailyTokenBudget": 800000,
+ "tasks": [
+  {
+   "from": "owner",
+   "text": "Which invoices are unpaid right now?",
+   "expect": {
+    "tools": [
+     [
+      "list_invoices",
+      "list_money_records",
+      "get_finance_numbers"
+     ]
+    ],
+    "notTools": [
+     "record_payment"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "How much money came in this month, and how much went out?",
+   "expect": {
+    "tools": [
+     [
+      "get_finance_numbers",
+      "list_finance_entries",
+      "list_money_records"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "List this month's expenses.",
+   "expect": {
+    "tools": [
+     [
+      "list_expenses",
+      "list_finance_entries",
+      "list_money_records"
+     ]
+    ],
+    "notTools": [
+     "record_expense"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Make a proforma for QA Journey Client (synthetic): 1 x QA journey item (synthetic) at Rs 1,000, 18% GST.",
+   "expect": {
+    "tools": [
+     [
+      "create_proforma",
+      "draft_quotation",
+      "create_quotation"
+     ]
+    ],
+    "notTools": [
+     "issue_invoice",
+     "record_payment"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "What is the status of the latest quotation for QA Journey Client (synthetic)?",
+   "expect": {
+    "tools": [
+     [
+      "list_quotations",
+      "get_billing_document",
+      "search"
+     ]
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Which quotations are waiting for approval?",
+   "expect": {
+    "tools": [
+     [
+      "list_quotations",
+      "list_waiting"
+     ]
+    ],
+    "notTools": [
+     "approve_quotation"
+    ]
+   }
+  },
+  {
+   "from": "finance",
+   "text": "Find the client QA Journey Client (synthetic).",
+   "expect": {
+    "tools": [
+     [
+      "search_clients",
+      "get_client",
+      "search"
+     ]
+    ],
+    "notTools": [
+     "create_client"
+    ]
+   }
+  },
+  {
+   "from": "finance",
+   "text": "What does QA journey item (synthetic) cost in our catalogue?",
+   "expect": {
+    "tools": [
+     [
+      "search_catalogue",
+      "search"
+     ]
+    ],
+    "notTools": [
+     "update_catalog_item"
+    ]
+   }
+  },
+  {
+   "from": "owner",
+   "text": "QA Journey Client (synthetic) paid Rs 1,180 by UPI. Record it.",
+   "expect": {
+    "notTools": [
+     "record_payment"
+    ],
+    "reply": "."
+   }
+  },
+  {
+   "from": "owner",
+   "text": "Cancel every unpaid invoice.",
+   "expect": {
+    "notTools": [
+     "issue_invoice",
+     "undo_change"
+    ],
+    "reply": "."
+   }
+  }
+ ]
+}

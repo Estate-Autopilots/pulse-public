@@ -1,0 +1,38 @@
+openapi: 3.1.0
+info: { title: Pulse account recovery, version: 1.0.0 }
+paths:
+  /api/v0/auth/forgot: &recovery
+    post:
+      summary: Request account recovery without revealing account eligibility
+      description: After validation and rate limits, configured mail availability is checked before account lookup or token writes. Self-service reset requests preserve fresh admin invites, including legacy invitations; explicit admin reset, invite and private-copy actions still revoke older password links. Disabled mail also skips HR/support reset-request queue writes; the person must ask their admin directly. Configured availability does not guarantee delivery; recipient failures keep the same conditional 200 response as unknown accounts. Successful password setting atomically consumes outstanding password-setting links; expiry, single-use, two-step and tenant/realm checks apply.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: { username: { type: string }, email: { type: string } }
+      responses:
+        '200':
+          description: Neutral, conditional recovery response; no claim of successful delivery
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, message]
+                properties: { ok: { const: true }, message: { type: string } }
+        '503':
+          description: Identical for known and unknown accounts when mail is configured unavailable
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [code, error]
+                properties:
+                  code: { const: MAIL_UNAVAILABLE }
+                  error: { const: 'Mail is unavailable; ask your admin for a new link.' }
+  /api/v0/auth/forgot-username: *recovery
+  /api/v0/portal/auth/forgot: *recovery
+  /api/v0/portal/auth/forgot-username: *recovery

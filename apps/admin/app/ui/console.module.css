@@ -1,0 +1,49 @@
+/* PULSE-ADMIN: the console's tables, forms and lists, on the kit's --sx-* tokens (ui/sx-tokens.css). */
+.stack { display: grid; gap: 16px; min-width: 0; align-content: start; }
+.split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; align-items: start; min-width: 0; }
+@media (max-width: 1100px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.name { color: var(--sx-ink); font-weight: 600; text-decoration: none; }
+.name:hover { color: var(--sx-accent); text-decoration: underline; }
+.sub { display: block; margin-top: 2px; color: var(--sx-muted); font-size: 12px; overflow-wrap: anywhere; }
+.muted { color: var(--sx-muted); }
+.nowrap { white-space: nowrap; }
+.code { font-family: var(--lx-font-mono, ui-monospace, monospace); font-size: 12px; overflow-wrap: anywhere; }
+.badges { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.chip { display: inline-flex; gap: 4px; align-items: baseline; margin: 0 10px 4px 0; }
+.meter { display: inline-grid; gap: 4px; min-width: 96px; font-variant-numeric: tabular-nums; text-align: left; }
+.meter small { color: var(--sx-muted); font-size: 11px; }
+.track { display: block; height: 4px; border-radius: 99px; background: var(--sx-sunken); overflow: hidden; }
+.track i { display: block; height: 100%; border-radius: 99px; background: var(--sx-accent); }
+.meter[data-over] i { background: var(--sx-bad); }
+.meter[data-over] > span:first-child { color: var(--sx-bad); }
+.form { display: grid; gap: 12px; padding: 14px 16px 16px; min-width: 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.heading { margin: 6px 0 0; font-size: 12px; font-weight: 650; color: var(--sx-muted); }
+.switches { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 4px 18px; }
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--sx-line); font-size: 13px; }
+.switch b { display: block; font-weight: 600; }
+.switch small { display: block; color: var(--sx-muted); font-size: 12px; }
+.switch input { width: 34px; height: 20px; accent-color: var(--sx-accent); }
+.error { margin: 0; color: var(--sx-bad); font-size: 13px; }
+.done { margin: 0; color: var(--sx-good); font-size: 13px; }
+.note { margin: 0; padding: 10px 16px 14px; color: var(--sx-muted); font-size: 13px; }
+.form .note { padding: 0; }
+.danger { color: var(--sx-bad) !important; border-color: color-mix(in oklab, var(--sx-bad) 45%, var(--sx-line)) !important; }
+.facts { display: grid; grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); gap: 8px 16px; margin: 0; padding: 12px 16px 16px; font-size: 13px; }
+.facts dt { color: var(--sx-muted); }
+.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.list { display: grid; margin: 0; padding: 0; list-style: none; }
+.item { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding: 12px 16px; border-bottom: 1px solid var(--sx-line); font-size: 13px; }
+.item:last-child { border-bottom: 0; }
+.item p { margin: 4px 0 0; }
+.item small { display: block; margin-top: 4px; color: var(--sx-muted); font-size: 12px; }
+.search { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--sx-line); }
+.search input { flex: 1 1 260px; min-width: 0; height: 34px; padding: 0 12px; border: 1px solid var(--sx-line-strong); border-radius: 8px; background: var(--sx-surface); }
+.search select { height: 34px; padding: 0 8px; border: 1px solid var(--sx-line-strong); border-radius: 8px; background: var(--sx-surface); }
+.viewAs { margin: 0 16px 16px; border: 1px solid color-mix(in oklab, var(--sx-accent) 40%, transparent); border-radius: 10px; background: color-mix(in oklab, var(--sx-accent) 6%, var(--sx-surface)); }
+.viewAsBar { display: flex; align-items: center; gap: 6px; margin: 0; padding: 8px 12px; border-bottom: 1px solid var(--sx-line); font-size: 12px; font-weight: 600; }
+.linkButton { border: 0; background: none; padding: 0 0 0 8px; color: var(--sx-accent); font-size: 12px; cursor: pointer; }
+@media (max-width: 640px) { .facts { grid-template-columns: minmax(0, 1fr); gap: 2px; } .facts dd { margin-bottom: 8px; } }
+.meter[data-near] i { background: var(--sx-warn); }
+.meter[data-near] > span:first-child { color: var(--sx-warn); }

@@ -1,0 +1,35 @@
+/* PM-BUILD-3: Approvals (the Mac's screen 05): two tabs, the team's review queue and what waits on clients. */
+.tabs { display: flex; gap: 6px; margin: 0 0 14px; border-bottom: 1px solid var(--theme-border); overflow-x: auto; scrollbar-width: none; }
+.tabs a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-bottom: 2px solid transparent; margin-bottom: -1px; font-size: 15px; font-weight: 600;
+  color: var(--theme-text-muted); text-decoration: none; white-space: nowrap; }
+.tabs a[aria-current="page"] { color: var(--theme-text); border-bottom-color: var(--theme-action); }
+.tabs b { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--theme-surface-subtle); font-size: 12.5px; color: var(--theme-text); }
+.panel { border: 1px solid var(--theme-border); border-radius: 16px; background: var(--theme-surface); padding: 8px 12px 12px; }
+.list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.item[data-plain] { border-left-width: 1px; }
+.tagPlain { font-weight: 600; color: var(--theme-text); }
+.review { display: inline-flex; align-items: center; min-height: 40px; padding: 0 18px; border-radius: 10px; border: 1px solid var(--theme-action); color: var(--theme-action); font-weight: 600; font-size: 14px; text-decoration: none; }
+.review:hover { background: color-mix(in srgb, var(--theme-action) 8%, var(--theme-surface)); }
+.item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 12px; align-items: center; padding: 14px; border-radius: 14px; border: 1px solid var(--theme-border);
+  border-left: 4px solid var(--pc); background: var(--theme-surface); }
+@media (min-width: 720px) { .item { grid-template-columns: auto minmax(0, 1fr) 300px; } .item[data-plain] { grid-template-columns: minmax(0, 1fr) 300px; } }
+.main { display: grid; gap: 3px; min-width: 0; }
+.title { font-size: 15px; color: var(--theme-text); overflow-wrap: anywhere; }
+.main small { font-size: 13px; color: var(--theme-text-muted); }
+.tag { display: inline-block; padding: 0 8px; border-radius: 999px; background: var(--pc-soft); color: var(--pc); font-weight: 600; }
+.end { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.end > .open, .end > .review { margin-left: auto; }
+@media (min-width: 720px) { .end { grid-column: -2; justify-content: flex-end; } }
+.chip { display: inline-flex; padding: 3px 10px; border-radius: 999px; background: var(--theme-surface-subtle); color: var(--theme-text); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.chip[data-tone="turn"] { background: color-mix(in srgb, #d98a00 16%, var(--theme-surface)); color: color-mix(in srgb, #8a5300 92%, var(--theme-text)); }
+.chip[data-tone="late"] { background: color-mix(in srgb, #d98a00 16%, var(--theme-surface)); color: color-mix(in srgb, #8a5300 92%, var(--theme-text)); }
+:global([data-theme="dark"]) .chip[data-tone="turn"] { background: color-mix(in srgb, #d98a00 16%, var(--theme-surface)); color: color-mix(in srgb, #8a5300 92%, var(--theme-text)); }
+.chip[data-tone="late"] { color: #f3c470; }
+.due { font-size: 12.5px; color: var(--theme-text-muted); }
+.open { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--theme-border-strong, var(--theme-border)); color: var(--theme-text);
+  font-weight: 600; font-size: 14px; text-decoration: none; }
+.open:hover { border-color: var(--theme-action); }
+.empty { display: grid; justify-items: center; gap: 6px; padding: 40px 16px; border: 1px dashed var(--theme-border); border-radius: 16px; text-align: center; color: var(--theme-text-muted); }
+.empty b { color: var(--theme-text); font-size: 16px; }
+.chip[data-tone="old"] { background: color-mix(in srgb, var(--theme-danger, #c62828) 14%, var(--theme-surface)); color: var(--theme-danger, #c62828); }
+:global([data-theme="dark"]) .chip[data-tone="old"] { color: #f6a3a3; }

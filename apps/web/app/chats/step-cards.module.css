@@ -1,0 +1,31 @@
+/* PM-BUILD-4: a step card under the viewer's own message (only they see it). Quiet: a thin card, one filled button. */
+.card { display: grid; gap: 8px; justify-self: end; width: min(360px, 74%); margin: 8px 0 10px auto; padding: 10px 12px 12px; border: 1px solid var(--theme-border); border-radius: 10px; background: var(--theme-surface); color: var(--theme-text); font-size: 13.5px; }
+.only { display: flex; align-items: center; gap: 5px; margin: 0; color: var(--theme-text-muted); font-size: 13px; }
+.only svg { width: 14px; height: 14px; flex: none; }
+.only > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ask { margin: 0; font-size: 14.5px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.list { margin: 0; padding-left: 18px; color: var(--theme-text-muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.yes, .no, .pick, .undo { min-height: 36px; padding: 0 12px; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer; }
+.yes { border: 0; background: var(--theme-action); color: var(--theme-action-text, #fff); }
+.pick { border: 1px solid var(--theme-border-strong, var(--theme-border)); background: var(--theme-surface); color: var(--theme-text); text-align: left; max-width: 100%; overflow-wrap: anywhere; }
+.no { border: 1px solid var(--theme-border); background: transparent; color: var(--theme-text); }
+.undo { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; margin-left: auto; padding: 0 8px; border: 0; background: transparent; color: var(--theme-action); }
+.undo svg { width: 14px; height: 14px; }
+.done { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 8px; margin: 0; }
+.doneStep { grid-column: 2 / 4; margin: 0; color: var(--theme-text); font-size: 13.5px; overflow-wrap: anywhere; }
+.done > svg { flex: none; width: 16px; height: 16px; color: #23a55a; }
+.done > span { overflow-wrap: anywhere; }
+.err { margin: 0; color: var(--theme-danger); font-size: 12.5px; }
+.yes:disabled, .no:disabled, .pick:disabled, .undo:disabled { opacity: 0.6; cursor: default; }
+.yes:focus-visible, .no:focus-visible, .pick:focus-visible, .undo:focus-visible { outline: 2px solid var(--theme-action); outline-offset: 2px; }
+.quiet { min-height: 32px; padding: 0 4px; border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 600; color: var(--theme-text-muted); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.quiet:disabled { opacity: 0.6; }
+/* The app's own primary in dark mode (ui.module.css): deep violet, white words. */
+:global(:root[data-theme="dark"]) .yes:not(:disabled) { background: #6B4CF0; color: #fff; }
+/* In a list, only the first card's answer is the filled button (one filled button per view). */
+.yes[data-quiet] { border: 1.5px solid var(--theme-action); background: var(--theme-surface); color: var(--theme-action); }
+:global(:root[data-theme="dark"]) .yes[data-quiet]:not(:disabled) { border-color: #9b86ff; background: transparent; color: #d8cfff; }
+@media (max-width: 600px) { .card { width: 84%; } }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.row > .ask { flex: 1 1 220px; }
